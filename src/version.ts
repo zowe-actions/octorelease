@@ -63,10 +63,6 @@ export async function version(branch: IProtectedBranch, eventData: any): Promise
 
         // TODO Update changelog
 
-        // Check if there are changes to push
-        cmdOutput = (await utils.execAndReturnOutput("git", ["cherry"])).trim();
-        if (cmdOutput.length > 0) {
-            await exec.exec(`git push origin ${branch.name}`);
-        }
+        utils.gitPush(branch.name);
     }
 }

@@ -1002,13 +1002,13 @@ function run() {
         try {
             const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
             const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-            const ciSkipPhrase = core.getInput("ciSkipPhrase");
+            const ciSkipPhrase = core.getInput("ci-skip-phrase");
             // Check for CI skip
             if (((_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message) && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
                 core.info("Commit message contains CI skip phrase so exiting now");
                 process.exit();
             }
-            const configFile = core.getInput("configFile");
+            const configFile = core.getInput("config-file");
             const config = yaml.safeLoad(fs.readFileSync(configFile).toString());
             const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
             const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
@@ -3081,11 +3081,33 @@ function execAndReturnOutput(commandLine, args) {
 exports.execAndReturnOutput = execAndReturnOutput;
 function gitCommit(message) {
     return __awaiter(this, void 0, void 0, function* () {
-        const ciSkipPhrase = core.getInput("ciSkipPhrase");
+        // const gitUser = "zowe-robot";
+        // const gitEmail = "zowe.robot@gmail.com";
+        const gitUser = "Timothy Johnson";
+        const gitEmail = "timothy.johnson@broadcom.com";
+        const ciSkipPhrase = core.getInput("ci-skip-phrase");
+        yield exec.exec(`git config --global user.name "${gitUser}"`);
+        yield exec.exec(`git config --global user.email "${gitEmail}"`);
         yield exec.exec(`git commit -m "${message} [${ciSkipPhrase}]" -s`);
     });
 }
 exports.gitCommit = gitCommit;
+function gitPush(branch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Check if there is anything to push
+        const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
+        if (cmdOutput.length == 0) {
+            return;
+        }
+        // const gitUser = "zowe-robot";
+        const gitUser = "tjohnsonBCM";
+        const authToken = core.getInput("repo-token");
+        const repository = requireEnvVar("GITHUB_REPOSITORY");
+        yield exec.exec(`git remote add origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+        yield exec.exec(`git push -u origin ${branch}`);
+    });
+}
+exports.gitPush = gitPush;
 function requireEnvVar(name) {
     const value = process.env[name];
     if (value == null) {
@@ -7033,11 +7055,7 @@ function version(branch, eventData) {
                 }
             }
             // TODO Update changelog
-            // Check if there are changes to push
-            cmdOutput = (yield utils.execAndReturnOutput("git", ["cherry"])).trim();
-            if (cmdOutput.length > 0) {
-                yield exec.exec(`git push origin ${branch.name}`);
-            }
+            utils.gitPush(branch.name);
         }
     });
 }
