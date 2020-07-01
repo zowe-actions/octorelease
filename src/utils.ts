@@ -1,3 +1,4 @@
+import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
 export async function execAndReturnOutput(commandLine: string, args?: string[]): Promise<string> {
@@ -11,6 +12,11 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
     };
     await exec.exec(commandLine, args, options);
     return capturedOutput;
+}
+
+export async function gitCommit(message: string): Promise<void> {
+    const ciSkipPhrase = core.getInput("ciSkipPhrase");
+    await exec.exec(`git commit -m "${message} [${ciSkipPhrase}]" -s`);
 }
 
 export function requireEnvVar(name: string): string {

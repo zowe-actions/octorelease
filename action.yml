@@ -2,14 +2,18 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
+  ciSkipPhrase:
+    description: 'Specifies phrase in commit message to trigger CI skip'
+    required: false
+    default: 'ci skip'
   configFile:
     description: 'Path to YAML config'
     required: false
     default: './zowe-deploy.yml'
   deploy:
-    description: 'Specifies whether deploy stage should run'
+    description: 'Specifies type of deploy stage that should run'
     required: false
-    default: 'true'
+    default: 'none'
   version:
     description: 'Specifies whether version stage should run'
     required: false
