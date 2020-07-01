@@ -997,22 +997,35 @@ const yaml = __importStar(__webpack_require__(414));
 const utils = __importStar(__webpack_require__(451));
 const version_1 = __webpack_require__(775);
 function run() {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
+            const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+            const ciSkipPhrase = core.getInput("ciSkipPhrase");
+            // Check for CI skip
+            if (((_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message) && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
+                core.info("Commit message contains CI skip phrase so exiting now");
+                process.exit();
+            }
             const configFile = core.getInput("configFile");
             const config = yaml.safeLoad(fs.readFileSync(configFile).toString());
             const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
             const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
+            // Check if protected branch is in config
             if (branchNames.indexOf(currentBranch) === -1) {
                 core.info(`${currentBranch} is not a protected branch in ${configFile} so exiting now`);
                 process.exit();
             }
             const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
             if (core.getInput("version") === "true") {
-                yield version_1.version(protectedBranch);
+                yield version_1.version(protectedBranch, eventData);
             }
-            if (core.getInput("deploy") === "true") {
-                // await deploy(protectedBranch);
+            if (core.getInput("deploy") === "npm") {
+                // await deployNpm(protectedBranch);
+            }
+            else if (core.getInput("deploy") === "vsix") {
+                // await deployVsix(protectedBranch);
             }
         }
         catch (error) {
@@ -3049,6 +3062,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 function execAndReturnOutput(commandLine, args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -3065,6 +3079,13 @@ function execAndReturnOutput(commandLine, args) {
     });
 }
 exports.execAndReturnOutput = execAndReturnOutput;
+function gitCommit(message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const ciSkipPhrase = core.getInput("ciSkipPhrase");
+        yield exec.exec(`git commit -m "${message} [${ciSkipPhrase}]" -s`);
+    });
+}
+exports.gitCommit = gitCommit;
 function requireEnvVar(name) {
     const value = process.env[name];
     if (value == null) {
@@ -6959,14 +6980,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
 const utils = __importStar(__webpack_require__(451));
-function version(protectedBranch) {
+function updateDependency(pkgName, pkgTag, packageJson, dev) {
     return __awaiter(this, void 0, void 0, function* () {
-        const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
-        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+        const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
+        let currentVersion = dependencies[pkgName];
+        if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
+            currentVersion = currentVersion.slice(1);
+        }
+        const latestVersion = (yield utils.execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+        if (currentVersion !== latestVersion) {
+            const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
+            yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
+            yield exec.exec(`git add package.json package-lock.json`);
+            yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
+        }
+    });
+}
+function version(branch, eventData) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let cmdOutput;
         let oldPackageJson = {};
         try {
-            const cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
+            cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
             oldPackageJson = JSON.parse(cmdOutput);
         }
         catch (_a) {
@@ -6975,16 +7012,32 @@ function version(protectedBranch) {
         const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
         if (oldPackageJson.version !== newPackageJson.version) {
             // Check semver level to see if new version is ok
-            if (protectedBranch.level && protectedBranch.level !== "major" && oldPackageJson.version) {
+            if (branch.level && branch.level !== "major" && oldPackageJson.version) {
                 const semverDiff = __webpack_require__(104); // eslint-disable-line @typescript-eslint/no-var-requires
                 const semverLevel = semverDiff(oldPackageJson.version, newPackageJson.version);
-                if (semverLevel === "major" || (semverLevel === "minor" && protectedBranch.level !== "minor")) {
-                    core.setFailed(`Protected branch ${protectedBranch.name} does not allow ${semverLevel} version changes`);
+                if (semverLevel === "major" || (semverLevel === "minor" && branch.level !== "minor")) {
+                    core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
                     process.exit();
                 }
             }
             // Update dependencies in package.json and package-lock.json
-            // Update changelog
+            if (branch.dependencies) {
+                for (const pkgName of Object.keys(branch.dependencies)) {
+                    yield updateDependency(pkgName, branch.dependencies[pkgName], newPackageJson, false);
+                }
+            }
+            // Update dev dependencies in package.json and package-lock.json
+            if (branch.devDependencies) {
+                for (const pkgName of Object.keys(branch.devDependencies)) {
+                    yield updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
+                }
+            }
+            // TODO Update changelog
+            // Check if there are changes to push
+            cmdOutput = (yield utils.execAndReturnOutput("git", ["cherry"])).trim();
+            if (cmdOutput.length > 0) {
+                yield exec.exec(`git push origin ${branch.name}`);
+            }
         }
     });
 }
