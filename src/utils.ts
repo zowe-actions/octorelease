@@ -19,11 +19,10 @@ export async function gitCommit(message: string): Promise<void> {
     // const gitEmail = "zowe.robot@gmail.com";
     const gitUser = "Timothy Johnson";
     const gitEmail = "timothy.johnson@broadcom.com";
-    const ciSkipPhrase = core.getInput("ci-skip-phrase");
 
     await exec.exec(`git config --global user.name "${gitUser}"`);
     await exec.exec(`git config --global user.email "${gitEmail}"`);
-    await exec.exec(`git commit -m "${message} [${ciSkipPhrase}]" -s`);
+    await exec.exec(`git commit -m "${message} [ci skip]" -s`);
 }
 
 export async function gitPush(branch: string): Promise<void> {

@@ -8,16 +8,6 @@ import { version } from "./version";
 
 async function run(): Promise<void> {
     try {
-        const eventPath: string = utils.requireEnvVar("GITHUB_EVENT_PATH");
-        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-        const ciSkipPhrase = core.getInput("ci-skip-phrase");
-
-        // Check for CI skip
-        if (eventData?.head_commit?.message && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
-            core.info("Commit message contains CI skip phrase so exiting now");
-            process.exit();
-        }
-
         const configFile: string = core.getInput("config-file");
         const config: IConfig = yaml.safeLoad(fs.readFileSync(configFile).toString()) as IConfig;
         const branchNames: string[] = (config.protectedBranches || []).map((branch: IProtectedBranch) => branch.name);
@@ -32,7 +22,7 @@ async function run(): Promise<void> {
         const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
 
         if (core.getInput("version") === "true") {
-            await version(protectedBranch, eventData);
+            await version(protectedBranch);
         }
 
         if (core.getInput("deploy") === "npm") {

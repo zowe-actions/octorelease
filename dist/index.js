@@ -997,17 +997,8 @@ const yaml = __importStar(__webpack_require__(414));
 const utils = __importStar(__webpack_require__(451));
 const version_1 = __webpack_require__(775);
 function run() {
-    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
-            const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-            const ciSkipPhrase = core.getInput("ci-skip-phrase");
-            // Check for CI skip
-            if (((_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message) && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
-                core.info("Commit message contains CI skip phrase so exiting now");
-                process.exit();
-            }
             const configFile = core.getInput("config-file");
             const config = yaml.safeLoad(fs.readFileSync(configFile).toString());
             const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
@@ -1019,7 +1010,7 @@ function run() {
             }
             const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
             if (core.getInput("version") === "true") {
-                yield version_1.version(protectedBranch, eventData);
+                yield version_1.version(protectedBranch);
             }
             if (core.getInput("deploy") === "npm") {
                 // await deployNpm(protectedBranch);
@@ -3085,10 +3076,9 @@ function gitCommit(message) {
         // const gitEmail = "zowe.robot@gmail.com";
         const gitUser = "Timothy Johnson";
         const gitEmail = "timothy.johnson@broadcom.com";
-        const ciSkipPhrase = core.getInput("ci-skip-phrase");
         yield exec.exec(`git config --global user.name "${gitUser}"`);
         yield exec.exec(`git config --global user.email "${gitEmail}"`);
-        yield exec.exec(`git commit -m "${message} [${ciSkipPhrase}]" -s`);
+        yield exec.exec(`git commit -m "${message} [ci skip]" -s`);
     });
 }
 exports.gitCommit = gitCommit;
@@ -7020,8 +7010,10 @@ function updateDependency(pkgName, pkgTag, packageJson, dev) {
         }
     });
 }
-function version(branch, eventData) {
+function version(branch) {
     return __awaiter(this, void 0, void 0, function* () {
+        const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
+        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
         let cmdOutput;
         let oldPackageJson = {};
         try {

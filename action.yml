@@ -2,10 +2,6 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  ci-skip-phrase:
-    description: 'Specifies phrase in commit message to trigger CI skip'
-    required: false
-    default: 'ci skip'
   config-file:
     description: 'Path to YAML config'
     required: false

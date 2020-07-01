@@ -22,7 +22,9 @@ async function updateDependency(pkgName: string, pkgTag: string, packageJson: an
     }
 }
 
-export async function version(branch: IProtectedBranch, eventData: any): Promise<void> {
+export async function version(branch: IProtectedBranch): Promise<void> {
+    const eventPath: string = utils.requireEnvVar("GITHUB_EVENT_PATH");
+    const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
     let cmdOutput: string;
     let oldPackageJson: any = {};
 
