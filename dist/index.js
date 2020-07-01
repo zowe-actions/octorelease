@@ -6966,11 +6966,11 @@ function version(protectedBranch) {
         const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
         let oldPackageJson = {};
         try {
-            const cmdOutput = yield utils.execAndReturnOutput("git", ["show", "--no-pager", `${eventData.before}:package.json`]);
+            const cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
             oldPackageJson = JSON.parse(cmdOutput);
         }
         catch (_a) {
-            core.warning(`Missing or invalid package.json at ${eventData.before}`);
+            core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
         }
         const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
         if (oldPackageJson.version !== newPackageJson.version) {
