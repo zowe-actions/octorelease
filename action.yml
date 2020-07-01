@@ -2,9 +2,18 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  configFile:
+    description: 'Path to YAML config'
+    required: false
+    default: './zowe-deploy.yml'
+  deploy:
+    description: 'Specifies whether deploy stage should run'
+    required: false
+    default: 'true'
+  version:
+    description: 'Specifies whether version stage should run'
+    required: false
+    default: 'true'
 runs:
   using: 'node12'
   main: 'dist/index.js'

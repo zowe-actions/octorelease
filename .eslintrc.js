@@ -6,7 +6,6 @@ module.exports = {
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:github/es6",
         "plugin:jest/recommended"
     ],
     "parser": "@typescript-eslint/parser",
@@ -18,6 +17,6 @@ module.exports = {
         "@typescript-eslint"
     ],
     "rules": {
-        "import/no-namespace": "off"
+        "@typescript-eslint/no-explicit-any": "off"
     }
 };
