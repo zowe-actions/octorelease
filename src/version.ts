@@ -9,10 +9,10 @@ export async function version(protectedBranch: IProtectedBranch): Promise<void> 
     let oldPackageJson: any = {};
 
     try {
-        const cmdOutput = await utils.execAndReturnOutput("git", ["show", "--no-pager", `${eventData.before}:package.json`]);
+        const cmdOutput = await utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
         oldPackageJson = JSON.parse(cmdOutput);
     } catch {
-        core.warning(`Missing or invalid package.json at ${eventData.before}`);
+        core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
     }
 
     const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
