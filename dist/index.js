@@ -3103,7 +3103,7 @@ function gitPush(branch) {
         const gitUser = "tjohnsonBCM";
         const authToken = core.getInput("repo-token");
         const repository = requireEnvVar("GITHUB_REPOSITORY");
-        yield exec.exec(`git remote add origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+        yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
         yield exec.exec(`git push -u origin ${branch}`);
     });
 }

@@ -37,7 +37,7 @@ export async function gitPush(branch: string): Promise<void> {
     const gitUser = "tjohnsonBCM";
     const authToken: string = core.getInput("repo-token");
     const repository: string = requireEnvVar("GITHUB_REPOSITORY");
-    await exec.exec(`git remote add origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+    await exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
     await exec.exec(`git push -u origin ${branch}`);
 }
 
