@@ -15499,28 +15499,26 @@ function updateDependency(pkgName, pkgTag, packageJson, dev) {
  * @param pkgVer - New version of the package
  */
 function updateChangelog(pkgVer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const changelogFile = "CHANGELOG.md";
-        if (!fs.existsSync(changelogFile)) {
-            core.warning("Missing changelog file, skipping changelog update");
-            return;
-        }
-        const changelogHeader = core.getInput("changelog-header");
-        if (!changelogHeader) {
-            core.warning("Changelog header was not defined, skipping changelog update");
-            return;
-        }
-        const changelogContents = fs.readFileSync(changelogFile).toString();
-        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
-            core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
-            return;
-        }
-        if (changelogContents.indexOf(changelogHeader) === -1) {
-            core.warning("Changelog header not found in changelog file, skipping changelog update");
-            return;
-        }
-        yield exec.exec("sed -i 's/" + changelogHeader + "/## \\`" + pkgVer + "\\`/' " + changelogFile);
-    });
+    const changelogFile = "CHANGELOG.md";
+    if (!fs.existsSync(changelogFile)) {
+        core.warning("Missing changelog file, skipping changelog update");
+        return;
+    }
+    const changelogHeader = core.getInput("changelog-header");
+    if (!changelogHeader) {
+        core.warning("Changelog header was not defined, skipping changelog update");
+        return;
+    }
+    const changelogContents = fs.readFileSync(changelogFile).toString();
+    if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
+        core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
+        return;
+    }
+    if (changelogContents.indexOf(changelogHeader) === -1) {
+        core.warning("Changelog header not found in changelog file, skipping changelog update");
+        return;
+    }
+    fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
 }
 function version(branch) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -15564,7 +15562,7 @@ function version(branch) {
             // Update version number in package-lock.json and changelog
             yield exec.exec("git reset --hard");
             const gitTag = (yield utils.execAndReturnOutput(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`)).trim();
-            yield updateChangelog(newPackageJson.version);
+            updateChangelog(newPackageJson.version);
             // Commit version bump and create tag
             yield exec.exec("git add -u");
             yield utils.gitCommit(`Bump version to ${newPackageJson.version}`);

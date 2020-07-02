@@ -36,7 +36,7 @@ async function updateDependency(pkgName: string, pkgTag: string, packageJson: an
  * recent changes with a header for the new version.
  * @param pkgVer - New version of the package
  */
-async function updateChangelog(pkgVer: string): Promise<void> {
+function updateChangelog(pkgVer: string): void {
     const changelogFile = "CHANGELOG.md";
     if (!fs.existsSync(changelogFile)) {
         core.warning("Missing changelog file, skipping changelog update");
@@ -60,7 +60,7 @@ async function updateChangelog(pkgVer: string): Promise<void> {
         return;
     }
 
-    await exec.exec("sed -i 's/" + changelogHeader + "/## \\`" + pkgVer + "\\`/' " + changelogFile);
+    fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
 }
 
 export async function version(branch: IProtectedBranch): Promise<void> {
@@ -111,7 +111,7 @@ export async function version(branch: IProtectedBranch): Promise<void> {
         // Update version number in package-lock.json and changelog
         await exec.exec("git reset --hard");
         const gitTag = (await utils.execAndReturnOutput(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`)).trim();
-        await updateChangelog(newPackageJson.version);
+        updateChangelog(newPackageJson.version);
 
         // Commit version bump and create tag
         await exec.exec("git add -u");
