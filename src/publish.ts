@@ -17,9 +17,9 @@ export async function publishGithub(): Promise<void> {
 
         let lineNum = changelogLines.indexOf("## `" + packageJson.version + "`");
         if (lineNum !== -1) {
-            while (changelogLines[lineNum + 1] && !changelogLines[lineNum + 1].startsWith("##")) {
-                releaseNotes += changelogLines[lineNum] + "\n";
+            while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("##")) {
                 lineNum++;
+                releaseNotes += changelogLines[lineNum] + "\n";
             }
         } else {
             core.warning(`Missing changelog header for version ${packageJson.version}`);
@@ -35,7 +35,7 @@ export async function publishGithub(): Promise<void> {
     const release = await octokit.repos.createRelease({
         owner, repo,
         tag_name: "v" + packageJson.version,
-        body: releaseNotes || undefined
+        body: releaseNotes.trim() || undefined
     })
 
     // Upload artifacts to release
