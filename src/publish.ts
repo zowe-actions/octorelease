@@ -51,9 +51,13 @@ export async function publishGithub(): Promise<void> {
     }
 
     // Upload artifacts to release
-    const artifactPaths: string[] = core.getInput("github-artifacts").split(",").map(s => s.trim());
+    const artifactPaths: string[] = [];
+    const glob = require("glob");
     const mime = require("mime-types");
-    for (const artifactPath of artifactPaths) {
+    core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
+        artifactPaths.push(...glob.sync(artifactPattern));
+    });
+    for (const artifactPath of artifactPaths.map(s => s.trim())) {
         await octokit.repos.uploadReleaseAsset({
             owner, repo, release_id,
             name: path.basename(artifactPath),

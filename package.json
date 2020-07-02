@@ -27,6 +27,7 @@
     "@actions/core": "^1.2.0",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",
+    "glob": "^7.1.6",
     "js-yaml": "^3.14.0",
     "mime-types": "^2.1.27",
     "npm-cli-login": "^0.1.1",
