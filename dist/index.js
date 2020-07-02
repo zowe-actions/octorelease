@@ -43869,7 +43869,7 @@ function version(branch) {
             // Update changelog
             yield updateChangelog(newPackageJson);
             // Update version number in package-lock.json and add Git tag
-            yield exec.exec(`npm version ${newPackageJson.version}`);
+            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version`);
             // Push commits and tag
             utils.gitPush(branch.name, true);
         }
