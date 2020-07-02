@@ -29288,7 +29288,7 @@ function version(branch) {
             // Commit version bump and create tag
             yield exec.exec("git add -u");
             yield utils.gitCommit(`Bump version to ${newPackageJson.version}`);
-            yield exec.exec(`git tag v${newPackageJson.version} -m "Release %s to ${branch.tag}"`);
+            yield exec.exec(`git tag v${newPackageJson.version} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
             // Push commits and tag
             yield utils.gitPush(branch.name, true);
         }

@@ -103,7 +103,7 @@ export async function version(branch: IProtectedBranch): Promise<void> {
         // Commit version bump and create tag
         await exec.exec("git add -u");
         await utils.gitCommit(`Bump version to ${newPackageJson.version}`);
-        await exec.exec(`git tag v${newPackageJson.version} -m "Release %s to ${branch.tag}"`);
+        await exec.exec(`git tag v${newPackageJson.version} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
 
         // Push commits and tag
         await utils.gitPush(branch.name, true);
