@@ -2,6 +2,10 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
+  changelog-header:
+    description: 'Changelog header used to track changes for new version'
+    required: false
+    default: ''
   config-file:
     description: 'Path to YAML config'
     required: false

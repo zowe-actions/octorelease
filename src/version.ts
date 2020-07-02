@@ -22,12 +22,42 @@ async function updateDependency(pkgName: string, pkgTag: string, packageJson: an
     }
 }
 
+async function updateChangelog(packageJson: any): Promise<void> {
+    const changelogFile = "CHANGELOG.md";
+    if (!fs.existsSync(changelogFile)) {
+        core.warning("Missing changelog file, skipping changelog update");
+        return;
+    }
+
+    const changelogHeader = core.getInput("changelog-header");
+    if (!changelogHeader) {
+        core.warning("Changelog header was not defined, skipping changelog update")
+        return;
+    }
+
+    const changelogContents: string = fs.readFileSync(changelogFile).toString();
+    if (changelogContents.indexOf("## `" + packageJson.version + "`") !== -1) {
+        core.warning(`Changelog header already exists for version ${packageJson.version}, skipping changelog update`);
+        return;
+    }
+
+    if (changelogContents.indexOf(changelogHeader) === -1) {
+        core.warning("Changelog header not found in changelog file, skipping changelog update");
+        return;
+    }
+
+    await exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
+    await exec.exec(`git add ${changelogFile}`);
+    // Don't commit here since npm version can handle it
+}
+
 export async function version(branch: IProtectedBranch): Promise<void> {
     const eventPath: string = utils.requireEnvVar("GITHUB_EVENT_PATH");
     const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
     let cmdOutput: string;
     let oldPackageJson: any = {};
 
+    // Load old package.json from base ref
     try {
         await exec.exec(`git fetch origin ${eventData.before}`);
         cmdOutput = await utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
@@ -65,17 +95,7 @@ export async function version(branch: IProtectedBranch): Promise<void> {
         }
 
         // Update changelog
-        const changelogFile = "CHANGELOG.md";
-        const changelogHeader = "## Recent Changes";
-        const changelogContents: string = fs.readFileSync(changelogFile).toString();
-        if (changelogContents.indexOf("## `" + newPackageJson.version + "`") !== -1) {
-            if (changelogContents.indexOf(changelogHeader) !== -1) {
-                await exec.exec("sed -i 's/" + changelogHeader + "/## `" + newPackageJson.version + "`/' " + changelogFile);
-                await exec.exec(`git add ${changelogFile}`);
-            } else {
-                core.warning(`Could not find ${changelogHeader} header in changelog`);
-            }
-        }
+        await updateChangelog(newPackageJson);
 
         // Update version number in package-lock.json and add Git tag
         await exec.exec(`npm version ${newPackageJson.version}`);
