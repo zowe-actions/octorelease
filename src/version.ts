@@ -47,8 +47,6 @@ async function updateChangelog(packageJson: any): Promise<void> {
     }
 
     await exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
-    await exec.exec(`git add ${changelogFile}`);
-    await utils.gitCommit(`Update changelog for v${packageJson.version}`);
 }
 
 export async function version(branch: IProtectedBranch): Promise<void> {
@@ -97,13 +95,15 @@ export async function version(branch: IProtectedBranch): Promise<void> {
             }
         }
 
-        // Update changelog
+        // Update version number in package-lock.json and changelog
+        await exec.exec("git reset --hard");
+        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`);
         await updateChangelog(newPackageJson);
 
-        // Update version number in package-lock.json and add Git tag
-        await exec.exec("git reset --hard");
-        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Release %s to ${branch.tag}"`);
-        await utils.gitCommit(`Bump version to ${newPackageJson.version}`, true);
+        // Commit version bump and create tag
+        await exec.exec("git add -u");
+        await utils.gitCommit(`Bump version to ${newPackageJson.version}`);
+        await exec.exec(`git tag v${newPackageJson.version} -m "Release %s to ${branch.tag}"`);
 
         // Push commits and tag
         await utils.gitPush(branch.name, true);

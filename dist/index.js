@@ -29228,8 +29228,6 @@ function updateChangelog(packageJson) {
             return;
         }
         yield exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
-        yield exec.exec(`git add ${changelogFile}`);
-        yield utils.gitCommit(`Update changelog for v${packageJson.version}`);
     });
 }
 function version(branch) {
@@ -29272,12 +29270,14 @@ function version(branch) {
                     yield updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
                 }
             }
-            // Update changelog
-            yield updateChangelog(newPackageJson);
-            // Update version number in package-lock.json and add Git tag
+            // Update version number in package-lock.json and changelog
             yield exec.exec("git reset --hard");
-            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Release %s to ${branch.tag}"`);
-            yield utils.gitCommit(`Bump version to ${newPackageJson.version}`, true);
+            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`);
+            yield updateChangelog(newPackageJson);
+            // Commit version bump and create tag
+            yield exec.exec("git add -u");
+            yield utils.gitCommit(`Bump version to ${newPackageJson.version}`);
+            yield exec.exec(`git tag v${newPackageJson.version} -m "Release %s to ${branch.tag}"`);
             // Push commits and tag
             yield utils.gitPush(branch.name, true);
         }
