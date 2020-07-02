@@ -24269,12 +24269,13 @@ const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const utils = __importStar(__webpack_require__(163));
 function publishNpm(branch) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         // Prevent publish from being affected by local npmrc
         yield exec.exec("rm -f .npmrc");
         const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
+        // Need to remove trailing slash from registry URL for npm-cli-login
+        const npmRegistry = (_b = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry) === null || _b === void 0 ? void 0 : _b.replace(/\/$/, "");
         if (!npmRegistry) {
             core.setFailed("Expected NPM registry to be defined in package.json but it is not");
             process.exit();
@@ -29276,12 +29277,12 @@ function version(branch) {
             }
             // Update version number in package-lock.json and changelog
             yield exec.exec("git reset --hard");
-            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`);
+            const gitTag = (yield utils.execAndReturnOutput(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`)).trim();
             yield updateChangelog(newPackageJson);
             // Commit version bump and create tag
             yield exec.exec("git add -u");
             yield utils.gitCommit(`Bump version to ${newPackageJson.version}`);
-            yield exec.exec(`git tag v${newPackageJson.version} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
+            yield exec.exec(`git tag ${gitTag} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
             // Push commits and tag
             yield utils.gitPush(branch.name, true);
         }

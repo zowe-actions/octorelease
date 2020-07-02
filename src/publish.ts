@@ -9,7 +9,8 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
     await exec.exec("rm -f .npmrc");
 
     const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-    const npmRegistry = packageJson.publishConfig?.registry;
+    // Need to remove trailing slash from registry URL for npm-cli-login
+    const npmRegistry = packageJson.publishConfig?.registry?.replace(/\/$/, "");
 
     if (!npmRegistry) {
         core.setFailed("Expected NPM registry to be defined in package.json but it is not");
