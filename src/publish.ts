@@ -30,7 +30,7 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
     const npmScope = packageJson.name.split("/")[0];
     npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
 
-    const publishedVersion: string = (await utils.execAndReturnOutput("npm", ["view", `${packageJson.version}@${branch.tag}`, "version"])).trim();
+    const publishedVersion = await utils.getPackageVersion(packageJson.name, branch.tag);
     const latestVersion = packageJson.version;
 
     // Publish package

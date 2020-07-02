@@ -6937,6 +6937,17 @@ function execAndReturnOutput(commandLine, args) {
     });
 }
 exports.execAndReturnOutput = execAndReturnOutput;
+function getPackageVersion(pkgName, pkgTag) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return (yield execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+        }
+        catch (error) {
+            core.warning(`Failed to get package version for ${pkgName}@${pkgTag}: ${error.message}`);
+        }
+    });
+}
+exports.getPackageVersion = getPackageVersion;
 function gitCommit(message, amend) {
     return __awaiter(this, void 0, void 0, function* () {
         const gitArgs = amend ? "--amend" : "";
@@ -24281,7 +24292,7 @@ function publishNpm(branch) {
         const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
         const npmScope = packageJson.name.split("/")[0];
         npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
-        const publishedVersion = (yield utils.execAndReturnOutput("npm", ["view", `${packageJson.version}@${branch.tag}`, "version"])).trim();
+        const publishedVersion = yield utils.getPackageVersion(packageJson.name, branch.tag);
         const latestVersion = packageJson.version;
         // Publish package
         if (publishedVersion != latestVersion) {
@@ -29197,7 +29208,7 @@ function updateDependency(pkgName, pkgTag, packageJson, dev) {
         if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
             currentVersion = currentVersion.slice(1);
         }
-        const latestVersion = (yield utils.execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+        const latestVersion = yield utils.getPackageVersion(pkgName, pkgTag);
         if (currentVersion !== latestVersion) {
             const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
             yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);

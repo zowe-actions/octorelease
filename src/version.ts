@@ -11,7 +11,7 @@ async function updateDependency(pkgName: string, pkgTag: string, packageJson: an
         currentVersion = currentVersion.slice(1);
     }
 
-    const latestVersion: string = (await utils.execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+    const latestVersion = await utils.getPackageVersion(pkgName, pkgTag);
 
     if (currentVersion !== latestVersion) {
         const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";

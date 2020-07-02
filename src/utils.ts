@@ -14,6 +14,14 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
     return capturedOutput;
 }
 
+export async function getPackageVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
+    try {
+        return (await execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+    } catch (error) {
+        core.warning(`Failed to get package version for ${pkgName}@${pkgTag}: ${error.message}`);
+    }
+}
+
 export async function gitCommit(message: string, amend?: boolean): Promise<void> {
     const gitArgs = amend ? "--amend" : "";
     await exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
