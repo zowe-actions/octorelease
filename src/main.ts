@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import * as yaml from "js-yaml";
 import { IConfig } from "./doc/IConfig";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
+import { publishNpm, publishVsce } from "./publish";
 import * as utils from "./utils";
 import { version } from "./version";
 
@@ -25,10 +26,12 @@ async function run(): Promise<void> {
             await version(protectedBranch);
         }
 
-        if (core.getInput("deploy") === "npm") {
-            // await deployNpm(protectedBranch);
-        } else if (core.getInput("deploy") === "vsix") {
-            // await deployVsix(protectedBranch);
+        if (core.getInput("publish") === "npm") {
+            await publishNpm(protectedBranch);
+        } else if (core.getInput("publish") === "vsce") {
+            await publishVsce(protectedBranch);
+        } else {
+            core.info("Missing or invalid publish type (allowed values: npm, vsce)");
         }
     } catch (error) {
         core.setFailed(error.message);

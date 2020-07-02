@@ -29,6 +29,7 @@ export async function version(branch: IProtectedBranch): Promise<void> {
     let oldPackageJson: any = {};
 
     try {
+        await exec.exec(`git fetch origin ${eventData.before}`);
         cmdOutput = await utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
         oldPackageJson = JSON.parse(cmdOutput);
     } catch {
@@ -63,8 +64,26 @@ export async function version(branch: IProtectedBranch): Promise<void> {
             }
         }
 
-        // TODO Update changelog
+        // Update changelog
+        const changelogFile = "CHANGELOG.md";
+        const changelogHeader = "## Recent Changes";
+        const changelogContents: string = fs.readFileSync(changelogFile).toString();
+        if (changelogContents.indexOf("## `" + newPackageJson.version + "`") !== -1) {
+            if (changelogContents.indexOf(changelogHeader) !== -1) {
+                await exec.exec("sed -i 's/" + changelogHeader + "/## `" + newPackageJson.version + "`/' " + changelogFile);
+                await exec.exec(`git add ${changelogFile}`);
+            } else {
+                core.warning(`Could not find ${changelogHeader} header in changelog`);
+            }
+        }
 
-        utils.gitPush(branch.name);
+        // Update version number in package-lock.json and add Git tag
+        await exec.exec(`npm version ${newPackageJson.version}`);
+
+        // Push commits and tag
+        utils.gitPush(branch.name, true);
+    } else {
+        core.info(`Version in package.json did not change so exiting now`);
+        process.exit();
     }
 }

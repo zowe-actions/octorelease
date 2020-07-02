@@ -25,7 +25,7 @@ export async function gitCommit(message: string): Promise<void> {
     await exec.exec(`git commit -m "${message} [ci skip]" -s`);
 }
 
-export async function gitPush(branch: string): Promise<void> {
+export async function gitPush(branch: string, tags?: boolean): Promise<void> {
     // Check if there is anything to push
     const cmdOutput = (await execAndReturnOutput("git", ["cherry"])).trim();
     if (cmdOutput.length == 0) {
@@ -37,7 +37,7 @@ export async function gitPush(branch: string): Promise<void> {
     const authToken: string = core.getInput("repo-token");
     const repository: string = requireEnvVar("GITHUB_REPOSITORY");
     await exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
-    await exec.exec(`git push -u origin ${branch}`);
+    await exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
 }
 
 export function requireEnvVar(name: string): string {

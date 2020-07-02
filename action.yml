@@ -6,10 +6,30 @@ inputs:
     description: 'Path to YAML config'
     required: false
     default: './zowe-deploy.yml'
-  deploy:
-    description: 'Specifies type of deploy stage that should run'
+  npm-credentials:
+    description: 'Username and password for NPM publisher (user:pass)'
+    required: false
+    default: ''
+  npm-email:
+    description: 'Email for NPM publisher'
+    required: false
+    default: ''
+  npm-registry:
+    description: 'NPM registry where NPM package will be published'
+    required: false
+    default: 'https://registry.npmjs.org'
+  publish:
+    description: 'Specifies type of publish stage that should run (npm or vsce)'
     required: false
     default: 'none'
+  publish-github:
+    description: 'Specifies whether to publish a release to GitHub'
+    required: false
+    default: 'false'
+  publish-token:
+    description: 'Token to publish VSCE to VS Code marketplace'
+    required: false
+    default: ''
   repo-token:
     description: 'Token with push access to GitHub repo'
     required: true
