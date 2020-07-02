@@ -44780,20 +44780,25 @@ const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const utils = __importStar(__webpack_require__(451));
 function publishNpm(branch) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const npmCredentials = core.getInput("npm-credentials");
         const npmEmail = core.getInput("npm-email");
         if (!npmCredentials || !npmEmail) {
-            core.setFailed("Expected NPM credentials and email to be defined but they are not");
+            core.setFailed("Expected NPM credentials and email to be defined as workflow inputs but they are not");
             process.exit();
         }
         // Prevent publish from being affected by local npmrc
         yield exec.exec("rm -f .npmrc");
         const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
+        if (!npmRegistry) {
+            core.setFailed("Expected NPM registry to be defined in package.json but it is not");
+            process.exit();
+        }
         // Login to registry in global npmrc
         const npmLogin = __webpack_require__(575); // eslint-disable-line @typescript-eslint/no-var-requires
         const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
-        const npmRegistry = core.getInput("npm-registry");
         const npmScope = packageJson.name.split("/")[0];
         npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
         const publishedVersion = (yield utils.execAndReturnOutput("npm", ["view", `${packageJson.version}@${branch.tag}`, "version"])).trim();

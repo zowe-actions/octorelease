@@ -9,7 +9,7 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
     const npmEmail = core.getInput("npm-email");
 
     if (!npmCredentials || !npmEmail) {
-        core.setFailed("Expected NPM credentials and email to be defined but they are not");
+        core.setFailed("Expected NPM credentials and email to be defined as workflow inputs but they are not");
         process.exit();
     }
 
@@ -17,11 +17,16 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
     await exec.exec("rm -f .npmrc");
 
     const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+    const npmRegistry = packageJson.publishConfig?.registry;
+
+    if (!npmRegistry) {
+        core.setFailed("Expected NPM registry to be defined in package.json but it is not");
+        process.exit();
+    }
 
     // Login to registry in global npmrc
     const npmLogin = require("npm-cli-login");  // eslint-disable-line @typescript-eslint/no-var-requires
     const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
-    const npmRegistry = core.getInput("npm-registry");
     const npmScope = packageJson.name.split("/")[0];
     npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
 

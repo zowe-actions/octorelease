@@ -14,10 +14,6 @@ inputs:
     description: 'Email for NPM publisher'
     required: false
     default: ''
-  npm-registry:
-    description: 'NPM registry where NPM package will be published'
-    required: false
-    default: 'https://registry.npmjs.org'
   publish:
     description: 'Specifies type of publish stage that should run (npm or vsce)'
     required: false
