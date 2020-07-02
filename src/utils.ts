@@ -43,10 +43,12 @@ export async function gitConfig(): Promise<void> {
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
     // Check if there is anything to push
-    const cmdOutput = (await execAndReturnOutput("git", ["cherry"])).trim();
-    if (cmdOutput.length == 0) {
-        core.warning("Nothing to push");
-        return;
+    if (!tags) {
+        const cmdOutput = (await execAndReturnOutput("git", ["cherry"])).trim();
+        if (cmdOutput.length == 0) {
+            core.warning("Nothing to push");
+            return;
+        }
     }
 
     const gitArgs = tags ? "--tags" : "";

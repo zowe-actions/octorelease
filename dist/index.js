@@ -6972,10 +6972,12 @@ exports.gitConfig = gitConfig;
 function gitPush(branch, tags) {
     return __awaiter(this, void 0, void 0, function* () {
         // Check if there is anything to push
-        const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
-        if (cmdOutput.length == 0) {
-            core.warning("Nothing to push");
-            return;
+        if (!tags) {
+            const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
+            if (cmdOutput.length == 0) {
+                core.warning("Nothing to push");
+                return;
+            }
         }
         const gitArgs = tags ? "--tags" : "";
         yield exec.exec(`git push ${gitArgs} -u origin ${branch}`);
