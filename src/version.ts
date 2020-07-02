@@ -102,7 +102,7 @@ export async function version(branch: IProtectedBranch): Promise<void> {
 
         // Update version number in package-lock.json and add Git tag
         await exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
-        await exec.exec(`git commit --amend -s`);
+        await exec.exec(`git commit --amend --no-edit -s`);
 
         // Push commits and tag
         utils.gitPush(branch.name, true);

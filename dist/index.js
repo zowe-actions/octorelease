@@ -34,7 +34,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(198);
+/******/ 		return __webpack_require__(131);
 /******/ 	};
 /******/
 /******/ 	// run startup
@@ -5805,7 +5805,69 @@ module.exports = require("child_process");
 
 /***/ }),
 /* 130 */,
-/* 131 */,
+/* 131 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+const yaml = __importStar(__webpack_require__(414));
+const publish_1 = __webpack_require__(446);
+const utils = __importStar(__webpack_require__(163));
+const version_1 = __webpack_require__(486);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const configFile = core.getInput("config-file");
+            const config = yaml.safeLoad(fs.readFileSync(configFile).toString());
+            const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
+            const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
+            // Check if protected branch is in config
+            if (branchNames.indexOf(currentBranch) === -1) {
+                core.info(`${currentBranch} is not a protected branch in ${configFile} so exiting now`);
+                process.exit();
+            }
+            const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
+            if (core.getInput("version") === "true") {
+                yield version_1.version(protectedBranch);
+            }
+            if (core.getInput("publish") === "npm") {
+                yield publish_1.publishNpm(protectedBranch);
+            }
+            else if (core.getInput("publish") === "vsce") {
+                yield publish_1.publishVsce(protectedBranch);
+            }
+            else {
+                core.info("Missing or invalid publish type (allowed values: npm, vsce)");
+            }
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+run();
+
+
+/***/ }),
 /* 132 */
 /***/ (function(module) {
 
@@ -6836,7 +6898,89 @@ module.exports = exports
 module.exports = {"$id":"content.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["size","mimeType"],"properties":{"size":{"type":"integer"},"compression":{"type":"integer"},"mimeType":{"type":"string"},"text":{"type":"string"},"encoding":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 163 */,
+/* 163 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+function execAndReturnOutput(commandLine, args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let capturedOutput = "";
+        const options = {
+            listeners: {
+                stdout: (data) => {
+                    capturedOutput += data.toString();
+                }
+            }
+        };
+        yield exec.exec(commandLine, args, options);
+        return capturedOutput;
+    });
+}
+exports.execAndReturnOutput = execAndReturnOutput;
+function gitCommit(message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec(`git commit -m "${message} [ci skip]" -s`);
+    });
+}
+exports.gitCommit = gitCommit;
+function gitConfig() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // const gitUser = "zowe-robot";
+        // const gitEmail = "zowe.robot@gmail.com";
+        let gitUser = "Timothy Johnson";
+        const gitEmail = "timothy.johnson@broadcom.com";
+        yield exec.exec(`git config --global user.name "${gitUser}"`);
+        yield exec.exec(`git config --global user.email "${gitEmail}"`);
+        // const gitUser = "zowe-robot";
+        gitUser = "tjohnsonBCM";
+        const authToken = core.getInput("repo-token");
+        const repository = requireEnvVar("GITHUB_REPOSITORY");
+        yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+    });
+}
+exports.gitConfig = gitConfig;
+function gitPush(branch, tags) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Check if there is anything to push
+        const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
+        if (cmdOutput.length == 0) {
+            return;
+        }
+        yield exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
+    });
+}
+exports.gitPush = gitPush;
+function requireEnvVar(name) {
+    const value = process.env[name];
+    if (value == null) {
+        throw new Error(`Expected environment variable ${name} to be defined but it is not`);
+    }
+    return value;
+}
+exports.requireEnvVar = requireEnvVar;
+
+
+/***/ }),
 /* 164 */,
 /* 165 */,
 /* 166 */,
@@ -10087,69 +10231,7 @@ nacl.setPRNG = function(fn) {
 
 /***/ }),
 /* 197 */,
-/* 198 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const core = __importStar(__webpack_require__(470));
-const yaml = __importStar(__webpack_require__(414));
-const publish_1 = __webpack_require__(806);
-const utils = __importStar(__webpack_require__(451));
-const version_1 = __webpack_require__(775);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const configFile = core.getInput("config-file");
-            const config = yaml.safeLoad(fs.readFileSync(configFile).toString());
-            const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
-            const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
-            // Check if protected branch is in config
-            if (branchNames.indexOf(currentBranch) === -1) {
-                core.info(`${currentBranch} is not a protected branch in ${configFile} so exiting now`);
-                process.exit();
-            }
-            const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
-            if (core.getInput("version") === "true") {
-                yield version_1.version(protectedBranch);
-            }
-            if (core.getInput("publish") === "npm") {
-                yield publish_1.publishNpm(protectedBranch);
-            }
-            else if (core.getInput("publish") === "vsce") {
-                yield publish_1.publishVsce(protectedBranch);
-            }
-            else {
-                core.info("Missing or invalid publish type (allowed values: npm, vsce)");
-            }
-        }
-        catch (error) {
-            core.setFailed(error.message);
-        }
-    });
-}
-run();
-
-
-/***/ }),
+/* 198 */,
 /* 199 */,
 /* 200 */
 /***/ (function(module) {
@@ -24148,7 +24230,81 @@ function renderValue (item, values) {
 /* 443 */,
 /* 444 */,
 /* 445 */,
-/* 446 */,
+/* 446 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+const utils = __importStar(__webpack_require__(163));
+function publishNpm(branch) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const npmCredentials = core.getInput("npm-credentials");
+        const npmEmail = core.getInput("npm-email");
+        if (!npmCredentials || !npmEmail) {
+            core.setFailed("Expected NPM credentials and email to be defined as workflow inputs but they are not");
+            process.exit();
+        }
+        // Prevent publish from being affected by local npmrc
+        yield exec.exec("rm -f .npmrc");
+        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
+        if (!npmRegistry) {
+            core.setFailed("Expected NPM registry to be defined in package.json but it is not");
+            process.exit();
+        }
+        // Login to registry in global npmrc
+        const npmLogin = __webpack_require__(575); // eslint-disable-line @typescript-eslint/no-var-requires
+        const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
+        const npmScope = packageJson.name.split("/")[0];
+        npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
+        const publishedVersion = (yield utils.execAndReturnOutput("npm", ["view", `${packageJson.version}@${branch.tag}`, "version"])).trim();
+        const latestVersion = packageJson.version;
+        // Publish package
+        if (publishedVersion != latestVersion) {
+            yield exec.exec(`npm publish --tag ${branch.tag}`);
+        }
+        else {
+            core.warning(`Version ${publishedVersion} has already been published, skipping publish`);
+        }
+        // Add alias tags
+        if (branch.aliasTags) {
+            for (const tag of branch.aliasTags) {
+                yield exec.exec(`npm dist-tag add ${packageJson.name}@${latestVersion} ${tag}`);
+            }
+        }
+    });
+}
+exports.publishNpm = publishNpm;
+function publishVsce(branch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.setFailed("Not yet implemented");
+    });
+}
+exports.publishVsce = publishVsce;
+
+
+/***/ }),
 /* 447 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -24563,89 +24719,7 @@ function writePkcs1EdDSAPublic(der, key) {
 
 /***/ }),
 /* 450 */,
-/* 451 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-function execAndReturnOutput(commandLine, args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let capturedOutput = "";
-        const options = {
-            listeners: {
-                stdout: (data) => {
-                    capturedOutput += data.toString();
-                }
-            }
-        };
-        yield exec.exec(commandLine, args, options);
-        return capturedOutput;
-    });
-}
-exports.execAndReturnOutput = execAndReturnOutput;
-function gitCommit(message) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec(`git commit -m "${message} [ci skip]" -s`);
-    });
-}
-exports.gitCommit = gitCommit;
-function gitConfig() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // const gitUser = "zowe-robot";
-        // const gitEmail = "zowe.robot@gmail.com";
-        let gitUser = "Timothy Johnson";
-        const gitEmail = "timothy.johnson@broadcom.com";
-        yield exec.exec(`git config --global user.name "${gitUser}"`);
-        yield exec.exec(`git config --global user.email "${gitEmail}"`);
-        // const gitUser = "zowe-robot";
-        gitUser = "tjohnsonBCM";
-        const authToken = core.getInput("repo-token");
-        const repository = requireEnvVar("GITHUB_REPOSITORY");
-        yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
-    });
-}
-exports.gitConfig = gitConfig;
-function gitPush(branch, tags) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Check if there is anything to push
-        const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
-        if (cmdOutput.length == 0) {
-            return;
-        }
-        yield exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
-    });
-}
-exports.gitPush = gitPush;
-function requireEnvVar(name) {
-    const value = process.env[name];
-    if (value == null) {
-        throw new Error(`Expected environment variable ${name} to be defined but it is not`);
-    }
-    return value;
-}
-exports.requireEnvVar = requireEnvVar;
-
-
-/***/ }),
+/* 451 */,
 /* 452 */,
 /* 453 */,
 /* 454 */,
@@ -29087,7 +29161,132 @@ function fromRegistry (res) {
 /* 483 */,
 /* 484 */,
 /* 485 */,
-/* 486 */,
+/* 486 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+const utils = __importStar(__webpack_require__(163));
+function updateDependency(pkgName, pkgTag, packageJson, dev) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
+        let currentVersion = dependencies[pkgName];
+        if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
+            currentVersion = currentVersion.slice(1);
+        }
+        const latestVersion = (yield utils.execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+        if (currentVersion !== latestVersion) {
+            const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
+            yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
+            yield exec.exec(`git add package.json package-lock.json`);
+            yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
+        }
+    });
+}
+function updateChangelog(packageJson) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const changelogFile = "CHANGELOG.md";
+        if (!fs.existsSync(changelogFile)) {
+            core.warning("Missing changelog file, skipping changelog update");
+            return;
+        }
+        const changelogHeader = core.getInput("changelog-header");
+        if (!changelogHeader) {
+            core.warning("Changelog header was not defined, skipping changelog update");
+            return;
+        }
+        const changelogContents = fs.readFileSync(changelogFile).toString();
+        if (changelogContents.indexOf("## `" + packageJson.version + "`") !== -1) {
+            core.warning(`Changelog header already exists for version ${packageJson.version}, skipping changelog update`);
+            return;
+        }
+        if (changelogContents.indexOf(changelogHeader) === -1) {
+            core.warning("Changelog header not found in changelog file, skipping changelog update");
+            return;
+        }
+        yield exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
+        yield exec.exec(`git add ${changelogFile}`);
+        yield utils.gitCommit("Update changelog");
+    });
+}
+function version(branch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
+        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+        let cmdOutput;
+        let oldPackageJson = {};
+        // Load old package.json from base ref
+        try {
+            yield exec.exec(`git fetch origin ${eventData.before}`);
+            cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
+            oldPackageJson = JSON.parse(cmdOutput);
+        }
+        catch (_a) {
+            core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
+        }
+        const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        if (oldPackageJson.version !== newPackageJson.version) {
+            // Check semver level to see if new version is ok
+            if (branch.level && branch.level !== "major" && oldPackageJson.version) {
+                const semverDiff = __webpack_require__(104); // eslint-disable-line @typescript-eslint/no-var-requires
+                const semverLevel = semverDiff(oldPackageJson.version, newPackageJson.version);
+                if (semverLevel === "major" || (semverLevel === "minor" && branch.level !== "minor")) {
+                    core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
+                    process.exit();
+                }
+            }
+            // Configure Git user, email, and origin URL
+            yield utils.gitConfig();
+            // Update dependencies in package.json and package-lock.json
+            if (branch.dependencies) {
+                for (const pkgName of Object.keys(branch.dependencies)) {
+                    yield updateDependency(pkgName, branch.dependencies[pkgName], newPackageJson, false);
+                }
+            }
+            // Update dev dependencies in package.json and package-lock.json
+            if (branch.devDependencies) {
+                for (const pkgName of Object.keys(branch.devDependencies)) {
+                    yield updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
+                }
+            }
+            // Update changelog
+            yield updateChangelog(newPackageJson);
+            // Update version number in package-lock.json and add Git tag
+            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
+            yield exec.exec(`git commit --amend --no-edit -s`);
+            // Push commits and tag
+            utils.gitPush(branch.name, true);
+        }
+        else {
+            core.info(`Version in package.json did not change so exiting now`);
+            process.exit();
+        }
+    });
+}
+exports.version = version;
+
+
+/***/ }),
 /* 487 */,
 /* 488 */,
 /* 489 */,
@@ -43765,132 +43964,7 @@ module.exports = function generate__limitLength(it, $keyword, $ruleType) {
 /***/ }),
 /* 773 */,
 /* 774 */,
-/* 775 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-const utils = __importStar(__webpack_require__(451));
-function updateDependency(pkgName, pkgTag, packageJson, dev) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
-        let currentVersion = dependencies[pkgName];
-        if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
-            currentVersion = currentVersion.slice(1);
-        }
-        const latestVersion = (yield utils.execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
-        if (currentVersion !== latestVersion) {
-            const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
-            yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
-            yield exec.exec(`git add package.json package-lock.json`);
-            yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
-        }
-    });
-}
-function updateChangelog(packageJson) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const changelogFile = "CHANGELOG.md";
-        if (!fs.existsSync(changelogFile)) {
-            core.warning("Missing changelog file, skipping changelog update");
-            return;
-        }
-        const changelogHeader = core.getInput("changelog-header");
-        if (!changelogHeader) {
-            core.warning("Changelog header was not defined, skipping changelog update");
-            return;
-        }
-        const changelogContents = fs.readFileSync(changelogFile).toString();
-        if (changelogContents.indexOf("## `" + packageJson.version + "`") !== -1) {
-            core.warning(`Changelog header already exists for version ${packageJson.version}, skipping changelog update`);
-            return;
-        }
-        if (changelogContents.indexOf(changelogHeader) === -1) {
-            core.warning("Changelog header not found in changelog file, skipping changelog update");
-            return;
-        }
-        yield exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
-        yield exec.exec(`git add ${changelogFile}`);
-        yield utils.gitCommit("Update changelog");
-    });
-}
-function version(branch) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
-        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-        let cmdOutput;
-        let oldPackageJson = {};
-        // Load old package.json from base ref
-        try {
-            yield exec.exec(`git fetch origin ${eventData.before}`);
-            cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
-            oldPackageJson = JSON.parse(cmdOutput);
-        }
-        catch (_a) {
-            core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
-        }
-        const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        if (oldPackageJson.version !== newPackageJson.version) {
-            // Check semver level to see if new version is ok
-            if (branch.level && branch.level !== "major" && oldPackageJson.version) {
-                const semverDiff = __webpack_require__(104); // eslint-disable-line @typescript-eslint/no-var-requires
-                const semverLevel = semverDiff(oldPackageJson.version, newPackageJson.version);
-                if (semverLevel === "major" || (semverLevel === "minor" && branch.level !== "minor")) {
-                    core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
-                    process.exit();
-                }
-            }
-            // Configure Git user, email, and origin URL
-            yield utils.gitConfig();
-            // Update dependencies in package.json and package-lock.json
-            if (branch.dependencies) {
-                for (const pkgName of Object.keys(branch.dependencies)) {
-                    yield updateDependency(pkgName, branch.dependencies[pkgName], newPackageJson, false);
-                }
-            }
-            // Update dev dependencies in package.json and package-lock.json
-            if (branch.devDependencies) {
-                for (const pkgName of Object.keys(branch.devDependencies)) {
-                    yield updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
-                }
-            }
-            // Update changelog
-            yield updateChangelog(newPackageJson);
-            // Update version number in package-lock.json and add Git tag
-            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
-            yield exec.exec(`git commit --amend -s`);
-            // Push commits and tag
-            utils.gitPush(branch.name, true);
-        }
-        else {
-            core.info(`Version in package.json did not change so exiting now`);
-            process.exit();
-        }
-    });
-}
-exports.version = version;
-
-
-/***/ }),
+/* 775 */,
 /* 776 */
 /***/ (function(module) {
 
@@ -44777,81 +44851,7 @@ function vars(arr, statement) {
 
 
 /***/ }),
-/* 806 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-const utils = __importStar(__webpack_require__(451));
-function publishNpm(branch) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const npmCredentials = core.getInput("npm-credentials");
-        const npmEmail = core.getInput("npm-email");
-        if (!npmCredentials || !npmEmail) {
-            core.setFailed("Expected NPM credentials and email to be defined as workflow inputs but they are not");
-            process.exit();
-        }
-        // Prevent publish from being affected by local npmrc
-        yield exec.exec("rm -f .npmrc");
-        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
-        if (!npmRegistry) {
-            core.setFailed("Expected NPM registry to be defined in package.json but it is not");
-            process.exit();
-        }
-        // Login to registry in global npmrc
-        const npmLogin = __webpack_require__(575); // eslint-disable-line @typescript-eslint/no-var-requires
-        const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
-        const npmScope = packageJson.name.split("/")[0];
-        npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
-        const publishedVersion = (yield utils.execAndReturnOutput("npm", ["view", `${packageJson.version}@${branch.tag}`, "version"])).trim();
-        const latestVersion = packageJson.version;
-        // Publish package
-        if (publishedVersion != latestVersion) {
-            yield exec.exec(`npm publish --tag ${branch.tag}`);
-        }
-        else {
-            core.warning(`Version ${publishedVersion} has already been published, skipping publish`);
-        }
-        // Add alias tags
-        if (branch.aliasTags) {
-            for (const tag of branch.aliasTags) {
-                yield exec.exec(`npm dist-tag add ${packageJson.name}@${latestVersion} ${tag}`);
-            }
-        }
-    });
-}
-exports.publishNpm = publishNpm;
-function publishVsce(branch) {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.setFailed("Not yet implemented");
-    });
-}
-exports.publishVsce = publishVsce;
-
-
-/***/ }),
+/* 806 */,
 /* 807 */
 /***/ (function(module) {
 
