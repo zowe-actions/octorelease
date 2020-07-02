@@ -60,7 +60,7 @@ async function updateChangelog(pkgVer: string): Promise<void> {
         return;
     }
 
-    await exec.exec("sed -i s/" + changelogHeader + "/## `" + pkgVer + "`/ " + changelogFile);
+    await exec.exec("sed -i 's/" + changelogHeader + "/## \\`" + pkgVer + "\\`/' " + changelogFile);
 }
 
 export async function version(branch: IProtectedBranch): Promise<void> {

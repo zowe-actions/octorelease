@@ -15519,7 +15519,7 @@ function updateChangelog(pkgVer) {
             core.warning("Changelog header not found in changelog file, skipping changelog update");
             return;
         }
-        yield exec.exec("sed -i s/" + changelogHeader + "/## `" + pkgVer + "`/ " + changelogFile);
+        yield exec.exec("sed -i 's/" + changelogHeader + "/## \\`" + pkgVer + "\\`/' " + changelogFile);
     });
 }
 function version(branch) {
