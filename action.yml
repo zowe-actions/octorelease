@@ -18,26 +18,22 @@ inputs:
     description: 'Email for NPM publisher'
     required: false
     default: ''
-  publish:
-    description: 'Specifies type of publish stage that should run (npm or vsce)'
-    required: false
-    default: 'none'
   publish-github:
     description: 'Specifies whether to publish a release to GitHub'
     required: false
     default: 'false'
-  publish-token:
-    description: 'Token to publish VSCE to VS Code marketplace'
-    required: false
-    default: ''
   repo-token:
     description: 'Token with push access to GitHub repo'
     required: true
     default: ''
-  version:
-    description: 'Specifies whether version stage should run'
+  skip-version:
+    description: 'Skip versioning the project before publishing it'
     required: false
-    default: 'true'
+    default: 'false'
+  vsce-token:
+    description: 'Token to publish extension to VS Code marketplace'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

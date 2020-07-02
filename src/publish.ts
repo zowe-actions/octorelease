@@ -5,14 +5,6 @@ import { IProtectedBranch } from "./doc/IProtectedBranch";
 import * as utils from "./utils";
 
 export async function publishNpm(branch: IProtectedBranch): Promise<void> {
-    const npmCredentials = core.getInput("npm-credentials");
-    const npmEmail = core.getInput("npm-email");
-
-    if (!npmCredentials || !npmEmail) {
-        core.setFailed("Expected NPM credentials and email to be defined as workflow inputs but they are not");
-        process.exit();
-    }
-
     // Prevent publish from being affected by local npmrc
     await exec.exec("rm -f .npmrc");
 
@@ -26,7 +18,8 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
 
     // Login to registry in global npmrc
     const npmLogin = require("npm-cli-login");  // eslint-disable-line @typescript-eslint/no-var-requires
-    const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
+    const [npmUsername, npmPassword] = core.getInput("npm-credentials").split(":", 2);
+    const npmEmail = core.getInput("npm-email");
     const npmScope = packageJson.name.split("/")[0];
     npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
 

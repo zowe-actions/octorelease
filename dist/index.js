@@ -5846,17 +5846,17 @@ function run() {
                 process.exit();
             }
             const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
-            if (core.getInput("version") === "true") {
+            if (core.getInput("skip-version") !== "true") {
                 yield version_1.version(protectedBranch);
             }
-            if (core.getInput("publish") === "npm") {
+            if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
                 yield publish_1.publishNpm(protectedBranch);
             }
-            else if (core.getInput("publish") === "vsce") {
+            else if (core.getInput("vsce-token")) {
                 yield publish_1.publishVsce(protectedBranch);
             }
             else {
-                core.info("Missing or invalid publish type (allowed values: npm, vsce)");
+                core.warning("Nothing to publish");
             }
         }
         catch (error) {
@@ -6959,12 +6959,10 @@ function gitConfig() {
     return __awaiter(this, void 0, void 0, function* () {
         // const gitUser = "zowe-robot";
         // const gitEmail = "zowe.robot@gmail.com";
-        let gitUser = "Timothy Johnson";
+        const gitUser = "tjohnsonBCM";
         const gitEmail = "timothy.johnson@broadcom.com";
         yield exec.exec(`git config --global user.name "${gitUser}"`);
         yield exec.exec(`git config --global user.email "${gitEmail}"`);
-        // const gitUser = "zowe-robot";
-        gitUser = "tjohnsonBCM";
         const authToken = core.getInput("repo-token");
         const repository = requireEnvVar("GITHUB_REPOSITORY");
         yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
@@ -24273,12 +24271,6 @@ const utils = __importStar(__webpack_require__(163));
 function publishNpm(branch) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const npmCredentials = core.getInput("npm-credentials");
-        const npmEmail = core.getInput("npm-email");
-        if (!npmCredentials || !npmEmail) {
-            core.setFailed("Expected NPM credentials and email to be defined as workflow inputs but they are not");
-            process.exit();
-        }
         // Prevent publish from being affected by local npmrc
         yield exec.exec("rm -f .npmrc");
         const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
@@ -24289,7 +24281,8 @@ function publishNpm(branch) {
         }
         // Login to registry in global npmrc
         const npmLogin = __webpack_require__(575); // eslint-disable-line @typescript-eslint/no-var-requires
-        const [npmUsername, npmPassword] = npmCredentials.split(":", 2);
+        const [npmUsername, npmPassword] = core.getInput("npm-credentials").split(":", 2);
+        const npmEmail = core.getInput("npm-email");
         const npmScope = packageJson.name.split("/")[0];
         npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
         const publishedVersion = yield utils.getPackageVersion(packageJson.name, branch.tag);

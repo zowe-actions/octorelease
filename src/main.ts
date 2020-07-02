@@ -22,16 +22,16 @@ async function run(): Promise<void> {
 
         const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
 
-        if (core.getInput("version") === "true") {
+        if (core.getInput("skip-version") !== "true") {
             await version(protectedBranch);
         }
 
-        if (core.getInput("publish") === "npm") {
+        if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
             await publishNpm(protectedBranch);
-        } else if (core.getInput("publish") === "vsce") {
+        } else if (core.getInput("vsce-token")) {
             await publishVsce(protectedBranch);
         } else {
-            core.info("Missing or invalid publish type (allowed values: npm, vsce)");
+            core.warning("Nothing to publish");
         }
     } catch (error) {
         core.setFailed(error.message);
