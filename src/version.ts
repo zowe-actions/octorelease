@@ -48,7 +48,7 @@ async function updateChangelog(packageJson: any): Promise<void> {
 
     await exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
     await exec.exec(`git add ${changelogFile}`);
-    // Don't commit here since npm version can handle it
+    await utils.gitCommit("Update changelog");
 }
 
 export async function version(branch: IProtectedBranch): Promise<void> {
@@ -80,6 +80,9 @@ export async function version(branch: IProtectedBranch): Promise<void> {
             }
         }
 
+        // Configure Git user, email, and origin URL
+        await utils.gitConfig();
+
         // Update dependencies in package.json and package-lock.json
         if (branch.dependencies) {
             for (const pkgName of Object.keys(branch.dependencies)) {
@@ -98,7 +101,8 @@ export async function version(branch: IProtectedBranch): Promise<void> {
         await updateChangelog(newPackageJson);
 
         // Update version number in package-lock.json and add Git tag
-        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version`);
+        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
+        await exec.exec(`git commit --amend -s`);
 
         // Push commits and tag
         utils.gitPush(branch.name, true);

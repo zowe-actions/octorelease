@@ -24604,16 +24604,26 @@ function execAndReturnOutput(commandLine, args) {
 exports.execAndReturnOutput = execAndReturnOutput;
 function gitCommit(message) {
     return __awaiter(this, void 0, void 0, function* () {
-        // const gitUser = "zowe-robot";
-        // const gitEmail = "zowe.robot@gmail.com";
-        const gitUser = "Timothy Johnson";
-        const gitEmail = "timothy.johnson@broadcom.com";
-        yield exec.exec(`git config --global user.name "${gitUser}"`);
-        yield exec.exec(`git config --global user.email "${gitEmail}"`);
         yield exec.exec(`git commit -m "${message} [ci skip]" -s`);
     });
 }
 exports.gitCommit = gitCommit;
+function gitConfig() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // const gitUser = "zowe-robot";
+        // const gitEmail = "zowe.robot@gmail.com";
+        let gitUser = "Timothy Johnson";
+        const gitEmail = "timothy.johnson@broadcom.com";
+        yield exec.exec(`git config --global user.name "${gitUser}"`);
+        yield exec.exec(`git config --global user.email "${gitEmail}"`);
+        // const gitUser = "zowe-robot";
+        gitUser = "tjohnsonBCM";
+        const authToken = core.getInput("repo-token");
+        const repository = requireEnvVar("GITHUB_REPOSITORY");
+        yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+    });
+}
+exports.gitConfig = gitConfig;
 function gitPush(branch, tags) {
     return __awaiter(this, void 0, void 0, function* () {
         // Check if there is anything to push
@@ -24621,11 +24631,6 @@ function gitPush(branch, tags) {
         if (cmdOutput.length == 0) {
             return;
         }
-        // const gitUser = "zowe-robot";
-        const gitUser = "tjohnsonBCM";
-        const authToken = core.getInput("repo-token");
-        const repository = requireEnvVar("GITHUB_REPOSITORY");
-        yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
         yield exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
     });
 }
@@ -43825,7 +43830,7 @@ function updateChangelog(packageJson) {
         }
         yield exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
         yield exec.exec(`git add ${changelogFile}`);
-        // Don't commit here since npm version can handle it
+        yield utils.gitCommit("Update changelog");
     });
 }
 function version(branch) {
@@ -43854,6 +43859,8 @@ function version(branch) {
                     process.exit();
                 }
             }
+            // Configure Git user, email, and origin URL
+            yield utils.gitConfig();
             // Update dependencies in package.json and package-lock.json
             if (branch.dependencies) {
                 for (const pkgName of Object.keys(branch.dependencies)) {
@@ -43869,7 +43876,8 @@ function version(branch) {
             // Update changelog
             yield updateChangelog(newPackageJson);
             // Update version number in package-lock.json and add Git tag
-            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version`);
+            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
+            yield exec.exec(`git commit --amend -s`);
             // Push commits and tag
             utils.gitPush(branch.name, true);
         }

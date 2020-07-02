@@ -15,14 +15,23 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
 }
 
 export async function gitCommit(message: string): Promise<void> {
+    await exec.exec(`git commit -m "${message} [ci skip]" -s`);
+}
+
+export async function gitConfig(): Promise<void> {
     // const gitUser = "zowe-robot";
     // const gitEmail = "zowe.robot@gmail.com";
-    const gitUser = "Timothy Johnson";
+    let gitUser = "Timothy Johnson";
     const gitEmail = "timothy.johnson@broadcom.com";
 
     await exec.exec(`git config --global user.name "${gitUser}"`);
     await exec.exec(`git config --global user.email "${gitEmail}"`);
-    await exec.exec(`git commit -m "${message} [ci skip]" -s`);
+
+    // const gitUser = "zowe-robot";
+    gitUser = "tjohnsonBCM";
+    const authToken: string = core.getInput("repo-token");
+    const repository: string = requireEnvVar("GITHUB_REPOSITORY");
+    await exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
@@ -32,11 +41,6 @@ export async function gitPush(branch: string, tags?: boolean): Promise<void> {
         return;
     }
 
-    // const gitUser = "zowe-robot";
-    const gitUser = "tjohnsonBCM";
-    const authToken: string = core.getInput("repo-token");
-    const repository: string = requireEnvVar("GITHUB_REPOSITORY");
-    await exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
     await exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
 }
 
