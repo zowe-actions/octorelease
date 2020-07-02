@@ -48,7 +48,7 @@ async function updateChangelog(packageJson: any): Promise<void> {
 
     await exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
     await exec.exec(`git add ${changelogFile}`);
-    await utils.gitCommit("Update changelog");
+    await utils.gitCommit(`Update changelog for v${packageJson.version}`);
 }
 
 export async function version(branch: IProtectedBranch): Promise<void> {
@@ -101,11 +101,12 @@ export async function version(branch: IProtectedBranch): Promise<void> {
         await updateChangelog(newPackageJson);
 
         // Update version number in package-lock.json and add Git tag
-        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
-        await exec.exec(`git commit --amend --no-edit -s`);
+        await exec.exec("git reset --hard");
+        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Release %s to ${branch.tag}"`);
+        await utils.gitCommit(`Bump version to ${newPackageJson.version}`, true);
 
         // Push commits and tag
-        utils.gitPush(branch.name, true);
+        await utils.gitPush(branch.name, true);
     } else {
         core.info(`Version in package.json did not change so exiting now`);
         process.exit();

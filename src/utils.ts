@@ -14,8 +14,9 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
     return capturedOutput;
 }
 
-export async function gitCommit(message: string): Promise<void> {
-    await exec.exec(`git commit -m "${message} [ci skip]" -s`);
+export async function gitCommit(message: string, amend?: boolean): Promise<void> {
+    const gitArgs = amend ? "--amend" : "";
+    await exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
 }
 
 export async function gitConfig(): Promise<void> {
@@ -38,10 +39,12 @@ export async function gitPush(branch: string, tags?: boolean): Promise<void> {
     // Check if there is anything to push
     const cmdOutput = (await execAndReturnOutput("git", ["cherry"])).trim();
     if (cmdOutput.length == 0) {
+        core.warning("Nothing to push");
         return;
     }
 
-    await exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
+    const gitArgs = tags ? "--tags" : "";
+    await exec.exec(`git push ${gitArgs} -u origin ${branch}`);
 }
 
 export function requireEnvVar(name: string): string {

@@ -6937,9 +6937,10 @@ function execAndReturnOutput(commandLine, args) {
     });
 }
 exports.execAndReturnOutput = execAndReturnOutput;
-function gitCommit(message) {
+function gitCommit(message, amend) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec(`git commit -m "${message} [ci skip]" -s`);
+        const gitArgs = amend ? "--amend" : "";
+        yield exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
     });
 }
 exports.gitCommit = gitCommit;
@@ -6964,9 +6965,11 @@ function gitPush(branch, tags) {
         // Check if there is anything to push
         const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
         if (cmdOutput.length == 0) {
+            core.warning("Nothing to push");
             return;
         }
-        yield exec.exec(`git push origin ${branch} ${tags ? "--tags" : ""}`);
+        const gitArgs = tags ? "--tags" : "";
+        yield exec.exec(`git push ${gitArgs} -u origin ${branch}`);
     });
 }
 exports.gitPush = gitPush;
@@ -29226,7 +29229,7 @@ function updateChangelog(packageJson) {
         }
         yield exec.exec("sed -i 's/" + changelogHeader + "/## `" + packageJson.version + "`/' " + changelogFile);
         yield exec.exec(`git add ${changelogFile}`);
-        yield utils.gitCommit("Update changelog");
+        yield utils.gitCommit(`Update changelog for v${packageJson.version}`);
     });
 }
 function version(branch) {
@@ -29272,10 +29275,11 @@ function version(branch) {
             // Update changelog
             yield updateChangelog(newPackageJson);
             // Update version number in package-lock.json and add Git tag
-            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Bump version to %s"`);
-            yield exec.exec(`git commit --amend --no-edit -s`);
+            yield exec.exec("git reset --hard");
+            yield exec.exec(`npm version ${newPackageJson.version} --allow-same-version -m "Release %s to ${branch.tag}"`);
+            yield utils.gitCommit(`Bump version to ${newPackageJson.version}`, true);
             // Push commits and tag
-            utils.gitPush(branch.name, true);
+            yield utils.gitPush(branch.name, true);
         }
         else {
             core.info(`Version in package.json did not change so exiting now`);
