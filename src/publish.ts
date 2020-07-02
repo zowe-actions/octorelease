@@ -1,8 +1,70 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as exec from "@actions/exec";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
 import * as utils from "./utils";
+
+export async function publishGithub(): Promise<void> {
+    const changelogFile = "CHANGELOG.md";
+    const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+    let releaseNotes = "";
+
+    // Try to find release notes in changelog
+    if (fs.existsSync(changelogFile)) {
+        const changelogLines: string[] = fs.readFileSync(changelogFile).toString().split(/\r?\n/);
+
+        let lineNum = changelogLines.indexOf("## `" + packageJson.version + "`");
+        if (lineNum !== -1) {
+            while (changelogLines[lineNum + 1] && !changelogLines[lineNum + 1].startsWith("##")) {
+                releaseNotes += changelogLines[lineNum + 1] + "\n";
+                lineNum++;
+            }
+        } else {
+            core.warning(`Missing changelog header for version ${packageJson.version}`);
+        }
+    } else {
+        core.warning("Missing changelog file");
+    }
+
+    // Get release created by version stage
+    const octokit = github.getOctokit(core.getInput("repo-token"));
+    const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
+    const tag = "v" + packageJson.version;
+    const release = await octokit.repos.getReleaseByTag({ owner, repo, tag });
+
+    if (!release) {
+        core.setFailed(`Could not find GitHub release matching the tag ${tag}`);
+        process.exit();
+        return;
+    }
+
+    const release_id = release.data.id;
+
+    // Add release notes to body of release
+    if (releaseNotes) {
+        await octokit.repos.updateRelease({
+            owner, repo, release_id,
+            body: releaseNotes
+        })
+    }
+
+    // Upload artifacts to release
+    const artifactPaths: string[] = core.getInput("github-artifacts").split(",").map(s => s.trim());
+    const mime = require("mime-types");
+    for (const artifactPath of artifactPaths) {
+        await octokit.repos.uploadReleaseAsset({
+            owner, repo, release_id,
+            name: path.basename(artifactPath),
+            data: fs.readFileSync(artifactPath).toString(),
+            url: release.data.upload_url,
+            headers: {
+                "Content-Type": mime.lookup(artifactPath)
+            }
+        })
+    }
+}
 
 export async function publishNpm(branch: IProtectedBranch): Promise<void> {
     // Prevent publish from being affected by local npmrc
@@ -18,7 +80,7 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
     }
 
     // Login to registry in global npmrc
-    const npmLogin = require("npm-cli-login");  // eslint-disable-line @typescript-eslint/no-var-requires
+    const npmLogin = require("npm-cli-login");
     const [npmUsername, npmPassword] = core.getInput("npm-credentials").split(":", 2);
     const npmEmail = core.getInput("npm-email");
     const npmScope = packageJson.name.split("/")[0];
@@ -40,8 +102,4 @@ export async function publishNpm(branch: IProtectedBranch): Promise<void> {
             await exec.exec(`npm dist-tag add ${packageJson.name}@${latestVersion} ${tag}`);
         }
     }
-}
-
-export async function publishVsce(branch: IProtectedBranch): Promise<void> {
-    core.setFailed("Not yet implemented");
 }

@@ -10,6 +10,10 @@ inputs:
     description: 'Path to YAML config'
     required: false
     default: './zowe-deploy.yml'
+  github-artifacts:
+    description: 'Comma-separated list of files to publish in GitHub release'
+    required: false
+    default: ''
   npm-credentials:
     description: 'Username and password for NPM publisher (user:pass)'
     required: false
@@ -18,10 +22,6 @@ inputs:
     description: 'Email for NPM publisher'
     required: false
     default: ''
-  publish-github:
-    description: 'Specifies whether to publish a release to GitHub'
-    required: false
-    default: 'false'
   repo-token:
     description: 'Token with push access to GitHub repo'
     required: true
@@ -30,10 +30,6 @@ inputs:
     description: 'Skip versioning the project before publishing it'
     required: false
     default: 'false'
-  vsce-token:
-    description: 'Token to publish extension to VS Code marketplace'
-    required: false
-    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

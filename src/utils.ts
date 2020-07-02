@@ -17,8 +17,8 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
 export async function getPackageVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
     try {
         return (await execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
-    } catch (error) {
-        core.warning(`Failed to get package version for ${pkgName}@${pkgTag}: ${error.message}`);
+    } catch {
+        core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
     }
 }
 
