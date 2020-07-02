@@ -18,7 +18,7 @@ export async function publishGithub(): Promise<void> {
         let lineNum = changelogLines.indexOf("## `" + packageJson.version + "`");
         if (lineNum !== -1) {
             while (changelogLines[lineNum + 1] && !changelogLines[lineNum + 1].startsWith("##")) {
-                releaseNotes += changelogLines[lineNum + 1] + "\n";
+                releaseNotes += changelogLines[lineNum] + "\n";
                 lineNum++;
             }
         } else {
@@ -28,22 +28,15 @@ export async function publishGithub(): Promise<void> {
         core.warning("Missing changelog file");
     }
 
-    // Get release created by version stage
     const octokit = github.getOctokit(core.getInput("repo-token"));
     const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-    const tag = "v" + packageJson.version;
-    core.info(releaseNotes);
-    core.info(JSON.stringify({ owner, repo, tag }));
-    const release = await octokit.repos.getReleaseByTag({ owner, repo, tag });
-    const release_id = release.data.id;
 
-    // Add release notes to body of release
-    if (releaseNotes) {
-        await octokit.repos.updateRelease({
-            owner, repo, release_id,
-            body: releaseNotes
-        })
-    }
+    // Create release and add release notes if any
+    const release = await octokit.repos.createRelease({
+        owner, repo,
+        tag_name: "v" + packageJson.version,
+        body: releaseNotes || undefined
+    })
 
     // Upload artifacts to release
     const artifactPaths: string[] = [];
@@ -54,7 +47,8 @@ export async function publishGithub(): Promise<void> {
     });
     for (const artifactPath of artifactPaths.map(s => s.trim())) {
         await octokit.repos.uploadReleaseAsset({
-            owner, repo, release_id,
+            owner, repo,
+            release_id: release.data.id,
             name: path.basename(artifactPath),
             data: fs.readFileSync(artifactPath).toString(),
             url: release.data.upload_url,
