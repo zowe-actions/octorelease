@@ -32,14 +32,9 @@ export async function publishGithub(): Promise<void> {
     const octokit = github.getOctokit(core.getInput("repo-token"));
     const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
     const tag = "v" + packageJson.version;
+    core.info(releaseNotes);
+    core.info(JSON.stringify({ owner, repo, tag }));
     const release = await octokit.repos.getReleaseByTag({ owner, repo, tag });
-
-    if (!release) {
-        core.setFailed(`Could not find GitHub release matching the tag ${tag}`);
-        process.exit();
-        return;
-    }
-
     const release_id = release.data.id;
 
     // Add release notes to body of release
