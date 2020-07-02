@@ -98,7 +98,7 @@ export async function version(branch: IProtectedBranch): Promise<void> {
         await updateChangelog(newPackageJson);
 
         // Update version number in package-lock.json and add Git tag
-        await exec.exec(`npm version ${newPackageJson.version}`);
+        await exec.exec(`npm version ${newPackageJson.version} --allow-same-version`);
 
         // Push commits and tag
         utils.gitPush(branch.name, true);
