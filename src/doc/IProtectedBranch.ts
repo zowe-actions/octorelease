@@ -3,6 +3,6 @@ export interface IProtectedBranch {
     dependencies?: { [key: string]: string };
     devDependencies?: { [key: string]: string };
     level?: "major" | "minor" | "patch";
-    tag: string;
+    tag?: string;
     aliasTags?: string[];
 }

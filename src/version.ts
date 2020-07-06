@@ -1,71 +1,98 @@
 import * as fs from "fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import * as github from "@actions/github";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
 import * as utils from "./utils";
 
+/**
+ * Type to hold level of difference between semantic versions.
+ */
+type SemVerLevel = "major" | "minor" | "patch" | "none";
+
 export class Version {
     public static async version(branch: IProtectedBranch): Promise<void> {
-        const eventPath: string = utils.requireEnvVar("GITHUB_EVENT_PATH");
-        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-        let oldPackageJson: any = {};
+        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        const semverLevel: SemVerLevel = await this.getSemVerLevel();
 
-        // Load old package.json from base ref
-        try {
-            await exec.exec(`git fetch origin ${eventData.before}`);
-            const cmdOutput = await utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
-            oldPackageJson = JSON.parse(cmdOutput);
-        } catch {
-            core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
+        if (semverLevel === "none") {
+            core.warning("Semver label was not set on PR so skipping version stage");
+            return;
         }
 
-        const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
-
-        if (oldPackageJson.version !== newPackageJson.version) {
-            // Check semver level to see if new version is ok
-            if (branch.level && branch.level !== "major" && oldPackageJson.version) {
-                const semverDiff = require("semver-diff");
-                const semverLevel = semverDiff(oldPackageJson.version, newPackageJson.version);
-
-                if (semverLevel === "major" || (semverLevel === "minor" && branch.level !== "minor")) {
-                    core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
-                    process.exit();
-                }
+        // Check semver level to see if new version is ok
+        if (branch.level && branch.level !== "major") {
+            if (semverLevel === "major" || (semverLevel === "minor" && branch.level === "patch")) {
+                core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
+                process.exit();
             }
-
-            // Configure Git user, email, and origin URL
-            await utils.gitConfig();
-
-            // Update dependencies in package.json and package-lock.json
-            if (branch.dependencies) {
-                for (const pkgName of Object.keys(branch.dependencies)) {
-                    await this.updateDependency(pkgName, branch.dependencies[pkgName], newPackageJson, false);
-                }
-            }
-
-            // Update dev dependencies in package.json and package-lock.json
-            if (branch.devDependencies) {
-                for (const pkgName of Object.keys(branch.devDependencies)) {
-                    await this.updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
-                }
-            }
-
-            // Update version number in package-lock.json and changelog
-            await exec.exec("git reset --hard");
-            const gitTag = (await utils.execAndReturnOutput(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`)).trim();
-            this.updateChangelog("CHANGELOG.md", newPackageJson.version);
-
-            // Commit version bump and create tag
-            await exec.exec("git add -u");
-            await utils.gitCommit(`Bump version to ${newPackageJson.version}`);
-            await exec.exec(`git tag ${gitTag} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
-
-            // Push commits and tag
-            await utils.gitPush(branch.name, true);
-        } else {
-            core.info(`Version in package.json did not change so exiting now`);
-            process.exit();
         }
+
+        // Configure Git user, email, and origin URL
+        await utils.gitConfig();
+
+        // Update dependencies in package.json and package-lock.json
+        if (branch.dependencies) {
+            for (const pkgName of Object.keys(branch.dependencies)) {
+                await this.updateDependency(pkgName, branch.dependencies[pkgName], packageJson, false);
+            }
+        }
+
+        // Update dev dependencies in package.json and package-lock.json
+        if (branch.devDependencies) {
+            for (const pkgName of Object.keys(branch.devDependencies)) {
+                await this.updateDependency(pkgName, branch.devDependencies[pkgName], packageJson, true);
+            }
+        }
+
+        // Update version number in package-lock.json and changelog
+        await exec.exec("git reset --hard");
+        const gitTag = (await utils.execAndReturnOutput(`npm version ${semverLevel} --allow-same-version --no-git-tag-version`)).trim();
+        const newVersion = gitTag.slice(1);
+        this.updateChangelog("CHANGELOG.md", newVersion);
+
+        // Commit version bump and create tag
+        await exec.exec("git add -u");
+        await utils.gitCommit(`Bump version to ${newVersion}`);
+        await exec.exec(`git tag ${gitTag} -m "Release ${newVersion} to ${branch.tag}"`);
+
+        // Push commits and tag
+        await utils.gitPush(branch.name, true);
+    }
+
+    private static async getSemVerLevel(): Promise<SemVerLevel> {
+        const gitHash: string = utils.requireEnvVar("GITHUB_SHA");
+        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
+
+        const octokit = github.getOctokit(core.getInput("repo-token"));
+        const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
+            owner, repo,
+            commit_sha: gitHash
+        });
+
+        if (prs.data.length === 0) {
+            core.warning(`Could not find pull request associated with commit ${gitHash}`);
+            return "none";
+        }
+
+        const [labelMajor, labelMinor, labelPatch] = core.getInput("semver-labels").split(",", 3).map(s => s.trim());
+        let semverLevel: SemVerLevel = "none";
+
+        const labels = await octokit.issues.listLabelsOnIssue({
+            owner, repo,
+            issue_number: prs.data[0].number
+        });
+        const labelNames = labels.data.map(label => label.name);
+
+        if (labelNames.indexOf(labelMajor) !== -1) {
+            semverLevel = "major";
+        } else if (labelNames.indexOf(labelMinor) !== -1) {
+            semverLevel = "minor";
+        } else if (labelNames.indexOf(labelPatch) !== -1) {
+            semverLevel = "patch";
+        }
+
+        return semverLevel;
     }
 
     /**
@@ -80,8 +107,8 @@ export class Version {
     private static async updateDependency(pkgName: string, pkgTag: string, packageJson: any, dev: boolean): Promise<void> {
         const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
         let currentVersion: string = dependencies[pkgName];
-        if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
-            currentVersion = currentVersion.slice(1);
+        if (currentVersion) {
+            currentVersion = require("semver").clean(currentVersion);
         }
 
         const latestVersion = await utils.getPackageVersion(pkgName, pkgTag);

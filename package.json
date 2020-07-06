@@ -10,7 +10,7 @@
     "pack": "ncc build",
     "test": "jest",
     "watch": "ncc build src/main.ts -w",
-    "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
+    "all": "npm run build && npm run lint && npm run pack && npm test"
   },
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
     "js-yaml": "^3.14.0",
     "mime-types": "^2.1.27",
     "npm-cli-login": "^0.1.1",
-    "semver-diff": "^3.1.1"
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",

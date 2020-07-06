@@ -8,10 +8,27 @@ import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
+        const shouldVersion: boolean = core.getInput("skip-version") !== "true";
+        const shouldPublishGithub: boolean = core.getInput("github-artifacts") !== "";
+        const shouldPublishNpm: boolean = core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "";
+
         const configFile: string = core.getInput("config-file");
-        const config: IConfig = require("js-yaml").safeLoad(fs.readFileSync(configFile).toString());
-        const branchNames: string[] = (config.protectedBranches || []).map((branch: IProtectedBranch) => branch.name);
         const currentBranch: string = (await utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
+        let config: IConfig = {
+            protectedBranches: [
+                {
+                    name: currentBranch
+                }
+            ]
+        };
+
+        if (fs.existsSync(configFile)) {
+            config = require("js-yaml").safeLoad(fs.readFileSync(configFile, "utf-8"));
+        } else {
+            core.warning(`Missing config file ${configFile} so continuing without protected branch rules`);
+        }
+
+        const branchNames: string[] = (config.protectedBranches || []).map(branch => branch.name);
 
         // Check if protected branch is in config
         if (branchNames.indexOf(currentBranch) === -1) {
@@ -19,25 +36,21 @@ async function run(): Promise<void> {
             process.exit();
         }
 
-        const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
+        const protectedBranch: IProtectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
 
-        if (core.getInput("skip-version") !== "true") {
+        if (shouldVersion) {
             await Version.version(protectedBranch);
         }
 
-        let publishJobs = false;
-
-        if (core.getInput("github-artifacts")) {
-            publishJobs = true;
+        if (shouldPublishGithub) {
             await Publish.publishGithub();
         }
 
-        if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
-            publishJobs = true;
+        if (shouldPublishNpm) {
             await Publish.publishNpm(protectedBranch);
         }
 
-        if (!publishJobs) {
+        if (!shouldPublishGithub && !shouldPublishNpm) {
             core.warning("Nothing to publish");
         }
     } catch (error) {

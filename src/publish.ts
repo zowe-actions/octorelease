@@ -8,41 +8,44 @@ import * as utils from "./utils";
 
 export class Publish {
     public static async publishGithub(): Promise<void> {
-        const octokit = github.getOctokit(core.getInput("repo-token"));
+        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
         const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
 
         // Create release and add release notes if any
-        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
+        const octokit = github.getOctokit(core.getInput("repo-token"));
         const releaseNotes = await this.getReleaseNotes("CHANGELOG.md", packageJson.version);
         const release = await octokit.repos.createRelease({
             owner, repo,
-            tag_name: "v" + packageJson.version,
+            tag_name: `v${packageJson.version}`,
             body: releaseNotes
         })
 
         // Upload artifacts to release
         const artifactPaths: string[] = [];
         const glob = require("glob");
-        const mime = require("mime-types");
         core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
             artifactPaths.push(...glob.sync(artifactPattern.trim()));
         });
 
         for (const artifactPath of artifactPaths) {
+            core.info(`Uploading release asset ${artifactPath}`);
             await octokit.repos.uploadReleaseAsset({
                 owner, repo,
                 release_id: release.data.id,
                 name: path.basename(artifactPath),
-                data: fs.readFileSync(artifactPath).toString(),
+                data: fs.readFileSync(artifactPath, "binary"),
                 url: release.data.upload_url,
-                headers: {
-                    "Content-Type": mime.lookup(artifactPath)
-                }
+                headers: this.getUploadRequestHeaders(artifactPath)
             })
         }
     }
 
     public static async publishNpm(branch: IProtectedBranch): Promise<void> {
+        if (!branch.tag) {
+            core.setFailed(`Expected NPM tag to be defined for ${branch.name} branch but it is not`);
+            process.exit();
+        }
+
         // Prevent publish from being affected by local npmrc
         await exec.exec("rm -f .npmrc");
 
@@ -106,5 +109,12 @@ export class Publish {
         }
 
         return releaseNotes.trim() || undefined;
+    }
+
+    private static getUploadRequestHeaders(artifactPath: string): any {
+        return {
+            "Content-Length": fs.statSync(artifactPath).size,
+            "Content-Type": require("mime-types").lookup(artifactPath) || "application/octet-stream"
+        };
     }
 }
