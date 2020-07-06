@@ -5369,83 +5369,929 @@ function serial(list, iterator, callback)
 /* 93 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-"use strict";
+module.exports = minimatch
+minimatch.Minimatch = Minimatch
 
+var path = { sep: '/' }
+try {
+  path = __webpack_require__(622)
+} catch (er) {}
 
+var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {}
+var expand = __webpack_require__(306)
 
-var common = __webpack_require__(128);
-
-
-function Mark(name, buffer, position, line, column) {
-  this.name     = name;
-  this.buffer   = buffer;
-  this.position = position;
-  this.line     = line;
-  this.column   = column;
+var plTypes = {
+  '!': { open: '(?:(?!(?:', close: '))[^/]*?)'},
+  '?': { open: '(?:', close: ')?' },
+  '+': { open: '(?:', close: ')+' },
+  '*': { open: '(?:', close: ')*' },
+  '@': { open: '(?:', close: ')' }
 }
 
+// any single thing other than /
+// don't need to escape / when using new RegExp()
+var qmark = '[^/]'
 
-Mark.prototype.getSnippet = function getSnippet(indent, maxLength) {
-  var head, start, tail, end, snippet;
+// * => any number of characters
+var star = qmark + '*?'
 
-  if (!this.buffer) return null;
+// ** when dots are allowed.  Anything goes, except .. and .
+// not (^ or / followed by one or two dots followed by $ or /),
+// followed by anything, any number of times.
+var twoStarDot = '(?:(?!(?:\\\/|^)(?:\\.{1,2})($|\\\/)).)*?'
 
-  indent = indent || 4;
-  maxLength = maxLength || 75;
+// not a ^ or / followed by a dot,
+// followed by anything, any number of times.
+var twoStarNoDot = '(?:(?!(?:\\\/|^)\\.).)*?'
 
-  head = '';
-  start = this.position;
+// characters that need to be escaped in RegExp.
+var reSpecials = charSet('().*{}+?[]^$\\!')
 
-  while (start > 0 && '\x00\r\n\x85\u2028\u2029'.indexOf(this.buffer.charAt(start - 1)) === -1) {
-    start -= 1;
-    if (this.position - start > (maxLength / 2 - 1)) {
-      head = ' ... ';
-      start += 5;
-      break;
+// "abc" -> { a:true, b:true, c:true }
+function charSet (s) {
+  return s.split('').reduce(function (set, c) {
+    set[c] = true
+    return set
+  }, {})
+}
+
+// normalizes slashes.
+var slashSplit = /\/+/
+
+minimatch.filter = filter
+function filter (pattern, options) {
+  options = options || {}
+  return function (p, i, list) {
+    return minimatch(p, pattern, options)
+  }
+}
+
+function ext (a, b) {
+  a = a || {}
+  b = b || {}
+  var t = {}
+  Object.keys(b).forEach(function (k) {
+    t[k] = b[k]
+  })
+  Object.keys(a).forEach(function (k) {
+    t[k] = a[k]
+  })
+  return t
+}
+
+minimatch.defaults = function (def) {
+  if (!def || !Object.keys(def).length) return minimatch
+
+  var orig = minimatch
+
+  var m = function minimatch (p, pattern, options) {
+    return orig.minimatch(p, pattern, ext(def, options))
+  }
+
+  m.Minimatch = function Minimatch (pattern, options) {
+    return new orig.Minimatch(pattern, ext(def, options))
+  }
+
+  return m
+}
+
+Minimatch.defaults = function (def) {
+  if (!def || !Object.keys(def).length) return Minimatch
+  return minimatch.defaults(def).Minimatch
+}
+
+function minimatch (p, pattern, options) {
+  if (typeof pattern !== 'string') {
+    throw new TypeError('glob pattern string required')
+  }
+
+  if (!options) options = {}
+
+  // shortcut: comments match nothing.
+  if (!options.nocomment && pattern.charAt(0) === '#') {
+    return false
+  }
+
+  // "" only matches ""
+  if (pattern.trim() === '') return p === ''
+
+  return new Minimatch(pattern, options).match(p)
+}
+
+function Minimatch (pattern, options) {
+  if (!(this instanceof Minimatch)) {
+    return new Minimatch(pattern, options)
+  }
+
+  if (typeof pattern !== 'string') {
+    throw new TypeError('glob pattern string required')
+  }
+
+  if (!options) options = {}
+  pattern = pattern.trim()
+
+  // windows support: need to use /, not \
+  if (path.sep !== '/') {
+    pattern = pattern.split(path.sep).join('/')
+  }
+
+  this.options = options
+  this.set = []
+  this.pattern = pattern
+  this.regexp = null
+  this.negate = false
+  this.comment = false
+  this.empty = false
+
+  // make the set of regexps etc.
+  this.make()
+}
+
+Minimatch.prototype.debug = function () {}
+
+Minimatch.prototype.make = make
+function make () {
+  // don't do it more than once.
+  if (this._made) return
+
+  var pattern = this.pattern
+  var options = this.options
+
+  // empty patterns and comments match nothing.
+  if (!options.nocomment && pattern.charAt(0) === '#') {
+    this.comment = true
+    return
+  }
+  if (!pattern) {
+    this.empty = true
+    return
+  }
+
+  // step 1: figure out negation, etc.
+  this.parseNegate()
+
+  // step 2: expand braces
+  var set = this.globSet = this.braceExpand()
+
+  if (options.debug) this.debug = console.error
+
+  this.debug(this.pattern, set)
+
+  // step 3: now we have a set, so turn each one into a series of path-portion
+  // matching patterns.
+  // These will be regexps, except in the case of "**", which is
+  // set to the GLOBSTAR object for globstar behavior,
+  // and will not contain any / characters
+  set = this.globParts = set.map(function (s) {
+    return s.split(slashSplit)
+  })
+
+  this.debug(this.pattern, set)
+
+  // glob --> regexps
+  set = set.map(function (s, si, set) {
+    return s.map(this.parse, this)
+  }, this)
+
+  this.debug(this.pattern, set)
+
+  // filter out everything that didn't compile properly.
+  set = set.filter(function (s) {
+    return s.indexOf(false) === -1
+  })
+
+  this.debug(this.pattern, set)
+
+  this.set = set
+}
+
+Minimatch.prototype.parseNegate = parseNegate
+function parseNegate () {
+  var pattern = this.pattern
+  var negate = false
+  var options = this.options
+  var negateOffset = 0
+
+  if (options.nonegate) return
+
+  for (var i = 0, l = pattern.length
+    ; i < l && pattern.charAt(i) === '!'
+    ; i++) {
+    negate = !negate
+    negateOffset++
+  }
+
+  if (negateOffset) this.pattern = pattern.substr(negateOffset)
+  this.negate = negate
+}
+
+// Brace expansion:
+// a{b,c}d -> abd acd
+// a{b,}c -> abc ac
+// a{0..3}d -> a0d a1d a2d a3d
+// a{b,c{d,e}f}g -> abg acdfg acefg
+// a{b,c}d{e,f}g -> abdeg acdeg abdeg abdfg
+//
+// Invalid sets are not expanded.
+// a{2..}b -> a{2..}b
+// a{b}c -> a{b}c
+minimatch.braceExpand = function (pattern, options) {
+  return braceExpand(pattern, options)
+}
+
+Minimatch.prototype.braceExpand = braceExpand
+
+function braceExpand (pattern, options) {
+  if (!options) {
+    if (this instanceof Minimatch) {
+      options = this.options
+    } else {
+      options = {}
     }
   }
 
-  tail = '';
-  end = this.position;
+  pattern = typeof pattern === 'undefined'
+    ? this.pattern : pattern
 
-  while (end < this.buffer.length && '\x00\r\n\x85\u2028\u2029'.indexOf(this.buffer.charAt(end)) === -1) {
-    end += 1;
-    if (end - this.position > (maxLength / 2 - 1)) {
-      tail = ' ... ';
-      end -= 5;
-      break;
+  if (typeof pattern === 'undefined') {
+    throw new TypeError('undefined pattern')
+  }
+
+  if (options.nobrace ||
+    !pattern.match(/\{.*\}/)) {
+    // shortcut. no need to expand.
+    return [pattern]
+  }
+
+  return expand(pattern)
+}
+
+// parse a component of the expanded set.
+// At this point, no pattern may contain "/" in it
+// so we're going to return a 2d array, where each entry is the full
+// pattern, split on '/', and then turned into a regular expression.
+// A regexp is made at the end which joins each array with an
+// escaped /, and another full one which joins each regexp with |.
+//
+// Following the lead of Bash 4.1, note that "**" only has special meaning
+// when it is the *only* thing in a path portion.  Otherwise, any series
+// of * is equivalent to a single *.  Globstar behavior is enabled by
+// default, and can be disabled by setting options.noglobstar.
+Minimatch.prototype.parse = parse
+var SUBPARSE = {}
+function parse (pattern, isSub) {
+  if (pattern.length > 1024 * 64) {
+    throw new TypeError('pattern is too long')
+  }
+
+  var options = this.options
+
+  // shortcuts
+  if (!options.noglobstar && pattern === '**') return GLOBSTAR
+  if (pattern === '') return ''
+
+  var re = ''
+  var hasMagic = !!options.nocase
+  var escaping = false
+  // ? => one single character
+  var patternListStack = []
+  var negativeLists = []
+  var stateChar
+  var inClass = false
+  var reClassStart = -1
+  var classStart = -1
+  // . and .. never match anything that doesn't start with .,
+  // even when options.dot is set.
+  var patternStart = pattern.charAt(0) === '.' ? '' // anything
+  // not (start or / followed by . or .. followed by / or end)
+  : options.dot ? '(?!(?:^|\\\/)\\.{1,2}(?:$|\\\/))'
+  : '(?!\\.)'
+  var self = this
+
+  function clearStateChar () {
+    if (stateChar) {
+      // we had some state-tracking character
+      // that wasn't consumed by this pass.
+      switch (stateChar) {
+        case '*':
+          re += star
+          hasMagic = true
+        break
+        case '?':
+          re += qmark
+          hasMagic = true
+        break
+        default:
+          re += '\\' + stateChar
+        break
+      }
+      self.debug('clearStateChar %j %j', stateChar, re)
+      stateChar = false
     }
   }
 
-  snippet = this.buffer.slice(start, end);
+  for (var i = 0, len = pattern.length, c
+    ; (i < len) && (c = pattern.charAt(i))
+    ; i++) {
+    this.debug('%s\t%s %s %j', pattern, i, re, c)
 
-  return common.repeat(' ', indent) + head + snippet + tail + '\n' +
-         common.repeat(' ', indent + this.position - start + head.length) + '^';
-};
+    // skip over any that are escaped.
+    if (escaping && reSpecials[c]) {
+      re += '\\' + c
+      escaping = false
+      continue
+    }
 
+    switch (c) {
+      case '/':
+        // completely not allowed, even escaped.
+        // Should already be path-split by now.
+        return false
 
-Mark.prototype.toString = function toString(compact) {
-  var snippet, where = '';
+      case '\\':
+        clearStateChar()
+        escaping = true
+      continue
 
-  if (this.name) {
-    where += 'in "' + this.name + '" ';
+      // the various stateChar values
+      // for the "extglob" stuff.
+      case '?':
+      case '*':
+      case '+':
+      case '@':
+      case '!':
+        this.debug('%s\t%s %s %j <-- stateChar', pattern, i, re, c)
+
+        // all of those are literals inside a class, except that
+        // the glob [!a] means [^a] in regexp
+        if (inClass) {
+          this.debug('  in class')
+          if (c === '!' && i === classStart + 1) c = '^'
+          re += c
+          continue
+        }
+
+        // if we already have a stateChar, then it means
+        // that there was something like ** or +? in there.
+        // Handle the stateChar, then proceed with this one.
+        self.debug('call clearStateChar %j', stateChar)
+        clearStateChar()
+        stateChar = c
+        // if extglob is disabled, then +(asdf|foo) isn't a thing.
+        // just clear the statechar *now*, rather than even diving into
+        // the patternList stuff.
+        if (options.noext) clearStateChar()
+      continue
+
+      case '(':
+        if (inClass) {
+          re += '('
+          continue
+        }
+
+        if (!stateChar) {
+          re += '\\('
+          continue
+        }
+
+        patternListStack.push({
+          type: stateChar,
+          start: i - 1,
+          reStart: re.length,
+          open: plTypes[stateChar].open,
+          close: plTypes[stateChar].close
+        })
+        // negation is (?:(?!js)[^/]*)
+        re += stateChar === '!' ? '(?:(?!(?:' : '(?:'
+        this.debug('plType %j %j', stateChar, re)
+        stateChar = false
+      continue
+
+      case ')':
+        if (inClass || !patternListStack.length) {
+          re += '\\)'
+          continue
+        }
+
+        clearStateChar()
+        hasMagic = true
+        var pl = patternListStack.pop()
+        // negation is (?:(?!js)[^/]*)
+        // The others are (?:<pattern>)<type>
+        re += pl.close
+        if (pl.type === '!') {
+          negativeLists.push(pl)
+        }
+        pl.reEnd = re.length
+      continue
+
+      case '|':
+        if (inClass || !patternListStack.length || escaping) {
+          re += '\\|'
+          escaping = false
+          continue
+        }
+
+        clearStateChar()
+        re += '|'
+      continue
+
+      // these are mostly the same in regexp and glob
+      case '[':
+        // swallow any state-tracking char before the [
+        clearStateChar()
+
+        if (inClass) {
+          re += '\\' + c
+          continue
+        }
+
+        inClass = true
+        classStart = i
+        reClassStart = re.length
+        re += c
+      continue
+
+      case ']':
+        //  a right bracket shall lose its special
+        //  meaning and represent itself in
+        //  a bracket expression if it occurs
+        //  first in the list.  -- POSIX.2 2.8.3.2
+        if (i === classStart + 1 || !inClass) {
+          re += '\\' + c
+          escaping = false
+          continue
+        }
+
+        // handle the case where we left a class open.
+        // "[z-a]" is valid, equivalent to "\[z-a\]"
+        if (inClass) {
+          // split where the last [ was, make sure we don't have
+          // an invalid re. if so, re-walk the contents of the
+          // would-be class to re-translate any characters that
+          // were passed through as-is
+          // TODO: It would probably be faster to determine this
+          // without a try/catch and a new RegExp, but it's tricky
+          // to do safely.  For now, this is safe and works.
+          var cs = pattern.substring(classStart + 1, i)
+          try {
+            RegExp('[' + cs + ']')
+          } catch (er) {
+            // not a valid class!
+            var sp = this.parse(cs, SUBPARSE)
+            re = re.substr(0, reClassStart) + '\\[' + sp[0] + '\\]'
+            hasMagic = hasMagic || sp[1]
+            inClass = false
+            continue
+          }
+        }
+
+        // finish up the class.
+        hasMagic = true
+        inClass = false
+        re += c
+      continue
+
+      default:
+        // swallow any state char that wasn't consumed
+        clearStateChar()
+
+        if (escaping) {
+          // no need
+          escaping = false
+        } else if (reSpecials[c]
+          && !(c === '^' && inClass)) {
+          re += '\\'
+        }
+
+        re += c
+
+    } // switch
+  } // for
+
+  // handle the case where we left a class open.
+  // "[abc" is valid, equivalent to "\[abc"
+  if (inClass) {
+    // split where the last [ was, and escape it
+    // this is a huge pita.  We now have to re-walk
+    // the contents of the would-be class to re-translate
+    // any characters that were passed through as-is
+    cs = pattern.substr(classStart + 1)
+    sp = this.parse(cs, SUBPARSE)
+    re = re.substr(0, reClassStart) + '\\[' + sp[0]
+    hasMagic = hasMagic || sp[1]
   }
 
-  where += 'at line ' + (this.line + 1) + ', column ' + (this.column + 1);
+  // handle the case where we had a +( thing at the *end*
+  // of the pattern.
+  // each pattern list stack adds 3 chars, and we need to go through
+  // and escape any | chars that were passed through as-is for the regexp.
+  // Go through and escape them, taking care not to double-escape any
+  // | chars that were already escaped.
+  for (pl = patternListStack.pop(); pl; pl = patternListStack.pop()) {
+    var tail = re.slice(pl.reStart + pl.open.length)
+    this.debug('setting tail', re, pl)
+    // maybe some even number of \, then maybe 1 \, followed by a |
+    tail = tail.replace(/((?:\\{2}){0,64})(\\?)\|/g, function (_, $1, $2) {
+      if (!$2) {
+        // the | isn't already escaped, so escape it.
+        $2 = '\\'
+      }
 
-  if (!compact) {
-    snippet = this.getSnippet();
+      // need to escape all those slashes *again*, without escaping the
+      // one that we need for escaping the | character.  As it works out,
+      // escaping an even number of slashes can be done by simply repeating
+      // it exactly after itself.  That's why this trick works.
+      //
+      // I am sorry that you have to see this.
+      return $1 + $1 + $2 + '|'
+    })
 
-    if (snippet) {
-      where += ':\n' + snippet;
+    this.debug('tail=%j\n   %s', tail, tail, pl, re)
+    var t = pl.type === '*' ? star
+      : pl.type === '?' ? qmark
+      : '\\' + pl.type
+
+    hasMagic = true
+    re = re.slice(0, pl.reStart) + t + '\\(' + tail
+  }
+
+  // handle trailing things that only matter at the very end.
+  clearStateChar()
+  if (escaping) {
+    // trailing \\
+    re += '\\\\'
+  }
+
+  // only need to apply the nodot start if the re starts with
+  // something that could conceivably capture a dot
+  var addPatternStart = false
+  switch (re.charAt(0)) {
+    case '.':
+    case '[':
+    case '(': addPatternStart = true
+  }
+
+  // Hack to work around lack of negative lookbehind in JS
+  // A pattern like: *.!(x).!(y|z) needs to ensure that a name
+  // like 'a.xyz.yz' doesn't match.  So, the first negative
+  // lookahead, has to look ALL the way ahead, to the end of
+  // the pattern.
+  for (var n = negativeLists.length - 1; n > -1; n--) {
+    var nl = negativeLists[n]
+
+    var nlBefore = re.slice(0, nl.reStart)
+    var nlFirst = re.slice(nl.reStart, nl.reEnd - 8)
+    var nlLast = re.slice(nl.reEnd - 8, nl.reEnd)
+    var nlAfter = re.slice(nl.reEnd)
+
+    nlLast += nlAfter
+
+    // Handle nested stuff like *(*.js|!(*.json)), where open parens
+    // mean that we should *not* include the ) in the bit that is considered
+    // "after" the negated section.
+    var openParensBefore = nlBefore.split('(').length - 1
+    var cleanAfter = nlAfter
+    for (i = 0; i < openParensBefore; i++) {
+      cleanAfter = cleanAfter.replace(/\)[+*?]?/, '')
+    }
+    nlAfter = cleanAfter
+
+    var dollar = ''
+    if (nlAfter === '' && isSub !== SUBPARSE) {
+      dollar = '$'
+    }
+    var newRe = nlBefore + nlFirst + nlAfter + dollar + nlLast
+    re = newRe
+  }
+
+  // if the re is not "" at this point, then we need to make sure
+  // it doesn't match against an empty path part.
+  // Otherwise a/* will match a/, which it should not.
+  if (re !== '' && hasMagic) {
+    re = '(?=.)' + re
+  }
+
+  if (addPatternStart) {
+    re = patternStart + re
+  }
+
+  // parsing just a piece of a larger pattern.
+  if (isSub === SUBPARSE) {
+    return [re, hasMagic]
+  }
+
+  // skip the regexp for non-magical patterns
+  // unescape anything in it, though, so that it'll be
+  // an exact match against a file etc.
+  if (!hasMagic) {
+    return globUnescape(pattern)
+  }
+
+  var flags = options.nocase ? 'i' : ''
+  try {
+    var regExp = new RegExp('^' + re + '$', flags)
+  } catch (er) {
+    // If it was an invalid regular expression, then it can't match
+    // anything.  This trick looks for a character after the end of
+    // the string, which is of course impossible, except in multi-line
+    // mode, but it's not a /m regex.
+    return new RegExp('$.')
+  }
+
+  regExp._glob = pattern
+  regExp._src = re
+
+  return regExp
+}
+
+minimatch.makeRe = function (pattern, options) {
+  return new Minimatch(pattern, options || {}).makeRe()
+}
+
+Minimatch.prototype.makeRe = makeRe
+function makeRe () {
+  if (this.regexp || this.regexp === false) return this.regexp
+
+  // at this point, this.set is a 2d array of partial
+  // pattern strings, or "**".
+  //
+  // It's better to use .match().  This function shouldn't
+  // be used, really, but it's pretty convenient sometimes,
+  // when you just want to work with a regex.
+  var set = this.set
+
+  if (!set.length) {
+    this.regexp = false
+    return this.regexp
+  }
+  var options = this.options
+
+  var twoStar = options.noglobstar ? star
+    : options.dot ? twoStarDot
+    : twoStarNoDot
+  var flags = options.nocase ? 'i' : ''
+
+  var re = set.map(function (pattern) {
+    return pattern.map(function (p) {
+      return (p === GLOBSTAR) ? twoStar
+      : (typeof p === 'string') ? regExpEscape(p)
+      : p._src
+    }).join('\\\/')
+  }).join('|')
+
+  // must match entire pattern
+  // ending in a * or ** will make it less strict.
+  re = '^(?:' + re + ')$'
+
+  // can match anything, as long as it's not this.
+  if (this.negate) re = '^(?!' + re + ').*$'
+
+  try {
+    this.regexp = new RegExp(re, flags)
+  } catch (ex) {
+    this.regexp = false
+  }
+  return this.regexp
+}
+
+minimatch.match = function (list, pattern, options) {
+  options = options || {}
+  var mm = new Minimatch(pattern, options)
+  list = list.filter(function (f) {
+    return mm.match(f)
+  })
+  if (mm.options.nonull && !list.length) {
+    list.push(pattern)
+  }
+  return list
+}
+
+Minimatch.prototype.match = match
+function match (f, partial) {
+  this.debug('match', f, this.pattern)
+  // short-circuit in the case of busted things.
+  // comments, etc.
+  if (this.comment) return false
+  if (this.empty) return f === ''
+
+  if (f === '/' && partial) return true
+
+  var options = this.options
+
+  // windows: need to use /, not \
+  if (path.sep !== '/') {
+    f = f.split(path.sep).join('/')
+  }
+
+  // treat the test path as a set of pathparts.
+  f = f.split(slashSplit)
+  this.debug(this.pattern, 'split', f)
+
+  // just ONE of the pattern sets in this.set needs to match
+  // in order for it to be valid.  If negating, then just one
+  // match means that we have failed.
+  // Either way, return on the first hit.
+
+  var set = this.set
+  this.debug(this.pattern, 'set', set)
+
+  // Find the basename of the path by looking for the last non-empty segment
+  var filename
+  var i
+  for (i = f.length - 1; i >= 0; i--) {
+    filename = f[i]
+    if (filename) break
+  }
+
+  for (i = 0; i < set.length; i++) {
+    var pattern = set[i]
+    var file = f
+    if (options.matchBase && pattern.length === 1) {
+      file = [filename]
+    }
+    var hit = this.matchOne(file, pattern, partial)
+    if (hit) {
+      if (options.flipNegate) return true
+      return !this.negate
     }
   }
 
-  return where;
-};
+  // didn't get any hits.  this is success if it's a negative
+  // pattern, failure otherwise.
+  if (options.flipNegate) return false
+  return this.negate
+}
 
+// set partial to true to test if, for example,
+// "/a/b" matches the start of "/*/b/*/d"
+// Partial means, if you run out of file before you run
+// out of pattern, then that's fine, as long as all
+// the parts match.
+Minimatch.prototype.matchOne = function (file, pattern, partial) {
+  var options = this.options
 
-module.exports = Mark;
+  this.debug('matchOne',
+    { 'this': this, file: file, pattern: pattern })
+
+  this.debug('matchOne', file.length, pattern.length)
+
+  for (var fi = 0,
+      pi = 0,
+      fl = file.length,
+      pl = pattern.length
+      ; (fi < fl) && (pi < pl)
+      ; fi++, pi++) {
+    this.debug('matchOne loop')
+    var p = pattern[pi]
+    var f = file[fi]
+
+    this.debug(pattern, p, f)
+
+    // should be impossible.
+    // some invalid regexp stuff in the set.
+    if (p === false) return false
+
+    if (p === GLOBSTAR) {
+      this.debug('GLOBSTAR', [pattern, p, f])
+
+      // "**"
+      // a/**/b/**/c would match the following:
+      // a/b/x/y/z/c
+      // a/x/y/z/b/c
+      // a/b/x/b/x/c
+      // a/b/c
+      // To do this, take the rest of the pattern after
+      // the **, and see if it would match the file remainder.
+      // If so, return success.
+      // If not, the ** "swallows" a segment, and try again.
+      // This is recursively awful.
+      //
+      // a/**/b/**/c matching a/b/x/y/z/c
+      // - a matches a
+      // - doublestar
+      //   - matchOne(b/x/y/z/c, b/**/c)
+      //     - b matches b
+      //     - doublestar
+      //       - matchOne(x/y/z/c, c) -> no
+      //       - matchOne(y/z/c, c) -> no
+      //       - matchOne(z/c, c) -> no
+      //       - matchOne(c, c) yes, hit
+      var fr = fi
+      var pr = pi + 1
+      if (pr === pl) {
+        this.debug('** at the end')
+        // a ** at the end will just swallow the rest.
+        // We have found a match.
+        // however, it will not swallow /.x, unless
+        // options.dot is set.
+        // . and .. are *never* matched by **, for explosively
+        // exponential reasons.
+        for (; fi < fl; fi++) {
+          if (file[fi] === '.' || file[fi] === '..' ||
+            (!options.dot && file[fi].charAt(0) === '.')) return false
+        }
+        return true
+      }
+
+      // ok, let's see if we can swallow whatever we can.
+      while (fr < fl) {
+        var swallowee = file[fr]
+
+        this.debug('\nglobstar while', file, fr, pattern, pr, swallowee)
+
+        // XXX remove this slice.  Just pass the start index.
+        if (this.matchOne(file.slice(fr), pattern.slice(pr), partial)) {
+          this.debug('globstar found match!', fr, fl, swallowee)
+          // found a match.
+          return true
+        } else {
+          // can't swallow "." or ".." ever.
+          // can only swallow ".foo" when explicitly asked.
+          if (swallowee === '.' || swallowee === '..' ||
+            (!options.dot && swallowee.charAt(0) === '.')) {
+            this.debug('dot detected!', file, fr, pattern, pr)
+            break
+          }
+
+          // ** swallows a segment, and continue.
+          this.debug('globstar swallow a segment, and continue')
+          fr++
+        }
+      }
+
+      // no match was found.
+      // However, in partial mode, we can't say this is necessarily over.
+      // If there's more *pattern* left, then
+      if (partial) {
+        // ran out of file
+        this.debug('\n>>> no match, partial?', file, fr, pattern, pr)
+        if (fr === fl) return true
+      }
+      return false
+    }
+
+    // something other than **
+    // non-magic patterns just have to match exactly
+    // patterns with magic have been turned into regexps.
+    var hit
+    if (typeof p === 'string') {
+      if (options.nocase) {
+        hit = f.toLowerCase() === p.toLowerCase()
+      } else {
+        hit = f === p
+      }
+      this.debug('string match', p, f, hit)
+    } else {
+      hit = f.match(p)
+      this.debug('pattern match', p, f, hit)
+    }
+
+    if (!hit) return false
+  }
+
+  // Note: ending in / means that we'll get a final ""
+  // at the end of the pattern.  This can only match a
+  // corresponding "" at the end of the file.
+  // If the file ends in /, then it can only match a
+  // a pattern that ends in /, unless the pattern just
+  // doesn't have any more for it. But, a/b/ should *not*
+  // match "a/b/*", even though "" matches against the
+  // [^/]*? pattern, except in partial mode, where it might
+  // simply not be reached yet.
+  // However, a/b/ should still satisfy a/*
+
+  // now either we fell off the end of the pattern, or we're done.
+  if (fi === fl && pi === pl) {
+    // ran out of pattern and filename at the same time.
+    // an exact hit!
+    return true
+  } else if (fi === fl) {
+    // ran out of file, but still had pattern left.
+    // this is ok if we're doing the match as part of
+    // a glob fs traversal.
+    return partial
+  } else if (pi === pl) {
+    // ran out of pattern, still have file left.
+    // this is only acceptable if we're on the very last
+    // empty segment of a file with a trailing slash.
+    // a/* should match a/b/
+    var emptyFileEnd = (fi === fl - 1) && (file[fi] === '')
+    return emptyFileEnd
+  }
+
+  // should be unreachable.
+  throw new Error('wtf?')
+}
+
+// replace stuff like \* with *
+function globUnescape (s) {
+  return s.replace(/\\(.)/g, '$1')
+}
+
+function regExpEscape (s) {
+  return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+}
 
 
 /***/ }),
@@ -7823,7 +8669,35 @@ module.exports.default = macosRelease;
 /***/ }),
 /* 119 */,
 /* 120 */,
-/* 121 */,
+/* 121 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+module.exports = tag
+
+var assert = __webpack_require__(357)
+
+function tag (uri, params, cb) {
+  assert(typeof uri === 'string', 'must pass registry URI to tag')
+  assert(params && typeof params === 'object', 'must pass params to tag')
+  assert(typeof cb === 'function', 'must pass callback to tag')
+
+  assert(typeof params.version === 'string', 'must pass version to tag')
+  assert(typeof params.tag === 'string', 'must pass tag name to tag')
+  assert(
+    params.auth && typeof params.auth === 'object',
+    'must pass auth to tag'
+  )
+
+  var options = {
+    method: 'PUT',
+    body: JSON.stringify(params.version),
+    auth: params.auth
+  }
+  this.request(uri + '/' + params.tag, options, cb)
+}
+
+
+/***/ }),
 /* 122 */,
 /* 123 */,
 /* 124 */,
@@ -7981,6 +8855,10 @@ const version_1 = __webpack_require__(228);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
+            const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+            core.info(JSON.stringify(eventData));
+            process.exit();
             const configFile = core.getInput("config-file");
             const config = __webpack_require__(414).safeLoad(fs.readFileSync(configFile).toString());
             const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
@@ -7992,16 +8870,16 @@ function run() {
             }
             const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
             if (core.getInput("skip-version") !== "true") {
-                yield version_1.version(protectedBranch);
+                yield version_1.Version.version(protectedBranch);
             }
             let publishJobs = false;
             if (core.getInput("github-artifacts")) {
                 publishJobs = true;
-                yield publish_1.publishGithub();
+                yield publish_1.Publish.publishGithub();
             }
             if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
                 publishJobs = true;
-                yield publish_1.publishNpm(protectedBranch);
+                yield publish_1.Publish.publishNpm(protectedBranch);
             }
             if (!publishJobs) {
                 core.warning("Nothing to publish");
@@ -10093,7 +10971,89 @@ exports.debug = debug // for test
 /* 177 */,
 /* 178 */,
 /* 179 */,
-/* 180 */,
+/* 180 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+"use strict";
+
+
+
+var common = __webpack_require__(128);
+
+
+function Mark(name, buffer, position, line, column) {
+  this.name     = name;
+  this.buffer   = buffer;
+  this.position = position;
+  this.line     = line;
+  this.column   = column;
+}
+
+
+Mark.prototype.getSnippet = function getSnippet(indent, maxLength) {
+  var head, start, tail, end, snippet;
+
+  if (!this.buffer) return null;
+
+  indent = indent || 4;
+  maxLength = maxLength || 75;
+
+  head = '';
+  start = this.position;
+
+  while (start > 0 && '\x00\r\n\x85\u2028\u2029'.indexOf(this.buffer.charAt(start - 1)) === -1) {
+    start -= 1;
+    if (this.position - start > (maxLength / 2 - 1)) {
+      head = ' ... ';
+      start += 5;
+      break;
+    }
+  }
+
+  tail = '';
+  end = this.position;
+
+  while (end < this.buffer.length && '\x00\r\n\x85\u2028\u2029'.indexOf(this.buffer.charAt(end)) === -1) {
+    end += 1;
+    if (end - this.position > (maxLength / 2 - 1)) {
+      tail = ' ... ';
+      end -= 5;
+      break;
+    }
+  }
+
+  snippet = this.buffer.slice(start, end);
+
+  return common.repeat(' ', indent) + head + snippet + tail + '\n' +
+         common.repeat(' ', indent + this.position - start + head.length) + '^';
+};
+
+
+Mark.prototype.toString = function toString(compact) {
+  var snippet, where = '';
+
+  if (this.name) {
+    where += 'in "' + this.name + '" ';
+  }
+
+  where += 'at line ' + (this.line + 1) + ', column ' + (this.column + 1);
+
+  if (!compact) {
+    snippet = this.getSnippet();
+
+    if (snippet) {
+      where += ':\n' + snippet;
+    }
+  }
+
+  return where;
+};
+
+
+module.exports = Mark;
+
+
+/***/ }),
 /* 181 */
 /***/ (function(module) {
 
@@ -14591,7 +15551,7 @@ function ReadableState(options, stream) {
   this.decoder = null;
   this.encoding = null;
   if (options.encoding) {
-    if (!StringDecoder) StringDecoder = __webpack_require__(674).StringDecoder;
+    if (!StringDecoder) StringDecoder = __webpack_require__(432).StringDecoder;
     this.decoder = new StringDecoder(options.encoding);
     this.encoding = options.encoding;
   }
@@ -14747,7 +15707,7 @@ Readable.prototype.isPaused = function () {
 
 // backwards compatibility.
 Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = __webpack_require__(674).StringDecoder;
+  if (!StringDecoder) StringDecoder = __webpack_require__(432).StringDecoder;
   this._readableState.decoder = new StringDecoder(enc);
   this._readableState.encoding = enc;
   return this;
@@ -15468,115 +16428,117 @@ const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const utils = __importStar(__webpack_require__(163));
-/**
- * Update a Node.js dependency or dev dependency to the latest version released
- * with the specified tag. If there is an update available, the version bump is
- * Git committed.
- * @param pkgName - Name of the dependency (e.g., `@zowe/imperative`)
- * @param pkgTag - Tag of the dependency (e.g., `zowe-v1-lts`)
- * @param packageJson - Package JSON object that contains dependency lists
- * @param dev - Specify true if the package is a dev dependency
- */
-function updateDependency(pkgName, pkgTag, packageJson, dev) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
-        let currentVersion = dependencies[pkgName];
-        if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
-            currentVersion = currentVersion.slice(1);
-        }
-        const latestVersion = yield utils.getPackageVersion(pkgName, pkgTag);
-        if (currentVersion !== latestVersion) {
-            const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
-            yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
-            yield exec.exec(`git add package.json package-lock.json`);
-            yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
-        }
-    });
-}
-/**
- * Update the changelog file, if one exists, to replace the header denoting
- * recent changes with a header for the new version.
- * @param pkgVer - New version of the package
- */
-function updateChangelog(pkgVer) {
-    const changelogFile = "CHANGELOG.md";
-    if (!fs.existsSync(changelogFile)) {
-        core.warning("Missing changelog file, skipping changelog update");
-        return;
-    }
-    const changelogHeader = core.getInput("changelog-header");
-    if (!changelogHeader) {
-        core.warning("Changelog header was not defined, skipping changelog update");
-        return;
-    }
-    const changelogContents = fs.readFileSync(changelogFile).toString();
-    if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
-        core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
-        return;
-    }
-    if (changelogContents.indexOf(changelogHeader) === -1) {
-        core.warning("Changelog header not found in changelog file, skipping changelog update");
-        return;
-    }
-    fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
-}
-function version(branch) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
-        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-        let oldPackageJson = {};
-        // Load old package.json from base ref
-        try {
-            yield exec.exec(`git fetch origin ${eventData.before}`);
-            const cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
-            oldPackageJson = JSON.parse(cmdOutput);
-        }
-        catch (_a) {
-            core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
-        }
-        const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        if (oldPackageJson.version !== newPackageJson.version) {
-            // Check semver level to see if new version is ok
-            if (branch.level && branch.level !== "major" && oldPackageJson.version) {
-                const semverDiff = __webpack_require__(104);
-                const semverLevel = semverDiff(oldPackageJson.version, newPackageJson.version);
-                if (semverLevel === "major" || (semverLevel === "minor" && branch.level !== "minor")) {
-                    core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
-                    process.exit();
-                }
+class Version {
+    static version(branch) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
+            const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+            let oldPackageJson = {};
+            // Load old package.json from base ref
+            try {
+                yield exec.exec(`git fetch origin ${eventData.before}`);
+                const cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
+                oldPackageJson = JSON.parse(cmdOutput);
             }
-            // Configure Git user, email, and origin URL
-            yield utils.gitConfig();
-            // Update dependencies in package.json and package-lock.json
-            if (branch.dependencies) {
-                for (const pkgName of Object.keys(branch.dependencies)) {
-                    yield updateDependency(pkgName, branch.dependencies[pkgName], newPackageJson, false);
-                }
+            catch (_a) {
+                core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
             }
-            // Update dev dependencies in package.json and package-lock.json
-            if (branch.devDependencies) {
-                for (const pkgName of Object.keys(branch.devDependencies)) {
-                    yield updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
+            const newPackageJson = JSON.parse(fs.readFileSync("package.json").toString());
+            if (oldPackageJson.version !== newPackageJson.version) {
+                // Check semver level to see if new version is ok
+                if (branch.level && branch.level !== "major" && oldPackageJson.version) {
+                    const semverDiff = __webpack_require__(104);
+                    const semverLevel = semverDiff(oldPackageJson.version, newPackageJson.version);
+                    if (semverLevel === "major" || (semverLevel === "minor" && branch.level !== "minor")) {
+                        core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
+                        process.exit();
+                    }
                 }
+                // Configure Git user, email, and origin URL
+                yield utils.gitConfig();
+                // Update dependencies in package.json and package-lock.json
+                if (branch.dependencies) {
+                    for (const pkgName of Object.keys(branch.dependencies)) {
+                        yield this.updateDependency(pkgName, branch.dependencies[pkgName], newPackageJson, false);
+                    }
+                }
+                // Update dev dependencies in package.json and package-lock.json
+                if (branch.devDependencies) {
+                    for (const pkgName of Object.keys(branch.devDependencies)) {
+                        yield this.updateDependency(pkgName, branch.devDependencies[pkgName], newPackageJson, true);
+                    }
+                }
+                // Update version number in package-lock.json and changelog
+                yield exec.exec("git reset --hard");
+                const gitTag = (yield utils.execAndReturnOutput(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`)).trim();
+                this.updateChangelog("CHANGELOG.md", newPackageJson.version);
+                // Commit version bump and create tag
+                yield exec.exec("git add -u");
+                yield utils.gitCommit(`Bump version to ${newPackageJson.version}`);
+                yield exec.exec(`git tag ${gitTag} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
+                // Push commits and tag
+                yield utils.gitPush(branch.name, true);
             }
-            // Update version number in package-lock.json and changelog
-            yield exec.exec("git reset --hard");
-            const gitTag = (yield utils.execAndReturnOutput(`npm version ${newPackageJson.version} --allow-same-version --no-git-tag-version`)).trim();
-            updateChangelog(newPackageJson.version);
-            // Commit version bump and create tag
-            yield exec.exec("git add -u");
-            yield utils.gitCommit(`Bump version to ${newPackageJson.version}`);
-            yield exec.exec(`git tag ${gitTag} -m "Release ${newPackageJson.version} to ${branch.tag}"`);
-            // Push commits and tag
-            yield utils.gitPush(branch.name, true);
+            else {
+                core.info(`Version in package.json did not change so exiting now`);
+                process.exit();
+            }
+        });
+    }
+    /**
+     * Update a Node.js dependency or dev dependency to the latest version released
+     * with the specified tag. If there is an update available, the version bump is
+     * Git committed.
+     * @param pkgName - Name of the dependency (e.g., `@zowe/imperative`)
+     * @param pkgTag - Tag of the dependency (e.g., `zowe-v1-lts`)
+     * @param packageJson - Package JSON object that contains dependency lists
+     * @param dev - Specify true if the package is a dev dependency
+     */
+    static updateDependency(pkgName, pkgTag, packageJson, dev) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
+            let currentVersion = dependencies[pkgName];
+            if (currentVersion && !(currentVersion[0] >= "0" && currentVersion[0] <= "9")) {
+                currentVersion = currentVersion.slice(1);
+            }
+            const latestVersion = yield utils.getPackageVersion(pkgName, pkgTag);
+            if (currentVersion !== latestVersion) {
+                const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
+                yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
+                yield exec.exec(`git add package.json package-lock.json`);
+                yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
+            }
+        });
+    }
+    /**
+     * Update the changelog file, if one exists, to replace the header denoting
+     * recent changes with a header for the new version.
+     * @param changelogFile - Path to changelog file
+     * @param pkgVer - New version of the package
+     */
+    static updateChangelog(changelogFile, pkgVer) {
+        if (!fs.existsSync(changelogFile)) {
+            core.warning("Missing changelog file, skipping changelog update");
+            return;
         }
-        else {
-            core.info(`Version in package.json did not change so exiting now`);
-            process.exit();
+        const changelogHeader = core.getInput("changelog-header");
+        if (!changelogHeader) {
+            core.warning("Changelog header was not defined, skipping changelog update");
+            return;
         }
-    });
+        const changelogContents = fs.readFileSync(changelogFile).toString();
+        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
+            core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
+            return;
+        }
+        if (changelogContents.indexOf(changelogHeader) === -1) {
+            core.warning("Changelog header not found in changelog file, skipping changelog update");
+            return;
+        }
+        fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
+    }
 }
-exports.version = version;
+exports.Version = Version;
 
 
 /***/ }),
@@ -19522,7 +20484,7 @@ globSync.GlobSync = GlobSync
 
 var fs = __webpack_require__(747)
 var rp = __webpack_require__(302)
-var minimatch = __webpack_require__(595)
+var minimatch = __webpack_require__(93)
 var Minimatch = minimatch.Minimatch
 var Glob = __webpack_require__(402).Glob
 var util = __webpack_require__(669)
@@ -21491,30 +22453,67 @@ module.exports = function (str, pos) {
 /* 282 */,
 /* 283 */,
 /* 284 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(module) {
 
-module.exports = tag
+"use strict";
 
-var assert = __webpack_require__(357)
+module.exports = balanced;
+function balanced(a, b, str) {
+  if (a instanceof RegExp) a = maybeMatch(a, str);
+  if (b instanceof RegExp) b = maybeMatch(b, str);
 
-function tag (uri, params, cb) {
-  assert(typeof uri === 'string', 'must pass registry URI to tag')
-  assert(params && typeof params === 'object', 'must pass params to tag')
-  assert(typeof cb === 'function', 'must pass callback to tag')
+  var r = range(a, b, str);
 
-  assert(typeof params.version === 'string', 'must pass version to tag')
-  assert(typeof params.tag === 'string', 'must pass tag name to tag')
-  assert(
-    params.auth && typeof params.auth === 'object',
-    'must pass auth to tag'
-  )
+  return r && {
+    start: r[0],
+    end: r[1],
+    pre: str.slice(0, r[0]),
+    body: str.slice(r[0] + a.length, r[1]),
+    post: str.slice(r[1] + b.length)
+  };
+}
 
-  var options = {
-    method: 'PUT',
-    body: JSON.stringify(params.version),
-    auth: params.auth
+function maybeMatch(reg, str) {
+  var m = str.match(reg);
+  return m ? m[0] : null;
+}
+
+balanced.range = range;
+function range(a, b, str) {
+  var begs, beg, left, right, result;
+  var ai = str.indexOf(a);
+  var bi = str.indexOf(b, ai + 1);
+  var i = ai;
+
+  if (ai >= 0 && bi > 0) {
+    begs = [];
+    left = str.length;
+
+    while (i >= 0 && !result) {
+      if (i == ai) {
+        begs.push(i);
+        ai = str.indexOf(a, i + 1);
+      } else if (begs.length == 1) {
+        result = [ begs.pop(), bi ];
+      } else {
+        beg = begs.pop();
+        if (beg < left) {
+          left = beg;
+          right = bi;
+        }
+
+        bi = str.indexOf(b, i + 1);
+      }
+
+      i = ai < bi && ai >= 0 ? ai : bi;
+    }
+
+    if (begs.length) {
+      result = [ left, right ];
+    }
   }
-  this.request(uri + '/' + params.tag, options, cb)
+
+  return result;
 }
 
 
@@ -22484,7 +23483,7 @@ function unmonkeypatch () {
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var concatMap = __webpack_require__(896);
-var balanced = __webpack_require__(781);
+var balanced = __webpack_require__(284);
 
 module.exports = expandTop;
 
@@ -26108,7 +27107,7 @@ module.exports = {
   minProperties: __webpack_require__(560),
   multipleOf: __webpack_require__(397),
   not: __webpack_require__(673),
-  oneOf: __webpack_require__(652),
+  oneOf: __webpack_require__(394),
   pattern: __webpack_require__(359),
   properties: __webpack_require__(343),
   propertyNames: __webpack_require__(35),
@@ -26675,7 +27674,86 @@ module.exports = core;
 /***/ }),
 /* 392 */,
 /* 393 */,
-/* 394 */,
+/* 394 */
+/***/ (function(module) {
+
+"use strict";
+
+module.exports = function generate_oneOf(it, $keyword, $ruleType) {
+  var out = ' ';
+  var $lvl = it.level;
+  var $dataLvl = it.dataLevel;
+  var $schema = it.schema[$keyword];
+  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
+  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
+  var $breakOnError = !it.opts.allErrors;
+  var $data = 'data' + ($dataLvl || '');
+  var $valid = 'valid' + $lvl;
+  var $errs = 'errs__' + $lvl;
+  var $it = it.util.copy(it);
+  var $closingBraces = '';
+  $it.level++;
+  var $nextValid = 'valid' + $it.level;
+  var $currentBaseId = $it.baseId,
+    $prevValid = 'prevValid' + $lvl,
+    $passingSchemas = 'passingSchemas' + $lvl;
+  out += 'var ' + ($errs) + ' = errors , ' + ($prevValid) + ' = false , ' + ($valid) + ' = false , ' + ($passingSchemas) + ' = null; ';
+  var $wasComposite = it.compositeRule;
+  it.compositeRule = $it.compositeRule = true;
+  var arr1 = $schema;
+  if (arr1) {
+    var $sch, $i = -1,
+      l1 = arr1.length - 1;
+    while ($i < l1) {
+      $sch = arr1[$i += 1];
+      if ((it.opts.strictKeywords ? typeof $sch == 'object' && Object.keys($sch).length > 0 : it.util.schemaHasRules($sch, it.RULES.all))) {
+        $it.schema = $sch;
+        $it.schemaPath = $schemaPath + '[' + $i + ']';
+        $it.errSchemaPath = $errSchemaPath + '/' + $i;
+        out += '  ' + (it.validate($it)) + ' ';
+        $it.baseId = $currentBaseId;
+      } else {
+        out += ' var ' + ($nextValid) + ' = true; ';
+      }
+      if ($i) {
+        out += ' if (' + ($nextValid) + ' && ' + ($prevValid) + ') { ' + ($valid) + ' = false; ' + ($passingSchemas) + ' = [' + ($passingSchemas) + ', ' + ($i) + ']; } else { ';
+        $closingBraces += '}';
+      }
+      out += ' if (' + ($nextValid) + ') { ' + ($valid) + ' = ' + ($prevValid) + ' = true; ' + ($passingSchemas) + ' = ' + ($i) + '; }';
+    }
+  }
+  it.compositeRule = $it.compositeRule = $wasComposite;
+  out += '' + ($closingBraces) + 'if (!' + ($valid) + ') {   var err =   '; /* istanbul ignore else */
+  if (it.createErrors !== false) {
+    out += ' { keyword: \'' + ('oneOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { passingSchemas: ' + ($passingSchemas) + ' } ';
+    if (it.opts.messages !== false) {
+      out += ' , message: \'should match exactly one schema in oneOf\' ';
+    }
+    if (it.opts.verbose) {
+      out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+    }
+    out += ' } ';
+  } else {
+    out += ' {} ';
+  }
+  out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
+  if (!it.compositeRule && $breakOnError) {
+    /* istanbul ignore if */
+    if (it.async) {
+      out += ' throw new ValidationError(vErrors); ';
+    } else {
+      out += ' validate.errors = vErrors; return false; ';
+    }
+  }
+  out += '} else {  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; }';
+  if (it.opts.allErrors) {
+    out += ' } ';
+  }
+  return out;
+}
+
+
+/***/ }),
 /* 395 */,
 /* 396 */,
 /* 397 */
@@ -27038,7 +28116,7 @@ module.exports = glob
 
 var fs = __webpack_require__(747)
 var rp = __webpack_require__(302)
-var minimatch = __webpack_require__(595)
+var minimatch = __webpack_require__(93)
 var Minimatch = minimatch.Minimatch
 var inherits = __webpack_require__(689)
 var EE = __webpack_require__(614).EventEmitter
@@ -27051,7 +28129,7 @@ var alphasort = common.alphasort
 var alphasorti = common.alphasorti
 var setopts = common.setopts
 var ownProp = common.ownProp
-var inflight = __webpack_require__(634)
+var inflight = __webpack_require__(674)
 var util = __webpack_require__(669)
 var childrenIgnored = common.childrenIgnored
 var isIgnored = common.isIgnored
@@ -28329,190 +29407,303 @@ function escape(s) {
 /* 432 */
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-/*
- * extsprintf.js: extended POSIX-style sprintf
- */
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var mod_assert = __webpack_require__(357);
-var mod_util = __webpack_require__(669);
 
-/*
- * Public interface
- */
-exports.sprintf = jsSprintf;
-exports.printf = jsPrintf;
-exports.fprintf = jsFprintf;
 
-/*
- * Stripped down version of s[n]printf(3c).  We make a best effort to throw an
- * exception when given a format string we don't understand, rather than
- * ignoring it, so that we won't break existing programs if/when we go implement
- * the rest of this.
- *
- * This implementation currently supports specifying
- *	- field alignment ('-' flag),
- * 	- zero-pad ('0' flag)
- *	- always show numeric sign ('+' flag),
- *	- field width
- *	- conversions for strings, decimal integers, and floats (numbers).
- *	- argument size specifiers.  These are all accepted but ignored, since
- *	  Javascript has no notion of the physical size of an argument.
- *
- * Everything else is currently unsupported, most notably precision, unsigned
- * numbers, non-decimal numbers, and characters.
- */
-function jsSprintf(fmt)
-{
-	var regex = [
-	    '([^%]*)',				/* normal text */
-	    '%',				/* start of format */
-	    '([\'\\-+ #0]*?)',			/* flags (optional) */
-	    '([1-9]\\d*)?',			/* width (optional) */
-	    '(\\.([1-9]\\d*))?',		/* precision (optional) */
-	    '[lhjztL]*?',			/* length mods (ignored) */
-	    '([diouxXfFeEgGaAcCsSp%jr])'	/* conversion */
-	].join('');
+/*<replacement>*/
 
-	var re = new RegExp(regex);
-	var args = Array.prototype.slice.call(arguments, 1);
-	var flags, width, precision, conversion;
-	var left, pad, sign, arg, match;
-	var ret = '';
-	var argn = 1;
+var Buffer = __webpack_require__(149).Buffer;
+/*</replacement>*/
 
-	mod_assert.equal('string', typeof (fmt));
+var isEncoding = Buffer.isEncoding || function (encoding) {
+  encoding = '' + encoding;
+  switch (encoding && encoding.toLowerCase()) {
+    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
+      return true;
+    default:
+      return false;
+  }
+};
 
-	while ((match = re.exec(fmt)) !== null) {
-		ret += match[1];
-		fmt = fmt.substring(match[0].length);
+function _normalizeEncoding(enc) {
+  if (!enc) return 'utf8';
+  var retried;
+  while (true) {
+    switch (enc) {
+      case 'utf8':
+      case 'utf-8':
+        return 'utf8';
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return 'utf16le';
+      case 'latin1':
+      case 'binary':
+        return 'latin1';
+      case 'base64':
+      case 'ascii':
+      case 'hex':
+        return enc;
+      default:
+        if (retried) return; // undefined
+        enc = ('' + enc).toLowerCase();
+        retried = true;
+    }
+  }
+};
 
-		flags = match[2] || '';
-		width = match[3] || 0;
-		precision = match[4] || '';
-		conversion = match[6];
-		left = false;
-		sign = false;
-		pad = ' ';
-
-		if (conversion == '%') {
-			ret += '%';
-			continue;
-		}
-
-		if (args.length === 0)
-			throw (new Error('too few args to sprintf'));
-
-		arg = args.shift();
-		argn++;
-
-		if (flags.match(/[\' #]/))
-			throw (new Error(
-			    'unsupported flags: ' + flags));
-
-		if (precision.length > 0)
-			throw (new Error(
-			    'non-zero precision not supported'));
-
-		if (flags.match(/-/))
-			left = true;
-
-		if (flags.match(/0/))
-			pad = '0';
-
-		if (flags.match(/\+/))
-			sign = true;
-
-		switch (conversion) {
-		case 's':
-			if (arg === undefined || arg === null)
-				throw (new Error('argument ' + argn +
-				    ': attempted to print undefined or null ' +
-				    'as a string'));
-			ret += doPad(pad, width, left, arg.toString());
-			break;
-
-		case 'd':
-			arg = Math.floor(arg);
-			/*jsl:fallthru*/
-		case 'f':
-			sign = sign && arg > 0 ? '+' : '';
-			ret += sign + doPad(pad, width, left,
-			    arg.toString());
-			break;
-
-		case 'x':
-			ret += doPad(pad, width, left, arg.toString(16));
-			break;
-
-		case 'j': /* non-standard */
-			if (width === 0)
-				width = 10;
-			ret += mod_util.inspect(arg, false, width);
-			break;
-
-		case 'r': /* non-standard */
-			ret += dumpException(arg);
-			break;
-
-		default:
-			throw (new Error('unsupported conversion: ' +
-			    conversion));
-		}
-	}
-
-	ret += fmt;
-	return (ret);
+// Do not cache `Buffer.isEncoding` when checking encoding names as some
+// modules monkey-patch it to support additional encodings
+function normalizeEncoding(enc) {
+  var nenc = _normalizeEncoding(enc);
+  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
+  return nenc || enc;
 }
 
-function jsPrintf() {
-	var args = Array.prototype.slice.call(arguments);
-	args.unshift(process.stdout);
-	jsFprintf.apply(null, args);
+// StringDecoder provides an interface for efficiently splitting a series of
+// buffers into a series of JS strings without breaking apart multi-byte
+// characters.
+exports.StringDecoder = StringDecoder;
+function StringDecoder(encoding) {
+  this.encoding = normalizeEncoding(encoding);
+  var nb;
+  switch (this.encoding) {
+    case 'utf16le':
+      this.text = utf16Text;
+      this.end = utf16End;
+      nb = 4;
+      break;
+    case 'utf8':
+      this.fillLast = utf8FillLast;
+      nb = 4;
+      break;
+    case 'base64':
+      this.text = base64Text;
+      this.end = base64End;
+      nb = 3;
+      break;
+    default:
+      this.write = simpleWrite;
+      this.end = simpleEnd;
+      return;
+  }
+  this.lastNeed = 0;
+  this.lastTotal = 0;
+  this.lastChar = Buffer.allocUnsafe(nb);
 }
 
-function jsFprintf(stream) {
-	var args = Array.prototype.slice.call(arguments, 1);
-	return (stream.write(jsSprintf.apply(this, args)));
+StringDecoder.prototype.write = function (buf) {
+  if (buf.length === 0) return '';
+  var r;
+  var i;
+  if (this.lastNeed) {
+    r = this.fillLast(buf);
+    if (r === undefined) return '';
+    i = this.lastNeed;
+    this.lastNeed = 0;
+  } else {
+    i = 0;
+  }
+  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
+  return r || '';
+};
+
+StringDecoder.prototype.end = utf8End;
+
+// Returns only complete characters in a Buffer
+StringDecoder.prototype.text = utf8Text;
+
+// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
+StringDecoder.prototype.fillLast = function (buf) {
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
+  this.lastNeed -= buf.length;
+};
+
+// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
+// continuation byte. If an invalid byte is detected, -2 is returned.
+function utf8CheckByte(byte) {
+  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
+  return byte >> 6 === 0x02 ? -1 : -2;
 }
 
-function doPad(chr, width, left, str)
-{
-	var ret = str;
-
-	while (ret.length < width) {
-		if (left)
-			ret += chr;
-		else
-			ret = chr + ret;
-	}
-
-	return (ret);
+// Checks at most 3 bytes at the end of a Buffer in order to detect an
+// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
+// needed to complete the UTF-8 character (if applicable) are returned.
+function utf8CheckIncomplete(self, buf, i) {
+  var j = buf.length - 1;
+  if (j < i) return 0;
+  var nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 1;
+    return nb;
+  }
+  if (--j < i || nb === -2) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 2;
+    return nb;
+  }
+  if (--j < i || nb === -2) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) {
+      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
+    }
+    return nb;
+  }
+  return 0;
 }
 
-/*
- * This function dumps long stack traces for exceptions having a cause() method.
- * See node-verror for an example.
- */
-function dumpException(ex)
-{
-	var ret;
-
-	if (!(ex instanceof Error))
-		throw (new Error(jsSprintf('invalid type for %%r: %j', ex)));
-
-	/* Note that V8 prepends "ex.stack" with ex.toString(). */
-	ret = 'EXCEPTION: ' + ex.constructor.name + ': ' + ex.stack;
-
-	if (ex.cause && typeof (ex.cause) === 'function') {
-		var cex = ex.cause();
-		if (cex) {
-			ret += '\nCaused by: ' + dumpException(cex);
-		}
-	}
-
-	return (ret);
+// Validates as many continuation bytes for a multi-byte UTF-8 character as
+// needed or are available. If we see a non-continuation byte where we expect
+// one, we "replace" the validated continuation bytes we've seen so far with
+// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
+// behavior. The continuation byte check is included three times in the case
+// where all of the continuation bytes for a character exist in the same buffer.
+// It is also done this way as a slight performance increase instead of using a
+// loop.
+function utf8CheckExtraBytes(self, buf, p) {
+  if ((buf[0] & 0xC0) !== 0x80) {
+    self.lastNeed = 0;
+    return '\ufffd';
+  }
+  if (self.lastNeed > 1 && buf.length > 1) {
+    if ((buf[1] & 0xC0) !== 0x80) {
+      self.lastNeed = 1;
+      return '\ufffd';
+    }
+    if (self.lastNeed > 2 && buf.length > 2) {
+      if ((buf[2] & 0xC0) !== 0x80) {
+        self.lastNeed = 2;
+        return '\ufffd';
+      }
+    }
+  }
 }
 
+// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
+function utf8FillLast(buf) {
+  var p = this.lastTotal - this.lastNeed;
+  var r = utf8CheckExtraBytes(this, buf, p);
+  if (r !== undefined) return r;
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, p, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, p, 0, buf.length);
+  this.lastNeed -= buf.length;
+}
+
+// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
+// partial character, the character's bytes are buffered until the required
+// number of bytes are available.
+function utf8Text(buf, i) {
+  var total = utf8CheckIncomplete(this, buf, i);
+  if (!this.lastNeed) return buf.toString('utf8', i);
+  this.lastTotal = total;
+  var end = buf.length - (total - this.lastNeed);
+  buf.copy(this.lastChar, 0, end);
+  return buf.toString('utf8', i, end);
+}
+
+// For UTF-8, a replacement character is added when ending on a partial
+// character.
+function utf8End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + '\ufffd';
+  return r;
+}
+
+// UTF-16LE typically needs two bytes per character, but even if we have an even
+// number of bytes available, we need to check if we end on a leading/high
+// surrogate. In that case, we need to wait for the next two bytes in order to
+// decode the last character properly.
+function utf16Text(buf, i) {
+  if ((buf.length - i) % 2 === 0) {
+    var r = buf.toString('utf16le', i);
+    if (r) {
+      var c = r.charCodeAt(r.length - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) {
+        this.lastNeed = 2;
+        this.lastTotal = 4;
+        this.lastChar[0] = buf[buf.length - 2];
+        this.lastChar[1] = buf[buf.length - 1];
+        return r.slice(0, -1);
+      }
+    }
+    return r;
+  }
+  this.lastNeed = 1;
+  this.lastTotal = 2;
+  this.lastChar[0] = buf[buf.length - 1];
+  return buf.toString('utf16le', i, buf.length - 1);
+}
+
+// For UTF-16LE we do not explicitly append special replacement characters if we
+// end on a partial character, we simply let v8 handle that.
+function utf16End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) {
+    var end = this.lastTotal - this.lastNeed;
+    return r + this.lastChar.toString('utf16le', 0, end);
+  }
+  return r;
+}
+
+function base64Text(buf, i) {
+  var n = (buf.length - i) % 3;
+  if (n === 0) return buf.toString('base64', i);
+  this.lastNeed = 3 - n;
+  this.lastTotal = 3;
+  if (n === 1) {
+    this.lastChar[0] = buf[buf.length - 1];
+  } else {
+    this.lastChar[0] = buf[buf.length - 2];
+    this.lastChar[1] = buf[buf.length - 1];
+  }
+  return buf.toString('base64', i, buf.length - n);
+}
+
+function base64End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
+  return r;
+}
+
+// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
+function simpleWrite(buf) {
+  return buf.toString(this.encoding);
+}
+
+function simpleEnd(buf) {
+  return buf && buf.length ? this.write(buf) : '';
+}
 
 /***/ }),
 /* 433 */,
@@ -28774,94 +29965,105 @@ const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const exec = __importStar(__webpack_require__(986));
 const utils = __importStar(__webpack_require__(163));
-function publishGithub() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const changelogFile = "CHANGELOG.md";
-        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        let releaseNotes = "";
-        // Try to find release notes in changelog
-        if (fs.existsSync(changelogFile)) {
-            const changelogLines = fs.readFileSync(changelogFile).toString().split(/\r?\n/);
-            let lineNum = changelogLines.indexOf("## `" + packageJson.version + "`");
-            if (lineNum !== -1) {
-                while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("##")) {
-                    lineNum++;
-                    releaseNotes += changelogLines[lineNum] + "\n";
+class Publish {
+    static publishGithub() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const octokit = github.getOctokit(core.getInput("repo-token"));
+            const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+            // Create release and add release notes if any
+            const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
+            const releaseNotes = yield this.getReleaseNotes("CHANGELOG.md", packageJson.version);
+            const release = yield octokit.repos.createRelease({
+                owner, repo,
+                tag_name: "v" + packageJson.version,
+                body: releaseNotes
+            });
+            // Upload artifacts to release
+            const artifactPaths = [];
+            const glob = __webpack_require__(402);
+            const mime = __webpack_require__(779);
+            core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
+                artifactPaths.push(...glob.sync(artifactPattern.trim()));
+            });
+            for (const artifactPath of artifactPaths) {
+                yield octokit.repos.uploadReleaseAsset({
+                    owner, repo,
+                    release_id: release.data.id,
+                    name: path.basename(artifactPath),
+                    data: fs.readFileSync(artifactPath).toString(),
+                    url: release.data.upload_url,
+                    headers: {
+                        "Content-Type": mime.lookup(artifactPath)
+                    }
+                });
+            }
+        });
+    }
+    static publishNpm(branch) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            // Prevent publish from being affected by local npmrc
+            yield exec.exec("rm -f .npmrc");
+            const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+            // Need to remove trailing slash from registry URL for npm-cli-login
+            const npmRegistry = (_b = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry) === null || _b === void 0 ? void 0 : _b.replace(/\/$/, "");
+            if (!npmRegistry) {
+                core.setFailed("Expected NPM registry to be defined in package.json but it is not");
+                process.exit();
+            }
+            // Login to registry in global npmrc
+            const npmLogin = __webpack_require__(575);
+            const [npmUsername, npmPassword] = core.getInput("npm-credentials").split(":", 2);
+            const npmEmail = core.getInput("npm-email");
+            const npmScope = packageJson.name.split("/")[0];
+            npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
+            const publishedVersion = yield utils.getPackageVersion(packageJson.name, branch.tag);
+            const latestVersion = packageJson.version;
+            // Publish package
+            if (publishedVersion != latestVersion) {
+                yield exec.exec(`npm publish --tag ${branch.tag}`);
+            }
+            else {
+                core.warning(`Version ${publishedVersion} has already been published, skipping publish`);
+            }
+            // Add alias tags
+            if (branch.aliasTags) {
+                for (const tag of branch.aliasTags) {
+                    yield exec.exec(`npm dist-tag add ${packageJson.name}@${latestVersion} ${tag}`);
+                }
+            }
+        });
+    }
+    /**
+     * Try to find release notes in changelog for the version being published.
+     * @param changelogFile - Path to changelog file
+     * @param pkgVer - Latest version of the package
+     */
+    static getReleaseNotes(changelogFile, pkgVer) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let releaseNotes = "";
+            // Try to find release notes in changelog
+            if (fs.existsSync(changelogFile)) {
+                const changelogLines = fs.readFileSync(changelogFile).toString().split(/\r?\n/);
+                let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
+                if (lineNum !== -1) {
+                    while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("##")) {
+                        lineNum++;
+                        releaseNotes += changelogLines[lineNum] + "\n";
+                    }
+                }
+                else {
+                    core.warning(`Missing changelog header for version ${pkgVer}`);
                 }
             }
             else {
-                core.warning(`Missing changelog header for version ${packageJson.version}`);
+                core.warning("Missing changelog file");
             }
-        }
-        else {
-            core.warning("Missing changelog file");
-        }
-        const octokit = github.getOctokit(core.getInput("repo-token"));
-        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-        // Create release and add release notes if any
-        const release = yield octokit.repos.createRelease({
-            owner, repo,
-            tag_name: "v" + packageJson.version,
-            body: releaseNotes.trim() || undefined
+            return releaseNotes.trim() || undefined;
         });
-        // Upload artifacts to release
-        const artifactPaths = [];
-        const glob = __webpack_require__(402);
-        const mime = __webpack_require__(779);
-        core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
-            artifactPaths.push(...glob.sync(artifactPattern));
-        });
-        for (const artifactPath of artifactPaths.map(s => s.trim())) {
-            yield octokit.repos.uploadReleaseAsset({
-                owner, repo,
-                release_id: release.data.id,
-                name: path.basename(artifactPath),
-                data: fs.readFileSync(artifactPath).toString(),
-                url: release.data.upload_url,
-                headers: {
-                    "Content-Type": mime.lookup(artifactPath)
-                }
-            });
-        }
-    });
+    }
 }
-exports.publishGithub = publishGithub;
-function publishNpm(branch) {
-    var _a, _b;
-    return __awaiter(this, void 0, void 0, function* () {
-        // Prevent publish from being affected by local npmrc
-        yield exec.exec("rm -f .npmrc");
-        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        // Need to remove trailing slash from registry URL for npm-cli-login
-        const npmRegistry = (_b = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry) === null || _b === void 0 ? void 0 : _b.replace(/\/$/, "");
-        if (!npmRegistry) {
-            core.setFailed("Expected NPM registry to be defined in package.json but it is not");
-            process.exit();
-        }
-        // Login to registry in global npmrc
-        const npmLogin = __webpack_require__(575);
-        const [npmUsername, npmPassword] = core.getInput("npm-credentials").split(":", 2);
-        const npmEmail = core.getInput("npm-email");
-        const npmScope = packageJson.name.split("/")[0];
-        npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
-        const publishedVersion = yield utils.getPackageVersion(packageJson.name, branch.tag);
-        const latestVersion = packageJson.version;
-        // Publish package
-        if (publishedVersion != latestVersion) {
-            yield exec.exec(`npm publish --tag ${branch.tag}`);
-        }
-        else {
-            core.warning(`Version ${publishedVersion} has already been published, skipping publish`);
-        }
-        // Add alias tags
-        if (branch.aliasTags) {
-            for (const tag of branch.aliasTags) {
-                yield exec.exec(`npm dist-tag add ${packageJson.name}@${latestVersion} ${tag}`);
-            }
-        }
-    });
-}
-exports.publishNpm = publishNpm;
+exports.Publish = Publish;
 
 
 /***/ }),
@@ -32859,7 +34061,7 @@ TemplateItem.prototype.getMinLength = function () {
 
 var common              = __webpack_require__(128);
 var YAMLException       = __webpack_require__(556);
-var Mark                = __webpack_require__(93);
+var Mark                = __webpack_require__(180);
 var DEFAULT_SAFE_SCHEMA = __webpack_require__(723);
 var DEFAULT_FULL_SCHEMA = __webpack_require__(438);
 
@@ -41646,935 +42848,7 @@ function escape (base, name) {
 /* 592 */,
 /* 593 */,
 /* 594 */,
-/* 595 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-module.exports = minimatch
-minimatch.Minimatch = Minimatch
-
-var path = { sep: '/' }
-try {
-  path = __webpack_require__(622)
-} catch (er) {}
-
-var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {}
-var expand = __webpack_require__(306)
-
-var plTypes = {
-  '!': { open: '(?:(?!(?:', close: '))[^/]*?)'},
-  '?': { open: '(?:', close: ')?' },
-  '+': { open: '(?:', close: ')+' },
-  '*': { open: '(?:', close: ')*' },
-  '@': { open: '(?:', close: ')' }
-}
-
-// any single thing other than /
-// don't need to escape / when using new RegExp()
-var qmark = '[^/]'
-
-// * => any number of characters
-var star = qmark + '*?'
-
-// ** when dots are allowed.  Anything goes, except .. and .
-// not (^ or / followed by one or two dots followed by $ or /),
-// followed by anything, any number of times.
-var twoStarDot = '(?:(?!(?:\\\/|^)(?:\\.{1,2})($|\\\/)).)*?'
-
-// not a ^ or / followed by a dot,
-// followed by anything, any number of times.
-var twoStarNoDot = '(?:(?!(?:\\\/|^)\\.).)*?'
-
-// characters that need to be escaped in RegExp.
-var reSpecials = charSet('().*{}+?[]^$\\!')
-
-// "abc" -> { a:true, b:true, c:true }
-function charSet (s) {
-  return s.split('').reduce(function (set, c) {
-    set[c] = true
-    return set
-  }, {})
-}
-
-// normalizes slashes.
-var slashSplit = /\/+/
-
-minimatch.filter = filter
-function filter (pattern, options) {
-  options = options || {}
-  return function (p, i, list) {
-    return minimatch(p, pattern, options)
-  }
-}
-
-function ext (a, b) {
-  a = a || {}
-  b = b || {}
-  var t = {}
-  Object.keys(b).forEach(function (k) {
-    t[k] = b[k]
-  })
-  Object.keys(a).forEach(function (k) {
-    t[k] = a[k]
-  })
-  return t
-}
-
-minimatch.defaults = function (def) {
-  if (!def || !Object.keys(def).length) return minimatch
-
-  var orig = minimatch
-
-  var m = function minimatch (p, pattern, options) {
-    return orig.minimatch(p, pattern, ext(def, options))
-  }
-
-  m.Minimatch = function Minimatch (pattern, options) {
-    return new orig.Minimatch(pattern, ext(def, options))
-  }
-
-  return m
-}
-
-Minimatch.defaults = function (def) {
-  if (!def || !Object.keys(def).length) return Minimatch
-  return minimatch.defaults(def).Minimatch
-}
-
-function minimatch (p, pattern, options) {
-  if (typeof pattern !== 'string') {
-    throw new TypeError('glob pattern string required')
-  }
-
-  if (!options) options = {}
-
-  // shortcut: comments match nothing.
-  if (!options.nocomment && pattern.charAt(0) === '#') {
-    return false
-  }
-
-  // "" only matches ""
-  if (pattern.trim() === '') return p === ''
-
-  return new Minimatch(pattern, options).match(p)
-}
-
-function Minimatch (pattern, options) {
-  if (!(this instanceof Minimatch)) {
-    return new Minimatch(pattern, options)
-  }
-
-  if (typeof pattern !== 'string') {
-    throw new TypeError('glob pattern string required')
-  }
-
-  if (!options) options = {}
-  pattern = pattern.trim()
-
-  // windows support: need to use /, not \
-  if (path.sep !== '/') {
-    pattern = pattern.split(path.sep).join('/')
-  }
-
-  this.options = options
-  this.set = []
-  this.pattern = pattern
-  this.regexp = null
-  this.negate = false
-  this.comment = false
-  this.empty = false
-
-  // make the set of regexps etc.
-  this.make()
-}
-
-Minimatch.prototype.debug = function () {}
-
-Minimatch.prototype.make = make
-function make () {
-  // don't do it more than once.
-  if (this._made) return
-
-  var pattern = this.pattern
-  var options = this.options
-
-  // empty patterns and comments match nothing.
-  if (!options.nocomment && pattern.charAt(0) === '#') {
-    this.comment = true
-    return
-  }
-  if (!pattern) {
-    this.empty = true
-    return
-  }
-
-  // step 1: figure out negation, etc.
-  this.parseNegate()
-
-  // step 2: expand braces
-  var set = this.globSet = this.braceExpand()
-
-  if (options.debug) this.debug = console.error
-
-  this.debug(this.pattern, set)
-
-  // step 3: now we have a set, so turn each one into a series of path-portion
-  // matching patterns.
-  // These will be regexps, except in the case of "**", which is
-  // set to the GLOBSTAR object for globstar behavior,
-  // and will not contain any / characters
-  set = this.globParts = set.map(function (s) {
-    return s.split(slashSplit)
-  })
-
-  this.debug(this.pattern, set)
-
-  // glob --> regexps
-  set = set.map(function (s, si, set) {
-    return s.map(this.parse, this)
-  }, this)
-
-  this.debug(this.pattern, set)
-
-  // filter out everything that didn't compile properly.
-  set = set.filter(function (s) {
-    return s.indexOf(false) === -1
-  })
-
-  this.debug(this.pattern, set)
-
-  this.set = set
-}
-
-Minimatch.prototype.parseNegate = parseNegate
-function parseNegate () {
-  var pattern = this.pattern
-  var negate = false
-  var options = this.options
-  var negateOffset = 0
-
-  if (options.nonegate) return
-
-  for (var i = 0, l = pattern.length
-    ; i < l && pattern.charAt(i) === '!'
-    ; i++) {
-    negate = !negate
-    negateOffset++
-  }
-
-  if (negateOffset) this.pattern = pattern.substr(negateOffset)
-  this.negate = negate
-}
-
-// Brace expansion:
-// a{b,c}d -> abd acd
-// a{b,}c -> abc ac
-// a{0..3}d -> a0d a1d a2d a3d
-// a{b,c{d,e}f}g -> abg acdfg acefg
-// a{b,c}d{e,f}g -> abdeg acdeg abdeg abdfg
-//
-// Invalid sets are not expanded.
-// a{2..}b -> a{2..}b
-// a{b}c -> a{b}c
-minimatch.braceExpand = function (pattern, options) {
-  return braceExpand(pattern, options)
-}
-
-Minimatch.prototype.braceExpand = braceExpand
-
-function braceExpand (pattern, options) {
-  if (!options) {
-    if (this instanceof Minimatch) {
-      options = this.options
-    } else {
-      options = {}
-    }
-  }
-
-  pattern = typeof pattern === 'undefined'
-    ? this.pattern : pattern
-
-  if (typeof pattern === 'undefined') {
-    throw new TypeError('undefined pattern')
-  }
-
-  if (options.nobrace ||
-    !pattern.match(/\{.*\}/)) {
-    // shortcut. no need to expand.
-    return [pattern]
-  }
-
-  return expand(pattern)
-}
-
-// parse a component of the expanded set.
-// At this point, no pattern may contain "/" in it
-// so we're going to return a 2d array, where each entry is the full
-// pattern, split on '/', and then turned into a regular expression.
-// A regexp is made at the end which joins each array with an
-// escaped /, and another full one which joins each regexp with |.
-//
-// Following the lead of Bash 4.1, note that "**" only has special meaning
-// when it is the *only* thing in a path portion.  Otherwise, any series
-// of * is equivalent to a single *.  Globstar behavior is enabled by
-// default, and can be disabled by setting options.noglobstar.
-Minimatch.prototype.parse = parse
-var SUBPARSE = {}
-function parse (pattern, isSub) {
-  if (pattern.length > 1024 * 64) {
-    throw new TypeError('pattern is too long')
-  }
-
-  var options = this.options
-
-  // shortcuts
-  if (!options.noglobstar && pattern === '**') return GLOBSTAR
-  if (pattern === '') return ''
-
-  var re = ''
-  var hasMagic = !!options.nocase
-  var escaping = false
-  // ? => one single character
-  var patternListStack = []
-  var negativeLists = []
-  var stateChar
-  var inClass = false
-  var reClassStart = -1
-  var classStart = -1
-  // . and .. never match anything that doesn't start with .,
-  // even when options.dot is set.
-  var patternStart = pattern.charAt(0) === '.' ? '' // anything
-  // not (start or / followed by . or .. followed by / or end)
-  : options.dot ? '(?!(?:^|\\\/)\\.{1,2}(?:$|\\\/))'
-  : '(?!\\.)'
-  var self = this
-
-  function clearStateChar () {
-    if (stateChar) {
-      // we had some state-tracking character
-      // that wasn't consumed by this pass.
-      switch (stateChar) {
-        case '*':
-          re += star
-          hasMagic = true
-        break
-        case '?':
-          re += qmark
-          hasMagic = true
-        break
-        default:
-          re += '\\' + stateChar
-        break
-      }
-      self.debug('clearStateChar %j %j', stateChar, re)
-      stateChar = false
-    }
-  }
-
-  for (var i = 0, len = pattern.length, c
-    ; (i < len) && (c = pattern.charAt(i))
-    ; i++) {
-    this.debug('%s\t%s %s %j', pattern, i, re, c)
-
-    // skip over any that are escaped.
-    if (escaping && reSpecials[c]) {
-      re += '\\' + c
-      escaping = false
-      continue
-    }
-
-    switch (c) {
-      case '/':
-        // completely not allowed, even escaped.
-        // Should already be path-split by now.
-        return false
-
-      case '\\':
-        clearStateChar()
-        escaping = true
-      continue
-
-      // the various stateChar values
-      // for the "extglob" stuff.
-      case '?':
-      case '*':
-      case '+':
-      case '@':
-      case '!':
-        this.debug('%s\t%s %s %j <-- stateChar', pattern, i, re, c)
-
-        // all of those are literals inside a class, except that
-        // the glob [!a] means [^a] in regexp
-        if (inClass) {
-          this.debug('  in class')
-          if (c === '!' && i === classStart + 1) c = '^'
-          re += c
-          continue
-        }
-
-        // if we already have a stateChar, then it means
-        // that there was something like ** or +? in there.
-        // Handle the stateChar, then proceed with this one.
-        self.debug('call clearStateChar %j', stateChar)
-        clearStateChar()
-        stateChar = c
-        // if extglob is disabled, then +(asdf|foo) isn't a thing.
-        // just clear the statechar *now*, rather than even diving into
-        // the patternList stuff.
-        if (options.noext) clearStateChar()
-      continue
-
-      case '(':
-        if (inClass) {
-          re += '('
-          continue
-        }
-
-        if (!stateChar) {
-          re += '\\('
-          continue
-        }
-
-        patternListStack.push({
-          type: stateChar,
-          start: i - 1,
-          reStart: re.length,
-          open: plTypes[stateChar].open,
-          close: plTypes[stateChar].close
-        })
-        // negation is (?:(?!js)[^/]*)
-        re += stateChar === '!' ? '(?:(?!(?:' : '(?:'
-        this.debug('plType %j %j', stateChar, re)
-        stateChar = false
-      continue
-
-      case ')':
-        if (inClass || !patternListStack.length) {
-          re += '\\)'
-          continue
-        }
-
-        clearStateChar()
-        hasMagic = true
-        var pl = patternListStack.pop()
-        // negation is (?:(?!js)[^/]*)
-        // The others are (?:<pattern>)<type>
-        re += pl.close
-        if (pl.type === '!') {
-          negativeLists.push(pl)
-        }
-        pl.reEnd = re.length
-      continue
-
-      case '|':
-        if (inClass || !patternListStack.length || escaping) {
-          re += '\\|'
-          escaping = false
-          continue
-        }
-
-        clearStateChar()
-        re += '|'
-      continue
-
-      // these are mostly the same in regexp and glob
-      case '[':
-        // swallow any state-tracking char before the [
-        clearStateChar()
-
-        if (inClass) {
-          re += '\\' + c
-          continue
-        }
-
-        inClass = true
-        classStart = i
-        reClassStart = re.length
-        re += c
-      continue
-
-      case ']':
-        //  a right bracket shall lose its special
-        //  meaning and represent itself in
-        //  a bracket expression if it occurs
-        //  first in the list.  -- POSIX.2 2.8.3.2
-        if (i === classStart + 1 || !inClass) {
-          re += '\\' + c
-          escaping = false
-          continue
-        }
-
-        // handle the case where we left a class open.
-        // "[z-a]" is valid, equivalent to "\[z-a\]"
-        if (inClass) {
-          // split where the last [ was, make sure we don't have
-          // an invalid re. if so, re-walk the contents of the
-          // would-be class to re-translate any characters that
-          // were passed through as-is
-          // TODO: It would probably be faster to determine this
-          // without a try/catch and a new RegExp, but it's tricky
-          // to do safely.  For now, this is safe and works.
-          var cs = pattern.substring(classStart + 1, i)
-          try {
-            RegExp('[' + cs + ']')
-          } catch (er) {
-            // not a valid class!
-            var sp = this.parse(cs, SUBPARSE)
-            re = re.substr(0, reClassStart) + '\\[' + sp[0] + '\\]'
-            hasMagic = hasMagic || sp[1]
-            inClass = false
-            continue
-          }
-        }
-
-        // finish up the class.
-        hasMagic = true
-        inClass = false
-        re += c
-      continue
-
-      default:
-        // swallow any state char that wasn't consumed
-        clearStateChar()
-
-        if (escaping) {
-          // no need
-          escaping = false
-        } else if (reSpecials[c]
-          && !(c === '^' && inClass)) {
-          re += '\\'
-        }
-
-        re += c
-
-    } // switch
-  } // for
-
-  // handle the case where we left a class open.
-  // "[abc" is valid, equivalent to "\[abc"
-  if (inClass) {
-    // split where the last [ was, and escape it
-    // this is a huge pita.  We now have to re-walk
-    // the contents of the would-be class to re-translate
-    // any characters that were passed through as-is
-    cs = pattern.substr(classStart + 1)
-    sp = this.parse(cs, SUBPARSE)
-    re = re.substr(0, reClassStart) + '\\[' + sp[0]
-    hasMagic = hasMagic || sp[1]
-  }
-
-  // handle the case where we had a +( thing at the *end*
-  // of the pattern.
-  // each pattern list stack adds 3 chars, and we need to go through
-  // and escape any | chars that were passed through as-is for the regexp.
-  // Go through and escape them, taking care not to double-escape any
-  // | chars that were already escaped.
-  for (pl = patternListStack.pop(); pl; pl = patternListStack.pop()) {
-    var tail = re.slice(pl.reStart + pl.open.length)
-    this.debug('setting tail', re, pl)
-    // maybe some even number of \, then maybe 1 \, followed by a |
-    tail = tail.replace(/((?:\\{2}){0,64})(\\?)\|/g, function (_, $1, $2) {
-      if (!$2) {
-        // the | isn't already escaped, so escape it.
-        $2 = '\\'
-      }
-
-      // need to escape all those slashes *again*, without escaping the
-      // one that we need for escaping the | character.  As it works out,
-      // escaping an even number of slashes can be done by simply repeating
-      // it exactly after itself.  That's why this trick works.
-      //
-      // I am sorry that you have to see this.
-      return $1 + $1 + $2 + '|'
-    })
-
-    this.debug('tail=%j\n   %s', tail, tail, pl, re)
-    var t = pl.type === '*' ? star
-      : pl.type === '?' ? qmark
-      : '\\' + pl.type
-
-    hasMagic = true
-    re = re.slice(0, pl.reStart) + t + '\\(' + tail
-  }
-
-  // handle trailing things that only matter at the very end.
-  clearStateChar()
-  if (escaping) {
-    // trailing \\
-    re += '\\\\'
-  }
-
-  // only need to apply the nodot start if the re starts with
-  // something that could conceivably capture a dot
-  var addPatternStart = false
-  switch (re.charAt(0)) {
-    case '.':
-    case '[':
-    case '(': addPatternStart = true
-  }
-
-  // Hack to work around lack of negative lookbehind in JS
-  // A pattern like: *.!(x).!(y|z) needs to ensure that a name
-  // like 'a.xyz.yz' doesn't match.  So, the first negative
-  // lookahead, has to look ALL the way ahead, to the end of
-  // the pattern.
-  for (var n = negativeLists.length - 1; n > -1; n--) {
-    var nl = negativeLists[n]
-
-    var nlBefore = re.slice(0, nl.reStart)
-    var nlFirst = re.slice(nl.reStart, nl.reEnd - 8)
-    var nlLast = re.slice(nl.reEnd - 8, nl.reEnd)
-    var nlAfter = re.slice(nl.reEnd)
-
-    nlLast += nlAfter
-
-    // Handle nested stuff like *(*.js|!(*.json)), where open parens
-    // mean that we should *not* include the ) in the bit that is considered
-    // "after" the negated section.
-    var openParensBefore = nlBefore.split('(').length - 1
-    var cleanAfter = nlAfter
-    for (i = 0; i < openParensBefore; i++) {
-      cleanAfter = cleanAfter.replace(/\)[+*?]?/, '')
-    }
-    nlAfter = cleanAfter
-
-    var dollar = ''
-    if (nlAfter === '' && isSub !== SUBPARSE) {
-      dollar = '$'
-    }
-    var newRe = nlBefore + nlFirst + nlAfter + dollar + nlLast
-    re = newRe
-  }
-
-  // if the re is not "" at this point, then we need to make sure
-  // it doesn't match against an empty path part.
-  // Otherwise a/* will match a/, which it should not.
-  if (re !== '' && hasMagic) {
-    re = '(?=.)' + re
-  }
-
-  if (addPatternStart) {
-    re = patternStart + re
-  }
-
-  // parsing just a piece of a larger pattern.
-  if (isSub === SUBPARSE) {
-    return [re, hasMagic]
-  }
-
-  // skip the regexp for non-magical patterns
-  // unescape anything in it, though, so that it'll be
-  // an exact match against a file etc.
-  if (!hasMagic) {
-    return globUnescape(pattern)
-  }
-
-  var flags = options.nocase ? 'i' : ''
-  try {
-    var regExp = new RegExp('^' + re + '$', flags)
-  } catch (er) {
-    // If it was an invalid regular expression, then it can't match
-    // anything.  This trick looks for a character after the end of
-    // the string, which is of course impossible, except in multi-line
-    // mode, but it's not a /m regex.
-    return new RegExp('$.')
-  }
-
-  regExp._glob = pattern
-  regExp._src = re
-
-  return regExp
-}
-
-minimatch.makeRe = function (pattern, options) {
-  return new Minimatch(pattern, options || {}).makeRe()
-}
-
-Minimatch.prototype.makeRe = makeRe
-function makeRe () {
-  if (this.regexp || this.regexp === false) return this.regexp
-
-  // at this point, this.set is a 2d array of partial
-  // pattern strings, or "**".
-  //
-  // It's better to use .match().  This function shouldn't
-  // be used, really, but it's pretty convenient sometimes,
-  // when you just want to work with a regex.
-  var set = this.set
-
-  if (!set.length) {
-    this.regexp = false
-    return this.regexp
-  }
-  var options = this.options
-
-  var twoStar = options.noglobstar ? star
-    : options.dot ? twoStarDot
-    : twoStarNoDot
-  var flags = options.nocase ? 'i' : ''
-
-  var re = set.map(function (pattern) {
-    return pattern.map(function (p) {
-      return (p === GLOBSTAR) ? twoStar
-      : (typeof p === 'string') ? regExpEscape(p)
-      : p._src
-    }).join('\\\/')
-  }).join('|')
-
-  // must match entire pattern
-  // ending in a * or ** will make it less strict.
-  re = '^(?:' + re + ')$'
-
-  // can match anything, as long as it's not this.
-  if (this.negate) re = '^(?!' + re + ').*$'
-
-  try {
-    this.regexp = new RegExp(re, flags)
-  } catch (ex) {
-    this.regexp = false
-  }
-  return this.regexp
-}
-
-minimatch.match = function (list, pattern, options) {
-  options = options || {}
-  var mm = new Minimatch(pattern, options)
-  list = list.filter(function (f) {
-    return mm.match(f)
-  })
-  if (mm.options.nonull && !list.length) {
-    list.push(pattern)
-  }
-  return list
-}
-
-Minimatch.prototype.match = match
-function match (f, partial) {
-  this.debug('match', f, this.pattern)
-  // short-circuit in the case of busted things.
-  // comments, etc.
-  if (this.comment) return false
-  if (this.empty) return f === ''
-
-  if (f === '/' && partial) return true
-
-  var options = this.options
-
-  // windows: need to use /, not \
-  if (path.sep !== '/') {
-    f = f.split(path.sep).join('/')
-  }
-
-  // treat the test path as a set of pathparts.
-  f = f.split(slashSplit)
-  this.debug(this.pattern, 'split', f)
-
-  // just ONE of the pattern sets in this.set needs to match
-  // in order for it to be valid.  If negating, then just one
-  // match means that we have failed.
-  // Either way, return on the first hit.
-
-  var set = this.set
-  this.debug(this.pattern, 'set', set)
-
-  // Find the basename of the path by looking for the last non-empty segment
-  var filename
-  var i
-  for (i = f.length - 1; i >= 0; i--) {
-    filename = f[i]
-    if (filename) break
-  }
-
-  for (i = 0; i < set.length; i++) {
-    var pattern = set[i]
-    var file = f
-    if (options.matchBase && pattern.length === 1) {
-      file = [filename]
-    }
-    var hit = this.matchOne(file, pattern, partial)
-    if (hit) {
-      if (options.flipNegate) return true
-      return !this.negate
-    }
-  }
-
-  // didn't get any hits.  this is success if it's a negative
-  // pattern, failure otherwise.
-  if (options.flipNegate) return false
-  return this.negate
-}
-
-// set partial to true to test if, for example,
-// "/a/b" matches the start of "/*/b/*/d"
-// Partial means, if you run out of file before you run
-// out of pattern, then that's fine, as long as all
-// the parts match.
-Minimatch.prototype.matchOne = function (file, pattern, partial) {
-  var options = this.options
-
-  this.debug('matchOne',
-    { 'this': this, file: file, pattern: pattern })
-
-  this.debug('matchOne', file.length, pattern.length)
-
-  for (var fi = 0,
-      pi = 0,
-      fl = file.length,
-      pl = pattern.length
-      ; (fi < fl) && (pi < pl)
-      ; fi++, pi++) {
-    this.debug('matchOne loop')
-    var p = pattern[pi]
-    var f = file[fi]
-
-    this.debug(pattern, p, f)
-
-    // should be impossible.
-    // some invalid regexp stuff in the set.
-    if (p === false) return false
-
-    if (p === GLOBSTAR) {
-      this.debug('GLOBSTAR', [pattern, p, f])
-
-      // "**"
-      // a/**/b/**/c would match the following:
-      // a/b/x/y/z/c
-      // a/x/y/z/b/c
-      // a/b/x/b/x/c
-      // a/b/c
-      // To do this, take the rest of the pattern after
-      // the **, and see if it would match the file remainder.
-      // If so, return success.
-      // If not, the ** "swallows" a segment, and try again.
-      // This is recursively awful.
-      //
-      // a/**/b/**/c matching a/b/x/y/z/c
-      // - a matches a
-      // - doublestar
-      //   - matchOne(b/x/y/z/c, b/**/c)
-      //     - b matches b
-      //     - doublestar
-      //       - matchOne(x/y/z/c, c) -> no
-      //       - matchOne(y/z/c, c) -> no
-      //       - matchOne(z/c, c) -> no
-      //       - matchOne(c, c) yes, hit
-      var fr = fi
-      var pr = pi + 1
-      if (pr === pl) {
-        this.debug('** at the end')
-        // a ** at the end will just swallow the rest.
-        // We have found a match.
-        // however, it will not swallow /.x, unless
-        // options.dot is set.
-        // . and .. are *never* matched by **, for explosively
-        // exponential reasons.
-        for (; fi < fl; fi++) {
-          if (file[fi] === '.' || file[fi] === '..' ||
-            (!options.dot && file[fi].charAt(0) === '.')) return false
-        }
-        return true
-      }
-
-      // ok, let's see if we can swallow whatever we can.
-      while (fr < fl) {
-        var swallowee = file[fr]
-
-        this.debug('\nglobstar while', file, fr, pattern, pr, swallowee)
-
-        // XXX remove this slice.  Just pass the start index.
-        if (this.matchOne(file.slice(fr), pattern.slice(pr), partial)) {
-          this.debug('globstar found match!', fr, fl, swallowee)
-          // found a match.
-          return true
-        } else {
-          // can't swallow "." or ".." ever.
-          // can only swallow ".foo" when explicitly asked.
-          if (swallowee === '.' || swallowee === '..' ||
-            (!options.dot && swallowee.charAt(0) === '.')) {
-            this.debug('dot detected!', file, fr, pattern, pr)
-            break
-          }
-
-          // ** swallows a segment, and continue.
-          this.debug('globstar swallow a segment, and continue')
-          fr++
-        }
-      }
-
-      // no match was found.
-      // However, in partial mode, we can't say this is necessarily over.
-      // If there's more *pattern* left, then
-      if (partial) {
-        // ran out of file
-        this.debug('\n>>> no match, partial?', file, fr, pattern, pr)
-        if (fr === fl) return true
-      }
-      return false
-    }
-
-    // something other than **
-    // non-magic patterns just have to match exactly
-    // patterns with magic have been turned into regexps.
-    var hit
-    if (typeof p === 'string') {
-      if (options.nocase) {
-        hit = f.toLowerCase() === p.toLowerCase()
-      } else {
-        hit = f === p
-      }
-      this.debug('string match', p, f, hit)
-    } else {
-      hit = f.match(p)
-      this.debug('pattern match', p, f, hit)
-    }
-
-    if (!hit) return false
-  }
-
-  // Note: ending in / means that we'll get a final ""
-  // at the end of the pattern.  This can only match a
-  // corresponding "" at the end of the file.
-  // If the file ends in /, then it can only match a
-  // a pattern that ends in /, unless the pattern just
-  // doesn't have any more for it. But, a/b/ should *not*
-  // match "a/b/*", even though "" matches against the
-  // [^/]*? pattern, except in partial mode, where it might
-  // simply not be reached yet.
-  // However, a/b/ should still satisfy a/*
-
-  // now either we fell off the end of the pattern, or we're done.
-  if (fi === fl && pi === pl) {
-    // ran out of pattern and filename at the same time.
-    // an exact hit!
-    return true
-  } else if (fi === fl) {
-    // ran out of file, but still had pattern left.
-    // this is ok if we're doing the match as part of
-    // a glob fs traversal.
-    return partial
-  } else if (pi === pl) {
-    // ran out of pattern, still have file left.
-    // this is only acceptable if we're on the very last
-    // empty segment of a file with a trailing slash.
-    // a/* should match a/b/
-    var emptyFileEnd = (fi === fl - 1) && (file[fi] === '')
-    return emptyFileEnd
-  }
-
-  // should be unreachable.
-  throw new Error('wtf?')
-}
-
-// replace stuff like \* with *
-function globUnescape (s) {
-  return s.replace(/\\(.)/g, '$1')
-}
-
-function regExpEscape (s) {
-  return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
-
-
-/***/ }),
+/* 595 */,
 /* 596 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -44325,66 +44599,7 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
 
 
 /***/ }),
-/* 634 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-var wrappy = __webpack_require__(11)
-var reqs = Object.create(null)
-var once = __webpack_require__(969)
-
-module.exports = wrappy(inflight)
-
-function inflight (key, cb) {
-  if (reqs[key]) {
-    reqs[key].push(cb)
-    return null
-  } else {
-    reqs[key] = [cb]
-    return makeres(key)
-  }
-}
-
-function makeres (key) {
-  return once(function RES () {
-    var cbs = reqs[key]
-    var len = cbs.length
-    var args = slice(arguments)
-
-    // XXX It's somewhat ambiguous whether a new callback added in this
-    // pass should be queued for later execution if something in the
-    // list of callbacks throws, or if it should just be discarded.
-    // However, it's such an edge case that it hardly matters, and either
-    // choice is likely as surprising as the other.
-    // As it happens, we do go ahead and schedule it for later execution.
-    try {
-      for (var i = 0; i < len; i++) {
-        cbs[i].apply(null, args)
-      }
-    } finally {
-      if (cbs.length > len) {
-        // added more in the interim.
-        // de-zalgo, just in case, but don't call again.
-        cbs.splice(0, len)
-        process.nextTick(function () {
-          RES.apply(null, args)
-        })
-      } else {
-        delete reqs[key]
-      }
-    }
-  })
-}
-
-function slice (args) {
-  var length = args.length
-  var array = []
-
-  for (var i = 0; i < length; i++) array[i] = args[i]
-  return array
-}
-
-
-/***/ }),
+/* 634 */,
 /* 635 */,
 /* 636 */,
 /* 637 */,
@@ -45397,81 +45612,190 @@ function orgAssertions (subcommand, uri, params, cb) {
 
 /***/ }),
 /* 652 */
-/***/ (function(module) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-"use strict";
+/*
+ * extsprintf.js: extended POSIX-style sprintf
+ */
 
-module.exports = function generate_oneOf(it, $keyword, $ruleType) {
-  var out = ' ';
-  var $lvl = it.level;
-  var $dataLvl = it.dataLevel;
-  var $schema = it.schema[$keyword];
-  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
-  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
-  var $breakOnError = !it.opts.allErrors;
-  var $data = 'data' + ($dataLvl || '');
-  var $valid = 'valid' + $lvl;
-  var $errs = 'errs__' + $lvl;
-  var $it = it.util.copy(it);
-  var $closingBraces = '';
-  $it.level++;
-  var $nextValid = 'valid' + $it.level;
-  var $currentBaseId = $it.baseId,
-    $prevValid = 'prevValid' + $lvl,
-    $passingSchemas = 'passingSchemas' + $lvl;
-  out += 'var ' + ($errs) + ' = errors , ' + ($prevValid) + ' = false , ' + ($valid) + ' = false , ' + ($passingSchemas) + ' = null; ';
-  var $wasComposite = it.compositeRule;
-  it.compositeRule = $it.compositeRule = true;
-  var arr1 = $schema;
-  if (arr1) {
-    var $sch, $i = -1,
-      l1 = arr1.length - 1;
-    while ($i < l1) {
-      $sch = arr1[$i += 1];
-      if ((it.opts.strictKeywords ? typeof $sch == 'object' && Object.keys($sch).length > 0 : it.util.schemaHasRules($sch, it.RULES.all))) {
-        $it.schema = $sch;
-        $it.schemaPath = $schemaPath + '[' + $i + ']';
-        $it.errSchemaPath = $errSchemaPath + '/' + $i;
-        out += '  ' + (it.validate($it)) + ' ';
-        $it.baseId = $currentBaseId;
-      } else {
-        out += ' var ' + ($nextValid) + ' = true; ';
-      }
-      if ($i) {
-        out += ' if (' + ($nextValid) + ' && ' + ($prevValid) + ') { ' + ($valid) + ' = false; ' + ($passingSchemas) + ' = [' + ($passingSchemas) + ', ' + ($i) + ']; } else { ';
-        $closingBraces += '}';
-      }
-      out += ' if (' + ($nextValid) + ') { ' + ($valid) + ' = ' + ($prevValid) + ' = true; ' + ($passingSchemas) + ' = ' + ($i) + '; }';
-    }
-  }
-  it.compositeRule = $it.compositeRule = $wasComposite;
-  out += '' + ($closingBraces) + 'if (!' + ($valid) + ') {   var err =   '; /* istanbul ignore else */
-  if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ('oneOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { passingSchemas: ' + ($passingSchemas) + ' } ';
-    if (it.opts.messages !== false) {
-      out += ' , message: \'should match exactly one schema in oneOf\' ';
-    }
-    if (it.opts.verbose) {
-      out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-    }
-    out += ' } ';
-  } else {
-    out += ' {} ';
-  }
-  out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-  if (!it.compositeRule && $breakOnError) {
-    /* istanbul ignore if */
-    if (it.async) {
-      out += ' throw new ValidationError(vErrors); ';
-    } else {
-      out += ' validate.errors = vErrors; return false; ';
-    }
-  }
-  out += '} else {  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; }';
-  if (it.opts.allErrors) {
-    out += ' } ';
-  }
-  return out;
+var mod_assert = __webpack_require__(357);
+var mod_util = __webpack_require__(669);
+
+/*
+ * Public interface
+ */
+exports.sprintf = jsSprintf;
+exports.printf = jsPrintf;
+exports.fprintf = jsFprintf;
+
+/*
+ * Stripped down version of s[n]printf(3c).  We make a best effort to throw an
+ * exception when given a format string we don't understand, rather than
+ * ignoring it, so that we won't break existing programs if/when we go implement
+ * the rest of this.
+ *
+ * This implementation currently supports specifying
+ *	- field alignment ('-' flag),
+ * 	- zero-pad ('0' flag)
+ *	- always show numeric sign ('+' flag),
+ *	- field width
+ *	- conversions for strings, decimal integers, and floats (numbers).
+ *	- argument size specifiers.  These are all accepted but ignored, since
+ *	  Javascript has no notion of the physical size of an argument.
+ *
+ * Everything else is currently unsupported, most notably precision, unsigned
+ * numbers, non-decimal numbers, and characters.
+ */
+function jsSprintf(fmt)
+{
+	var regex = [
+	    '([^%]*)',				/* normal text */
+	    '%',				/* start of format */
+	    '([\'\\-+ #0]*?)',			/* flags (optional) */
+	    '([1-9]\\d*)?',			/* width (optional) */
+	    '(\\.([1-9]\\d*))?',		/* precision (optional) */
+	    '[lhjztL]*?',			/* length mods (ignored) */
+	    '([diouxXfFeEgGaAcCsSp%jr])'	/* conversion */
+	].join('');
+
+	var re = new RegExp(regex);
+	var args = Array.prototype.slice.call(arguments, 1);
+	var flags, width, precision, conversion;
+	var left, pad, sign, arg, match;
+	var ret = '';
+	var argn = 1;
+
+	mod_assert.equal('string', typeof (fmt));
+
+	while ((match = re.exec(fmt)) !== null) {
+		ret += match[1];
+		fmt = fmt.substring(match[0].length);
+
+		flags = match[2] || '';
+		width = match[3] || 0;
+		precision = match[4] || '';
+		conversion = match[6];
+		left = false;
+		sign = false;
+		pad = ' ';
+
+		if (conversion == '%') {
+			ret += '%';
+			continue;
+		}
+
+		if (args.length === 0)
+			throw (new Error('too few args to sprintf'));
+
+		arg = args.shift();
+		argn++;
+
+		if (flags.match(/[\' #]/))
+			throw (new Error(
+			    'unsupported flags: ' + flags));
+
+		if (precision.length > 0)
+			throw (new Error(
+			    'non-zero precision not supported'));
+
+		if (flags.match(/-/))
+			left = true;
+
+		if (flags.match(/0/))
+			pad = '0';
+
+		if (flags.match(/\+/))
+			sign = true;
+
+		switch (conversion) {
+		case 's':
+			if (arg === undefined || arg === null)
+				throw (new Error('argument ' + argn +
+				    ': attempted to print undefined or null ' +
+				    'as a string'));
+			ret += doPad(pad, width, left, arg.toString());
+			break;
+
+		case 'd':
+			arg = Math.floor(arg);
+			/*jsl:fallthru*/
+		case 'f':
+			sign = sign && arg > 0 ? '+' : '';
+			ret += sign + doPad(pad, width, left,
+			    arg.toString());
+			break;
+
+		case 'x':
+			ret += doPad(pad, width, left, arg.toString(16));
+			break;
+
+		case 'j': /* non-standard */
+			if (width === 0)
+				width = 10;
+			ret += mod_util.inspect(arg, false, width);
+			break;
+
+		case 'r': /* non-standard */
+			ret += dumpException(arg);
+			break;
+
+		default:
+			throw (new Error('unsupported conversion: ' +
+			    conversion));
+		}
+	}
+
+	ret += fmt;
+	return (ret);
+}
+
+function jsPrintf() {
+	var args = Array.prototype.slice.call(arguments);
+	args.unshift(process.stdout);
+	jsFprintf.apply(null, args);
+}
+
+function jsFprintf(stream) {
+	var args = Array.prototype.slice.call(arguments, 1);
+	return (stream.write(jsSprintf.apply(this, args)));
+}
+
+function doPad(chr, width, left, str)
+{
+	var ret = str;
+
+	while (ret.length < width) {
+		if (left)
+			ret += chr;
+		else
+			ret = chr + ret;
+	}
+
+	return (ret);
+}
+
+/*
+ * This function dumps long stack traces for exceptions having a cause() method.
+ * See node-verror for an example.
+ */
+function dumpException(ex)
+{
+	var ret;
+
+	if (!(ex instanceof Error))
+		throw (new Error(jsSprintf('invalid type for %%r: %j', ex)));
+
+	/* Note that V8 prepends "ex.stack" with ex.toString(). */
+	ret = 'EXCEPTION: ' + ex.constructor.name + ': ' + ex.stack;
+
+	if (ex.cause && typeof (ex.cause) === 'function') {
+		var cex = ex.cause();
+		if (cex) {
+			ret += '\nCaused by: ' + dumpException(cex);
+		}
+	}
+
+	return (ret);
 }
 
 
@@ -46971,305 +47295,63 @@ module.exports = function generate_not(it, $keyword, $ruleType) {
 
 /***/ }),
 /* 674 */
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-"use strict";
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
+var wrappy = __webpack_require__(11)
+var reqs = Object.create(null)
+var once = __webpack_require__(969)
 
+module.exports = wrappy(inflight)
 
-
-/*<replacement>*/
-
-var Buffer = __webpack_require__(149).Buffer;
-/*</replacement>*/
-
-var isEncoding = Buffer.isEncoding || function (encoding) {
-  encoding = '' + encoding;
-  switch (encoding && encoding.toLowerCase()) {
-    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
-      return true;
-    default:
-      return false;
-  }
-};
-
-function _normalizeEncoding(enc) {
-  if (!enc) return 'utf8';
-  var retried;
-  while (true) {
-    switch (enc) {
-      case 'utf8':
-      case 'utf-8':
-        return 'utf8';
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return 'utf16le';
-      case 'latin1':
-      case 'binary':
-        return 'latin1';
-      case 'base64':
-      case 'ascii':
-      case 'hex':
-        return enc;
-      default:
-        if (retried) return; // undefined
-        enc = ('' + enc).toLowerCase();
-        retried = true;
-    }
-  }
-};
-
-// Do not cache `Buffer.isEncoding` when checking encoding names as some
-// modules monkey-patch it to support additional encodings
-function normalizeEncoding(enc) {
-  var nenc = _normalizeEncoding(enc);
-  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
-  return nenc || enc;
-}
-
-// StringDecoder provides an interface for efficiently splitting a series of
-// buffers into a series of JS strings without breaking apart multi-byte
-// characters.
-exports.StringDecoder = StringDecoder;
-function StringDecoder(encoding) {
-  this.encoding = normalizeEncoding(encoding);
-  var nb;
-  switch (this.encoding) {
-    case 'utf16le':
-      this.text = utf16Text;
-      this.end = utf16End;
-      nb = 4;
-      break;
-    case 'utf8':
-      this.fillLast = utf8FillLast;
-      nb = 4;
-      break;
-    case 'base64':
-      this.text = base64Text;
-      this.end = base64End;
-      nb = 3;
-      break;
-    default:
-      this.write = simpleWrite;
-      this.end = simpleEnd;
-      return;
-  }
-  this.lastNeed = 0;
-  this.lastTotal = 0;
-  this.lastChar = Buffer.allocUnsafe(nb);
-}
-
-StringDecoder.prototype.write = function (buf) {
-  if (buf.length === 0) return '';
-  var r;
-  var i;
-  if (this.lastNeed) {
-    r = this.fillLast(buf);
-    if (r === undefined) return '';
-    i = this.lastNeed;
-    this.lastNeed = 0;
+function inflight (key, cb) {
+  if (reqs[key]) {
+    reqs[key].push(cb)
+    return null
   } else {
-    i = 0;
+    reqs[key] = [cb]
+    return makeres(key)
   }
-  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
-  return r || '';
-};
-
-StringDecoder.prototype.end = utf8End;
-
-// Returns only complete characters in a Buffer
-StringDecoder.prototype.text = utf8Text;
-
-// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
-StringDecoder.prototype.fillLast = function (buf) {
-  if (this.lastNeed <= buf.length) {
-    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
-    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
-  }
-  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
-  this.lastNeed -= buf.length;
-};
-
-// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
-// continuation byte. If an invalid byte is detected, -2 is returned.
-function utf8CheckByte(byte) {
-  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
-  return byte >> 6 === 0x02 ? -1 : -2;
 }
 
-// Checks at most 3 bytes at the end of a Buffer in order to detect an
-// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
-// needed to complete the UTF-8 character (if applicable) are returned.
-function utf8CheckIncomplete(self, buf, i) {
-  var j = buf.length - 1;
-  if (j < i) return 0;
-  var nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) self.lastNeed = nb - 1;
-    return nb;
-  }
-  if (--j < i || nb === -2) return 0;
-  nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) self.lastNeed = nb - 2;
-    return nb;
-  }
-  if (--j < i || nb === -2) return 0;
-  nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) {
-      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
-    }
-    return nb;
-  }
-  return 0;
-}
+function makeres (key) {
+  return once(function RES () {
+    var cbs = reqs[key]
+    var len = cbs.length
+    var args = slice(arguments)
 
-// Validates as many continuation bytes for a multi-byte UTF-8 character as
-// needed or are available. If we see a non-continuation byte where we expect
-// one, we "replace" the validated continuation bytes we've seen so far with
-// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
-// behavior. The continuation byte check is included three times in the case
-// where all of the continuation bytes for a character exist in the same buffer.
-// It is also done this way as a slight performance increase instead of using a
-// loop.
-function utf8CheckExtraBytes(self, buf, p) {
-  if ((buf[0] & 0xC0) !== 0x80) {
-    self.lastNeed = 0;
-    return '\ufffd';
-  }
-  if (self.lastNeed > 1 && buf.length > 1) {
-    if ((buf[1] & 0xC0) !== 0x80) {
-      self.lastNeed = 1;
-      return '\ufffd';
-    }
-    if (self.lastNeed > 2 && buf.length > 2) {
-      if ((buf[2] & 0xC0) !== 0x80) {
-        self.lastNeed = 2;
-        return '\ufffd';
+    // XXX It's somewhat ambiguous whether a new callback added in this
+    // pass should be queued for later execution if something in the
+    // list of callbacks throws, or if it should just be discarded.
+    // However, it's such an edge case that it hardly matters, and either
+    // choice is likely as surprising as the other.
+    // As it happens, we do go ahead and schedule it for later execution.
+    try {
+      for (var i = 0; i < len; i++) {
+        cbs[i].apply(null, args)
+      }
+    } finally {
+      if (cbs.length > len) {
+        // added more in the interim.
+        // de-zalgo, just in case, but don't call again.
+        cbs.splice(0, len)
+        process.nextTick(function () {
+          RES.apply(null, args)
+        })
+      } else {
+        delete reqs[key]
       }
     }
-  }
+  })
 }
 
-// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
-function utf8FillLast(buf) {
-  var p = this.lastTotal - this.lastNeed;
-  var r = utf8CheckExtraBytes(this, buf, p);
-  if (r !== undefined) return r;
-  if (this.lastNeed <= buf.length) {
-    buf.copy(this.lastChar, p, 0, this.lastNeed);
-    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
-  }
-  buf.copy(this.lastChar, p, 0, buf.length);
-  this.lastNeed -= buf.length;
+function slice (args) {
+  var length = args.length
+  var array = []
+
+  for (var i = 0; i < length; i++) array[i] = args[i]
+  return array
 }
 
-// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
-// partial character, the character's bytes are buffered until the required
-// number of bytes are available.
-function utf8Text(buf, i) {
-  var total = utf8CheckIncomplete(this, buf, i);
-  if (!this.lastNeed) return buf.toString('utf8', i);
-  this.lastTotal = total;
-  var end = buf.length - (total - this.lastNeed);
-  buf.copy(this.lastChar, 0, end);
-  return buf.toString('utf8', i, end);
-}
-
-// For UTF-8, a replacement character is added when ending on a partial
-// character.
-function utf8End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + '\ufffd';
-  return r;
-}
-
-// UTF-16LE typically needs two bytes per character, but even if we have an even
-// number of bytes available, we need to check if we end on a leading/high
-// surrogate. In that case, we need to wait for the next two bytes in order to
-// decode the last character properly.
-function utf16Text(buf, i) {
-  if ((buf.length - i) % 2 === 0) {
-    var r = buf.toString('utf16le', i);
-    if (r) {
-      var c = r.charCodeAt(r.length - 1);
-      if (c >= 0xD800 && c <= 0xDBFF) {
-        this.lastNeed = 2;
-        this.lastTotal = 4;
-        this.lastChar[0] = buf[buf.length - 2];
-        this.lastChar[1] = buf[buf.length - 1];
-        return r.slice(0, -1);
-      }
-    }
-    return r;
-  }
-  this.lastNeed = 1;
-  this.lastTotal = 2;
-  this.lastChar[0] = buf[buf.length - 1];
-  return buf.toString('utf16le', i, buf.length - 1);
-}
-
-// For UTF-16LE we do not explicitly append special replacement characters if we
-// end on a partial character, we simply let v8 handle that.
-function utf16End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) {
-    var end = this.lastTotal - this.lastNeed;
-    return r + this.lastChar.toString('utf16le', 0, end);
-  }
-  return r;
-}
-
-function base64Text(buf, i) {
-  var n = (buf.length - i) % 3;
-  if (n === 0) return buf.toString('base64', i);
-  this.lastNeed = 3 - n;
-  this.lastTotal = 3;
-  if (n === 1) {
-    this.lastChar[0] = buf[buf.length - 1];
-  } else {
-    this.lastChar[0] = buf[buf.length - 2];
-    this.lastChar[1] = buf[buf.length - 1];
-  }
-  return buf.toString('base64', i, buf.length - n);
-}
-
-function base64End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
-  return r;
-}
-
-// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
-function simpleWrite(buf) {
-  return buf.toString(this.encoding);
-}
-
-function simpleEnd(buf) {
-  return buf && buf.length ? this.write(buf) : '';
-}
 
 /***/ }),
 /* 675 */,
@@ -52543,72 +52625,7 @@ function populateMaps (extensions, types) {
 
 /***/ }),
 /* 780 */,
-/* 781 */
-/***/ (function(module) {
-
-"use strict";
-
-module.exports = balanced;
-function balanced(a, b, str) {
-  if (a instanceof RegExp) a = maybeMatch(a, str);
-  if (b instanceof RegExp) b = maybeMatch(b, str);
-
-  var r = range(a, b, str);
-
-  return r && {
-    start: r[0],
-    end: r[1],
-    pre: str.slice(0, r[0]),
-    body: str.slice(r[0] + a.length, r[1]),
-    post: str.slice(r[1] + b.length)
-  };
-}
-
-function maybeMatch(reg, str) {
-  var m = str.match(reg);
-  return m ? m[0] : null;
-}
-
-balanced.range = range;
-function range(a, b, str) {
-  var begs, beg, left, right, result;
-  var ai = str.indexOf(a);
-  var bi = str.indexOf(b, ai + 1);
-  var i = ai;
-
-  if (ai >= 0 && bi > 0) {
-    begs = [];
-    left = str.length;
-
-    while (i >= 0 && !result) {
-      if (i == ai) {
-        begs.push(i);
-        ai = str.indexOf(a, i + 1);
-      } else if (begs.length == 1) {
-        result = [ begs.pop(), bi ];
-      } else {
-        beg = begs.pop();
-        if (beg < left) {
-          left = beg;
-          right = bi;
-        }
-
-        bi = str.indexOf(b, i + 1);
-      }
-
-      i = ai < bi && ai >= 0 ? ai : bi;
-    }
-
-    if (begs.length) {
-      result = [ left, right ];
-    }
-  }
-
-  return result;
-}
-
-
-/***/ }),
+/* 781 */,
 /* 782 */,
 /* 783 */,
 /* 784 */
@@ -57856,7 +57873,7 @@ function ownProp (obj, field) {
 }
 
 var path = __webpack_require__(622)
-var minimatch = __webpack_require__(595)
+var minimatch = __webpack_require__(93)
 var isAbsolute = __webpack_require__(681)
 var Minimatch = minimatch.Minimatch
 
@@ -63220,7 +63237,7 @@ function done(stream, er, data) {
 var mod_assert = __webpack_require__(477);
 var mod_util = __webpack_require__(669);
 
-var mod_extsprintf = __webpack_require__(432);
+var mod_extsprintf = __webpack_require__(652);
 var mod_verror = __webpack_require__(956);
 var mod_jsonschema = __webpack_require__(703);
 
@@ -66572,7 +66589,7 @@ module.exports.shellSync = (cmd, opts) => handleShell(module.exports.sync, cmd, 
 var mod_assertplus = __webpack_require__(477);
 var mod_util = __webpack_require__(669);
 
-var mod_extsprintf = __webpack_require__(432);
+var mod_extsprintf = __webpack_require__(652);
 var mod_isError = __webpack_require__(286).isError;
 var sprintf = mod_extsprintf.sprintf;
 
@@ -68617,7 +68634,7 @@ function RegClient (config) {
   client.sendAnonymousCLIMetrics = __webpack_require__(960)
   client.star = __webpack_require__(555)
   client.stars = __webpack_require__(828)
-  client.tag = __webpack_require__(284)
+  client.tag = __webpack_require__(121)
   client.team = __webpack_require__(978)
   client.unpublish = __webpack_require__(585)
   client.whoami = __webpack_require__(845)

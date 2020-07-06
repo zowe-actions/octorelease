@@ -8,6 +8,11 @@ import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
+        const eventPath: string = utils.requireEnvVar("GITHUB_EVENT_PATH");
+        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+        core.info(JSON.stringify(eventData));
+        process.exit();
+
         const configFile: string = core.getInput("config-file");
         const config: IConfig = require("js-yaml").safeLoad(fs.readFileSync(configFile).toString());
         const branchNames: string[] = (config.protectedBranches || []).map((branch: IProtectedBranch) => branch.name);
