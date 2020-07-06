@@ -26,6 +26,10 @@ inputs:
     description: 'Token with push access to GitHub repo'
     required: true
     default: ''
+  semver-labels:
+    description: 'Comma-separated list of semver labels to detect on PRs'
+    required: false
+    default: 'release-major,release-minor,release-patch'
   skip-version:
     description: 'Skip versioning the project before publishing it'
     required: false

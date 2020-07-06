@@ -8,11 +8,11 @@ import * as utils from "./utils";
 
 export class Publish {
     public static async publishGithub(): Promise<void> {
-        const octokit = github.getOctokit(core.getInput("repo-token"));
+        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
         const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
 
         // Create release and add release notes if any
-        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
+        const octokit = github.getOctokit(core.getInput("repo-token"));
         const releaseNotes = await this.getReleaseNotes("CHANGELOG.md", packageJson.version);
         const release = await octokit.repos.createRelease({
             owner, repo,
@@ -33,7 +33,7 @@ export class Publish {
                 owner, repo,
                 release_id: release.data.id,
                 name: path.basename(artifactPath),
-                data: fs.readFileSync(artifactPath).toString(),
+                data: fs.readFileSync(artifactPath).toString("binary"),
                 url: release.data.upload_url,
                 headers: {
                     "Content-Type": mime.lookup(artifactPath)
