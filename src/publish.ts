@@ -23,7 +23,6 @@ export class Publish {
         // Upload artifacts to release
         const artifactPaths: string[] = [];
         const glob = require("glob");
-        const mime = require("mime-types");
         core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
             artifactPaths.push(...glob.sync(artifactPattern.trim()));
         });
@@ -35,10 +34,7 @@ export class Publish {
                 name: path.basename(artifactPath),
                 data: fs.readFileSync(artifactPath, "binary"),
                 url: release.data.upload_url,
-                headers: {
-                    "Content-Length": fs.statSync(artifactPath).size,
-                    "Content-Type": mime.lookup(artifactPath) || "application/zip"
-                },
+                headers: this.getUploadRequestHeaders(artifactPath)
             })
         }
     }
@@ -107,5 +103,17 @@ export class Publish {
         }
 
         return releaseNotes.trim() || undefined;
+    }
+
+    private static getUploadRequestHeaders(artifactPath: string): any {
+        let mimeType = require("mime-types").lookup(artifactPath);
+        if (!mimeType) {
+            mimeType = artifactPath.endsWith(".tgz") ? "application/gzip" : "application/zip";
+        }
+
+        return {
+            "Content-Length": fs.statSync(artifactPath).size,
+            "Content-Type": mimeType
+        };
     }
 }

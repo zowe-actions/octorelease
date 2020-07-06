@@ -31141,7 +31141,6 @@ class Publish {
             // Upload artifacts to release
             const artifactPaths = [];
             const glob = __webpack_require__(402);
-            const mime = __webpack_require__(779);
             core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
                 artifactPaths.push(...glob.sync(artifactPattern.trim()));
             });
@@ -31152,10 +31151,7 @@ class Publish {
                     name: path.basename(artifactPath),
                     data: fs.readFileSync(artifactPath, "binary"),
                     url: release.data.upload_url,
-                    headers: {
-                        "Content-Length": fs.statSync(artifactPath).size,
-                        "Content-Type": mime.lookup(artifactPath) || "application/zip"
-                    },
+                    headers: this.getUploadRequestHeaders(artifactPath)
                 });
             }
         });
@@ -31222,6 +31218,16 @@ class Publish {
             }
             return releaseNotes.trim() || undefined;
         });
+    }
+    static getUploadRequestHeaders(artifactPath) {
+        let mimeType = __webpack_require__(779).lookup(artifactPath);
+        if (!mimeType) {
+            mimeType = artifactPath.endsWith(".tgz") ? "application/gzip" : "application/zip";
+        }
+        return {
+            "Content-Length": fs.statSync(artifactPath).size,
+            "Content-Type": mimeType
+        };
     }
 }
 exports.Publish = Publish;
