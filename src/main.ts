@@ -2,9 +2,9 @@ import * as fs from "fs";
 import * as core from "@actions/core";
 import { IConfig } from "./doc/IConfig";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
-import { publishGithub, publishNpm } from "./publish";
+import { Publish } from "./publish";
 import * as utils from "./utils";
-import { version } from "./version";
+import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
@@ -22,19 +22,19 @@ async function run(): Promise<void> {
         const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
 
         if (core.getInput("skip-version") !== "true") {
-            await version(protectedBranch);
+            await Version.version(protectedBranch);
         }
 
         let publishJobs = false;
 
         if (core.getInput("github-artifacts")) {
             publishJobs = true;
-            await publishGithub();
+            await Publish.publishGithub();
         }
 
         if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
             publishJobs = true;
-            await publishNpm(protectedBranch);
+            await Publish.publishNpm(protectedBranch);
         }
 
         if (!publishJobs) {
