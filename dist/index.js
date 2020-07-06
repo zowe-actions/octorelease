@@ -31053,7 +31053,7 @@ class Publish {
             }
             catch (err) {
                 if (err.message.indexOf("already_exists") !== -1) {
-                    core.warning(`Version ${packageJson.version} has already been published to GitHub`);
+                    core.error(`Version ${packageJson.version} has already been published to GitHub`);
                     return;
                 }
                 else {
@@ -31101,19 +31101,18 @@ class Publish {
             const npmEmail = core.getInput("npm-email");
             const npmScope = packageJson.name.split("/")[0];
             npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
-            const publishedVersion = yield utils.getPackageVersion(packageJson.name, branch.tag);
-            const latestVersion = packageJson.version;
             // Publish package
-            if (publishedVersion != latestVersion) {
+            const alreadyPublished = yield utils.getPackageVersion(packageJson.name, packageJson.version);
+            if (!alreadyPublished) {
                 yield exec.exec(`npm publish --tag ${branch.tag}`);
             }
             else {
-                core.warning(`Version ${publishedVersion} has already been published to NPM`);
+                core.error(`Version ${packageJson.version} has already been published to NPM`);
             }
             // Add alias tags
             if (branch.aliasTags) {
                 for (const tag of branch.aliasTags) {
-                    yield exec.exec(`npm dist-tag add ${packageJson.name}@${latestVersion} ${tag}`);
+                    yield exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
                 }
             }
         });
