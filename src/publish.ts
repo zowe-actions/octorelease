@@ -28,6 +28,7 @@ export class Publish {
         });
 
         for (const artifactPath of artifactPaths) {
+            core.info(`Uploading release asset ${artifactPath}`);
             await octokit.repos.uploadReleaseAsset({
                 owner, repo,
                 release_id: release.data.id,
@@ -40,6 +41,11 @@ export class Publish {
     }
 
     public static async publishNpm(branch: IProtectedBranch): Promise<void> {
+        if (!branch.tag) {
+            core.setFailed(`Expected NPM tag to be defined for ${branch.name} branch but it is not`);
+            process.exit();
+        }
+
         // Prevent publish from being affected by local npmrc
         await exec.exec("rm -f .npmrc");
 

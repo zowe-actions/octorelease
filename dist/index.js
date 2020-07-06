@@ -9615,13 +9615,15 @@ const version_1 = __webpack_require__(228);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const shouldVersion = core.getInput("skip-version") !== "true";
+            const shouldPublishGithub = core.getInput("github-artifacts") !== "";
+            const shouldPublishNpm = core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "";
             const configFile = core.getInput("config-file");
             const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
             let config = {
                 protectedBranches: [
                     {
-                        name: currentBranch,
-                        tag: "latest"
+                        name: currentBranch
                     }
                 ]
             };
@@ -9629,7 +9631,7 @@ function run() {
                 config = __webpack_require__(414).safeLoad(fs.readFileSync(configFile, "utf-8"));
             }
             else {
-                core.warning(`Missing config file ${configFile} so using default config`);
+                core.warning(`Missing config file ${configFile} so continuing without protected branch rules`);
             }
             const branchNames = (config.protectedBranches || []).map(branch => branch.name);
             // Check if protected branch is in config
@@ -9638,19 +9640,16 @@ function run() {
                 process.exit();
             }
             const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
-            if (core.getInput("skip-version") !== "true") {
+            if (shouldVersion) {
                 yield version_1.Version.version(protectedBranch);
             }
-            let publishJobs = false;
-            if (core.getInput("github-artifacts")) {
-                publishJobs = true;
+            if (shouldPublishGithub) {
                 yield publish_1.Publish.publishGithub();
             }
-            if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
-                publishJobs = true;
+            if (shouldPublishNpm) {
                 yield publish_1.Publish.publishNpm(protectedBranch);
             }
-            if (!publishJobs) {
+            if (!shouldPublishGithub && !shouldPublishNpm) {
                 core.warning("Nothing to publish");
             }
         }
@@ -31158,6 +31157,7 @@ class Publish {
                 artifactPaths.push(...glob.sync(artifactPattern.trim()));
             });
             for (const artifactPath of artifactPaths) {
+                core.info(`Uploading release asset ${artifactPath}`);
                 yield octokit.repos.uploadReleaseAsset({
                     owner, repo,
                     release_id: release.data.id,
@@ -31172,6 +31172,10 @@ class Publish {
     static publishNpm(branch) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
+            if (!branch.tag) {
+                core.setFailed(`Expected NPM tag to be defined for ${branch.name} branch but it is not`);
+                process.exit();
+            }
             // Prevent publish from being affected by local npmrc
             yield exec.exec("rm -f .npmrc");
             const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
