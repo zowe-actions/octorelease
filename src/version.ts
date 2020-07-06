@@ -16,8 +16,8 @@ export class Version {
         const semverLevel: SemVerLevel = await this.getSemVerLevel();
 
         if (semverLevel === "none") {
-            core.warning("Semver label was not set on PR so exiting now");
-            process.exit();
+            core.warning("Semver label was not set on PR so skipping version stage");
+            return;
         }
 
         // Check semver level to see if new version is ok
@@ -72,7 +72,7 @@ export class Version {
 
         if (prs.data.length === 0) {
             core.warning(`Could not find pull request associated with commit ${gitHash}`);
-            process.exit();
+            return "none";
         }
 
         const [labelMajor, labelMinor, labelPatch] = core.getInput("semver-labels").split(",", 3).map(s => s.trim());

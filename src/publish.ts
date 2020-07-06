@@ -33,11 +33,12 @@ export class Publish {
                 owner, repo,
                 release_id: release.data.id,
                 name: path.basename(artifactPath),
-                data: fs.readFileSync(artifactPath).toString("binary"),
+                data: fs.readFileSync(artifactPath, "binary"),
                 url: release.data.upload_url,
                 headers: {
-                    "Content-Type": mime.lookup(artifactPath)
-                }
+                    "Content-Length": fs.statSync(artifactPath).size,
+                    "Content-Type": mime.lookup(artifactPath) || "application/zip"
+                },
             })
         }
     }

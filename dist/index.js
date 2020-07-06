@@ -17274,8 +17274,8 @@ class Version {
             const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
             const semverLevel = yield this.getSemVerLevel();
             if (semverLevel === "none") {
-                core.warning("Semver label was not set on PR so exiting now");
-                process.exit();
+                core.warning("Semver label was not set on PR so skipping version stage");
+                return;
             }
             // Check semver level to see if new version is ok
             if (branch.level && branch.level !== "major") {
@@ -17322,7 +17322,7 @@ class Version {
             });
             if (prs.data.length === 0) {
                 core.warning(`Could not find pull request associated with commit ${gitHash}`);
-                process.exit();
+                return "none";
             }
             const [labelMajor, labelMinor, labelPatch] = core.getInput("semver-labels").split(",", 3).map(s => s.trim());
             let semverLevel = "none";
@@ -31150,11 +31150,12 @@ class Publish {
                     owner, repo,
                     release_id: release.data.id,
                     name: path.basename(artifactPath),
-                    data: fs.readFileSync(artifactPath).toString("binary"),
+                    data: fs.readFileSync(artifactPath, "binary"),
                     url: release.data.upload_url,
                     headers: {
-                        "Content-Type": mime.lookup(artifactPath)
-                    }
+                        "Content-Length": fs.statSync(artifactPath).size,
+                        "Content-Type": mime.lookup(artifactPath) || "application/zip"
+                    },
                 });
             }
         });
