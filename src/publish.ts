@@ -33,7 +33,7 @@ export class Publish {
                 owner, repo,
                 release_id: release.data.id,
                 name: path.basename(artifactPath),
-                data: fs.readFileSync(artifactPath, "binary"),
+                data: fs.readFileSync(artifactPath) as any,
                 url: release.data.upload_url,
                 headers: this.getUploadRequestHeaders(artifactPath)
             })
