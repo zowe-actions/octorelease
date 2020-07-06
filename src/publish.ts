@@ -16,7 +16,7 @@ export class Publish {
         const releaseNotes = await this.getReleaseNotes("CHANGELOG.md", packageJson.version);
         const release = await octokit.repos.createRelease({
             owner, repo,
-            tag_name: "v" + packageJson.version,
+            tag_name: `v${packageJson.version}`,
             body: releaseNotes
         })
 
@@ -106,14 +106,9 @@ export class Publish {
     }
 
     private static getUploadRequestHeaders(artifactPath: string): any {
-        let mimeType = require("mime-types").lookup(artifactPath);
-        if (!mimeType) {
-            mimeType = artifactPath.endsWith(".tgz") ? "application/gzip" : "application/zip";
-        }
-
         return {
             "Content-Length": fs.statSync(artifactPath).size,
-            "Content-Type": mimeType
+            "Content-Type": require("mime-types").lookup(artifactPath) || "application/octet-stream"
         };
     }
 }

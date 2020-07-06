@@ -31135,7 +31135,7 @@ class Publish {
             const releaseNotes = yield this.getReleaseNotes("CHANGELOG.md", packageJson.version);
             const release = yield octokit.repos.createRelease({
                 owner, repo,
-                tag_name: "v" + packageJson.version,
+                tag_name: `v${packageJson.version}`,
                 body: releaseNotes
             });
             // Upload artifacts to release
@@ -31220,13 +31220,9 @@ class Publish {
         });
     }
     static getUploadRequestHeaders(artifactPath) {
-        let mimeType = __webpack_require__(779).lookup(artifactPath);
-        if (!mimeType) {
-            mimeType = artifactPath.endsWith(".tgz") ? "application/gzip" : "application/zip";
-        }
         return {
             "Content-Length": fs.statSync(artifactPath).size,
-            "Content-Type": mimeType
+            "Content-Type": __webpack_require__(779).lookup(artifactPath) || "application/octet-stream"
         };
     }
 }
