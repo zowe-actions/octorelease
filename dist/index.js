@@ -31043,11 +31043,23 @@ class Publish {
             // Create release and add release notes if any
             const octokit = github.getOctokit(core.getInput("repo-token"));
             const releaseNotes = yield this.getReleaseNotes("CHANGELOG.md", packageJson.version);
-            const release = yield octokit.repos.createRelease({
-                owner, repo,
-                tag_name: `v${packageJson.version}`,
-                body: releaseNotes
-            });
+            let release;
+            try {
+                release = yield octokit.repos.createRelease({
+                    owner, repo,
+                    tag_name: `v${packageJson.version}`,
+                    body: releaseNotes
+                });
+            }
+            catch (err) {
+                if (err.message.indexOf("already_exists") !== -1) {
+                    core.warning(`Version ${packageJson.version} has already been published to GitHub`);
+                    return;
+                }
+                else {
+                    throw err;
+                }
+            }
             // Upload artifacts to release
             const artifactPaths = [];
             const glob = __webpack_require__(402);
@@ -31096,7 +31108,7 @@ class Publish {
                 yield exec.exec(`npm publish --tag ${branch.tag}`);
             }
             else {
-                core.warning(`Version ${publishedVersion} has already been published, skipping publish`);
+                core.warning(`Version ${publishedVersion} has already been published to NPM`);
             }
             // Add alias tags
             if (branch.aliasTags) {
