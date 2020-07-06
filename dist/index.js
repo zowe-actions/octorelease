@@ -9616,9 +9616,22 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const configFile = core.getInput("config-file");
-            const config = __webpack_require__(414).safeLoad(fs.readFileSync(configFile).toString());
-            const branchNames = (config.protectedBranches || []).map((branch) => branch.name);
             const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
+            let config = {
+                protectedBranches: [
+                    {
+                        name: currentBranch,
+                        tag: "latest"
+                    }
+                ]
+            };
+            if (fs.existsSync(configFile)) {
+                config = __webpack_require__(414).safeLoad(fs.readFileSync(configFile, "utf-8"));
+            }
+            else {
+                core.warning(`Missing config file ${configFile} so using default config`);
+            }
+            const branchNames = (config.protectedBranches || []).map(branch => branch.name);
             // Check if protected branch is in config
             if (branchNames.indexOf(currentBranch) === -1) {
                 core.info(`${currentBranch} is not a protected branch in ${configFile} so exiting now`);
