@@ -17367,10 +17367,9 @@ class Version {
     static updateDependency(pkgName, pkgTag, packageJson, dev) {
         return __awaiter(this, void 0, void 0, function* () {
             const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
-            const semver = __webpack_require__(876);
             let currentVersion = dependencies[pkgName];
             if (currentVersion) {
-                currentVersion = semver.clean(currentVersion);
+                currentVersion = __webpack_require__(876).clean(currentVersion);
             }
             const latestVersion = yield utils.getPackageVersion(pkgName, pkgTag);
             if (currentVersion !== latestVersion) {
