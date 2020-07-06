@@ -27,14 +27,14 @@ async function run(): Promise<void> {
 
         let publishJobs = false;
 
-        if (core.getInput("github-artifacts")) {
-            publishJobs = true;
-            await Publish.publishGithub();
-        }
-
         if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
             publishJobs = true;
             await Publish.publishNpm(protectedBranch);
+        }
+
+        if (core.getInput("github-artifacts")) {
+            publishJobs = true;
+            await Publish.publishGithub();
         }
 
         if (!publishJobs) {

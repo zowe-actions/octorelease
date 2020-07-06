@@ -9629,13 +9629,13 @@ function run() {
                 yield version_1.Version.version(protectedBranch);
             }
             let publishJobs = false;
-            if (core.getInput("github-artifacts")) {
-                publishJobs = true;
-                yield publish_1.Publish.publishGithub();
-            }
             if (core.getInput("npm-credentials") && core.getInput("npm-email")) {
                 publishJobs = true;
                 yield publish_1.Publish.publishNpm(protectedBranch);
+            }
+            if (core.getInput("github-artifacts")) {
+                publishJobs = true;
+                yield publish_1.Publish.publishGithub();
             }
             if (!publishJobs) {
                 core.warning("Nothing to publish");
