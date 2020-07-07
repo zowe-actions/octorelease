@@ -30,15 +30,13 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
 export async function gitConfig(): Promise<void> {
     // const gitUser = "zowe-robot";
     // const gitEmail = "zowe.robot@gmail.com";
-    const gitUser = "tjohnsonBCM";
-    const gitEmail = "timothy.johnson@broadcom.com";
-
+    const gitUser = "github-actions[bot]";
+    const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
     await exec.exec(`git config --global user.name "${gitUser}"`);
     await exec.exec(`git config --global user.email "${gitEmail}"`);
 
-    const authToken: string = core.getInput("repo-token");
     const repository: string = requireEnvVar("GITHUB_REPOSITORY");
-    await exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+    await exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {

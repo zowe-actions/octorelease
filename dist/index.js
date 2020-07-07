@@ -11093,13 +11093,12 @@ function gitConfig() {
     return __awaiter(this, void 0, void 0, function* () {
         // const gitUser = "zowe-robot";
         // const gitEmail = "zowe.robot@gmail.com";
-        const gitUser = "tjohnsonBCM";
-        const gitEmail = "timothy.johnson@broadcom.com";
+        const gitUser = "github-actions[bot]";
+        const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
         yield exec.exec(`git config --global user.name "${gitUser}"`);
         yield exec.exec(`git config --global user.email "${gitEmail}"`);
-        const authToken = core.getInput("repo-token");
         const repository = requireEnvVar("GITHUB_REPOSITORY");
-        yield exec.exec(`git remote set-url origin https://${gitUser}:${authToken}@github.com/${repository}.git`);
+        yield exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
     });
 }
 exports.gitConfig = gitConfig;
