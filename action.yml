@@ -9,17 +9,21 @@ inputs:
   config-file:
     description: 'Path to YAML config'
     required: false
-    default: './zowe-deploy.yml'
+    default: './node-deploy.yml'
   github-artifacts:
     description: 'Comma-separated list of files to publish in GitHub release'
     required: false
     default: ''
   npm-credentials:
-    description: 'Username and password for NPM publisher (user:pass)'
+    description: 'Username and password for NPM login (user:pass)'
     required: false
     default: ''
   npm-email:
-    description: 'Email for NPM publisher'
+    description: 'Email address for NPM login'
+    required: false
+    default: ''
+  npm-registry:
+    description: 'Registry where NPM package should be published'
     required: false
     default: ''
   repo-token:
@@ -30,8 +34,8 @@ inputs:
     description: 'Comma-separated list of semver labels to detect on PRs'
     required: false
     default: 'release-major,release-minor,release-patch'
-  skip-version:
-    description: 'Skip versioning the project before publishing it'
+  update-version:
+    description: 'Update package version if semver label detected on PR'
     required: false
     default: 'false'
 runs:

@@ -28,8 +28,6 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
 }
 
 export async function gitConfig(): Promise<void> {
-    // const gitUser = "zowe-robot";
-    // const gitEmail = "zowe.robot@gmail.com";
     const gitUser = "github-actions[bot]";
     const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
     await exec.exec(`git config --global user.name "${gitUser}"`);

@@ -9615,7 +9615,7 @@ const version_1 = __webpack_require__(228);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const shouldVersion = core.getInput("skip-version") !== "true";
+            const shouldVersion = core.getInput("update-version") === "true";
             const shouldPublishGithub = core.getInput("github-artifacts") !== "";
             const shouldPublishNpm = core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "";
             const configFile = core.getInput("config-file");
@@ -11091,8 +11091,6 @@ function gitCommit(message, amend) {
 exports.gitCommit = gitCommit;
 function gitConfig() {
     return __awaiter(this, void 0, void 0, function* () {
-        // const gitUser = "zowe-robot";
-        // const gitEmail = "zowe.robot@gmail.com";
         const gitUser = "github-actions[bot]";
         const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
         yield exec.exec(`git config --global user.name "${gitUser}"`);
@@ -31071,6 +31069,7 @@ class Publish {
                     owner, repo,
                     release_id: release.data.id,
                     name: path.basename(artifactPath),
+                    // Need to upload as buffer because converting to string corrupts binary data
                     data: fs.readFileSync(artifactPath),
                     url: release.data.upload_url,
                     headers: this.getUploadRequestHeaders(artifactPath)
@@ -31079,18 +31078,17 @@ class Publish {
         });
     }
     static publishNpm(branch) {
-        var _a, _b;
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (!branch.tag) {
-                core.setFailed(`Expected NPM tag to be defined for ${branch.name} branch but it is not`);
-                process.exit();
-            }
             // Prevent publish from being affected by local npmrc
             yield exec.exec("rm -f .npmrc");
             const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-            // Need to remove trailing slash from registry URL for npm-cli-login
-            const npmRegistry = (_b = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry) === null || _b === void 0 ? void 0 : _b.replace(/\/$/, "");
-            if (!npmRegistry) {
+            let npmRegistry = core.getInput("npm-registry") || ((_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry);
+            if (npmRegistry) {
+                // Need to remove trailing slash from registry URL for npm-cli-login
+                npmRegistry = npmRegistry.replace(/\/$/, "");
+            }
+            else {
                 core.setFailed("Expected NPM registry to be defined in package.json but it is not");
                 process.exit();
             }
@@ -31103,7 +31101,7 @@ class Publish {
             // Publish package
             const alreadyPublished = yield utils.getPackageVersion(packageJson.name, packageJson.version);
             if (!alreadyPublished) {
-                yield exec.exec(`npm publish --tag ${branch.tag}`);
+                yield exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
             }
             else {
                 core.error(`Version ${packageJson.version} has already been published to NPM`);
@@ -31129,7 +31127,7 @@ class Publish {
                 const changelogLines = fs.readFileSync(changelogFile).toString().split(/\r?\n/);
                 let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
                 if (lineNum !== -1) {
-                    while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("##")) {
+                    while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
                         lineNum++;
                         releaseNotes += changelogLines[lineNum] + "\n";
                     }

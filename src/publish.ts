@@ -44,6 +44,7 @@ export class Publish {
                 owner, repo,
                 release_id: release.data.id,
                 name: path.basename(artifactPath),
+                // Need to upload as buffer because converting to string corrupts binary data
                 data: fs.readFileSync(artifactPath) as any,
                 url: release.data.upload_url,
                 headers: this.getUploadRequestHeaders(artifactPath)
@@ -52,19 +53,16 @@ export class Publish {
     }
 
     public static async publishNpm(branch: IProtectedBranch): Promise<void> {
-        if (!branch.tag) {
-            core.setFailed(`Expected NPM tag to be defined for ${branch.name} branch but it is not`);
-            process.exit();
-        }
-
         // Prevent publish from being affected by local npmrc
         await exec.exec("rm -f .npmrc");
 
         const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
-        // Need to remove trailing slash from registry URL for npm-cli-login
-        const npmRegistry = packageJson.publishConfig?.registry?.replace(/\/$/, "");
+        let npmRegistry = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
 
-        if (!npmRegistry) {
+        if (npmRegistry) {
+            // Need to remove trailing slash from registry URL for npm-cli-login
+            npmRegistry = npmRegistry.replace(/\/$/, "");
+        } else {
             core.setFailed("Expected NPM registry to be defined in package.json but it is not");
             process.exit();
         }
@@ -79,7 +77,7 @@ export class Publish {
         // Publish package
         const alreadyPublished = await utils.getPackageVersion(packageJson.name, packageJson.version);
         if (!alreadyPublished) {
-            await exec.exec(`npm publish --tag ${branch.tag}`);
+            await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
         } else {
             core.error(`Version ${packageJson.version} has already been published to NPM`);
         }
@@ -106,7 +104,7 @@ export class Publish {
 
             let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
             if (lineNum !== -1) {
-                while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("##")) {
+                while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
                     lineNum++;
                     releaseNotes += changelogLines[lineNum] + "\n";
                 }

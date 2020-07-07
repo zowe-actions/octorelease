@@ -8,7 +8,7 @@ import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
-        const shouldVersion: boolean = core.getInput("skip-version") !== "true";
+        const shouldVersion: boolean = core.getInput("update-version") === "true";
         const shouldPublishGithub: boolean = core.getInput("github-artifacts") !== "";
         const shouldPublishNpm: boolean = core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "";
 
