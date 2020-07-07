@@ -11,13 +11,29 @@ type PublishType = "github" | "npm" | "vsce";
 
 export class Publish {
     public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
-        switch (publishType) {
-            case "github":
-                return this.publishGithub();
-            case "npm":
-                return this.publishNpm(protectedBranch);
-            case "vsce":
-                return this.publishVsce();
+        const oldPath = process.cwd();
+        const newPath = core.getInput(`${publishType}-path`);
+
+        if (newPath) {
+            process.chdir(path.resolve(oldPath, newPath));
+        }
+
+        try {
+            switch (publishType) {
+                case "github":
+                    await this.publishGithub();
+                    break;
+                case "npm":
+                    await this.publishNpm(protectedBranch);
+                    break;
+                case "vsce":
+                    await this.publishVsce();
+                    break;
+            }
+        } finally {
+            if (newPath) {
+                process.chdir(oldPath);
+            }
         }
     }
 

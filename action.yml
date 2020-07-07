@@ -22,6 +22,10 @@ inputs:
     description: 'Email address for NPM login'
     required: false
     default: ''
+  npm-path:
+    description: 'Project root directory of NPM package'
+    required: false
+    default: ''
   npm-registry:
     description: 'Registry where NPM package should be published'
     required: false
@@ -38,6 +42,10 @@ inputs:
     description: 'Update package version if semver label detected on PR'
     required: false
     default: 'false'
+  vsce-path:
+    description: 'Project root directory of VS Code extension'
+    required: false
+    default: ''
   vsce-token:
     description: 'Token with publish access to VS Code Marketplace'
     required: false
