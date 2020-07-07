@@ -8,10 +8,6 @@ import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
-        const shouldVersion: boolean = core.getInput("update-version") === "true";
-        const shouldPublishGithub: boolean = core.getInput("github-artifacts") !== "";
-        const shouldPublishNpm: boolean = core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "";
-
         const configFile: string = core.getInput("config-file");
         const currentBranch: string = (await utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
         let config: IConfig = {
@@ -38,19 +34,23 @@ async function run(): Promise<void> {
 
         const protectedBranch: IProtectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
 
-        if (shouldVersion) {
+        if (core.getInput("update-version") === "true") {
             await Version.version(protectedBranch);
         }
 
-        if (shouldPublishGithub) {
-            await Publish.publishGithub();
+        const publishJobs: { [key: string]: boolean } = {
+            github: core.getInput("github-artifacts") !== "",
+            npm: core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "",
+            vsce: core.getInput("vsce-token") !== ""
+        };
+
+        for (const publishType of Object.keys(publishJobs)) {
+            if (publishJobs[publishType]) {
+                await Publish.publish(publishType as any, protectedBranch);
+            }
         }
 
-        if (shouldPublishNpm) {
-            await Publish.publishNpm(protectedBranch);
-        }
-
-        if (!shouldPublishGithub && !shouldPublishNpm) {
+        if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length === 0) {
             core.warning("Nothing to publish");
         }
     } catch (error) {

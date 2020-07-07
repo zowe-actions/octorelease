@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
+import { Changelog } from "./changelog";
 import * as utils from "./utils";
 
 /**
@@ -12,7 +13,7 @@ type SemVerLevel = "major" | "minor" | "patch" | "none";
 
 export class Version {
     public static async version(branch: IProtectedBranch): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         const semverLevel: SemVerLevel = await this.getSemVerLevel();
 
         if (semverLevel === "none") {
@@ -49,7 +50,7 @@ export class Version {
         await exec.exec("git reset --hard");
         const gitTag = (await utils.execAndReturnOutput(`npm version ${semverLevel} --allow-same-version --no-git-tag-version`)).trim();
         const newVersion = gitTag.slice(1);
-        this.updateChangelog("CHANGELOG.md", newVersion);
+        Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
 
         // Commit version bump and create tag
         await exec.exec("git add -u");
@@ -120,37 +121,5 @@ export class Version {
             await exec.exec(`git add package.json package-lock.json`);
             await utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
         }
-    }
-
-    /**
-     * Update the changelog file, if one exists, to replace the header denoting
-     * recent changes with a header for the new version.
-     * @param changelogFile - Path to changelog file
-     * @param pkgVer - New version of the package
-     */
-    private static updateChangelog(changelogFile: string, pkgVer: string): void {
-        if (!fs.existsSync(changelogFile)) {
-            core.warning("Missing changelog file, skipping changelog update");
-            return;
-        }
-
-        const changelogHeader = core.getInput("changelog-header");
-        if (!changelogHeader) {
-            core.warning("Changelog header was not defined, skipping changelog update")
-            return;
-        }
-
-        const changelogContents: string = fs.readFileSync(changelogFile).toString();
-        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
-            core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
-            return;
-        }
-
-        if (changelogContents.indexOf(changelogHeader) === -1) {
-            core.warning("Changelog header not found in changelog file, skipping changelog update");
-            return;
-        }
-
-        fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
     }
 }

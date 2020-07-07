@@ -38,6 +38,10 @@ inputs:
     description: 'Update package version if semver label detected on PR'
     required: false
     default: 'false'
+  vsce-token:
+    description: 'Token with publish access to VS Code Marketplace'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

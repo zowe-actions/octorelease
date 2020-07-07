@@ -4,16 +4,30 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as exec from "@actions/exec";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
+import { Changelog } from "./changelog";
 import * as utils from "./utils";
 
+type PublishType = "github" | "npm" | "vsce";
+
 export class Publish {
-    public static async publishGithub(): Promise<void> {
+    public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
+        switch (publishType) {
+            case "github":
+                return this.publishGithub();
+            case "npm":
+                return this.publishNpm(protectedBranch);
+            case "vsce":
+                return this.publishVsce();
+        }
+    }
+
+    private static async publishGithub(): Promise<void> {
         const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 
         // Create release and add release notes if any
         const octokit = github.getOctokit(core.getInput("repo-token"));
-        const releaseNotes = await this.getReleaseNotes("CHANGELOG.md", packageJson.version);
+        const releaseNotes = Changelog.getReleaseNotes("CHANGELOG.md", packageJson.version);
         let release;
 
         try {
@@ -47,16 +61,19 @@ export class Publish {
                 // Need to upload as buffer because converting to string corrupts binary data
                 data: fs.readFileSync(artifactPath) as any,
                 url: release.data.upload_url,
-                headers: this.getUploadRequestHeaders(artifactPath)
+                headers: {
+                    "Content-Length": fs.statSync(artifactPath).size,
+                    "Content-Type": require("mime-types").lookup(artifactPath) || "application/octet-stream"
+                }
             });
         }
     }
 
-    public static async publishNpm(branch: IProtectedBranch): Promise<void> {
+    private static async publishNpm(branch: IProtectedBranch): Promise<void> {
         // Prevent publish from being affected by local npmrc
         await exec.exec("rm -f .npmrc");
 
-        const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         let npmRegistry = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
 
         if (npmRegistry) {
@@ -90,38 +107,19 @@ export class Publish {
         }
     }
 
-    /**
-     * Try to find release notes in changelog for the version being published.
-     * @param changelogFile - Path to changelog file
-     * @param pkgVer - Latest version of the package
-     */
-    private static async getReleaseNotes(changelogFile: string, pkgVer: string): Promise<string | undefined> {
-        let releaseNotes = "";
+    private static async publishVsce(): Promise<void> {
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+        const vsceMetadata = await utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
 
-        // Try to find release notes in changelog
-        if (fs.existsSync(changelogFile)) {
-            const changelogLines: string[] = fs.readFileSync(changelogFile).toString().split(/\r?\n/);
+        const latestVersion = packageJson.version;
+        const publishedVersion = JSON.parse(vsceMetadata).versions[0]?.version;
 
-            let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
-            if (lineNum !== -1) {
-                while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
-                    lineNum++;
-                    releaseNotes += changelogLines[lineNum] + "\n";
-                }
-            } else {
-                core.warning(`Missing changelog header for version ${pkgVer}`);
-            }
+        // Publish extension
+        if (publishedVersion !== latestVersion) {
+            const vsceToken = core.getInput("vsce-token");
+            await exec.exec(`npx vsce publish -p ${vsceToken}`);
         } else {
-            core.warning("Missing changelog file");
+            core.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
         }
-
-        return releaseNotes.trim() || undefined;
-    }
-
-    private static getUploadRequestHeaders(artifactPath: string): any {
-        return {
-            "Content-Length": fs.statSync(artifactPath).size,
-            "Content-Type": require("mime-types").lookup(artifactPath) || "application/octet-stream"
-        };
     }
 }

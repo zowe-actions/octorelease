@@ -9615,9 +9615,6 @@ const version_1 = __webpack_require__(228);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const shouldVersion = core.getInput("update-version") === "true";
-            const shouldPublishGithub = core.getInput("github-artifacts") !== "";
-            const shouldPublishNpm = core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "";
             const configFile = core.getInput("config-file");
             const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
             let config = {
@@ -9640,16 +9637,20 @@ function run() {
                 process.exit();
             }
             const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
-            if (shouldVersion) {
+            if (core.getInput("update-version") === "true") {
                 yield version_1.Version.version(protectedBranch);
             }
-            if (shouldPublishGithub) {
-                yield publish_1.Publish.publishGithub();
+            const publishJobs = {
+                github: core.getInput("github-artifacts") !== "",
+                npm: core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "",
+                vsce: core.getInput("vsce-token") !== ""
+            };
+            for (const publishType of Object.keys(publishJobs)) {
+                if (publishJobs[publishType]) {
+                    yield publish_1.Publish.publish(publishType, protectedBranch);
+                }
             }
-            if (shouldPublishNpm) {
-                yield publish_1.Publish.publishNpm(protectedBranch);
-            }
-            if (!shouldPublishGithub && !shouldPublishNpm) {
+            if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length === 0) {
                 core.warning("Nothing to publish");
             }
         }
@@ -17103,11 +17104,12 @@ const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
+const changelog_1 = __webpack_require__(705);
 const utils = __importStar(__webpack_require__(163));
 class Version {
     static version(branch) {
         return __awaiter(this, void 0, void 0, function* () {
-            const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
             const semverLevel = yield this.getSemVerLevel();
             if (semverLevel === "none") {
                 core.warning("Semver label was not set on PR so skipping version stage");
@@ -17138,7 +17140,7 @@ class Version {
             yield exec.exec("git reset --hard");
             const gitTag = (yield utils.execAndReturnOutput(`npm version ${semverLevel} --allow-same-version --no-git-tag-version`)).trim();
             const newVersion = gitTag.slice(1);
-            this.updateChangelog("CHANGELOG.md", newVersion);
+            changelog_1.Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
             // Commit version bump and create tag
             yield exec.exec("git add -u");
             yield utils.gitCommit(`Bump version to ${newVersion}`);
@@ -17203,33 +17205,6 @@ class Version {
                 yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
             }
         });
-    }
-    /**
-     * Update the changelog file, if one exists, to replace the header denoting
-     * recent changes with a header for the new version.
-     * @param changelogFile - Path to changelog file
-     * @param pkgVer - New version of the package
-     */
-    static updateChangelog(changelogFile, pkgVer) {
-        if (!fs.existsSync(changelogFile)) {
-            core.warning("Missing changelog file, skipping changelog update");
-            return;
-        }
-        const changelogHeader = core.getInput("changelog-header");
-        if (!changelogHeader) {
-            core.warning("Changelog header was not defined, skipping changelog update");
-            return;
-        }
-        const changelogContents = fs.readFileSync(changelogFile).toString();
-        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
-            core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
-            return;
-        }
-        if (changelogContents.indexOf(changelogHeader) === -1) {
-            core.warning("Changelog header not found in changelog file, skipping changelog update");
-            return;
-        }
-        fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
     }
 }
 exports.Version = Version;
@@ -31031,15 +31006,28 @@ const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const exec = __importStar(__webpack_require__(986));
+const changelog_1 = __webpack_require__(705);
 const utils = __importStar(__webpack_require__(163));
 class Publish {
+    static publish(publishType, protectedBranch) {
+        return __awaiter(this, void 0, void 0, function* () {
+            switch (publishType) {
+                case "github":
+                    return this.publishGithub();
+                case "npm":
+                    return this.publishNpm(protectedBranch);
+                case "vsce":
+                    return this.publishVsce();
+            }
+        });
+    }
     static publishGithub() {
         return __awaiter(this, void 0, void 0, function* () {
             const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-            const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
             // Create release and add release notes if any
             const octokit = github.getOctokit(core.getInput("repo-token"));
-            const releaseNotes = yield this.getReleaseNotes("CHANGELOG.md", packageJson.version);
+            const releaseNotes = changelog_1.Changelog.getReleaseNotes("CHANGELOG.md", packageJson.version);
             let release;
             try {
                 release = yield octokit.repos.createRelease({
@@ -31072,7 +31060,10 @@ class Publish {
                     // Need to upload as buffer because converting to string corrupts binary data
                     data: fs.readFileSync(artifactPath),
                     url: release.data.upload_url,
-                    headers: this.getUploadRequestHeaders(artifactPath)
+                    headers: {
+                        "Content-Length": fs.statSync(artifactPath).size,
+                        "Content-Type": __webpack_require__(779).lookup(artifactPath) || "application/octet-stream"
+                    }
                 });
             }
         });
@@ -31082,7 +31073,7 @@ class Publish {
         return __awaiter(this, void 0, void 0, function* () {
             // Prevent publish from being affected by local npmrc
             yield exec.exec("rm -f .npmrc");
-            const packageJson = JSON.parse(fs.readFileSync("package.json").toString());
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
             let npmRegistry = core.getInput("npm-registry") || ((_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry);
             if (npmRegistry) {
                 // Need to remove trailing slash from registry URL for npm-cli-login
@@ -31114,39 +31105,22 @@ class Publish {
             }
         });
     }
-    /**
-     * Try to find release notes in changelog for the version being published.
-     * @param changelogFile - Path to changelog file
-     * @param pkgVer - Latest version of the package
-     */
-    static getReleaseNotes(changelogFile, pkgVer) {
+    static publishVsce() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let releaseNotes = "";
-            // Try to find release notes in changelog
-            if (fs.existsSync(changelogFile)) {
-                const changelogLines = fs.readFileSync(changelogFile).toString().split(/\r?\n/);
-                let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
-                if (lineNum !== -1) {
-                    while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
-                        lineNum++;
-                        releaseNotes += changelogLines[lineNum] + "\n";
-                    }
-                }
-                else {
-                    core.warning(`Missing changelog header for version ${pkgVer}`);
-                }
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+            const vsceMetadata = yield utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
+            const latestVersion = packageJson.version;
+            const publishedVersion = (_a = JSON.parse(vsceMetadata).versions[0]) === null || _a === void 0 ? void 0 : _a.version;
+            // Publish extension
+            if (publishedVersion !== latestVersion) {
+                const vsceToken = core.getInput("vsce-token");
+                yield exec.exec(`npx vsce publish -p ${vsceToken}`);
             }
             else {
-                core.warning("Missing changelog file");
+                core.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
             }
-            return releaseNotes.trim() || undefined;
         });
-    }
-    static getUploadRequestHeaders(artifactPath) {
-        return {
-            "Content-Length": fs.statSync(artifactPath).size,
-            "Content-Type": __webpack_require__(779).lookup(artifactPath) || "application/octet-stream"
-        };
     }
 }
 exports.Publish = Publish;
@@ -51055,7 +51029,80 @@ function serializer(replacer, cycleReplacer) {
 
 
 /***/ }),
-/* 705 */,
+/* 705 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+class Changelog {
+    /**
+     * Try to find release notes in changelog for the version being published.
+     * @param changelogFile - Path to changelog file
+     * @param pkgVer - Latest version of the package
+     */
+    static getReleaseNotes(changelogFile, pkgVer) {
+        let releaseNotes = "";
+        // Try to find release notes in changelog
+        if (fs.existsSync(changelogFile)) {
+            const changelogLines = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
+            let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
+            if (lineNum !== -1) {
+                while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
+                    lineNum++;
+                    releaseNotes += changelogLines[lineNum] + "\n";
+                }
+            }
+            else {
+                core.warning(`Missing changelog header for version ${pkgVer}`);
+            }
+        }
+        else {
+            core.warning("Missing changelog file");
+        }
+        return releaseNotes.trim() || undefined;
+    }
+    /**
+     * Update the changelog file, if one exists, to replace the header denoting
+     * recent changes with a header for the new version.
+     * @param changelogFile - Path to changelog file
+     * @param pkgVer - New version of the package
+     */
+    static updateLatestVersion(changelogFile, pkgVer) {
+        if (!fs.existsSync(changelogFile)) {
+            core.warning("Missing changelog file, skipping changelog update");
+            return;
+        }
+        const changelogHeader = core.getInput("changelog-header");
+        if (!changelogHeader) {
+            core.warning("Changelog header was not defined, skipping changelog update");
+            return;
+        }
+        const changelogContents = fs.readFileSync(changelogFile, "utf-8");
+        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
+            core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
+            return;
+        }
+        if (changelogContents.indexOf(changelogHeader) === -1) {
+            core.warning("Changelog header not found in changelog file, skipping changelog update");
+            return;
+        }
+        fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
+    }
+}
+exports.Changelog = Changelog;
+
+
+/***/ }),
 /* 706 */,
 /* 707 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
