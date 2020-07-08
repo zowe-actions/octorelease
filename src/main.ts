@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as core from "@actions/core";
 import { IConfig } from "./doc/IConfig";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
@@ -33,6 +34,11 @@ async function run(): Promise<void> {
         }
 
         const protectedBranch: IProtectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
+        const rootDir = core.getInput("root-dir");
+
+        if (rootDir) {
+            process.chdir(path.resolve(process.cwd(), rootDir));
+        }
 
         if (core.getInput("update-version") === "true") {
             await Version.version(protectedBranch);

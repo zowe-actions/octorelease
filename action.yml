@@ -9,7 +9,7 @@ inputs:
   config-file:
     description: 'Path to YAML config'
     required: false
-    default: './node-deploy.yml'
+    default: './node-publish.yml'
   github-artifacts:
     description: 'Comma-separated list of files to publish in GitHub release'
     required: false
@@ -22,10 +22,6 @@ inputs:
     description: 'Email address for NPM login'
     required: false
     default: ''
-  npm-path:
-    description: 'Project root directory of NPM package'
-    required: false
-    default: ''
   npm-registry:
     description: 'Registry where NPM package should be published'
     required: false
@@ -33,6 +29,10 @@ inputs:
   repo-token:
     description: 'Token with push access to GitHub repo'
     required: true
+    default: ''
+  root-dir:
+    description: 'Root directory of Node.js project that contains package.json'
+    required: false
     default: ''
   semver-labels:
     description: 'Comma-separated list of semver labels to detect on PRs'
@@ -42,10 +42,6 @@ inputs:
     description: 'Update package version if semver label detected on PR'
     required: false
     default: 'false'
-  vsce-path:
-    description: 'Project root directory of VS Code extension'
-    required: false
-    default: ''
   vsce-token:
     description: 'Token with publish access to VS Code Marketplace'
     required: false

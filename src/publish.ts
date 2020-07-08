@@ -11,29 +11,13 @@ type PublishType = "github" | "npm" | "vsce";
 
 export class Publish {
     public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
-        const oldPath = process.cwd();
-        const newPath = core.getInput(`${publishType}-path`);
-
-        if (newPath) {
-            process.chdir(path.resolve(oldPath, newPath));
-        }
-
-        try {
-            switch (publishType) {
-                case "github":
-                    await this.publishGithub();
-                    break;
-                case "npm":
-                    await this.publishNpm(protectedBranch);
-                    break;
-                case "vsce":
-                    await this.publishVsce();
-                    break;
-            }
-        } finally {
-            if (newPath) {
-                process.chdir(oldPath);
-            }
+        switch (publishType) {
+            case "github":
+                return this.publishGithub();
+            case "npm":
+                return this.publishNpm(protectedBranch);
+            case "vsce":
+                return this.publishVsce();
         }
     }
 
@@ -64,6 +48,7 @@ export class Publish {
         // Upload artifacts to release
         const artifactPaths: string[] = [];
         const glob = require("glob");
+        const mime = require("mime-types");
         core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
             artifactPaths.push(...glob.sync(artifactPattern.trim()));
         });
@@ -79,7 +64,7 @@ export class Publish {
                 url: release.data.upload_url,
                 headers: {
                     "Content-Length": fs.statSync(artifactPath).size,
-                    "Content-Type": require("mime-types").lookup(artifactPath) || "application/octet-stream"
+                    "Content-Type": mime.lookup(artifactPath) || "application/octet-stream"
                 }
             });
         }
