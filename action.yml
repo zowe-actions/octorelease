@@ -14,16 +14,12 @@ inputs:
     description: 'Line-separated list of files to publish in GitHub release'
     required: false
     default: ''
-  npm-credentials:
-    description: 'Username and password for NPM login (user:pass)'
-    required: false
-    default: ''
-  npm-email:
-    description: 'Email address for NPM login'
-    required: false
-    default: ''
   npm-registry:
-    description: 'Registry where NPM package should be published'
+    description: 'Registry where NPM package will be published'
+    required: false
+    default: ''
+  npm-token:
+    description: 'Token with publish access to NPM registry'
     required: false
     default: ''
   repo-token:

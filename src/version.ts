@@ -107,10 +107,7 @@ export class Version {
      */
     private static async updateDependency(pkgName: string, pkgTag: string, packageJson: any, dev: boolean): Promise<void> {
         const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
-        let currentVersion: string = dependencies[pkgName];
-        if (currentVersion) {
-            currentVersion = require("semver").clean(currentVersion);
-        }
+        const currentVersion: string = dependencies[pkgName];
 
         const latestVersion = await utils.getPackageVersion(pkgName, pkgTag);
 

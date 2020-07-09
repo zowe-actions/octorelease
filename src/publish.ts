@@ -69,40 +69,38 @@ export class Publish {
     }
 
     private static async publishNpm(branch: IProtectedBranch): Promise<void> {
-        // Prevent publish from being affected by local npmrc
-        await exec.exec("rm -f .npmrc");
-
         const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        let npmRegistry = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
+        const npmRegistry: string | undefined = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
+        let npmScope: string | undefined = undefined;
 
-        if (npmRegistry) {
-            // Need to remove trailing slash from registry URL for npm-cli-login
-            npmRegistry = npmRegistry.replace(/\/$/, "");
-        } else {
+        if (!npmRegistry) {
             core.setFailed("Expected NPM registry to be defined in package.json but it is not");
             process.exit();
         }
 
-        // Login to registry in global npmrc
-        const npmLogin = require("npm-cli-login");
-        const [npmUsername, npmPassword] = core.getInput("npm-credentials").split(":", 2);
-        const npmEmail = core.getInput("npm-email");
-        const npmScope = packageJson.name.split("/")[0];
-        npmLogin(npmUsername, npmPassword, npmEmail, npmRegistry, npmScope);
-
-        // Publish package
-        const alreadyPublished = await utils.getPackageVersion(packageJson.name, packageJson.version);
-        if (!alreadyPublished) {
-            await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
-        } else {
-            core.error(`Version ${packageJson.version} has already been published to NPM`);
+        if (packageJson.name.indexOf("/") !== -1) {
+            npmScope = packageJson.name.split("/")[0];
         }
 
-        // Add alias tags
-        if (branch.aliasTags) {
-            for (const tag of branch.aliasTags) {
-                await exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
+        utils.npmConfig(npmRegistry, npmScope);
+
+        try {
+            // Publish package
+            const alreadyPublished = await utils.getPackageVersion(packageJson.name, packageJson.version);
+            if (!alreadyPublished) {
+                await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
+            } else {
+                core.error(`Version ${packageJson.version} has already been published to NPM`);
             }
+
+            // Add alias tags
+            if (branch.aliasTags) {
+                for (const tag of branch.aliasTags) {
+                    await exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
+                }
+            }
+        } finally {
+            utils.npmReset();
         }
     }
 

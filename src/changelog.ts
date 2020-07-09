@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as os from "os";
 import * as core from "@actions/core";
 
 export class Changelog {
@@ -18,7 +19,7 @@ export class Changelog {
             if (lineNum !== -1) {
                 while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
                     lineNum++;
-                    releaseNotes += changelogLines[lineNum] + "\n";
+                    releaseNotes += changelogLines[lineNum] + os.EOL;
                 }
             } else {
                 core.warning(`Missing changelog header for version ${pkgVer}`);

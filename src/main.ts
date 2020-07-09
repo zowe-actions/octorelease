@@ -46,7 +46,7 @@ async function run(): Promise<void> {
 
         const publishJobs: { [key: string]: boolean } = {
             github: core.getInput("github-artifacts") !== "",
-            npm: core.getInput("npm-credentials") !== "" && core.getInput("npm-email") !== "",
+            npm: core.getInput("npm-token") !== "",
             vsce: core.getInput("vsce-token") !== ""
         };
 

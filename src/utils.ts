@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as os from "os";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
@@ -49,6 +51,30 @@ export async function gitPush(branch: string, tags?: boolean): Promise<void> {
 
     const gitArgs = tags ? "--tags" : "";
     await exec.exec(`git push ${gitArgs} -u origin ${branch}`);
+}
+
+export function npmConfig(registry: string, scope?: string): void {
+    registry = registry.endsWith("/") ? registry : (registry + "/");
+    scope = scope?.toLowerCase();
+
+    if (fs.existsSync(".npmrc")) {
+        fs.renameSync(".npmrc", ".npmrc.bak");
+    }
+
+    // Remove HTTP or HTTPS protocol from front of registry URL
+    const authString = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
+    const registryString = (scope ? `${scope}:` : "") + `registry=${registry}`;
+    fs.writeFileSync(".npmrc", authString + os.EOL + registryString + os.EOL);
+}
+
+export function npmReset(): void {
+    if (fs.existsSync(".npmrc")) {
+        fs.unlinkSync(".npmrc");
+    }
+
+    if (fs.existsSync(".npmrc.bak")) {
+        fs.renameSync(".npmrc.bak", ".npmrc");
+    }
 }
 
 export function requireEnvVar(name: string): string {
