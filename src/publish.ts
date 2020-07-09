@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import * as glob from "@actions/glob";
 import * as exec from "@actions/exec";
 import { IProtectedBranch } from "./doc/IProtectedBranch";
 import { Changelog } from "./changelog";
@@ -46,12 +47,9 @@ export class Publish {
         }
 
         // Upload artifacts to release
-        const artifactPaths: string[] = [];
-        const glob = require("glob");
+        const globber = await glob.create(core.getInput("github-artifacts"));
+        const artifactPaths: string[] = await globber.glob();
         const mime = require("mime-types");
-        core.getInput("github-artifacts").split(",").forEach((artifactPattern) => {
-            artifactPaths.push(...glob.sync(artifactPattern.trim()));
-        });
 
         for (const artifactPath of artifactPaths) {
             core.info(`Uploading release asset ${artifactPath}`);

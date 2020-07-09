@@ -9,9 +9,9 @@ inputs:
   config-file:
     description: 'Path to YAML config'
     required: false
-    default: './node-publish.yml'
+    default: './.github/node-publish-config.yml'
   github-artifacts:
-    description: 'Comma-separated list of files to publish in GitHub release'
+    description: 'Line-separated list of files to publish in GitHub release'
     required: false
     default: ''
   npm-credentials:

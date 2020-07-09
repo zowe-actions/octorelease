@@ -22,7 +22,7 @@ async function run(): Promise<void> {
         if (fs.existsSync(configFile)) {
             config = require("js-yaml").safeLoad(fs.readFileSync(configFile, "utf-8"));
         } else {
-            core.warning(`Missing config file ${configFile} so continuing without protected branch rules`);
+            core.warning(`Config file ${configFile} not found so continuing with default config`);
         }
 
         const branchNames: string[] = (config.protectedBranches || []).map(branch => branch.name);
