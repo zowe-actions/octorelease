@@ -4307,9 +4307,9 @@ function npmConfig(registry, scope) {
         fs.renameSync(".npmrc", ".npmrc.bak");
     }
     // Remove HTTP or HTTPS protocol from front of registry URL
-    const authString = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
-    const registryString = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(".npmrc", authString + os.EOL + registryString + os.EOL);
+    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
+    const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
+    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
 }
 exports.npmConfig = npmConfig;
 function npmReset() {

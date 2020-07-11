@@ -1,6 +1,6 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'node-versioner'
+description: 'GitHub Action to version a Node.js project and publish it to GitHub/NPM registry/VS Code Marketplace'
+author: 'tjohnsonBCM'
 inputs:
   changelog-header:
     description: 'Changelog header used to track changes for new version'
@@ -9,7 +9,7 @@ inputs:
   config-file:
     description: 'Path to YAML config'
     required: false
-    default: './.github/node-publish-config.yml'
+    default: './.github/node-versioner-config.yml'
   github-artifacts:
     description: 'Line-separated list of files to publish in GitHub release'
     required: false

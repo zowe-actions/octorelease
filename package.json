@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "node-versioner",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "GitHub Action to version a Node.js project and publish it to GitHub/NPM registry/VS Code Marketplace",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -14,14 +14,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/tjohnsonBCM/node-versioner.git"
   },
   "keywords": [
     "actions",
+    "changelog",
+    "github",
     "node",
-    "setup"
+    "npm",
+    "publish",
+    "semver",
+    "version",
+    "vsce"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "tjohnsonBCM",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",
