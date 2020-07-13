@@ -22,8 +22,8 @@ inputs:
     description: 'Token with publish access to NPM registry'
     required: false
     default: ''
-  prepublish-cmds:
-    description: 'Commands that will run before project is published'
+  prepublish-cmd:
+    description: 'Shell command that will run before project is published'
     required: false
     default: ''
   repo-token:

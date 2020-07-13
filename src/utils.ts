@@ -16,12 +16,9 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
     return capturedOutput;
 }
 
-export async function execCommands(commandLines: string): Promise<undefined> {
-    if (!commandLines) {
-        return;
-    }
-    for (const command of commandLines.split(/\r?\n/)) {
-        await exec.exec(command);
+export async function execBashCmd(command: string): Promise<void> {
+    if (command) {
+        await exec.exec("bash", ["-c", command]);
     }
 }
 

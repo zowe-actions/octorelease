@@ -2558,7 +2558,7 @@ class Version {
             }
             // Update version number in package-lock.json and changelog
             yield exec.exec("git reset --hard");
-            const gitTag = (yield utils.execAndReturnOutput(`npm version ${semverLevel} --allow-same-version --no-git-tag-version`)).trim();
+            const gitTag = (yield utils.execAndReturnOutput("npm", ["version", semverLevel, "--allow-same-version --no-git-tag-version"])).trim();
             const newVersion = gitTag.slice(1);
             changelog_1.Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
             // Commit version bump and create tag
@@ -3833,7 +3833,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const configFile = core.getInput("config-file");
-            const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim();
+            const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse --abbrev-ref HEAD"])).trim();
             let config = {
                 protectedBranches: [
                     {
@@ -3867,7 +3867,7 @@ function run() {
                 vsce: core.getInput("vsce-token") !== ""
             };
             if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length > 0) {
-                yield utils.execCommands(core.getInput("prepublish-cmds"));
+                yield utils.execBashCmd(core.getInput("prepublish-cmd"));
             }
             else {
                 core.warning("Nothing to publish");
@@ -4259,17 +4259,14 @@ function execAndReturnOutput(commandLine, args) {
     });
 }
 exports.execAndReturnOutput = execAndReturnOutput;
-function execCommands(commandLines) {
+function execBashCmd(command) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!commandLines) {
-            return;
-        }
-        for (const command of commandLines.split(/\r?\n/)) {
-            yield exec.exec(command);
+        if (command) {
+            yield exec.exec("bash", ["-c", command]);
         }
     });
 }
-exports.execCommands = execCommands;
+exports.execBashCmd = execBashCmd;
 function getPackageVersion(pkgName, pkgTag) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -6746,7 +6743,7 @@ class Publish {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-            const vsceMetadata = yield utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
+            const vsceMetadata = yield utils.execAndReturnOutput("npx", ["vsce show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
             const latestVersion = packageJson.version;
             const publishedVersion = (_a = JSON.parse(vsceMetadata).versions[0]) === null || _a === void 0 ? void 0 : _a.version;
             // Publish extension
