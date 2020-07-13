@@ -2558,7 +2558,7 @@ class Version {
             }
             // Update version number in package-lock.json and changelog
             yield exec.exec("git reset --hard");
-            const gitTag = (yield utils.execAndReturnOutput("npm", ["version", semverLevel, "--allow-same-version --no-git-tag-version"])).trim();
+            const gitTag = (yield utils.execAndReturnOutput("npm", ["version", semverLevel, "--allow-same-version", "--no-git-tag-version"])).trim();
             const newVersion = gitTag.slice(1);
             changelog_1.Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
             // Commit version bump and create tag
@@ -3833,7 +3833,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const configFile = core.getInput("config-file");
-            const currentBranch = (yield utils.execAndReturnOutput("git", ["rev-parse --abbrev-ref HEAD"])).trim();
+            const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
             let config = {
                 protectedBranches: [
                     {
@@ -4300,7 +4300,7 @@ function gitPush(branch, tags) {
     return __awaiter(this, void 0, void 0, function* () {
         // Check if there is anything to push
         if (!tags) {
-            const cmdOutput = (yield execAndReturnOutput("git", ["cherry"])).trim();
+            const cmdOutput = (yield execAndReturnOutput("git cherry")).trim();
             if (cmdOutput.length == 0) {
                 core.warning("Nothing to push");
                 return;
@@ -6743,7 +6743,7 @@ class Publish {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-            const vsceMetadata = yield utils.execAndReturnOutput("npx", ["vsce show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
+            const vsceMetadata = yield utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
             const latestVersion = packageJson.version;
             const publishedVersion = (_a = JSON.parse(vsceMetadata).versions[0]) === null || _a === void 0 ? void 0 : _a.version;
             // Publish extension

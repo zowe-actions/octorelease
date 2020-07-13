@@ -106,7 +106,7 @@ export class Publish {
 
     private static async publishVsce(): Promise<void> {
         const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        const vsceMetadata = await utils.execAndReturnOutput("npx", ["vsce show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
+        const vsceMetadata = await utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
 
         const latestVersion = packageJson.version;
         const publishedVersion = JSON.parse(vsceMetadata).versions[0]?.version;

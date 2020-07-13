@@ -10,7 +10,7 @@ import { Version } from "./version";
 async function run(): Promise<void> {
     try {
         const configFile: string = core.getInput("config-file");
-        const currentBranch: string = (await utils.execAndReturnOutput("git", ["rev-parse --abbrev-ref HEAD"])).trim();
+        const currentBranch: string = (await utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
         let config: IConfig = {
             protectedBranches: [
                 {

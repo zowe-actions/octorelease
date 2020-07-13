@@ -48,7 +48,7 @@ export class Version {
 
         // Update version number in package-lock.json and changelog
         await exec.exec("git reset --hard");
-        const gitTag = (await utils.execAndReturnOutput("npm", ["version", semverLevel, "--allow-same-version --no-git-tag-version"])).trim();
+        const gitTag = (await utils.execAndReturnOutput("npm", ["version", semverLevel, "--allow-same-version", "--no-git-tag-version"])).trim();
         const newVersion = gitTag.slice(1);
         Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
 
