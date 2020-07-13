@@ -39,7 +39,7 @@ inputs:
     required: false
     default: 'release-major,release-minor,release-patch'
   skip-version:
-    description: 'Don't update package version (skip detection of semver label on PRs)'
+    description: 'Don''t update package version (skip detection of semver label on PRs)'
     required: false
     default: 'false'
   vsce-token:
