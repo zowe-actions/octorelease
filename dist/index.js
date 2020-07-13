@@ -2567,6 +2567,7 @@ class Version {
             yield exec.exec(`git tag ${gitTag} -m "Release ${newVersion} to ${branch.tag}"`);
             // Push commits and tag
             yield utils.gitPush(branch.name, true);
+            core.setOutput("new-version", newVersion);
         });
     }
     static getSemVerLevel() {
@@ -3857,7 +3858,7 @@ function run() {
             if (rootDir) {
                 process.chdir(path.resolve(process.cwd(), rootDir));
             }
-            if (core.getInput("update-version") === "true") {
+            if (core.getInput("skip-version") !== "true") {
                 yield version_1.Version.version(protectedBranch);
             }
             const publishJobs = {
@@ -3865,13 +3866,16 @@ function run() {
                 npm: core.getInput("npm-token") !== "",
                 vsce: core.getInput("vsce-token") !== ""
             };
+            if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length > 0) {
+                yield utils.execCommands(core.getInput("prepublish-cmds"));
+            }
+            else {
+                core.warning("Nothing to publish");
+            }
             for (const publishType of Object.keys(publishJobs)) {
                 if (publishJobs[publishType]) {
                     yield publish_1.Publish.publish(publishType, protectedBranch);
                 }
-            }
-            if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length === 0) {
-                core.warning("Nothing to publish");
             }
         }
         catch (error) {
@@ -4255,6 +4259,17 @@ function execAndReturnOutput(commandLine, args) {
     });
 }
 exports.execAndReturnOutput = execAndReturnOutput;
+function execCommands(commandLines) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!commandLines) {
+            return;
+        }
+        for (const command of commandLines.split(/\r?\n/)) {
+            yield exec.exec(command);
+        }
+    });
+}
+exports.execCommands = execCommands;
 function getPackageVersion(pkgName, pkgTag) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -5727,7 +5742,8 @@ class Changelog {
         // Try to find release notes in changelog
         if (fs.existsSync(changelogFile)) {
             const changelogLines = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
-            let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
+            const pkgVerRegex = new RegExp(`## \\W*${pkgVer}\\W*`);
+            let lineNum = changelogLines.findIndex((line) => line.match(pkgVerRegex));
             if (lineNum !== -1) {
                 while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
                     lineNum++;

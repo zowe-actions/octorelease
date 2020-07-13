@@ -14,8 +14,9 @@ export class Changelog {
         // Try to find release notes in changelog
         if (fs.existsSync(changelogFile)) {
             const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
+            const pkgVerRegex = new RegExp(`## \\W*${pkgVer}\\W*`);
 
-            let lineNum = changelogLines.indexOf("## `" + pkgVer + "`");
+            let lineNum = changelogLines.findIndex((line) => line.match(pkgVerRegex));
             if (lineNum !== -1) {
                 while ((changelogLines[lineNum + 1] != null) && !changelogLines[lineNum + 1].startsWith("## ")) {
                     lineNum++;

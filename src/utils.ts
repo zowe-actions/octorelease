@@ -16,6 +16,15 @@ export async function execAndReturnOutput(commandLine: string, args?: string[]):
     return capturedOutput;
 }
 
+export async function execCommands(commandLines: string): Promise<undefined> {
+    if (!commandLines) {
+        return;
+    }
+    for (const command of commandLines.split(/\r?\n/)) {
+        await exec.exec(command);
+    }
+}
+
 export async function getPackageVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
     try {
         return (await execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();

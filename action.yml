@@ -22,6 +22,10 @@ inputs:
     description: 'Token with publish access to NPM registry'
     required: false
     default: ''
+  prepublish-cmds:
+    description: 'Commands that will run before project is published'
+    required: false
+    default: ''
   repo-token:
     description: 'Token with push access to GitHub repo'
     required: true
@@ -34,14 +38,17 @@ inputs:
     description: 'Comma-separated list of semver labels to detect on PRs'
     required: false
     default: 'release-major,release-minor,release-patch'
-  update-version:
-    description: 'Update package version if semver label detected on PR'
+  skip-version:
+    description: 'Don't update package version (skip detection of semver label on PRs)'
     required: false
     default: 'false'
   vsce-token:
     description: 'Token with publish access to VS Code Marketplace'
     required: false
     default: ''
+outputs:
+  new-version:
+    description: 'The new package version if it has changed'
 runs:
   using: 'node12'
   main: 'dist/index.js'

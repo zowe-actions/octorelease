@@ -40,7 +40,7 @@ async function run(): Promise<void> {
             process.chdir(path.resolve(process.cwd(), rootDir));
         }
 
-        if (core.getInput("update-version") === "true") {
+        if (core.getInput("skip-version") !== "true") {
             await Version.version(protectedBranch);
         }
 
@@ -50,14 +50,16 @@ async function run(): Promise<void> {
             vsce: core.getInput("vsce-token") !== ""
         };
 
+        if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length > 0) {
+            await utils.execCommands(core.getInput("prepublish-cmds"));
+        } else {
+            core.warning("Nothing to publish");
+        }
+
         for (const publishType of Object.keys(publishJobs)) {
             if (publishJobs[publishType]) {
                 await Publish.publish(publishType as any, protectedBranch);
             }
-        }
-
-        if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length === 0) {
-            core.warning("Nothing to publish");
         }
     } catch (error) {
         core.setFailed(error.message);

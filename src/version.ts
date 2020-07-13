@@ -59,6 +59,7 @@ export class Version {
 
         // Push commits and tag
         await utils.gitPush(branch.name, true);
+        core.setOutput("new-version", newVersion);
     }
 
     private static async getSemVerLevel(): Promise<SemVerLevel> {
