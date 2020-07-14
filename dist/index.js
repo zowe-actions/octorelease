@@ -2525,7 +2525,7 @@ const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
 const changelog_1 = __webpack_require__(361);
-const utils = __importStar(__webpack_require__(163));
+const utils = __importStar(__webpack_require__(183));
 class Version {
     static version(branch) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2615,7 +2615,7 @@ class Version {
         return __awaiter(this, void 0, void 0, function* () {
             const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
             const currentVersion = dependencies[pkgName];
-            const latestVersion = yield utils.getPackageVersion(pkgName, pkgTag);
+            const latestVersion = yield utils.npmViewVersion(pkgName, pkgTag);
             if (currentVersion !== latestVersion) {
                 const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
                 yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
@@ -3823,37 +3823,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
+const utils = __importStar(__webpack_require__(217));
+const config_1 = __webpack_require__(641);
 const publish_1 = __webpack_require__(446);
-const utils = __importStar(__webpack_require__(163));
 const version_1 = __webpack_require__(52);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const configFile = core.getInput("config-file");
             const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
-            let config = {
-                protectedBranches: [
-                    {
-                        name: currentBranch
-                    }
-                ]
-            };
-            if (fs.existsSync(configFile)) {
-                config = __webpack_require__(414).safeLoad(fs.readFileSync(configFile, "utf-8"));
-            }
-            else {
-                core.warning(`Config file ${configFile} not found so continuing with default config`);
-            }
-            const branchNames = (config.protectedBranches || []).map(branch => branch.name);
-            // Check if protected branch is in config
-            if (branchNames.indexOf(currentBranch) === -1) {
-                core.info(`${currentBranch} is not a protected branch in ${configFile} so exiting now`);
-                process.exit();
-            }
-            const protectedBranch = config.protectedBranches[branchNames.indexOf(currentBranch)];
+            const protectedBranch = (new config_1.Config()).getProtectedBranch(currentBranch);
             const rootDir = core.getInput("root-dir");
             if (rootDir) {
                 process.chdir(path.resolve(process.cwd(), rootDir));
@@ -3867,7 +3847,7 @@ function run() {
                 vsce: core.getInput("vsce-token") !== ""
             };
             if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length > 0) {
-                yield utils.execBashCmd(core.getInput("prepublish-cmd"));
+                yield publish_1.Publish.prepublish();
             }
             else {
                 core.warning("Nothing to publish");
@@ -4218,133 +4198,6 @@ module.exports.MaxBufferError = MaxBufferError;
 
 /***/ }),
 
-/***/ 163:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-function execAndReturnOutput(commandLine, args) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let capturedOutput = "";
-        const options = {
-            listeners: {
-                stdout: (data) => {
-                    capturedOutput += data.toString();
-                }
-            }
-        };
-        yield exec.exec(commandLine, args, options);
-        return capturedOutput;
-    });
-}
-exports.execAndReturnOutput = execAndReturnOutput;
-function execBashCmd(command) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (command) {
-            yield exec.exec("bash", ["-c", command]);
-        }
-    });
-}
-exports.execBashCmd = execBashCmd;
-function getPackageVersion(pkgName, pkgTag) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            return (yield execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
-        }
-        catch (_a) {
-            core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
-        }
-    });
-}
-exports.getPackageVersion = getPackageVersion;
-function gitCommit(message, amend) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const gitArgs = amend ? "--amend" : "";
-        yield exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
-    });
-}
-exports.gitCommit = gitCommit;
-function gitConfig() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const gitUser = "github-actions[bot]";
-        const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
-        yield exec.exec(`git config --global user.name "${gitUser}"`);
-        yield exec.exec(`git config --global user.email "${gitEmail}"`);
-        const repository = requireEnvVar("GITHUB_REPOSITORY");
-        yield exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
-    });
-}
-exports.gitConfig = gitConfig;
-function gitPush(branch, tags) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Check if there is anything to push
-        if (!tags) {
-            const cmdOutput = (yield execAndReturnOutput("git cherry")).trim();
-            if (cmdOutput.length == 0) {
-                core.warning("Nothing to push");
-                return;
-            }
-        }
-        const gitArgs = tags ? "--tags" : "";
-        yield exec.exec(`git push ${gitArgs} -u origin ${branch}`);
-    });
-}
-exports.gitPush = gitPush;
-function npmConfig(registry, scope) {
-    var _a;
-    registry = registry.endsWith("/") ? registry : (registry + "/");
-    scope = (_a = scope) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-    if (fs.existsSync(".npmrc")) {
-        fs.renameSync(".npmrc", ".npmrc.bak");
-    }
-    // Remove HTTP or HTTPS protocol from front of registry URL
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
-    const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
-}
-exports.npmConfig = npmConfig;
-function npmReset() {
-    if (fs.existsSync(".npmrc")) {
-        fs.unlinkSync(".npmrc");
-    }
-    if (fs.existsSync(".npmrc.bak")) {
-        fs.renameSync(".npmrc.bak", ".npmrc");
-    }
-}
-exports.npmReset = npmReset;
-function requireEnvVar(name) {
-    const value = process.env[name];
-    if (value == null) {
-        throw new Error(`Expected environment variable ${name} to be defined but it is not`);
-    }
-    return value;
-}
-exports.requireEnvVar = requireEnvVar;
-
-
-/***/ }),
-
 /***/ 168:
 /***/ (function(module) {
 
@@ -4530,6 +4383,22 @@ module.exports = new Type('tag:yaml.org,2002:omap', {
 
 /***/ }),
 
+/***/ 183:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(__webpack_require__(217));
+__export(__webpack_require__(776));
+__export(__webpack_require__(545));
+
+
+/***/ }),
+
 /***/ 197:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -4582,6 +4451,64 @@ function checkMode (stat, options) {
 /***/ (function(module) {
 
 module.exports = require("https");
+
+/***/ }),
+
+/***/ 217:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const exec = __importStar(__webpack_require__(986));
+function execAndReturnOutput(commandLine, args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let capturedOutput = "";
+        const options = {
+            listeners: {
+                stdout: (data) => {
+                    capturedOutput += data.toString();
+                }
+            }
+        };
+        yield exec.exec(commandLine, args, options);
+        return capturedOutput;
+    });
+}
+exports.execAndReturnOutput = execAndReturnOutput;
+function execBashCmd(command) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (command) {
+            yield exec.exec("bash", ["-c", command]);
+        }
+    });
+}
+exports.execBashCmd = execBashCmd;
+function requireEnvVar(name) {
+    const value = process.env[name];
+    if (value == null) {
+        throw new Error(`Expected environment variable ${name} to be defined but it is not`);
+    }
+    return value;
+}
+exports.requireEnvVar = requireEnvVar;
+
 
 /***/ }),
 
@@ -6645,8 +6572,13 @@ const github = __importStar(__webpack_require__(469));
 const glob = __importStar(__webpack_require__(281));
 const exec = __importStar(__webpack_require__(986));
 const changelog_1 = __webpack_require__(361);
-const utils = __importStar(__webpack_require__(163));
+const utils = __importStar(__webpack_require__(183));
 class Publish {
+    static prepublish() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield utils.execBashCmd(core.getInput("prepublish-cmd"));
+        });
+    }
     static publish(publishType, protectedBranch) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (publishType) {
@@ -6720,7 +6652,7 @@ class Publish {
             utils.npmConfig(npmRegistry, npmScope);
             try {
                 // Publish package
-                const alreadyPublished = yield utils.getPackageVersion(packageJson.name, packageJson.version);
+                const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
                 if (!alreadyPublished) {
                     yield exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
                 }
@@ -11477,6 +11409,69 @@ exports.HttpClient = HttpClient;
 
 /***/ }),
 
+/***/ 545:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
+const core = __importStar(__webpack_require__(470));
+const core_1 = __webpack_require__(217);
+function npmConfig(registry, scope) {
+    var _a;
+    registry = registry.endsWith("/") ? registry : (registry + "/");
+    scope = (_a = scope) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+    if (fs.existsSync(".npmrc")) {
+        fs.renameSync(".npmrc", ".npmrc.bak");
+    }
+    // Remove HTTP or HTTPS protocol from front of registry URL
+    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
+    const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
+    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
+}
+exports.npmConfig = npmConfig;
+function npmReset() {
+    if (fs.existsSync(".npmrc")) {
+        fs.unlinkSync(".npmrc");
+    }
+    if (fs.existsSync(".npmrc.bak")) {
+        fs.renameSync(".npmrc.bak", ".npmrc");
+    }
+}
+exports.npmReset = npmReset;
+function npmViewVersion(pkgName, pkgTag) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return (yield core_1.execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+        }
+        catch (_a) {
+            core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
+        }
+    });
+}
+exports.npmViewVersion = npmViewVersion;
+
+
+/***/ }),
+
 /***/ 548:
 /***/ (function(module) {
 
@@ -12117,6 +12112,60 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
   kind: 'scalar',
   resolve: resolveYamlMerge
 });
+
+
+/***/ }),
+
+/***/ 641:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+class Config {
+    constructor() {
+        this.mConfig = {
+            protectedBranches: []
+        };
+        this.mConfigFile = core.getInput("config-file");
+        if (fs.existsSync(this.mConfigFile)) {
+            this.mConfig = __webpack_require__(414).safeLoad(fs.readFileSync(this.mConfigFile, "utf-8"));
+        }
+        else {
+            this.mConfigFile = null;
+            core.warning(`Config file ${this.mConfigFile} not found so continuing with default config`);
+        }
+    }
+    getProtectedBranch(branchName) {
+        // Use default config if config file not found
+        if (this.mConfigFile == null) {
+            this.mConfig = {
+                protectedBranches: [
+                    {
+                        name: branchName
+                    }
+                ]
+            };
+        }
+        const branchNames = this.mConfig.protectedBranches.map(branch => branch.name);
+        // Check if protected branch is in config
+        if (branchNames.indexOf(branchName) === -1) {
+            core.info(`${branchName} is not a protected branch in ${this.mConfigFile} so exiting now`);
+            process.exit();
+        }
+        return this.mConfig.protectedBranches[branchNames.indexOf(branchName)];
+    }
+}
+exports.Config = Config;
 
 
 /***/ }),
@@ -14303,6 +14352,76 @@ module.exports = function (x) {
 
 	return x;
 };
+
+
+/***/ }),
+
+/***/ 776:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+const core_1 = __webpack_require__(217);
+function gitCommit(message, amend) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Check if there is anything to commit
+        if (!amend) {
+            const cmdOutput = (yield core_1.execAndReturnOutput("git diff --name-only --cached")).trim();
+            if (cmdOutput.length == 0) {
+                core.warning("Nothing to commit");
+                return;
+            }
+        }
+        const gitArgs = amend ? "--amend" : "";
+        yield exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
+    });
+}
+exports.gitCommit = gitCommit;
+function gitConfig() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const gitUser = "github-actions[bot]";
+        const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
+        yield exec.exec(`git config --global user.name "${gitUser}"`);
+        yield exec.exec(`git config --global user.email "${gitEmail}"`);
+        const repository = core_1.requireEnvVar("GITHUB_REPOSITORY");
+        yield exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
+    });
+}
+exports.gitConfig = gitConfig;
+function gitPush(branch, tags) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Check if there is anything to push
+        if (!tags) {
+            const cmdOutput = (yield core_1.execAndReturnOutput("git cherry")).trim();
+            if (cmdOutput.length == 0) {
+                core.warning("Nothing to push");
+                return;
+            }
+        }
+        const gitArgs = tags ? "--tags" : "";
+        yield exec.exec(`git push ${gitArgs} -u origin ${branch}`);
+    });
+}
+exports.gitPush = gitPush;
 
 
 /***/ }),

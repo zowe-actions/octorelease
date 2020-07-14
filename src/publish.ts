@@ -4,13 +4,17 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as glob from "@actions/glob";
 import * as exec from "@actions/exec";
-import { IProtectedBranch } from "./doc/IProtectedBranch";
+import { IProtectedBranch } from "./doc";
 import { Changelog } from "./changelog";
 import * as utils from "./utils";
 
 type PublishType = "github" | "npm" | "vsce";
 
 export class Publish {
+    public static async prepublish(): Promise<void> {
+        await utils.execBashCmd(core.getInput("prepublish-cmd"));
+    }
+
     public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
         switch (publishType) {
             case "github":
@@ -86,7 +90,7 @@ export class Publish {
 
         try {
             // Publish package
-            const alreadyPublished = await utils.getPackageVersion(packageJson.name, packageJson.version);
+            const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
             if (!alreadyPublished) {
                 await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
             } else {

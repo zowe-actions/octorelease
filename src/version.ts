@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
-import { IProtectedBranch } from "./doc/IProtectedBranch";
+import { IProtectedBranch } from "./doc";
 import { Changelog } from "./changelog";
 import * as utils from "./utils";
 
@@ -110,7 +110,7 @@ export class Version {
         const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
         const currentVersion: string = dependencies[pkgName];
 
-        const latestVersion = await utils.getPackageVersion(pkgName, pkgTag);
+        const latestVersion = await utils.npmViewVersion(pkgName, pkgTag);
 
         if (currentVersion !== latestVersion) {
             const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
