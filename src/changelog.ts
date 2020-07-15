@@ -51,12 +51,12 @@ export class Changelog {
         }
 
         const changelogContents: string = fs.readFileSync(changelogFile, "utf-8");
-        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
+        if (changelogContents.includes("## `" + pkgVer + "`")) {
             core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
             return;
         }
 
-        if (changelogContents.indexOf(changelogHeader) === -1) {
+        if (!changelogContents.includes(changelogHeader)) {
             core.warning("Changelog header not found in changelog file, skipping changelog update");
             return;
         }

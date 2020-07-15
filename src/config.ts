@@ -23,19 +23,13 @@ export class Config {
     public getProtectedBranch(branchName: string): IProtectedBranch {
         // Use default config if config file not found
         if (this.mConfigFile == null) {
-            this.mConfig = {
-                protectedBranches: [
-                    {
-                        name: branchName
-                    }
-                ]
-            };
+            return { name: branchName };
         }
 
         const branchNames: string[] = this.mConfig.protectedBranches.map(branch => branch.name);
 
         // Check if protected branch is in config
-        if (branchNames.indexOf(branchName) === -1) {
+        if (!branchNames.includes(branchName)) {
             core.info(`${branchName} is not a protected branch in ${this.mConfigFile} so exiting now`);
             process.exit();
         }

@@ -475,13 +475,13 @@ class SemVer {
             });
             const labelNames = labels.data.map(label => label.name);
             const semverInfo = { level: "none" };
-            if (labelNames.indexOf(labelMajor) !== -1) {
+            if (labelNames.includes(labelMajor)) {
                 semverInfo.level = "major";
             }
-            else if (labelNames.indexOf(labelMinor) !== -1) {
+            else if (labelNames.includes(labelMinor)) {
                 semverInfo.level = "minor";
             }
-            else if (labelNames.indexOf(labelPatch) !== -1) {
+            else if (labelNames.includes(labelPatch)) {
                 semverInfo.level = "patch";
             }
             else {
@@ -5789,11 +5789,11 @@ class Changelog {
             return;
         }
         const changelogContents = fs.readFileSync(changelogFile, "utf-8");
-        if (changelogContents.indexOf("## `" + pkgVer + "`") !== -1) {
+        if (changelogContents.includes("## `" + pkgVer + "`")) {
             core.warning(`Changelog header already exists for version ${pkgVer}, skipping changelog update`);
             return;
         }
-        if (changelogContents.indexOf(changelogHeader) === -1) {
+        if (!changelogContents.includes(changelogHeader)) {
             core.warning("Changelog header not found in changelog file, skipping changelog update");
             return;
         }
@@ -6696,7 +6696,7 @@ class Publish {
                 });
             }
             catch (err) {
-                if (err.message.indexOf("already_exists") !== -1) {
+                if (err.message.includes("already_exists")) {
                     core.error(`Version ${packageJson.version} has already been published to GitHub`);
                     return;
                 }
@@ -6735,7 +6735,7 @@ class Publish {
                 core.setFailed("Expected NPM registry to be defined in package.json but it is not");
                 process.exit();
             }
-            if (packageJson.name.indexOf("/") !== -1) {
+            if (packageJson.name.includes("/")) {
                 npmScope = packageJson.name.split("/")[0];
             }
             utils.npmConfig(npmRegistry, npmScope);
@@ -12237,17 +12237,11 @@ class Config {
     getProtectedBranch(branchName) {
         // Use default config if config file not found
         if (this.mConfigFile == null) {
-            this.mConfig = {
-                protectedBranches: [
-                    {
-                        name: branchName
-                    }
-                ]
-            };
+            return { name: branchName };
         }
         const branchNames = this.mConfig.protectedBranches.map(branch => branch.name);
         // Check if protected branch is in config
-        if (branchNames.indexOf(branchName) === -1) {
+        if (!branchNames.includes(branchName)) {
             core.info(`${branchName} is not a protected branch in ${this.mConfigFile} so exiting now`);
             process.exit();
         }

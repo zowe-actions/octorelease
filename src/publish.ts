@@ -45,7 +45,7 @@ export class Publish {
                 body: releaseNotes
             });
         } catch (err) {
-            if (err.message.indexOf("already_exists") !== -1) {
+            if (err.message.includes("already_exists")) {
                 core.error(`Version ${packageJson.version} has already been published to GitHub`);
                 return;
             } else {
@@ -85,7 +85,7 @@ export class Publish {
             process.exit();
         }
 
-        if (packageJson.name.indexOf("/") !== -1) {
+        if (packageJson.name.includes("/")) {
             npmScope = packageJson.name.split("/")[0];
         }
 

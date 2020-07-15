@@ -60,11 +60,11 @@ export class SemVer {
         const labelNames = labels.data.map(label => label.name);
         const semverInfo: ISemVerInfo = { level: "none" };
 
-        if (labelNames.indexOf(labelMajor) !== -1) {
+        if (labelNames.includes(labelMajor)) {
             semverInfo.level = "major";
-        } else if (labelNames.indexOf(labelMinor) !== -1) {
+        } else if (labelNames.includes(labelMinor)) {
             semverInfo.level = "minor";
-        } else if (labelNames.indexOf(labelPatch) !== -1) {
+        } else if (labelNames.includes(labelPatch)) {
             semverInfo.level = "patch";
         } else {
             core.warning("Semver label was not set on PR so skipping version stage");
