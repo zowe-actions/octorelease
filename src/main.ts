@@ -11,13 +11,14 @@ async function run(): Promise<void> {
         const currentBranch: string = (await utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
         const protectedBranch: IProtectedBranch = (new Config()).getProtectedBranch(currentBranch);
         const rootDir = core.getInput("root-dir");
+        const versionStrategy = core.getInput("version-strategy");
 
         if (rootDir) {
             process.chdir(path.resolve(process.cwd(), rootDir));
         }
 
-        if (core.getInput("skip-version") !== "true") {
-            await Version.version(protectedBranch);
+        if (versionStrategy === "compare" || versionStrategy === "labels") {
+            await Version.version(versionStrategy, protectedBranch);
         }
 
         const publishJobs: { [key: string]: boolean } = {
@@ -26,10 +27,8 @@ async function run(): Promise<void> {
             vsce: core.getInput("vsce-token") !== ""
         };
 
-        if (Object.keys(publishJobs).filter(publishType => publishJobs[publishType]).length > 0) {
+        if (Object.values(publishJobs).includes(true)) {
             await Publish.prepublish();
-        } else {
-            core.warning("Nothing to publish");
         }
 
         for (const publishType of Object.keys(publishJobs)) {

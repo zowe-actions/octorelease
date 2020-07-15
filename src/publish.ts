@@ -8,7 +8,10 @@ import { IProtectedBranch } from "./doc";
 import { Changelog } from "./changelog";
 import * as utils from "./utils";
 
-type PublishType = "github" | "npm" | "vsce";
+/**
+ * Type of publish action
+ */
+export type PublishType = "github" | "npm" | "vsce";
 
 export class Publish {
     public static async prepublish(): Promise<void> {

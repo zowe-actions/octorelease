@@ -1,30 +1,29 @@
 import * as fs from "fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import * as github from "@actions/github";
 import { IProtectedBranch } from "./doc";
 import { Changelog } from "./changelog";
+import { SemVer } from "./semver";
 import * as utils from "./utils";
 
 /**
- * Type to hold level of difference between semantic versions.
+ * Type of version strategy
  */
-type SemVerLevel = "major" | "minor" | "patch" | "none";
+export type VersionStrategy = "compare" | "labels";
 
 export class Version {
-    public static async version(branch: IProtectedBranch): Promise<void> {
+    public static async version(strategy: VersionStrategy, branch: IProtectedBranch): Promise<void> {
         const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        const semverLevel: SemVerLevel = await this.getSemVerLevel();
+        const semverInfo = await SemVer.getSemVerInfo((strategy === "compare") ? packageJson.version : undefined);
 
-        if (semverLevel === "none") {
-            core.warning("Semver label was not set on PR so skipping version stage");
+        if (!semverInfo || semverInfo.level === "none") {
             return;
         }
 
         // Check semver level to see if new version is ok
         if (branch.level && branch.level !== "major") {
-            if (semverLevel === "major" || (semverLevel === "minor" && branch.level === "patch")) {
-                core.setFailed(`Protected branch ${branch.name} does not allow ${semverLevel} version changes`);
+            if (semverInfo.level === "major" || (semverInfo.level === "minor" && branch.level === "patch")) {
+                core.setFailed(`Protected branch ${branch.name} does not allow ${semverInfo.level} version changes`);
                 process.exit();
             }
         }
@@ -48,8 +47,9 @@ export class Version {
 
         // Update version number in package-lock.json and changelog
         await exec.exec("git reset --hard");
-        const gitTag = (await utils.execAndReturnOutput("npm", ["version", semverLevel, "--allow-same-version", "--no-git-tag-version"])).trim();
-        const newVersion = gitTag.slice(1);
+        let newVersion: string = semverInfo.newVersion || semverInfo.level;
+        const gitTag = (await utils.execAndReturnOutput("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"])).trim();
+        newVersion = gitTag.slice(1);
         Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
 
         // Commit version bump and create tag
@@ -60,41 +60,6 @@ export class Version {
         // Push commits and tag
         await utils.gitPush(branch.name, true);
         core.setOutput("new-version", newVersion);
-    }
-
-    private static async getSemVerLevel(): Promise<SemVerLevel> {
-        const gitHash: string = utils.requireEnvVar("GITHUB_SHA");
-        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-
-        const octokit = github.getOctokit(core.getInput("repo-token"));
-        const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
-            owner, repo,
-            commit_sha: gitHash
-        });
-
-        if (prs.data.length === 0) {
-            core.warning(`Could not find pull request associated with commit ${gitHash}`);
-            return "none";
-        }
-
-        const [labelMajor, labelMinor, labelPatch] = core.getInput("semver-labels").split(",", 3).map(s => s.trim());
-        let semverLevel: SemVerLevel = "none";
-
-        const labels = await octokit.issues.listLabelsOnIssue({
-            owner, repo,
-            issue_number: prs.data[0].number
-        });
-        const labelNames = labels.data.map(label => label.name);
-
-        if (labelNames.indexOf(labelMajor) !== -1) {
-            semverLevel = "major";
-        } else if (labelNames.indexOf(labelMinor) !== -1) {
-            semverLevel = "minor";
-        } else if (labelNames.indexOf(labelPatch) !== -1) {
-            semverLevel = "patch";
-        }
-
-        return semverLevel;
     }
 
     /**

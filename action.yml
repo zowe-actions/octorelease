@@ -38,10 +38,10 @@ inputs:
     description: 'Comma-separated list of semver labels to detect on PRs'
     required: false
     default: 'release-major,release-minor,release-patch'
-  skip-version:
-    description: 'Don''t update package version (skip detection of semver label on PRs)'
+  version-strategy:
+    description: 'Strategy for updating package version (none, compare, labels)'
     required: false
-    default: 'false'
+    default: 'labels'
   vsce-token:
     description: 'Token with publish access to VS Code Marketplace'
     required: false
