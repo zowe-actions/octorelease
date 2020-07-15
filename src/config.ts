@@ -17,20 +17,31 @@ export class Config {
         }
     }
 
-    public getProtectedBranch(branchName: string): IProtectedBranch {
+    public getProtectedBranch(currentBranch: string): IProtectedBranch {
         // Use default config if config file not found
         if (this.mConfig == null) {
-            return { name: branchName };
+            return { name: currentBranch };
         }
 
         const branchNames: string[] = this.mConfig.protectedBranches.map(branch => branch.name);
+        const minimatch = require("minimatch");
+        const branchIndex: number = branchNames.findIndex((branch) => minimatch(currentBranch, branch));
 
         // Check if protected branch is in config
-        if (!branchNames.includes(branchName)) {
-            core.info(`${branchName} is not a protected branch in ${this.mConfigFile} so exiting now`);
+        if (branchIndex === -1) {
+            core.info(`${currentBranch} is not a protected branch in ${this.mConfigFile} so exiting now`);
             process.exit();
         }
 
-        return this.mConfig.protectedBranches[branchNames.indexOf(branchName)];
+        return this.renderBranchName({
+            ...this.mConfig.protectedBranches[branchIndex],
+            name: currentBranch
+        }, currentBranch);
+    }
+
+    private renderBranchName(obj: any, branchName: string): any {
+        return JSON.parse(JSON.stringify(obj), (key, value) => {
+            return (typeof value === "string") ? value.replace("{{name}}", branchName) : value;
+        });
     }
 }

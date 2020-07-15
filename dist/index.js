@@ -13976,18 +13976,25 @@ class Config {
             core.info(`Config file ${this.mConfigFile} not found so continuing with default config`);
         }
     }
-    getProtectedBranch(branchName) {
+    getProtectedBranch(currentBranch) {
         // Use default config if config file not found
         if (this.mConfig == null) {
-            return { name: branchName };
+            return { name: currentBranch };
         }
         const branchNames = this.mConfig.protectedBranches.map(branch => branch.name);
+        const minimatch = __webpack_require__(595);
+        const branchIndex = branchNames.findIndex((branch) => minimatch(currentBranch, branch));
         // Check if protected branch is in config
-        if (!branchNames.includes(branchName)) {
-            core.info(`${branchName} is not a protected branch in ${this.mConfigFile} so exiting now`);
+        if (branchIndex === -1) {
+            core.info(`${currentBranch} is not a protected branch in ${this.mConfigFile} so exiting now`);
             process.exit();
         }
-        return this.mConfig.protectedBranches[branchNames.indexOf(branchName)];
+        return this.renderBranchName(Object.assign(Object.assign({}, this.mConfig.protectedBranches[branchIndex]), { name: currentBranch }), currentBranch);
+    }
+    renderBranchName(obj, branchName) {
+        return JSON.parse(JSON.stringify(obj), (key, value) => {
+            return (typeof value === "string") ? value.replace("{{name}}", branchName) : value;
+        });
     }
 }
 exports.Config = Config;
