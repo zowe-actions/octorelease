@@ -12230,8 +12230,8 @@ class Config {
             this.mConfig = __webpack_require__(414).safeLoad(fs.readFileSync(this.mConfigFile, "utf-8"));
         }
         else {
+            core.info(`Config file ${this.mConfigFile} not found so continuing with default config`);
             this.mConfigFile = null;
-            core.warning(`Config file ${this.mConfigFile} not found so continuing with default config`);
         }
     }
     getProtectedBranch(branchName) {

@@ -15,8 +15,8 @@ export class Config {
         if (fs.existsSync(this.mConfigFile)) {
             this.mConfig = require("js-yaml").safeLoad(fs.readFileSync(this.mConfigFile, "utf-8"));
         } else {
+            core.info(`Config file ${this.mConfigFile} not found so continuing with default config`);
             this.mConfigFile = null;
-            core.warning(`Config file ${this.mConfigFile} not found so continuing with default config`);
         }
     }
 
