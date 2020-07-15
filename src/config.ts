@@ -3,11 +3,9 @@ import * as core from "@actions/core";
 import { IConfig, IProtectedBranch } from "./doc";
 
 export class Config {
-    private mConfig: IConfig = {
-        protectedBranches: []
-    };
+    private mConfig: IConfig | null = null;
 
-    private mConfigFile: string | null;
+    private mConfigFile: string;
 
     constructor() {
         this.mConfigFile = core.getInput("config-file");
@@ -16,13 +14,12 @@ export class Config {
             this.mConfig = require("js-yaml").safeLoad(fs.readFileSync(this.mConfigFile, "utf-8"));
         } else {
             core.info(`Config file ${this.mConfigFile} not found so continuing with default config`);
-            this.mConfigFile = null;
         }
     }
 
     public getProtectedBranch(branchName: string): IProtectedBranch {
         // Use default config if config file not found
-        if (this.mConfigFile == null) {
+        if (this.mConfig == null) {
             return { name: branchName };
         }
 
