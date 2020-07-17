@@ -41,7 +41,7 @@ export class Config {
 
     private renderBranchName(obj: any, branchName: string): any {
         return JSON.parse(JSON.stringify(obj), (key, value) => {
-            return (typeof value === "string") ? value.replace("{{name}}", branchName) : value;
+            return (typeof value === "string") ? value.replace("${name}", branchName) : value;
         });
     }
 }
