@@ -9,7 +9,7 @@ import { Version } from "./version";
 async function run(): Promise<void> {
     try {
         const currentBranch: string = (await utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
-        const protectedBranch: IProtectedBranch = (new Config()).getProtectedBranch(currentBranch);
+        const protectedBranch: IProtectedBranch = await (new Config()).getProtectedBranch(currentBranch);
         const rootDir = core.getInput("root-dir");
         const versionStrategy = core.getInput("version-strategy");
 

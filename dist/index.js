@@ -3584,7 +3584,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
-            const protectedBranch = (new config_1.Config()).getProtectedBranch(currentBranch);
+            const protectedBranch = yield (new config_1.Config()).getProtectedBranch(currentBranch);
             const rootDir = core.getInput("root-dir");
             const versionStrategy = core.getInput("version-strategy");
             if (rootDir) {
@@ -13955,6 +13955,15 @@ module.exports = {"application/1d-interleaved-parityfec":{"source":"iana"},"appl
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -13965,6 +13974,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
+const github = __importStar(__webpack_require__(469));
+const utils = __importStar(__webpack_require__(452));
 class Config {
     constructor() {
         this.mConfig = null;
@@ -13977,19 +13988,32 @@ class Config {
         }
     }
     getProtectedBranch(currentBranch) {
-        // Use default config if config file not found
-        if (this.mConfig == null) {
-            return { name: currentBranch };
-        }
-        const branchNames = this.mConfig.protectedBranches.map(branch => branch.name);
-        const minimatch = __webpack_require__(595);
-        const branchIndex = branchNames.findIndex((branch) => minimatch(currentBranch, branch));
-        // Check if protected branch is in config
-        if (branchIndex === -1) {
-            core.info(`${currentBranch} is not a protected branch in ${this.mConfigFile} so exiting now`);
-            process.exit();
-        }
-        return this.renderBranchName(Object.assign(Object.assign({}, this.mConfig.protectedBranches[branchIndex]), { name: currentBranch }), currentBranch);
+        return __awaiter(this, void 0, void 0, function* () {
+            // Use default config if config file not found
+            if (this.mConfig == null) {
+                return { name: currentBranch };
+            }
+            const branchNames = this.mConfig.protectedBranches.map(branch => branch.name);
+            const minimatch = __webpack_require__(595);
+            const branchIndex = branchNames.findIndex((branch) => minimatch(currentBranch, branch));
+            // Check if branch is missing in config
+            if (branchIndex === -1) {
+                core.info(`${currentBranch} is not a listed branch in ${this.mConfigFile} so exiting now`);
+                process.exit();
+            }
+            const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
+            const octokit = github.getOctokit(core.getInput("repo-token"));
+            const branchData = yield octokit.repos.getBranch({
+                owner, repo,
+                branch: currentBranch
+            });
+            // Check if branch is unprotected
+            if (!branchData.data.protected) {
+                core.info(`${currentBranch} is not a protected branch in GitHub so exiting now`);
+                process.exit();
+            }
+            return this.renderBranchName(Object.assign(Object.assign({}, this.mConfig.protectedBranches[branchIndex]), { name: currentBranch }), currentBranch);
+        });
     }
     renderBranchName(obj, branchName) {
         return JSON.parse(JSON.stringify(obj), (key, value) => {
