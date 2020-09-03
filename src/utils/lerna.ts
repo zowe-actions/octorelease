@@ -5,7 +5,7 @@ import { IPackageInfo } from "../doc/IPackageInfo";
 
 export async function lernaList(onlyChanged: boolean): Promise<IPackageInfo[]> {
     const lernaCmd = onlyChanged ? "changed" : "list";
-    const cmdOutput = await execAndReturnOutput("lerna", [lernaCmd, "--long", "--toposort", "--loglevel silent"]);
+    const cmdOutput = await execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel silent"]);
     const packageInfo: IPackageInfo[] = [];
 
     for (const line of cmdOutput.trim().split("\n")) {
@@ -20,6 +20,6 @@ export async function lernaList(onlyChanged: boolean): Promise<IPackageInfo[]> {
 }
 
 export async function lernaVersion(newVersion: string): Promise<string> {
-    await exec.exec(`lerna version ${newVersion} --exact --no-git-tag-version -y --loglevel silent`);
+    await exec.exec(`npx lerna version ${newVersion} --exact --no-git-tag-version -y --loglevel silent`);
     return JSON.parse(fs.readFileSync("lerna.json", "utf-8")).version;
 }

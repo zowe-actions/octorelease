@@ -6276,6 +6276,7 @@ const utils = __importStar(__webpack_require__(452));
 class Publish {
     static prepublish() {
         return __awaiter(this, void 0, void 0, function* () {
+            // TODO What if prepublish command needs to run in package folders rather than at top-level?
             yield utils.execBashCmd(core.getInput("prepublish-cmd"));
         });
     }
@@ -10377,7 +10378,7 @@ const core_1 = __webpack_require__(183);
 function lernaList(onlyChanged) {
     return __awaiter(this, void 0, void 0, function* () {
         const lernaCmd = onlyChanged ? "changed" : "list";
-        const cmdOutput = yield core_1.execAndReturnOutput("lerna", [lernaCmd, "--long", "--toposort", "--loglevel silent"]);
+        const cmdOutput = yield core_1.execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel silent"]);
         const packageInfo = [];
         for (const line of cmdOutput.trim().split("\n")) {
             const [name, version, path] = line.split(/\s+/, 3);
@@ -10392,7 +10393,7 @@ function lernaList(onlyChanged) {
 exports.lernaList = lernaList;
 function lernaVersion(newVersion) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec(`lerna version ${newVersion} --exact --no-git-tag-version -y --loglevel silent`);
+        yield exec.exec(`npx lerna version ${newVersion} --exact --no-git-tag-version -y --loglevel silent`);
         return JSON.parse(fs.readFileSync("lerna.json", "utf-8")).version;
     });
 }

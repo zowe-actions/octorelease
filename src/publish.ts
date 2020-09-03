@@ -15,6 +15,7 @@ export type PublishType = "github" | "npm" | "vsce";
 
 export class Publish {
     public static async prepublish(): Promise<void> {
+        // TODO What if prepublish command needs to run in package folders rather than at top-level?
         await utils.execBashCmd(core.getInput("prepublish-cmd"));
     }
 
