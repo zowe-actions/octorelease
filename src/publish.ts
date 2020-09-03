@@ -18,24 +18,24 @@ export class Publish {
         await utils.execBashCmd(core.getInput("prepublish-cmd"));
     }
 
-    public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
+    public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch, pkgDir?: string): Promise<void> {
         switch (publishType) {
             case "github":
-                return this.publishGithub();
+                return this.publishGithub(pkgDir);
             case "npm":
-                return this.publishNpm(protectedBranch);
+                return this.publishNpm(protectedBranch, pkgDir);
             case "vsce":
-                return this.publishVsce();
+                return this.publishVsce(pkgDir);
         }
     }
 
-    private static async publishGithub(): Promise<void> {
+    private static async publishGithub(pkgDir?: string): Promise<void> {
         const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+        const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
 
         // Create release and add release notes if any
         const octokit = github.getOctokit(core.getInput("repo-token"));
-        const releaseNotes = Changelog.getReleaseNotes("CHANGELOG.md", packageJson.version);
+        const releaseNotes = Changelog.getReleaseNotes(utils.prependPkgDir("CHANGELOG.md", pkgDir), packageJson.version);
         let release;
 
         try {
@@ -46,6 +46,8 @@ export class Publish {
             });
         } catch (err) {
             if (err.message.includes("already_exists")) {
+                // TODO Don't fail if release already exists
+                // Should continue, but check for artifacts that already exist and don't overwrite them
                 core.error(`Version ${packageJson.version} has already been published to GitHub`);
                 return;
             } else {
@@ -75,8 +77,8 @@ export class Publish {
         }
     }
 
-    private static async publishNpm(branch: IProtectedBranch): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+    private static async publishNpm(branch: IProtectedBranch, pkgDir?: string): Promise<void> {
+        const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
         const npmRegistry: string | undefined = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
         let npmScope: string | undefined = undefined;
 
@@ -95,7 +97,7 @@ export class Publish {
             // Publish package
             const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
             if (!alreadyPublished) {
-                await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
+                await utils.execInDir(`npm publish --tag ${branch.tag || "latest"}`, pkgDir);
             } else {
                 core.error(`Version ${packageJson.version} has already been published to NPM`);
             }
@@ -111,8 +113,8 @@ export class Publish {
         }
     }
 
-    private static async publishVsce(): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+    private static async publishVsce(pkgDir?: string): Promise<void> {
+        const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
         const vsceMetadata = await utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
 
         const latestVersion = packageJson.version;
@@ -121,7 +123,7 @@ export class Publish {
         // Publish extension
         if (publishedVersion !== latestVersion) {
             const vsceToken = core.getInput("vsce-token");
-            await exec.exec(`npx vsce publish -p ${vsceToken}`);
+            await utils.execInDir(`npx vsce publish -p ${vsceToken}`, pkgDir);
         } else {
             core.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
         }

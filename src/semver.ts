@@ -4,6 +4,7 @@ import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { ISemVerInfo } from "./doc";
 import * as utils from "./utils";
+import { Project } from "./project";
 
 export class SemVer {
     public static async getSemVerInfo(pkgVer?: string): Promise<ISemVerInfo | undefined> {
@@ -13,20 +14,21 @@ export class SemVer {
     private static async getSemVerInfoFromPackageJson(newPkgVer: string): Promise<ISemVerInfo | undefined> {
         const eventPath: string = utils.requireEnvVar("GITHUB_EVENT_PATH");
         const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+        const jsonWithVersion = (Project.projectType === "lerna") ? "lerna.json" : "package.json";
         let oldPackageJson: any = {};
 
         // Load old package.json from base ref
         try {
             await exec.exec(`git fetch origin ${eventData.before}`);
-            const cmdOutput = await utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
+            const cmdOutput = await utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:${jsonWithVersion}`]);
             oldPackageJson = JSON.parse(cmdOutput);
         } catch {
-            core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
+            core.warning(`Missing or invalid ${jsonWithVersion} in commit ${eventData.before}`);
             return;
         }
 
         if (oldPackageJson.version === newPkgVer) {
-            core.warning("Version in package.json did not change so skipping version stage");
+            core.warning(`Version in ${jsonWithVersion} did not change so skipping version stage`);
             return { level: "none" };
         } else {
             const semverDiff = require("semver-diff");

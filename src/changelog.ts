@@ -61,6 +61,7 @@ export class Changelog {
             return;
         }
 
-        fs.writeFileSync(changelogFile, changelogContents.replace(/## Recent Changes/, "## `" + pkgVer + "`"));
+        // TODO Make changelog format less rigid
+        fs.writeFileSync(changelogFile, changelogContents.replace(changelogHeader, "## `" + pkgVer + "`"));
     }
 }

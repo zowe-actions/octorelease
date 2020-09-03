@@ -9,6 +9,7 @@
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
     "test": "jest",
+    "clean": "rimraf lib",
     "watch": "ncc build src/main.ts -w",
     "all": "npm run build && npm run lint && npm run pack && npm test"
   },
@@ -49,6 +50,7 @@
     "eslint-plugin-jest": "^22.21.0",
     "jest": "^26.1.0",
     "jest-circus": "^26.1.0",
+    "rimraf": "^3.0.2",
     "ts-jest": "^26.1.1",
     "typescript": "^3.6.4"
   }

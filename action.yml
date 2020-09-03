@@ -26,6 +26,10 @@ inputs:
     description: 'Shell command that will run before project is published'
     required: false
     default: ''
+  project-type:
+    description: 'Project type for a monorepo (lerna, yarn-workspaces)'
+    required: false
+    default: ''
   repo-token:
     description: 'Token with push access to GitHub repo'
     required: true

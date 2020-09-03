@@ -27,6 +27,11 @@ export function npmReset(): void {
     }
 }
 
+export async function npmVersion(newVersion: string): Promise<string> {
+    const gitTag = (await execAndReturnOutput("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"])).trim();
+    return gitTag.slice(1);
+}
+
 export async function npmViewVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
     try {
         return (await execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
