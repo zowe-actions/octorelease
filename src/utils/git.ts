@@ -23,7 +23,8 @@ export async function gitConfig(): Promise<void> {
     await exec.exec(`git config --global user.email "${gitEmail}"`);
 
     const repository: string = requireEnvVar("GITHUB_REPOSITORY");
-    await exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
+    const repoToken: string = core.getInput("repo-token");
+    await exec.exec(`git remote set-url origin https://${repoToken}@github.com/${repository}.git`);
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
