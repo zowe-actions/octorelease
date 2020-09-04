@@ -14684,6 +14684,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const core_1 = __webpack_require__(183);
@@ -14710,8 +14711,9 @@ function gitConfig() {
         yield exec.exec(`git config --global user.email "${gitEmail}"`);
         const repository = core_1.requireEnvVar("GITHUB_REPOSITORY");
         yield exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
+        yield exec.exec("git config --global credential.helper store");
         const repoToken = core.getInput("repo-token");
-        fs.writeFileSync(core_1.requireEnvVar("HOME") + "/.git-credentials", `https://${repoToken}:x-oauth-basic@github.com`);
+        fs.writeFileSync(os.homedir() + "/.git-credentials", `https://${repoToken}:x-oauth-basic@github.com` + os.EOL);
     });
 }
 exports.gitConfig = gitConfig;
