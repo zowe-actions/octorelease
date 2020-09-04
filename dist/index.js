@@ -3639,6 +3639,7 @@ function run() {
                     // Make the publish logic smart enough so it won't overwrite any parts that were already published
                     // But continues running to publish anything that failed previously
                     for (const pkgInfo of project_1.Project.changedPkgInfo) {
+                        console.log("about to publish", pkgInfo.path);
                         yield publish_1.Publish.publish(publishType, protectedBranch, pkgInfo.path);
                     }
                 }
@@ -6270,7 +6271,6 @@ const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const glob = __importStar(__webpack_require__(281));
-const exec = __importStar(__webpack_require__(986));
 const changelog_1 = __webpack_require__(361);
 const utils = __importStar(__webpack_require__(452));
 class Publish {
@@ -6353,6 +6353,7 @@ class Publish {
                 npmScope = packageJson.name.split("/")[0];
             }
             utils.npmConfig(npmRegistry, npmScope, pkgDir);
+            console.log("my output do be", yield utils.execAndReturnOutput("ls -la", undefined, pkgDir));
             try {
                 // Publish package
                 const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
@@ -6365,7 +6366,7 @@ class Publish {
                 // Add alias tags
                 if (branch.aliasTags) {
                     for (const tag of branch.aliasTags) {
-                        yield exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
+                        yield utils.execInDir(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`, pkgDir);
                     }
                 }
             }

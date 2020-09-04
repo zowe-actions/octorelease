@@ -93,6 +93,7 @@ export class Publish {
         }
 
         utils.npmConfig(npmRegistry, npmScope, pkgDir);
+        console.log("my output do be", await utils.execAndReturnOutput("ls -la", undefined, pkgDir));
 
         try {
             // Publish package
@@ -106,7 +107,7 @@ export class Publish {
             // Add alias tags
             if (branch.aliasTags) {
                 for (const tag of branch.aliasTags) {
-                    await exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
+                    await utils.execInDir(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`, pkgDir);
                 }
             }
         } finally {

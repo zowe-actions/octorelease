@@ -40,6 +40,7 @@ async function run(): Promise<void> {
                 // Make the publish logic smart enough so it won't overwrite any parts that were already published
                 // But continues running to publish anything that failed previously
                 for (const pkgInfo of Project.changedPkgInfo) {
+                    console.log("about to publish", pkgInfo.path);
                     await Publish.publish(publishType as any, protectedBranch, pkgInfo.path);
                 }
             }

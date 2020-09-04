@@ -32,7 +32,7 @@ inputs:
     default: ''
   repo-token:
     description: 'Token with push access to GitHub repo'
-    required: true
+    required: true  # TODO Should this be required or can we fallback to github.token ?
     default: ''
   root-dir:
     description: 'Root directory of Node.js project that contains package.json'
