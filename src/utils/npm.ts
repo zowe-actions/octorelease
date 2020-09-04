@@ -1,29 +1,35 @@
 import * as fs from "fs";
 import * as os from "os";
 import * as core from "@actions/core";
-import { execAndReturnOutput } from "./core";
+import { execAndReturnOutput, prependPkgDir } from "./core";
 
-export function npmConfig(registry: string, scope?: string): void {
+export function npmConfig(registry: string, scope?: string, pkgDir?: string): void {
     registry = registry.endsWith("/") ? registry : (registry + "/");
     scope = scope?.toLowerCase();
 
-    if (fs.existsSync(".npmrc")) {
-        fs.renameSync(".npmrc", ".npmrc.bak");
+    const npmrcFile = prependPkgDir(".npmrc", pkgDir);
+    const npmrcBakFile = prependPkgDir(".npmrc.bak", pkgDir);
+
+    if (fs.existsSync(npmrcFile)) {
+        fs.renameSync(npmrcFile, npmrcBakFile);
     }
 
     // Remove HTTP or HTTPS protocol from front of registry URL
     const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
     const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
+    fs.writeFileSync(npmrcFile, authLine + os.EOL + registryLine + os.EOL);
 }
 
-export function npmReset(): void {
-    if (fs.existsSync(".npmrc")) {
-        fs.unlinkSync(".npmrc");
+export function npmReset(pkgDir?: string): void {
+    const npmrcFile = prependPkgDir(".npmrc", pkgDir);
+    const npmrcBakFile = prependPkgDir(".npmrc.bak", pkgDir);
+
+    if (fs.existsSync(npmrcFile)) {
+        fs.unlinkSync(npmrcFile);
     }
 
-    if (fs.existsSync(".npmrc.bak")) {
-        fs.renameSync(".npmrc.bak", ".npmrc");
+    if (fs.existsSync(npmrcBakFile)) {
+        fs.renameSync(npmrcBakFile, npmrcFile);
     }
 }
 

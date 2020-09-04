@@ -18,7 +18,7 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
     await exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
 }
 
-export async function gitConfig(): Promise<void> {
+export async function gitConfig(saveToken?: boolean): Promise<void> {
     const gitUser = "github-actions[bot]";
     const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
     await exec.exec(`git config --global user.name "${gitUser}"`);
@@ -27,10 +27,12 @@ export async function gitConfig(): Promise<void> {
     const repository: string = requireEnvVar("GITHUB_REPOSITORY");
     await exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
 
-    await exec.exec("git config --global credential.helper store");
-    const repoToken: string = core.getInput("repo-token");
-    fs.writeFileSync(os.homedir() + "/.git-credentials",
-        `https://${repoToken}:x-oauth-basic@github.com` + os.EOL);
+    if (saveToken) {
+        await exec.exec("git config --global credential.helper store");
+        const repoToken: string = core.getInput("repo-token");
+        fs.writeFileSync(os.homedir() + "/.git-credentials",
+            `https://${repoToken}:x-oauth-basic@github.com` + os.EOL);
+    }
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {

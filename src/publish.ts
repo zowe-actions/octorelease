@@ -92,7 +92,7 @@ export class Publish {
             npmScope = packageJson.name.split("/")[0];
         }
 
-        utils.npmConfig(npmRegistry, npmScope);
+        utils.npmConfig(npmRegistry, npmScope, pkgDir);
 
         try {
             // Publish package
@@ -110,7 +110,7 @@ export class Publish {
                 }
             }
         } finally {
-            utils.npmReset();
+            utils.npmReset(pkgDir);
         }
     }
 

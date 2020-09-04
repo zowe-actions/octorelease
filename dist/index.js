@@ -6352,7 +6352,7 @@ class Publish {
             if (packageJson.name.includes("/")) {
                 npmScope = packageJson.name.split("/")[0];
             }
-            utils.npmConfig(npmRegistry, npmScope);
+            utils.npmConfig(npmRegistry, npmScope, pkgDir);
             try {
                 // Publish package
                 const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
@@ -6370,7 +6370,7 @@ class Publish {
                 }
             }
             finally {
-                utils.npmReset();
+                utils.npmReset(pkgDir);
             }
         });
     }
@@ -11207,25 +11207,29 @@ const fs = __importStar(__webpack_require__(747));
 const os = __importStar(__webpack_require__(87));
 const core = __importStar(__webpack_require__(470));
 const core_1 = __webpack_require__(183);
-function npmConfig(registry, scope) {
+function npmConfig(registry, scope, pkgDir) {
     var _a;
     registry = registry.endsWith("/") ? registry : (registry + "/");
     scope = (_a = scope) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-    if (fs.existsSync(".npmrc")) {
-        fs.renameSync(".npmrc", ".npmrc.bak");
+    const npmrcFile = core_1.prependPkgDir(".npmrc", pkgDir);
+    const npmrcBakFile = core_1.prependPkgDir(".npmrc.bak", pkgDir);
+    if (fs.existsSync(npmrcFile)) {
+        fs.renameSync(npmrcFile, npmrcBakFile);
     }
     // Remove HTTP or HTTPS protocol from front of registry URL
     const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
     const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
+    fs.writeFileSync(npmrcFile, authLine + os.EOL + registryLine + os.EOL);
 }
 exports.npmConfig = npmConfig;
-function npmReset() {
-    if (fs.existsSync(".npmrc")) {
-        fs.unlinkSync(".npmrc");
+function npmReset(pkgDir) {
+    const npmrcFile = core_1.prependPkgDir(".npmrc", pkgDir);
+    const npmrcBakFile = core_1.prependPkgDir(".npmrc.bak", pkgDir);
+    if (fs.existsSync(npmrcFile)) {
+        fs.unlinkSync(npmrcFile);
     }
-    if (fs.existsSync(".npmrc.bak")) {
-        fs.renameSync(".npmrc.bak", ".npmrc");
+    if (fs.existsSync(npmrcBakFile)) {
+        fs.renameSync(npmrcBakFile, npmrcFile);
     }
 }
 exports.npmReset = npmReset;
@@ -14703,7 +14707,7 @@ function gitCommit(message, amend) {
     });
 }
 exports.gitCommit = gitCommit;
-function gitConfig() {
+function gitConfig(saveToken) {
     return __awaiter(this, void 0, void 0, function* () {
         const gitUser = "github-actions[bot]";
         const gitEmail = "41898282+github-actions[bot]@users.noreply.github.com";
@@ -14711,9 +14715,11 @@ function gitConfig() {
         yield exec.exec(`git config --global user.email "${gitEmail}"`);
         const repository = core_1.requireEnvVar("GITHUB_REPOSITORY");
         yield exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
-        yield exec.exec("git config --global credential.helper store");
-        const repoToken = core.getInput("repo-token");
-        fs.writeFileSync(os.homedir() + "/.git-credentials", `https://${repoToken}:x-oauth-basic@github.com` + os.EOL);
+        if (saveToken) {
+            yield exec.exec("git config --global credential.helper store");
+            const repoToken = core.getInput("repo-token");
+            fs.writeFileSync(os.homedir() + "/.git-credentials", `https://${repoToken}:x-oauth-basic@github.com` + os.EOL);
+        }
     });
 }
 exports.gitConfig = gitConfig;
