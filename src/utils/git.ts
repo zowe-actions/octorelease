@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { execAndReturnOutput, requireEnvVar } from "./core";
@@ -23,8 +24,11 @@ export async function gitConfig(): Promise<void> {
     await exec.exec(`git config --global user.email "${gitEmail}"`);
 
     const repository: string = requireEnvVar("GITHUB_REPOSITORY");
+    await exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
+
     const repoToken: string = core.getInput("repo-token");
-    await exec.exec(`git remote set-url origin https://${repoToken}@github.com/${repository}.git`);
+    fs.writeFileSync(requireEnvVar("HOME") + "/.git-credentials",
+        `https://${repoToken}:x-oauth-basic@github.com`);
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {

@@ -14683,6 +14683,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const core_1 = __webpack_require__(183);
@@ -14708,8 +14709,9 @@ function gitConfig() {
         yield exec.exec(`git config --global user.name "${gitUser}"`);
         yield exec.exec(`git config --global user.email "${gitEmail}"`);
         const repository = core_1.requireEnvVar("GITHUB_REPOSITORY");
+        yield exec.exec(`git remote set-url origin https://github.com/${repository}.git`);
         const repoToken = core.getInput("repo-token");
-        yield exec.exec(`git remote set-url origin https://${repoToken}@github.com/${repository}.git`);
+        fs.writeFileSync(core_1.requireEnvVar("HOME") + "/.git-credentials", `https://${repoToken}:x-oauth-basic@github.com`);
     });
 }
 exports.gitConfig = gitConfig;
