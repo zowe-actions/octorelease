@@ -10378,7 +10378,7 @@ const core_1 = __webpack_require__(183);
 function lernaList(onlyChanged) {
     return __awaiter(this, void 0, void 0, function* () {
         const lernaCmd = onlyChanged ? "changed" : "list";
-        const cmdOutput = yield core_1.execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel silent"]);
+        const cmdOutput = yield core_1.execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel", "silent"]);
         const packageInfo = [];
         for (const line of cmdOutput.trim().split("\n")) {
             const [name, version, path] = line.split(/\s+/, 3);

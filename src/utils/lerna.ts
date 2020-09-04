@@ -5,7 +5,7 @@ import { IPackageInfo } from "../doc/IPackageInfo";
 
 export async function lernaList(onlyChanged: boolean): Promise<IPackageInfo[]> {
     const lernaCmd = onlyChanged ? "changed" : "list";
-    const cmdOutput = await execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel silent"]);
+    const cmdOutput = await execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel", "silent"]);
     const packageInfo: IPackageInfo[] = [];
 
     for (const line of cmdOutput.trim().split("\n")) {
