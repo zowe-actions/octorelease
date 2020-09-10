@@ -3614,9 +3614,8 @@ const version_1 = __webpack_require__(52);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Add back logic to handle [ci skip]
-            const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
-            const protectedBranch = yield (new config_1.Config()).getProtectedBranch(currentBranch);
+            utils.exitIfCiSkip(core.getInput("ci-skip-phrase"));
+            const protectedBranch = yield (new config_1.Config()).getProtectedBranch();
             const rootDir = core.getInput("root-dir");
             const versionStrategy = core.getInput("version-strategy");
             if (rootDir) {
@@ -4109,7 +4108,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 function execAndReturnOutput(commandLine, args, cwd) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -4142,6 +4143,17 @@ function execInDir(command, cwd) {
     });
 }
 exports.execInDir = execInDir;
+function exitIfCiSkip(ciSkipPhrase) {
+    var _a, _b;
+    const eventPath = requireEnvVar("GITHUB_EVENT_PATH");
+    const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+    // Check for CI skip
+    if (((_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message) && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
+        core.info("Commit message contains CI skip phrase so exiting now");
+        process.exit();
+    }
+}
+exports.exitIfCiSkip = exitIfCiSkip;
 function prependPkgDir(filePath, pkgDir) {
     return (pkgDir != null) ? path.join(pkgDir, filePath) : filePath;
 }
@@ -12969,8 +12981,9 @@ class Config {
             core.info(`Config file ${this.mConfigFile} not found so continuing with default config`);
         }
     }
-    getProtectedBranch(currentBranch) {
+    getProtectedBranch() {
         return __awaiter(this, void 0, void 0, function* () {
+            const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
             // Use default config if config file not found
             if (this.mConfig == null) {
                 return { name: currentBranch };
@@ -14705,7 +14718,9 @@ function gitCommit(message, amend) {
             }
         }
         const gitArgs = amend ? "--amend" : "";
-        yield exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
+        // TODO What if ci-skip-phrase is empty? Should validate user input
+        const ciSkipPhrase = core.getInput("ci-skip-phrase");
+        yield exec.exec(`git commit ${gitArgs} -m "${message} [${ciSkipPhrase}]" -s`);
     });
 }
 exports.gitCommit = gitCommit;

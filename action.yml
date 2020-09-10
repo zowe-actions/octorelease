@@ -12,6 +12,13 @@ inputs:
     required: false
     default: ''
 
+  # Specify a phrase that if present in commit message will cause the version
+  # and publish stages to be skipped.
+  ci-skip-phrase:
+    description: 'Phrase in commit message that will trigger CI skip'
+    required: false
+    default: 'ci skip'
+
   # Specify the path to a YAML config file in the repo. If specified and the
   # config file exists, then protected branch rules will be read from it. If not
   # specified, no branch rules will be enforced.

@@ -15,7 +15,9 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
     }
 
     const gitArgs = amend ? "--amend" : "";
-    await exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
+    // TODO What if ci-skip-phrase is empty? Should validate user input
+    const ciSkipPhrase = core.getInput("ci-skip-phrase");
+    await exec.exec(`git commit ${gitArgs} -m "${message} [${ciSkipPhrase}]" -s`);
 }
 
 export async function gitConfig(saveToken?: boolean): Promise<void> {

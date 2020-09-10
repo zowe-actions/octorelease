@@ -19,7 +19,9 @@ export class Config {
         }
     }
 
-    public async getProtectedBranch(currentBranch: string): Promise<IProtectedBranch> {
+    public async getProtectedBranch(): Promise<IProtectedBranch> {
+        const currentBranch: string = (await utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
+
         // Use default config if config file not found
         if (this.mConfig == null) {
             return { name: currentBranch };

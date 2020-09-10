@@ -1,4 +1,6 @@
+import * as fs from "fs";
 import * as path from "path";
+import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
 export async function execAndReturnOutput(commandLine: string, args?: string[], cwd?: string): Promise<string> {
@@ -24,6 +26,17 @@ export async function execBashCmd(command: string): Promise<void> {
 export async function execInDir(command: string, cwd?: string): Promise<void> {
     const options = (cwd != null) ? { cwd: path.resolve(cwd) } : undefined;
     await exec.exec(command, undefined, options);
+}
+
+export function exitIfCiSkip(ciSkipPhrase: string): void {
+    const eventPath: string = requireEnvVar("GITHUB_EVENT_PATH");
+    const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
+
+    // Check for CI skip
+    if (eventData?.head_commit?.message && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
+        core.info("Commit message contains CI skip phrase so exiting now");
+        process.exit();
+    }
 }
 
 export function prependPkgDir(filePath: string, pkgDir?: string): string {

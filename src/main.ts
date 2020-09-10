@@ -9,9 +9,9 @@ import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
-        // TODO Add back logic to handle [ci skip]
-        const currentBranch: string = (await utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
-        const protectedBranch: IProtectedBranch = await (new Config()).getProtectedBranch(currentBranch);
+        utils.exitIfCiSkip(core.getInput("ci-skip-phrase"));
+
+        const protectedBranch: IProtectedBranch = await (new Config()).getProtectedBranch();
         const rootDir = core.getInput("root-dir");
         const versionStrategy = core.getInput("version-strategy");
 
