@@ -3614,6 +3614,7 @@ const version_1 = __webpack_require__(52);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Add back logic to handle [ci skip]
             const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
             const protectedBranch = yield (new config_1.Config()).getProtectedBranch(currentBranch);
             const rootDir = core.getInput("root-dir");
