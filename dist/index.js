@@ -3636,8 +3636,6 @@ function run() {
             for (const publishType of Object.keys(publishJobs)) {
                 if (publishJobs[publishType]) {
                     // TODO Publish all packages, not just changed ones
-                    // Make the publish logic smart enough so it won't overwrite any parts that were already published
-                    // But continues running to publish anything that failed previously
                     for (const pkgInfo of project_1.Project.changedPkgInfo) {
                         console.log("about to publish", pkgInfo.path);
                         yield publish_1.Publish.publish(publishType, protectedBranch, pkgInfo.path);
@@ -6308,39 +6306,48 @@ class Publish {
     static publishGithub(pkgDir) {
         return __awaiter(this, void 0, void 0, function* () {
             const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-            const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
-            // Create release and add release notes if any
             const octokit = github.getOctokit(core.getInput("repo-token"));
-            const releaseNotes = changelog_1.Changelog.getReleaseNotes(utils.prependPkgDir("CHANGELOG.md", pkgDir), packageJson.version);
+            const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+            const tagName = `v${packageJson.version}`;
             let release;
+            // Get release if it already exists
             try {
-                release = yield octokit.repos.createRelease({
+                release = yield octokit.repos.getReleaseByTag({
                     owner, repo,
-                    tag_name: `v${packageJson.version}`,
-                    body: releaseNotes
+                    tag: tagName
                 });
             }
             catch (err) {
-                if (err.message.includes("already_exists")) {
-                    // TODO Don't fail if release already exists
-                    // Should continue, but check for artifacts that already exist and don't overwrite them
-                    core.error(`Version ${packageJson.version} has already been published to GitHub`);
-                    return;
-                }
-                else {
+                if (err.status != 404) {
                     throw err;
                 }
+            }
+            // Create release if it doesn't exist and try to add release notes
+            if (release == null) {
+                const releaseNotes = changelog_1.Changelog.getReleaseNotes(utils.prependPkgDir("CHANGELOG.md", pkgDir), packageJson.version);
+                core.info(`Creating GitHub release with tag ${tagName}`);
+                release = yield octokit.repos.createRelease({
+                    owner, repo,
+                    tag_name: tagName,
+                    body: releaseNotes
+                });
             }
             // Upload artifacts to release
             const globber = yield glob.create(core.getInput("github-artifacts"));
             const artifactPaths = yield globber.glob();
             const mime = __webpack_require__(779);
             for (const artifactPath of artifactPaths) {
+                const assetName = path.basename(artifactPath);
+                // Skip uploading asset if one with same name was uploaded previously
+                if (release.data.assets && release.data.assets.findIndex((asset) => asset.name === assetName) !== -1) {
+                    core.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
+                    continue;
+                }
                 core.info(`Uploading release asset ${artifactPath}`);
                 yield octokit.repos.uploadReleaseAsset({
                     owner, repo,
                     release_id: release.data.id,
-                    name: path.basename(artifactPath),
+                    name: assetName,
                     // Need to upload as buffer because converting to string corrupts binary data
                     data: fs.readFileSync(artifactPath),
                     url: release.data.upload_url,
@@ -6366,7 +6373,6 @@ class Publish {
                 npmScope = packageJson.name.split("/")[0];
             }
             utils.npmConfig(npmRegistry, npmScope, pkgDir);
-            console.log("my output do be", yield utils.execAndReturnOutput("ls -la", undefined, pkgDir));
             try {
                 // Publish package
                 const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
