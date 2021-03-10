@@ -3,7 +3,6 @@ import * as core from "@actions/core";
 import { IProtectedBranch } from "./doc";
 import * as utils from "./utils/core";
 import { Config } from "./config";
-import { Project } from "./project";
 import { Publish } from "./publish";
 import { Version } from "./version";
 
@@ -18,8 +17,6 @@ async function run(): Promise<void> {
         if (rootDir) {
             process.chdir(path.resolve(process.cwd(), rootDir));
         }
-
-        await Project.calcChangedPkgInfo();
 
         if (versionStrategy === "compare" || versionStrategy === "labels") {
             await Version.version(versionStrategy, protectedBranch);
@@ -37,11 +34,7 @@ async function run(): Promise<void> {
 
         for (const publishType of Object.keys(publishJobs)) {
             if (publishJobs[publishType]) {
-                // TODO Publish all packages, not just changed ones
-                for (const pkgInfo of Project.changedPkgInfo) {
-                    console.log("about to publish", pkgInfo.path);
-                    await Publish.publish(publishType as any, protectedBranch, pkgInfo.path);
-                }
+                await Publish.publish(publishType as any, protectedBranch);
             }
         }
     } catch (error) {

@@ -3,7 +3,6 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IProtectedBranch, ISemVerInfo } from "./doc";
 import { Changelog } from "./changelog";
-import { Project } from "./project";
 import { SemVer } from "./semver";
 import * as utils from "./utils";
 
@@ -37,13 +36,8 @@ export class Version {
         // Update version number in package-lock.json and changelog
         await exec.exec("git reset --hard");
         let newVersion: string = semverInfo.newVersion || semverInfo.level;
-        newVersion = await ((Project.projectType === "lerna") ? utils.lernaVersion : utils.npmVersion)(newVersion);
-
-        for (const pkgInfo of Project.changedPkgInfo) {
-            // TODO What if a package had no changes previously, but now has updated dependencies
-            // Do we need to add an automated changelog entry (like "Update to Imperative 4.x")
-            Changelog.updateLatestVersion(utils.prependPkgDir("CHANGELOG.md", pkgInfo.path), newVersion);
-        }
+        newVersion = await utils.npmVersion(newVersion);
+        Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
 
         // Commit version bump and create tag
         await exec.exec("git add -u");
@@ -56,8 +50,7 @@ export class Version {
     }
 
     private static async beforeVersion(strategy: VersionStrategy, branch: IProtectedBranch): Promise<ISemVerInfo | undefined> {
-        const jsonWithVersion = (Project.projectType === "lerna") ? "lerna.json" : "package.json";
-        const newVersion: string = JSON.parse(fs.readFileSync(jsonWithVersion, "utf-8")).version;
+        const newVersion: string = JSON.parse(fs.readFileSync("package.json", "utf-8")).version;
         const semverInfo = await SemVer.getSemVerInfo((strategy === "compare") ? newVersion : undefined);
 
         if (!semverInfo || semverInfo.level === "none") {
@@ -84,38 +77,20 @@ export class Version {
      * Git committed.
      * @param pkgName - Name of the dependency (e.g., `@zowe/imperative`)
      * @param pkgTag - Tag of the dependency (e.g., `zowe-v1-lts`)
-     * @param packageJson - Package JSON object that contains dependency lists
      * @param dev - Specify true if the package is a dev dependency
      */
     private static async updateDependency(pkgName: string, pkgTag: string, dev: boolean): Promise<void> {
-        let commitMsg = null;
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+        const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
+        const currentVersion: string = dependencies[pkgName];
+        const latestVersion = await utils.npmViewVersion(pkgName, pkgTag);
 
-        // TODO Update dependencies for all packages, not just changed ones
-        // If we don't do this for all packages, then dependency versions will get out of sync
-        // TODO Rewrite this method so it is called for a package.json file and loops thru all its dependencies
-        // Then dependency versions can be cached and reused when this method is called for other package.json files
-        for (const pkgInfo of Project.changedPkgInfo) {
-            const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgInfo.path), "utf-8"));
-            const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
-            const currentVersion: string = dependencies[pkgName];
+        if (currentVersion !== latestVersion) {
+            const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
+            await exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
 
-            if (currentVersion == null) {
-                continue;
-            }
-
-            const latestVersion = await utils.npmViewVersion(pkgName, pkgTag);
-
-            if (currentVersion !== latestVersion) {
-                const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
-                await utils.execInDir(`npm install ${pkgName}@${latestVersion} ${npmArgs}`, pkgInfo.path);
-
-                await utils.execInDir(`git add package.json package-lock.json`, pkgInfo.path);
-                commitMsg = `Bump ${pkgName} from ${currentVersion} to ${latestVersion}`;
-            }
-        }
-
-        if (commitMsg) {
-            await utils.gitCommit(commitMsg);
+            await exec.exec(`git add package.json package-lock.json`);
+            await utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
         }
     }
 }

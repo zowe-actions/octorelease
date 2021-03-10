@@ -59,19 +59,6 @@ inputs:
     required: false
     default: ''
 
-  # Specify a project type, if your repo is a monorepo that contains multiple
-  # packages.
-  # Options:
-  #  * 'none' (default) - Simple NPM project with only one package to publish.
-  #  * 'lerna' - Monorepo managed with Lerna (fixed version scheme). Only
-  #      packages with changes since the last Git tag will be published.
-  #  * 'yarn-workspaces' - Monorepo managed with Yarn Workspaces.
-  #      Not yet implemented.
-  project-type:
-    description: 'Project type for a monorepo (lerna, yarn-workspaces)'
-    required: false
-    default: ''
-
   # (required) Specify token to authenticate to GitHub repository to push tags
   # and version bump commits. If you are performing versioning on a protected
   # branch, the default token in secrets.GITHUB_TOKEN does not have sufficient

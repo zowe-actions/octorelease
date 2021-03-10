@@ -23,11 +23,6 @@ export async function execBashCmd(command: string): Promise<void> {
     }
 }
 
-export async function execInDir(command: string, cwd?: string): Promise<void> {
-    const options = (cwd != null) ? { cwd: path.resolve(cwd) } : undefined;
-    await exec.exec(command, undefined, options);
-}
-
 export function exitIfCiSkip(ciSkipPhrase: string): void {
     const eventPath: string = requireEnvVar("GITHUB_EVENT_PATH");
     const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
@@ -37,10 +32,6 @@ export function exitIfCiSkip(ciSkipPhrase: string): void {
         core.info("Commit message contains CI skip phrase so exiting now");
         process.exit();
     }
-}
-
-export function prependPkgDir(filePath: string, pkgDir?: string): string {
-    return (pkgDir != null) ? path.join(pkgDir, filePath) : filePath;
 }
 
 export function requireEnvVar(name: string): string {

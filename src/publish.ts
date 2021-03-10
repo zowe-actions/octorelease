@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as glob from "@actions/glob";
 import { IProtectedBranch } from "./doc";
@@ -18,21 +19,21 @@ export class Publish {
         await utils.execBashCmd(core.getInput("prepublish-cmd"));
     }
 
-    public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch, pkgDir?: string): Promise<void> {
+    public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
         switch (publishType) {
             case "github":
-                return this.publishGithub(pkgDir);
+                return this.publishGithub();
             case "npm":
-                return this.publishNpm(protectedBranch, pkgDir);
+                return this.publishNpm(protectedBranch);
             case "vsce":
-                return this.publishVsce(pkgDir);
+                return this.publishVsce();
         }
     }
 
-    private static async publishGithub(pkgDir?: string): Promise<void> {
+    private static async publishGithub(): Promise<void> {
         const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
         const octokit = github.getOctokit(core.getInput("repo-token"));
-        const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         const tagName = `v${packageJson.version}`;
         let release;
 
@@ -50,7 +51,7 @@ export class Publish {
 
         // Create release if it doesn't exist and try to add release notes
         if (release == null) {
-            const releaseNotes = Changelog.getReleaseNotes(utils.prependPkgDir("CHANGELOG.md", pkgDir),
+            const releaseNotes = Changelog.getReleaseNotes("CHANGELOG.md",
                 packageJson.version);
 
             core.info(`Creating GitHub release with tag ${tagName}`);
@@ -91,8 +92,8 @@ export class Publish {
         }
     }
 
-    private static async publishNpm(branch: IProtectedBranch, pkgDir?: string): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+    private static async publishNpm(branch: IProtectedBranch): Promise<void> {
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         const npmRegistry: string | undefined = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
         let npmScope: string | undefined = undefined;
 
@@ -105,13 +106,13 @@ export class Publish {
             npmScope = packageJson.name.split("/")[0];
         }
 
-        utils.npmConfig(npmRegistry, npmScope, pkgDir);
+        utils.npmConfig(npmRegistry, npmScope);
 
         try {
             // Publish package
             const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
             if (!alreadyPublished) {
-                await utils.execInDir(`npm publish --tag ${branch.tag || "latest"}`, pkgDir);
+                await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
             } else {
                 core.error(`Version ${packageJson.version} has already been published to NPM`);
             }
@@ -119,16 +120,16 @@ export class Publish {
             // Add alias tags
             if (branch.aliasTags) {
                 for (const tag of branch.aliasTags) {
-                    await utils.execInDir(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`, pkgDir);
+                    await exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
                 }
             }
         } finally {
-            utils.npmReset(pkgDir);
+            utils.npmReset();
         }
     }
 
-    private static async publishVsce(pkgDir?: string): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+    private static async publishVsce(): Promise<void> {
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         const vsceMetadata = await utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
 
         const latestVersion = packageJson.version;
@@ -137,7 +138,7 @@ export class Publish {
         // Publish extension
         if (publishedVersion !== latestVersion) {
             const vsceToken = core.getInput("vsce-token");
-            await utils.execInDir(`npx vsce publish -p ${vsceToken}`, pkgDir);
+            await exec.exec(`npx vsce publish -p ${vsceToken}`);
         } else {
             core.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
         }
