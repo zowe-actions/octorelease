@@ -8,9 +8,10 @@ import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
-        utils.exitIfCiSkip(core.getInput("ci-skip-phrase"));
+        utils.exitIfCiSkip();
+        Config.load();
 
-        const protectedBranch: IProtectedBranch = await (new Config()).getProtectedBranch();
+        const protectedBranch: IProtectedBranch = await Config.getProtectedBranch();
         const rootDir = core.getInput("root-dir");
         const versionStrategy = core.getInput("version-strategy");
 

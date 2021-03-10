@@ -5,11 +5,11 @@ import { IConfig, IProtectedBranch } from "./doc";
 import * as utils from "./utils";
 
 export class Config {
-    private mConfig: IConfig | null = null;
+    private static mConfig: IConfig | null = null;
 
-    private mConfigFile: string;
+    private static mConfigFile: string;
 
-    constructor() {
+    public static load(): void {
         this.mConfigFile = core.getInput("config-file");
 
         if (fs.existsSync(this.mConfigFile)) {
@@ -19,7 +19,7 @@ export class Config {
         }
     }
 
-    public async getProtectedBranch(): Promise<IProtectedBranch> {
+    public static async getProtectedBranch(): Promise<IProtectedBranch> {
         const currentBranch: string = (await utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
 
         // Use default config if config file not found
@@ -28,8 +28,7 @@ export class Config {
         }
 
         const branchNames: string[] = this.mConfig.protectedBranches.map(branch => branch.name);
-        const minimatch = require("minimatch");
-        const branchIndex: number = branchNames.findIndex((branch) => minimatch(currentBranch, branch));
+        const branchIndex: number = branchNames.findIndex((branch) => branch === currentBranch);
 
         // Check if branch is missing in config
         if (branchIndex === -1) {
@@ -50,15 +49,6 @@ export class Config {
             process.exit();
         }
 
-        return this.renderBranchName({
-            ...this.mConfig.protectedBranches[branchIndex],
-            name: currentBranch
-        }, currentBranch);
-    }
-
-    private renderBranchName(obj: any, branchName: string): any {
-        return JSON.parse(JSON.stringify(obj), (key, value) => {
-            return (typeof value === "string") ? value.replace("${name}", branchName) : value;
-        });
+        return this.mConfig.protectedBranches[branchIndex];
     }
 }

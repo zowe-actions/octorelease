@@ -1,6 +1,6 @@
 name: 'node-versioner'
 description: 'GitHub Action to version a Node.js project and publish it to GitHub/NPM registry/VS Code Marketplace'
-author: 'tjohnsonBCM'
+author: 't1m0thyj'
 inputs:
   # Specify the format of your changelog header for unreleased changes. If
   # specified and the header exists in CHANGELOG.md, then it will be updated as
@@ -11,13 +11,6 @@ inputs:
     description: 'Changelog header used to track changes for new version'
     required: false
     default: ''
-
-  # Specify a phrase that if present in commit message will cause the version
-  # and publish stages to be skipped.
-  ci-skip-phrase:
-    description: 'Phrase in commit message that will trigger CI skip'
-    required: false
-    default: 'ci skip'
 
   # Specify the path to a YAML config file in the repo. If specified and the
   # config file exists, then protected branch rules will be read from it. If not
@@ -59,14 +52,14 @@ inputs:
     required: false
     default: ''
 
-  # (required) Specify token to authenticate to GitHub repository to push tags
-  # and version bump commits. If you are performing versioning on a protected
-  # branch, the default token in secrets.GITHUB_TOKEN does not have sufficient
-  # privileges to push so you must supply a different token with admin rights.
+  # Specify token to authenticate to GitHub repository to push tags and version
+  # bump commits. If you are performing versioning on a protected branch, the
+  # default token in secrets.GITHUB_TOKEN does not have sufficient privileges
+  # to push so you must supply a different token with admin rights.
   repo-token:
     description: 'Token with push access to GitHub repo'
-    required: true
-    default: ''
+    required: false
+    default: '${{ github.token }}'
 
   # Specify a path to root directory of your project that contains the
   # package.json file. If not specified, defaults to the top level.
@@ -74,17 +67,6 @@ inputs:
     description: 'Root directory of NPM project that contains package.json'
     required: false
     default: ''
-
-  # Specify a list of PR labels that should be used to detect the semver level
-  # of changes. If not specified, the default labels will be used:
-  #   'release-major,release-minor,release-patch'
-  # This means that if a PR is labeled with 'release-minor', a minor version
-  # bump is performed. The list requires three labels to be specified, each
-  # separated by commas, like this: `Major,Minor,Patch`.
-  semver-labels:
-    description: 'Comma-separated list of semver labels to detect on PRs'
-    required: false
-    default: 'release-major,release-minor,release-patch'
 
   # Specify a version strategy that will be used to determine if package version
   # should be updated.

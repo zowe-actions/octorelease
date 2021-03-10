@@ -23,12 +23,12 @@ export async function execBashCmd(command: string): Promise<void> {
     }
 }
 
-export function exitIfCiSkip(ciSkipPhrase: string): void {
+export function exitIfCiSkip(): void {
     const eventPath: string = requireEnvVar("GITHUB_EVENT_PATH");
     const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
 
     // Check for CI skip
-    if (eventData?.head_commit?.message && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
+    if (eventData?.head_commit?.message && eventData.head_commit.message.indexOf("ci skip") !== -1) {
         core.info("Commit message contains CI skip phrase so exiting now");
         process.exit();
     }

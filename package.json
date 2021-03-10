@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tjohnsonBCM/node-versioner.git"
+    "url": "git+https://github.com/t1m0thyj/node-versioner.git"
   },
   "keywords": [
     "actions",
@@ -28,7 +28,7 @@
     "version",
     "vsce"
   ],
-  "author": "tjohnsonBCM",
+  "author": "t1m0thyj",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",
@@ -37,7 +37,6 @@
     "@actions/glob": "^0.1.0",
     "js-yaml": "^3.14.0",
     "mime-types": "^2.1.27",
-    "minimatch": "^3.0.4",
     "semver-diff": "^3.1.1"
   },
   "devDependencies": {

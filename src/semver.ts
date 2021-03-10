@@ -52,7 +52,6 @@ export class SemVer {
             return;
         }
 
-        const [labelMajor, labelMinor, labelPatch] = core.getInput("semver-labels").split(",", 3).map(s => s.trim());
         const labels = await octokit.issues.listLabelsOnIssue({
             owner, repo,
             issue_number: prs.data[0].number
@@ -60,11 +59,11 @@ export class SemVer {
         const labelNames = labels.data.map(label => label.name);
         const semverInfo: ISemVerInfo = { level: "none" };
 
-        if (labelNames.includes(labelMajor)) {
+        if (labelNames.includes("release-major")) {
             semverInfo.level = "major";
-        } else if (labelNames.includes(labelMinor)) {
+        } else if (labelNames.includes("release-minor")) {
             semverInfo.level = "minor";
-        } else if (labelNames.includes(labelPatch)) {
+        } else if (labelNames.includes("release-patch")) {
             semverInfo.level = "patch";
         } else {
             core.warning("Semver label was not set on PR so skipping version stage");

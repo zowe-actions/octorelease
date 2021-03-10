@@ -421,7 +421,6 @@ const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
 const utils = __importStar(__webpack_require__(452));
-const project_1 = __webpack_require__(771);
 class SemVer {
     static getSemVerInfo(pkgVer) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -432,20 +431,19 @@ class SemVer {
         return __awaiter(this, void 0, void 0, function* () {
             const eventPath = utils.requireEnvVar("GITHUB_EVENT_PATH");
             const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-            const jsonWithVersion = (project_1.Project.projectType === "lerna") ? "lerna.json" : "package.json";
             let oldPackageJson = {};
             // Load old package.json from base ref
             try {
                 yield exec.exec(`git fetch origin ${eventData.before}`);
-                const cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:${jsonWithVersion}`]);
+                const cmdOutput = yield utils.execAndReturnOutput("git", ["--no-pager", "show", `${eventData.before}:package.json`]);
                 oldPackageJson = JSON.parse(cmdOutput);
             }
             catch (_a) {
-                core.warning(`Missing or invalid ${jsonWithVersion} in commit ${eventData.before}`);
+                core.warning(`Missing or invalid package.json in commit ${eventData.before}`);
                 return;
             }
             if (oldPackageJson.version === newPkgVer) {
-                core.warning(`Version in ${jsonWithVersion} did not change so skipping version stage`);
+                core.warning(`Version in package.json did not change so skipping version stage`);
                 return { level: "none" };
             }
             else {
@@ -470,20 +468,19 @@ class SemVer {
                 core.warning(`Could not find pull request associated with commit ${gitHash}`);
                 return;
             }
-            const [labelMajor, labelMinor, labelPatch] = core.getInput("semver-labels").split(",", 3).map(s => s.trim());
             const labels = yield octokit.issues.listLabelsOnIssue({
                 owner, repo,
                 issue_number: prs.data[0].number
             });
             const labelNames = labels.data.map(label => label.name);
             const semverInfo = { level: "none" };
-            if (labelNames.includes(labelMajor)) {
+            if (labelNames.includes("release-major")) {
                 semverInfo.level = "major";
             }
-            else if (labelNames.includes(labelMinor)) {
+            else if (labelNames.includes("release-minor")) {
                 semverInfo.level = "minor";
             }
-            else if (labelNames.includes(labelPatch)) {
+            else if (labelNames.includes("release-patch")) {
                 semverInfo.level = "patch";
             }
             else {
@@ -3134,7 +3131,6 @@ const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const changelog_1 = __webpack_require__(361);
-const project_1 = __webpack_require__(771);
 const semver_1 = __webpack_require__(7);
 const utils = __importStar(__webpack_require__(452));
 class Version {
@@ -3159,12 +3155,8 @@ class Version {
             // Update version number in package-lock.json and changelog
             yield exec.exec("git reset --hard");
             let newVersion = semverInfo.newVersion || semverInfo.level;
-            newVersion = yield ((project_1.Project.projectType === "lerna") ? utils.lernaVersion : utils.npmVersion)(newVersion);
-            for (const pkgInfo of project_1.Project.changedPkgInfo) {
-                // TODO What if a package had no changes previously, but now has updated dependencies
-                // Do we need to add an automated changelog entry (like "Update to Imperative 4.x")
-                changelog_1.Changelog.updateLatestVersion(utils.prependPkgDir("CHANGELOG.md", pkgInfo.path), newVersion);
-            }
+            newVersion = yield utils.npmVersion(newVersion);
+            changelog_1.Changelog.updateLatestVersion("CHANGELOG.md", newVersion);
             // Commit version bump and create tag
             yield exec.exec("git add -u");
             yield utils.gitCommit(`Bump version to ${newVersion}`);
@@ -3176,8 +3168,7 @@ class Version {
     }
     static beforeVersion(strategy, branch) {
         return __awaiter(this, void 0, void 0, function* () {
-            const jsonWithVersion = (project_1.Project.projectType === "lerna") ? "lerna.json" : "package.json";
-            const newVersion = JSON.parse(fs.readFileSync(jsonWithVersion, "utf-8")).version;
+            const newVersion = JSON.parse(fs.readFileSync("package.json", "utf-8")).version;
             const semverInfo = yield semver_1.SemVer.getSemVerInfo((strategy === "compare") ? newVersion : undefined);
             if (!semverInfo || semverInfo.level === "none") {
                 return;
@@ -3200,33 +3191,19 @@ class Version {
      * Git committed.
      * @param pkgName - Name of the dependency (e.g., `@zowe/imperative`)
      * @param pkgTag - Tag of the dependency (e.g., `zowe-v1-lts`)
-     * @param packageJson - Package JSON object that contains dependency lists
      * @param dev - Specify true if the package is a dev dependency
      */
     static updateDependency(pkgName, pkgTag, dev) {
         return __awaiter(this, void 0, void 0, function* () {
-            let commitMsg = null;
-            // TODO Update dependencies for all packages, not just changed ones
-            // If we don't do this for all packages, then dependency versions will get out of sync
-            // TODO Rewrite this method so it is called for a package.json file and loops thru all its dependencies
-            // Then dependency versions can be cached and reused when this method is called for other package.json files
-            for (const pkgInfo of project_1.Project.changedPkgInfo) {
-                const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgInfo.path), "utf-8"));
-                const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
-                const currentVersion = dependencies[pkgName];
-                if (currentVersion == null) {
-                    continue;
-                }
-                const latestVersion = yield utils.npmViewVersion(pkgName, pkgTag);
-                if (currentVersion !== latestVersion) {
-                    const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
-                    yield utils.execInDir(`npm install ${pkgName}@${latestVersion} ${npmArgs}`, pkgInfo.path);
-                    yield utils.execInDir(`git add package.json package-lock.json`, pkgInfo.path);
-                    commitMsg = `Bump ${pkgName} from ${currentVersion} to ${latestVersion}`;
-                }
-            }
-            if (commitMsg) {
-                yield utils.gitCommit(commitMsg);
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+            const dependencies = packageJson[dev ? "devDependencies" : "dependencies"] || {};
+            const currentVersion = dependencies[pkgName];
+            const latestVersion = yield utils.npmViewVersion(pkgName, pkgTag);
+            if (currentVersion !== latestVersion) {
+                const npmArgs = dev ? "--save-dev" : "--save-prod --save-exact";
+                yield exec.exec(`npm install ${pkgName}@${latestVersion} ${npmArgs}`);
+                yield exec.exec(`git add package.json package-lock.json`);
+                yield utils.gitCommit(`Bump ${pkgName} from ${currentVersion} to ${latestVersion}`);
             }
         });
     }
@@ -3608,20 +3585,19 @@ const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const utils = __importStar(__webpack_require__(183));
 const config_1 = __webpack_require__(641);
-const project_1 = __webpack_require__(771);
 const publish_1 = __webpack_require__(446);
 const version_1 = __webpack_require__(52);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            utils.exitIfCiSkip(core.getInput("ci-skip-phrase"));
-            const protectedBranch = yield (new config_1.Config()).getProtectedBranch();
+            utils.exitIfCiSkip();
+            config_1.Config.load();
+            const protectedBranch = yield config_1.Config.getProtectedBranch();
             const rootDir = core.getInput("root-dir");
             const versionStrategy = core.getInput("version-strategy");
             if (rootDir) {
                 process.chdir(path.resolve(process.cwd(), rootDir));
             }
-            yield project_1.Project.calcChangedPkgInfo();
             if (versionStrategy === "compare" || versionStrategy === "labels") {
                 yield version_1.Version.version(versionStrategy, protectedBranch);
             }
@@ -3635,11 +3611,7 @@ function run() {
             }
             for (const publishType of Object.keys(publishJobs)) {
                 if (publishJobs[publishType]) {
-                    // TODO Publish all packages, not just changed ones
-                    for (const pkgInfo of project_1.Project.changedPkgInfo) {
-                        console.log("about to publish", pkgInfo.path);
-                        yield publish_1.Publish.publish(publishType, protectedBranch, pkgInfo.path);
-                    }
+                    yield publish_1.Publish.publish(publishType, protectedBranch);
                 }
             }
         }
@@ -4134,28 +4106,17 @@ function execBashCmd(command) {
     });
 }
 exports.execBashCmd = execBashCmd;
-function execInDir(command, cwd) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const options = (cwd != null) ? { cwd: path.resolve(cwd) } : undefined;
-        yield exec.exec(command, undefined, options);
-    });
-}
-exports.execInDir = execInDir;
-function exitIfCiSkip(ciSkipPhrase) {
+function exitIfCiSkip() {
     var _a, _b;
     const eventPath = requireEnvVar("GITHUB_EVENT_PATH");
     const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
     // Check for CI skip
-    if (((_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message) && eventData.head_commit.message.indexOf(ciSkipPhrase) !== -1) {
+    if (((_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message) && eventData.head_commit.message.indexOf("ci skip") !== -1) {
         core.info("Commit message contains CI skip phrase so exiting now");
         process.exit();
     }
 }
 exports.exitIfCiSkip = exitIfCiSkip;
-function prependPkgDir(filePath, pkgDir) {
-    return (pkgDir != null) ? path.join(pkgDir, filePath) : filePath;
-}
-exports.prependPkgDir = prependPkgDir;
 function requireEnvVar(name) {
     const value = process.env[name];
     if (value == null) {
@@ -6280,6 +6241,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
 const glob = __importStar(__webpack_require__(281));
 const changelog_1 = __webpack_require__(361);
@@ -6291,23 +6253,23 @@ class Publish {
             yield utils.execBashCmd(core.getInput("prepublish-cmd"));
         });
     }
-    static publish(publishType, protectedBranch, pkgDir) {
+    static publish(publishType, protectedBranch) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (publishType) {
                 case "github":
-                    return this.publishGithub(pkgDir);
+                    return this.publishGithub();
                 case "npm":
-                    return this.publishNpm(protectedBranch, pkgDir);
+                    return this.publishNpm(protectedBranch);
                 case "vsce":
-                    return this.publishVsce(pkgDir);
+                    return this.publishVsce();
             }
         });
     }
-    static publishGithub(pkgDir) {
+    static publishGithub() {
         return __awaiter(this, void 0, void 0, function* () {
             const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
             const octokit = github.getOctokit(core.getInput("repo-token"));
-            const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
             const tagName = `v${packageJson.version}`;
             let release;
             // Get release if it already exists
@@ -6324,7 +6286,7 @@ class Publish {
             }
             // Create release if it doesn't exist and try to add release notes
             if (release == null) {
-                const releaseNotes = changelog_1.Changelog.getReleaseNotes(utils.prependPkgDir("CHANGELOG.md", pkgDir), packageJson.version);
+                const releaseNotes = changelog_1.Changelog.getReleaseNotes("CHANGELOG.md", packageJson.version);
                 core.info(`Creating GitHub release with tag ${tagName}`);
                 release = yield octokit.repos.createRelease({
                     owner, repo,
@@ -6359,10 +6321,10 @@ class Publish {
             }
         });
     }
-    static publishNpm(branch, pkgDir) {
+    static publishNpm(branch) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
             const npmRegistry = core.getInput("npm-registry") || ((_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry);
             let npmScope = undefined;
             if (!npmRegistry) {
@@ -6372,12 +6334,12 @@ class Publish {
             if (packageJson.name.includes("/")) {
                 npmScope = packageJson.name.split("/")[0];
             }
-            utils.npmConfig(npmRegistry, npmScope, pkgDir);
+            utils.npmConfig(npmRegistry, npmScope);
             try {
                 // Publish package
                 const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
                 if (!alreadyPublished) {
-                    yield utils.execInDir(`npm publish --tag ${branch.tag || "latest"}`, pkgDir);
+                    yield exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
                 }
                 else {
                     core.error(`Version ${packageJson.version} has already been published to NPM`);
@@ -6385,26 +6347,26 @@ class Publish {
                 // Add alias tags
                 if (branch.aliasTags) {
                     for (const tag of branch.aliasTags) {
-                        yield utils.execInDir(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`, pkgDir);
+                        yield exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
                     }
                 }
             }
             finally {
-                utils.npmReset(pkgDir);
+                utils.npmReset();
             }
         });
     }
-    static publishVsce(pkgDir) {
+    static publishVsce() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const packageJson = JSON.parse(fs.readFileSync(utils.prependPkgDir("package.json", pkgDir), "utf-8"));
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
             const vsceMetadata = yield utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
             const latestVersion = packageJson.version;
             const publishedVersion = (_a = JSON.parse(vsceMetadata).versions[0]) === null || _a === void 0 ? void 0 : _a.version;
             // Publish extension
             if (publishedVersion !== latestVersion) {
                 const vsceToken = core.getInput("vsce-token");
-                yield utils.execInDir(`npx vsce publish -p ${vsceToken}`, pkgDir);
+                yield exec.exec(`npx vsce publish -p ${vsceToken}`);
             }
             else {
                 core.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
@@ -6612,7 +6574,6 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(__webpack_require__(183));
 __export(__webpack_require__(776));
-__export(__webpack_require__(479));
 __export(__webpack_require__(545));
 
 
@@ -7178,6 +7139,12 @@ function convertBody(buffer, headers) {
 	// html4
 	if (!res && str) {
 		res = /<meta[\s]+?http-equiv=(['"])content-type\1[\s]+?content=(['"])(.+?)\2/i.exec(str);
+		if (!res) {
+			res = /<meta[\s]+?content=(['"])(.+?)\1[\s]+?http-equiv=(['"])content-type\3/i.exec(str);
+			if (res) {
+				res.pop(); // drop last quote
+			}
+		}
 
 		if (res) {
 			res = /charset=(.*)/i.exec(res.pop());
@@ -8185,7 +8152,7 @@ function fetch(url, opts) {
 				// HTTP fetch step 5.5
 				switch (request.redirect) {
 					case 'error':
-						reject(new FetchError(`redirect mode is set to error: ${request.url}`, 'no-redirect'));
+						reject(new FetchError(`uri requested responds with a redirect, redirect mode is set to error: ${request.url}`, 'no-redirect'));
 						finalize();
 						return;
 					case 'manual':
@@ -8224,7 +8191,8 @@ function fetch(url, opts) {
 							method: request.method,
 							body: request.body,
 							signal: request.signal,
-							timeout: request.timeout
+							timeout: request.timeout,
+							size: request.size
 						};
 
 						// HTTP-redirect fetch step 9
@@ -10370,58 +10338,6 @@ exports.getState = getState;
 
 /***/ }),
 
-/***/ 479:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const exec = __importStar(__webpack_require__(986));
-const core_1 = __webpack_require__(183);
-function lernaList(onlyChanged) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const lernaCmd = onlyChanged ? "changed" : "list";
-        const cmdOutput = yield core_1.execAndReturnOutput("npx", ["lerna", lernaCmd, "--long", "--toposort", "--loglevel", "silent"]);
-        const packageInfo = [];
-        for (const line of cmdOutput.trim().split("\n")) {
-            const [name, version, path] = line.split(/\s+/, 3);
-            packageInfo.push({
-                name, path,
-                version: version.slice(1)
-            });
-        }
-        return packageInfo;
-    });
-}
-exports.lernaList = lernaList;
-function lernaVersion(newVersion) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec(`npx lerna version ${newVersion} --exact --no-git-tag-version -y --loglevel silent`);
-        return JSON.parse(fs.readFileSync("lerna.json", "utf-8")).version;
-    });
-}
-exports.lernaVersion = lernaVersion;
-
-
-/***/ }),
-
 /***/ 489:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -11227,29 +11143,25 @@ const fs = __importStar(__webpack_require__(747));
 const os = __importStar(__webpack_require__(87));
 const core = __importStar(__webpack_require__(470));
 const core_1 = __webpack_require__(183);
-function npmConfig(registry, scope, pkgDir) {
+function npmConfig(registry, scope) {
     var _a;
     registry = registry.endsWith("/") ? registry : (registry + "/");
     scope = (_a = scope) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-    const npmrcFile = core_1.prependPkgDir(".npmrc", pkgDir);
-    const npmrcBakFile = core_1.prependPkgDir(".npmrc.bak", pkgDir);
-    if (fs.existsSync(npmrcFile)) {
-        fs.renameSync(npmrcFile, npmrcBakFile);
+    if (fs.existsSync(".npmrc")) {
+        fs.renameSync(".npmrc", ".npmrc.bak");
     }
     // Remove HTTP or HTTPS protocol from front of registry URL
     const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
     const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(npmrcFile, authLine + os.EOL + registryLine + os.EOL);
+    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
 }
 exports.npmConfig = npmConfig;
-function npmReset(pkgDir) {
-    const npmrcFile = core_1.prependPkgDir(".npmrc", pkgDir);
-    const npmrcBakFile = core_1.prependPkgDir(".npmrc.bak", pkgDir);
-    if (fs.existsSync(npmrcFile)) {
-        fs.unlinkSync(npmrcFile);
+function npmReset() {
+    if (fs.existsSync(".npmrc")) {
+        fs.unlinkSync(".npmrc");
     }
-    if (fs.existsSync(npmrcBakFile)) {
-        fs.renameSync(npmrcBakFile, npmrcFile);
+    if (fs.existsSync(".npmrc.bak")) {
+        fs.renameSync(".npmrc.bak", ".npmrc");
     }
 }
 exports.npmReset = npmReset;
@@ -12977,8 +12889,7 @@ const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const utils = __importStar(__webpack_require__(452));
 class Config {
-    constructor() {
-        this.mConfig = null;
+    static load() {
         this.mConfigFile = core.getInput("config-file");
         if (fs.existsSync(this.mConfigFile)) {
             this.mConfig = __webpack_require__(414).safeLoad(fs.readFileSync(this.mConfigFile, "utf-8"));
@@ -12987,7 +12898,7 @@ class Config {
             core.info(`Config file ${this.mConfigFile} not found so continuing with default config`);
         }
     }
-    getProtectedBranch() {
+    static getProtectedBranch() {
         return __awaiter(this, void 0, void 0, function* () {
             const currentBranch = (yield utils.execAndReturnOutput("git rev-parse --abbrev-ref HEAD")).trim();
             // Use default config if config file not found
@@ -12995,8 +12906,7 @@ class Config {
                 return { name: currentBranch };
             }
             const branchNames = this.mConfig.protectedBranches.map(branch => branch.name);
-            const minimatch = __webpack_require__(595);
-            const branchIndex = branchNames.findIndex((branch) => minimatch(currentBranch, branch));
+            const branchIndex = branchNames.findIndex((branch) => branch === currentBranch);
             // Check if branch is missing in config
             if (branchIndex === -1) {
                 core.info(`${currentBranch} is not a listed branch in ${this.mConfigFile} so exiting now`);
@@ -13013,16 +12923,12 @@ class Config {
                 core.info(`${currentBranch} is not a protected branch in GitHub so exiting now`);
                 process.exit();
             }
-            return this.renderBranchName(Object.assign(Object.assign({}, this.mConfig.protectedBranches[branchIndex]), { name: currentBranch }), currentBranch);
-        });
-    }
-    renderBranchName(obj, branchName) {
-        return JSON.parse(JSON.stringify(obj), (key, value) => {
-            return (typeof value === "string") ? value.replace("${name}", branchName) : value;
+            return this.mConfig.protectedBranches[branchIndex];
         });
     }
 }
 exports.Config = Config;
+Config.mConfig = null;
 
 
 /***/ }),
@@ -14606,86 +14512,6 @@ module.exports = function (x) {
 
 /***/ }),
 
-/***/ 771:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const core = __importStar(__webpack_require__(470));
-const utils = __importStar(__webpack_require__(452));
-class Project {
-    static get projectType() {
-        switch (core.getInput("project-type")) {
-            case "lerna":
-                return "lerna";
-            case "yarn-workspaces":
-                throw Error("Not yet implemented");
-            default:
-                return null;
-        }
-    }
-    // public static async calcAllPkgInfo(): Promise<void> {
-    //     switch (this.projectType) {
-    //         case "lerna":
-    //             this.validateLerna();
-    //             this.allPkgInfo = await utils.lernaList(false);
-    //             break;
-    //         default:
-    //             this.allPkgInfo = [{
-    //                 name: JSON.parse(fs.readFileSync("package.json", "utf-8")).name
-    //             }];
-    //     }
-    // }
-    static calcChangedPkgInfo() {
-        return __awaiter(this, void 0, void 0, function* () {
-            switch (this.projectType) {
-                case "lerna":
-                    // TODO Remove following line once calcAllPkgInfo is implemented
-                    this.validateLerna();
-                    this.changedPkgInfo = yield utils.lernaList(true);
-                    break;
-                default:
-                    this.changedPkgInfo = [{
-                            name: JSON.parse(fs.readFileSync("package.json", "utf-8")).name
-                        }];
-            }
-        });
-    }
-    static validateLerna() {
-        if (!fs.existsSync("lerna.json")) {
-            core.setFailed("Project type is lerna and lerna.json file not found");
-            process.exit();
-        }
-        const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
-        if (lernaJson.version === "independent") {
-            core.setFailed("Lerna project uses independent version mode which is not supported");
-            process.exit();
-        }
-    }
-}
-exports.Project = Project;
-
-
-/***/ }),
-
 /***/ 776:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -14724,9 +14550,7 @@ function gitCommit(message, amend) {
             }
         }
         const gitArgs = amend ? "--amend" : "";
-        // TODO What if ci-skip-phrase is empty? Should validate user input
-        const ciSkipPhrase = core.getInput("ci-skip-phrase");
-        yield exec.exec(`git commit ${gitArgs} -m "${message} [${ciSkipPhrase}]" -s`);
+        yield exec.exec(`git commit ${gitArgs} -m "${message} [ci skip]" -s`);
     });
 }
 exports.gitCommit = gitCommit;
