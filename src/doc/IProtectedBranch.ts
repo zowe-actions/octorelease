@@ -1,8 +1,9 @@
 export interface IProtectedBranch {
     name: string;
-    dependencies?: { [key: string]: string };
-    devDependencies?: { [key: string]: string };
-    level?: "major" | "minor" | "patch";
     tag?: string;
+    level?: "major" | "minor" | "patch";
+    prerelease?: boolean | string;
+    dependencies?: string[] | Record<string, string>;
+    devDependencies?: string[] | Record<string, string>;
     aliasTags?: string[];
 }

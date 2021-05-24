@@ -1,7 +1,12 @@
 import * as fs from "fs";
 import * as os from "os";
 import * as core from "@actions/core";
-import { execAndReturnOutput } from "./core";
+import * as exec from "@actions/exec";
+import { getExecOutput } from "./core";
+
+export async function npmAddTag(pkgName: string, pkgVersion: string, tag: string, inDir?: string): Promise<void> {
+    await exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
+}
 
 export function npmConfig(registry: string, scope?: string): void {
     registry = registry.endsWith("/") ? registry : (registry + "/");
@@ -17,6 +22,15 @@ export function npmConfig(registry: string, scope?: string): void {
     fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
 }
 
+export async function npmPack(inDir?: string): Promise<string> {
+    const cmdOutput = await getExecOutput("npm", ["pack"], { cwd: inDir });
+    return cmdOutput.stdout.split("\n").pop() as any;
+}
+
+export async function npmPublish(tag: string, inDir?: string): Promise<void> {
+    await exec.exec("npm", ["publish", "--tag", tag], { cwd: inDir });
+}
+
 export function npmReset(): void {
     if (fs.existsSync(".npmrc")) {
         fs.unlinkSync(".npmrc");
@@ -27,14 +41,13 @@ export function npmReset(): void {
     }
 }
 
-export async function npmVersion(newVersion: string): Promise<string> {
-    const gitTag = (await execAndReturnOutput("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"])).trim();
-    return gitTag.slice(1);
+export async function npmVersion(newVersion: string): Promise<void> {
+    await exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
 }
 
 export async function npmViewVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
     try {
-        return (await execAndReturnOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).trim();
+        return (await getExecOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
     } catch {
         core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
     }

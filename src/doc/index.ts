@@ -1,3 +1,3 @@
 export * from "./IConfig";
+export * from "./IContext";
 export * from "./IProtectedBranch";
-export * from "./ISemVerInfo";

@@ -1,46 +1,41 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as glob from "@actions/glob";
-import { IProtectedBranch } from "./doc";
-import { Changelog } from "./changelog";
+import { IContext } from "./doc";
 import * as utils from "./utils";
 
-/**
- * Type of publish action
- */
-export type PublishType = "github" | "npm" | "vsce";
-
 export class Publish {
-    public static async prepublish(): Promise<void> {
-        // TODO What if prepublish command needs to run in package folders rather than at top-level?
-        await utils.execBashCmd(core.getInput("prepublish-cmd"));
-    }
+    private static newVersion: string;
 
-    public static async publish(publishType: PublishType, protectedBranch: IProtectedBranch): Promise<void> {
-        switch (publishType) {
-            case "github":
-                return this.publishGithub();
-            case "npm":
-                return this.publishNpm(protectedBranch);
-            case "vsce":
-                return this.publishVsce();
+    public static async publish(context: IContext, newVersion: string): Promise<void> {
+        this.newVersion = newVersion;
+
+        for (const publishType of context.config.publishConfig) {
+            switch (publishType) {
+                case "github":
+                    await this.publishGithub(context);
+                    break;
+                case "lerna":
+                    await this.publishLerna(context);
+                    break;
+                case "npm":
+                    await this.publishNpm(context);
+                    break;
+            }
         }
     }
 
-    private static async publishGithub(): Promise<void> {
-        const [owner, repo] = utils.requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
-        const octokit = github.getOctokit(core.getInput("repo-token"));
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        const tagName = `v${packageJson.version}`;
+    private static async publishGithub(context: IContext): Promise<void> {
+        const octokit = github.getOctokit(context.github.token);
+        const tagName = `v${this.newVersion}`;
         let release;
 
         // Get release if it already exists
         try {
             release = await octokit.repos.getReleaseByTag({
-                owner, repo,
+                ...context.repository,
                 tag: tagName
             });
         } catch (err) {
@@ -51,19 +46,18 @@ export class Publish {
 
         // Create release if it doesn't exist and try to add release notes
         if (release == null) {
-            const releaseNotes = Changelog.getReleaseNotes("CHANGELOG.md",
-                packageJson.version);
+            const releaseNotes = await this.getReleaseNotes(context);
 
             core.info(`Creating GitHub release with tag ${tagName}`);
             release = await octokit.repos.createRelease({
-                owner, repo,
+                ...context.repository,
                 tag_name: tagName,
                 body: releaseNotes
             });
         }
 
         // Upload artifacts to release
-        const globber = await glob.create(core.getInput("github-artifacts"));
+        const globber = await glob.create("dist/*");
         const artifactPaths: string[] = await globber.glob();
         const mime = require("mime-types");
 
@@ -78,7 +72,7 @@ export class Publish {
 
             core.info(`Uploading release asset ${artifactPath}`);
             await octokit.repos.uploadReleaseAsset({
-                owner, repo,
+                ...context.repository,
                 release_id: release.data.id,
                 name: assetName,
                 // Need to upload as buffer because converting to string corrupts binary data
@@ -92,14 +86,26 @@ export class Publish {
         }
     }
 
-    private static async publishNpm(branch: IProtectedBranch): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        const npmRegistry: string | undefined = core.getInput("npm-registry") || packageJson.publishConfig?.registry;
-        let npmScope: string | undefined = undefined;
+    private static async publishLerna(context: IContext): Promise<void> {
+        for (const { location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
+            await this.publishNpm(context, location);
+        }
+    }
 
-        if (!npmRegistry) {
-            core.setFailed("Expected NPM registry to be defined in package.json but it is not");
-            process.exit();
+    private static async publishNpm(context: IContext, inDir?: string): Promise<void> {
+        const cwd = inDir || process.cwd();
+
+        if (context.config.publishConfig.includes("github")) {
+            const tgzFile = await utils.npmPack(inDir);
+            fs.renameSync(path.join(cwd, tgzFile), path.join("dist", path.basename(tgzFile)));
+        }
+
+        const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+        const npmRegistry: string | undefined = packageJson.publishConfig?.registry;
+        let npmScope: string | undefined;
+
+        if (npmRegistry == null) {
+            throw new Error("Expected NPM registry to be defined in package.json but it is not");
         }
 
         if (packageJson.name.includes("/")) {
@@ -112,15 +118,15 @@ export class Publish {
             // Publish package
             const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
             if (!alreadyPublished) {
-                await exec.exec(`npm publish --tag ${branch.tag || "latest"}`);
+                await utils.npmPublish(context.branch.tag, inDir);
             } else {
                 core.error(`Version ${packageJson.version} has already been published to NPM`);
             }
 
             // Add alias tags
-            if (branch.aliasTags) {
-                for (const tag of branch.aliasTags) {
-                    await exec.exec(`npm dist-tag add ${packageJson.name}@${packageJson.version} ${tag}`);
+            if (context.branch.aliasTags) {
+                for (const tag of context.branch.aliasTags) {
+                    await utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
                 }
             }
         } finally {
@@ -128,19 +134,44 @@ export class Publish {
         }
     }
 
-    private static async publishVsce(): Promise<void> {
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        const vsceMetadata = await utils.execAndReturnOutput("npx", ["vsce", "show", `${packageJson.publisher}.${packageJson.name}`, "--json"]);
+    private static async getReleaseNotes(context: IContext): Promise<string | undefined> {
+        if (context.config.publishConfig.includes("lerna")) {
+            let releaseNotes = "";
 
-        const latestVersion = packageJson.version;
-        const publishedVersion = JSON.parse(vsceMetadata).versions[0]?.version;
+            for (const { name, location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
+                const changelogFile = path.join(path.relative(process.cwd(), location), "CHANGELOG.md");
+                const packageReleaseNotes = this.getPackageChangelog(changelogFile);
+                if (packageReleaseNotes != null) {
+                    releaseNotes += `**${name}**\n${packageReleaseNotes}\n\n`;
+                }
+            }
 
-        // Publish extension
-        if (publishedVersion !== latestVersion) {
-            const vsceToken = core.getInput("vsce-token");
-            await exec.exec(`npx vsce publish -p ${vsceToken}`);
+            return releaseNotes || undefined;
         } else {
-            core.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
+            return this.getPackageChangelog("CHANGELOG.md");
         }
+    }
+
+    private static getPackageChangelog(changelogFile: string): string | undefined {
+        let releaseNotes = "";
+    
+        if (fs.existsSync(changelogFile)) {
+            const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
+            let lineNum = changelogLines.findIndex(line => line.startsWith(`## \`${this.newVersion}\``));
+    
+            if (lineNum !== -1) {
+                while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {
+                    lineNum++;
+                    releaseNotes += changelogLines[lineNum] + "\n";
+                }
+                core.info(`Found changelog header in ${changelogFile}`);
+            } else {
+                core.warning(`Missing changelog header in ${changelogFile}`);
+            }
+        } else {
+            core.warning(`Missing changelog file ${changelogFile}`);
+        }
+    
+        return releaseNotes.trim() || undefined;
     }
 }

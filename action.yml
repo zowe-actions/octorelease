@@ -1,92 +1,92 @@
 name: 'node-versioner'
 description: 'GitHub Action to version a Node.js project and publish it to GitHub/NPM registry/VS Code Marketplace'
 author: 't1m0thyj'
-inputs:
-  # Specify the format of your changelog header for unreleased changes. If
-  # specified and the header exists in CHANGELOG.md, then it will be updated as
-  # part of the versioning stage. If not specified, no automatic changelog
-  # updates will happen.
-  # Example: '## Unreleased'
-  changelog-header:
-    description: 'Changelog header used to track changes for new version'
-    required: false
-    default: ''
+# inputs:
+#   # Specify the format of your changelog header for unreleased changes. If
+#   # specified and the header exists in CHANGELOG.md, then it will be updated as
+#   # part of the versioning stage. If not specified, no automatic changelog
+#   # updates will happen.
+#   # Example: '## Unreleased'
+#   changelog-header:
+#     description: 'Changelog header used to track changes for new version'
+#     required: false
+#     default: ''
 
-  # Specify the path to a YAML config file in the repo. If specified and the
-  # config file exists, then protected branch rules will be read from it. If not
-  # specified, no branch rules will be enforced.
-  config-file:
-    description: 'Path to YAML config'
-    required: false
-    default: './.github/node-versioner-config.yml'
+#   # Specify the path to a YAML config file in the repo. If specified and the
+#   # config file exists, then protected branch rules will be read from it. If not
+#   # specified, no branch rules will be enforced.
+#   config-file:
+#     description: 'Path to YAML config'
+#     required: false
+#     default: './.github/node-versioner-config.yml'
 
-  # Specify a list of files, each on a new line, that should be published in a
-  # GitHub release as part of the publishing stage. Wildcards are supported.
-  # Example: 'dist/*.tgz'
-  github-artifacts:
-    description: 'Line-separated list of files to publish in GitHub release'
-    required: false
-    default: ''
+#   # Specify a list of files, each on a new line, that should be published in a
+#   # GitHub release as part of the publishing stage. Wildcards are supported.
+#   # Example: 'dist/*.tgz'
+#   github-artifacts:
+#     description: 'Line-separated list of files to publish in GitHub release'
+#     required: false
+#     default: ''
 
-  # Specify an NPM registry where package should be published. If not specified,
-  # the publishConfig.registry value in package.json will be used.
-  # Example: 'https://registry.npmjs.org/'
-  npm-registry:
-    description: 'Registry where NPM package will be published'
-    required: false
-    default: ''
+#   # Specify an NPM registry where package should be published. If not specified,
+#   # the publishConfig.registry value in package.json will be used.
+#   # Example: 'https://registry.npmjs.org/'
+#   npm-registry:
+#     description: 'Registry where NPM package will be published'
+#     required: false
+#     default: ''
 
-  # Specify token to authenticate to an NPM registry. If specified, then a
-  # package will be published there.
-  npm-token:
-    description: 'Token with publish access to NPM registry'
-    required: false
-    default: ''
+#   # Specify token to authenticate to an NPM registry. If specified, then a
+#   # package will be published there.
+#   npm-token:
+#     description: 'Token with publish access to NPM registry'
+#     required: false
+#     default: ''
 
-  # Specify a shell command that should run between the versioning and
-  # publishing stages. The command will not run if the project version has not
-  # changed, or there are no packages to publish.
-  # Example: 'npm pack'
-  prepublish-cmd:
-    description: 'Shell command that will run before project is published'
-    required: false
-    default: ''
+#   # Specify a shell command that should run between the versioning and
+#   # publishing stages. The command will not run if the project version has not
+#   # changed, or there are no packages to publish.
+#   # Example: 'npm pack'
+#   prepublish-cmd:
+#     description: 'Shell command that will run before project is published'
+#     required: false
+#     default: ''
 
-  # Specify token to authenticate to GitHub repository to push tags and version
-  # bump commits. If you are performing versioning on a protected branch, the
-  # default token in secrets.GITHUB_TOKEN does not have sufficient privileges
-  # to push so you must supply a different token with admin rights.
-  repo-token:
-    description: 'Token with push access to GitHub repo'
-    required: false
-    default: '${{ github.token }}'
+#   # Specify token to authenticate to GitHub repository to push tags and version
+#   # bump commits. If you are performing versioning on a protected branch, the
+#   # default token in secrets.GITHUB_TOKEN does not have sufficient privileges
+#   # to push so you must supply a different token with admin rights.
+#   repo-token:
+#     description: 'Token with push access to GitHub repo'
+#     required: false
+#     default: '${{ github.token }}'
 
-  # Specify a path to root directory of your project that contains the
-  # package.json file. If not specified, defaults to the top level.
-  root-dir:
-    description: 'Root directory of NPM project that contains package.json'
-    required: false
-    default: ''
+#   # Specify a path to root directory of your project that contains the
+#   # package.json file. If not specified, defaults to the top level.
+#   root-dir:
+#     description: 'Root directory of NPM project that contains package.json'
+#     required: false
+#     default: ''
 
-  # Specify a version strategy that will be used to determine if package version
-  # should be updated.
-  # Options:
-  #  * 'none' - Never bump package versions. Always try to publish packages.
-  #  * 'compare' - Compare version numbers between package.json files in source
-  #      and target branches. Only publish packages if version has changed.
-  #  * 'labels' (default) - Check for a label on PR that specifies the semver
-  #      level of changes. Only publish packages if version change requested.
-  version-strategy:
-    description: 'Strategy for updating package version (none, compare, labels)'
-    required: false
-    default: 'labels'
+#   # Specify a version strategy that will be used to determine if package version
+#   # should be updated.
+#   # Options:
+#   #  * 'none' - Never bump package versions. Always try to publish packages.
+#   #  * 'compare' - Compare version numbers between package.json files in source
+#   #      and target branches. Only publish packages if version has changed.
+#   #  * 'labels' (default) - Check for a label on PR that specifies the semver
+#   #      level of changes. Only publish packages if version change requested.
+#   version-strategy:
+#     description: 'Strategy for updating package version (none, compare, labels)'
+#     required: false
+#     default: 'labels'
 
-  # Specify token to authenticate to VS Code Marketplace. If specified, then a
-  # VSIX extension package will be published there.
-  vsce-token:
-    description: 'Token with publish access to VS Code Marketplace'
-    required: false
-    default: ''
+#   # Specify token to authenticate to VS Code Marketplace. If specified, then a
+#   # VSIX extension package will be published there.
+#   vsce-token:
+#     description: 'Token with publish access to VS Code Marketplace'
+#     required: false
+#     default: ''
 outputs:
   new-version:
     description: 'The new package version if it has changed'
