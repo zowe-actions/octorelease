@@ -37,6 +37,9 @@ export async function buildContext(): Promise<IContext | undefined> {
             sha: requireEnvVar("GITHUB_SHA"),
             token: requireEnvVar("GITHUB_TOKEN")
         },
+        npm: {
+            token: requireEnvVar("NPM_TOKEN")
+        },
         repository: { owner, repo }
     };
 }

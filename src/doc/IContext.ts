@@ -7,5 +7,6 @@ export interface IContext {
     config: IConfig;
     eventData: any;
     github: { sha: string, token: string };
+    npm: { token: string };
     repository: { owner: string, repo: string };
 }

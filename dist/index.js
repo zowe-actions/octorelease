@@ -6529,6 +6529,9 @@ function buildContext() {
                 sha: requireEnvVar("GITHUB_SHA"),
                 token: requireEnvVar("GITHUB_TOKEN")
             },
+            npm: {
+                token: requireEnvVar("NPM_TOKEN")
+            },
             repository: { owner, repo }
         };
     });
@@ -11452,7 +11455,7 @@ class Publish {
             if (packageJson.name.includes("/")) {
                 npmScope = packageJson.name.split("/")[0];
             }
-            utils.npmConfig(npmRegistry, npmScope);
+            utils.npmConfig(context, npmRegistry, npmScope);
             try {
                 // Publish package
                 const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
@@ -15979,7 +15982,7 @@ function npmAddTag(pkgName, pkgVersion, tag, inDir) {
     });
 }
 exports.npmAddTag = npmAddTag;
-function npmConfig(registry, scope) {
+function npmConfig(context, registry, scope) {
     var _a;
     registry = registry.endsWith("/") ? registry : (registry + "/");
     scope = (_a = scope) === null || _a === void 0 ? void 0 : _a.toLowerCase();
@@ -15987,7 +15990,7 @@ function npmConfig(registry, scope) {
         fs.renameSync(".npmrc", ".npmrc.bak");
     }
     // Remove HTTP or HTTPS protocol from front of registry URL
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
+    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.npm.token;
     const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
     fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
 }

@@ -112,7 +112,7 @@ export class Publish {
             npmScope = packageJson.name.split("/")[0];
         }
 
-        utils.npmConfig(npmRegistry, npmScope);
+        utils.npmConfig(context, npmRegistry, npmScope);
 
         try {
             // Publish package
