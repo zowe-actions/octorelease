@@ -10,16 +10,8 @@ export class Version {
     public static async version(context: IContext): Promise<[string, string]> {
         const jsonFile = context.config.publishConfig.includes("lerna") ? "lerna.json" : "package.json";
         const currentVersion: string = JSON.parse(fs.readFileSync(jsonFile, "utf-8")).version;
-        const oldVersion = await this.getOldVersion(context, jsonFile);
-        let newVersion = currentVersion;
-        let semverLevel: string | null = oldVersion ? semver.diff(oldVersion, currentVersion) : null;
-
-        if (semverLevel == null) {
-            semverLevel = await this.checkPrForSemverLabel(context);
-            if (semverLevel != null) {
-                newVersion = semver.inc(currentVersion, semverLevel as any) || newVersion;
-            }
-        }
+        const semverLevel = await this.checkPrForSemverLabel(context);
+        let newVersion = semver.inc(currentVersion, semverLevel as any) || currentVersion;
 
         if (context.branch.prerelease) {
             const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
@@ -90,14 +82,6 @@ export class Version {
             default:
                 core.warning("Could not find semver label on pull request");
                 return null;
-        }
-    }
-
-    private static async getOldVersion(context: IContext, jsonFile: string): Promise<string | undefined> {
-        try {
-            return JSON.parse(await utils.gitShow(context.eventData.before, jsonFile)).version;
-        } catch {
-            core.warning(`Could not load version from package.json@${context.eventData.before}`);
         }
     }
 

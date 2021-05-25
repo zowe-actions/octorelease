@@ -2896,15 +2896,8 @@ class Version {
         return __awaiter(this, void 0, void 0, function* () {
             const jsonFile = context.config.publishConfig.includes("lerna") ? "lerna.json" : "package.json";
             const currentVersion = JSON.parse(fs.readFileSync(jsonFile, "utf-8")).version;
-            const oldVersion = yield this.getOldVersion(context, jsonFile);
-            let newVersion = currentVersion;
-            let semverLevel = oldVersion ? semver.diff(oldVersion, currentVersion) : null;
-            if (semverLevel == null) {
-                semverLevel = yield this.checkPrForSemverLabel(context);
-                if (semverLevel != null) {
-                    newVersion = semver.inc(currentVersion, semverLevel) || newVersion;
-                }
-            }
+            const semverLevel = yield this.checkPrForSemverLabel(context);
+            let newVersion = semver.inc(currentVersion, semverLevel) || currentVersion;
             if (context.branch.prerelease) {
                 const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
                 const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
@@ -2960,16 +2953,6 @@ class Version {
                 default:
                     core.warning("Could not find semver label on pull request");
                     return null;
-            }
-        });
-    }
-    static getOldVersion(context, jsonFile) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return JSON.parse(yield utils.gitShow(context.eventData.before, jsonFile)).version;
-            }
-            catch (_a) {
-                core.warning(`Could not load version from package.json@${context.eventData.before}`);
             }
         });
     }
