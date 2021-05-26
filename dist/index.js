@@ -6441,15 +6441,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log("a");
 const core = __importStar(__webpack_require__(470));
+console.log("b");
 const utils = __importStar(__webpack_require__(183));
+console.log("c");
 const publish_1 = __webpack_require__(446);
+console.log("d");
 const version_1 = __webpack_require__(52);
+console.log("e");
 function run() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("f");
         try {
+            console.log("g");
             const context = yield utils.buildContext();
+            console.log("z");
             if (context == null) {
                 core.info("Current branch is not a release branch, exiting now");
                 process.exit();
@@ -6966,7 +6974,9 @@ function requireEnvVar(name) {
 }
 function buildContext() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("h");
         const config = yield cosmiconfig_1.cosmiconfig("release").search();
+        console.log("i");
         if (config == null || config.isEmpty) {
             throw new Error("Failed to load config because file does not exist or is empty");
         }

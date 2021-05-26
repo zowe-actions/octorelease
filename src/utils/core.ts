@@ -14,7 +14,9 @@ function requireEnvVar(name: string): string {
 }
 
 export async function buildContext(): Promise<IContext | undefined> {
+    console.log("h");
     const config = await cosmiconfig("release").search();
+    console.log("i");
     if (config == null || config.isEmpty) {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
