@@ -21,7 +21,9 @@ export async function buildContext(): Promise<IContext | undefined> {
 
     const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
     const micromatch = require("micromatch");
-    const branch = config.config.branches.find((branch: any) => micromatch.isMatch(branchName, branch.name));
+    const branch = config.config.branches
+        .map((branch: any) => typeof branch === "string" ? { name: branch } : branch)
+        .find((branch: any) => micromatch.isMatch(branchName, branch.name));
     if (branch == null) {
         return;
     }

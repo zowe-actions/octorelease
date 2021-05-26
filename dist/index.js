@@ -6972,7 +6972,9 @@ function buildContext() {
         }
         const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
         const micromatch = __webpack_require__(74);
-        const branch = config.config.branches.find((branch) => micromatch.isMatch(branchName, branch.name));
+        const branch = config.config.branches
+            .map((branch) => typeof branch === "string" ? { name: branch } : branch)
+            .find((branch) => micromatch.isMatch(branchName, branch.name));
         if (branch == null) {
             return;
         }
