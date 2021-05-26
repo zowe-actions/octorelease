@@ -3,7 +3,7 @@ export interface IProtectedBranch {
     tag?: string;
     level?: "major" | "minor" | "patch";
     prerelease?: boolean | string;
-    dependencies?: string[] | Record<string, string>;
-    devDependencies?: string[] | Record<string, string>;
+    dependencies?: string[] | { [key: string]: string };
+    devDependencies?: string[] | { [key: string]: string };
     aliasTags?: string[];
 }

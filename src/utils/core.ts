@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import { StringDecoder } from "string_decoder";
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext } from "../doc/IContext";
@@ -11,8 +10,9 @@ export async function buildContext(): Promise<IContext | undefined> {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
-    const branchName = process.env.GITHUB_BASE_REF || process.env.GITHUB_REF?.replace(/^refs\/heads\//, "");
-    const branch = config.config.branches.find((branch: any) => branch.name === branchName);
+    const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
+    const micromatch = require("micromatch");
+    const branch = config.config.branches.find((branch: any) => micromatch.isMatch(branchName, branch.name));
     if (branch == null) {
         return;
     }
@@ -25,22 +25,28 @@ export async function buildContext(): Promise<IContext | undefined> {
 
     const [owner, repo] = requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
 
+    const publishConfig: any = {};
+    for (const pc of config.config.publishConfig) {
+        if (typeof pc === "string") {
+            publishConfig[pc] = {};
+        } else {
+            publishConfig[pc[0]] = pc[1];
+        }
+    }
+
     return {
         branch,
-        committer: {
-            name: requireEnvVar("GIT_COMMITTER_NAME"),
-            email: requireEnvVar("GIT_COMMITTER_EMAIL")
-        },
-        config: config.config,
         eventData,
-        github: {
-            sha: requireEnvVar("GITHUB_SHA"),
-            token: requireEnvVar("GITHUB_TOKEN")
+        git: {
+            commitSha: requireEnvVar("GITHUB_SHA"),
+            committer: {
+                name: requireEnvVar("GIT_COMMITTER_NAME"),
+                email: requireEnvVar("GIT_COMMITTER_EMAIL")
+            },
+            repository: { owner, repo }
         },
-        npm: {
-            token: requireEnvVar("NPM_TOKEN")
-        },
-        repository: { owner, repo }
+        isMonorepo: fs.existsSync("lerna.json"),
+        publishConfig
     };
 }
 
@@ -86,7 +92,7 @@ export async function getExecOutput(commandLine: string, args?: string[], option
     return { exitCode, stdout, stderr };
 }
 
-function requireEnvVar(name: string): string {
+export function requireEnvVar(name: string): string {
     const value = process.env[name];
     if (value == null) {
         throw new Error(`Expected environment variable ${name} to be defined but it is not`);

@@ -1,8 +1,10 @@
 import { IProtectedBranch } from "./IProtectedBranch";
 
-export type PublishType = "github" | "lerna" | "npm";
+export type PublishType = "github" | "npm";
+
+export type PublishConfig = PublishType | [PublishType, Record<string, any>];
 
 export interface IConfig {
     branches: IProtectedBranch[];
-    publishConfig: PublishType[];
+    publishConfig: PublishConfig[];
 }

@@ -2,16 +2,15 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as semver from "semver";
 import { IContext } from "./doc/IContext";
 import * as utils from "./utils";
 
 export class Version {
     public static async version(context: IContext): Promise<[string, string]> {
-        const jsonFile = context.config.publishConfig.includes("lerna") ? "lerna.json" : "package.json";
+        const jsonFile = context.isMonorepo ? "lerna.json" : "package.json";
         const currentVersion: string = JSON.parse(fs.readFileSync(jsonFile, "utf-8")).version;
         const semverLevel = await this.checkPrForSemverLabel(context);
-        let newVersion = semver.inc(currentVersion, semverLevel as any) || currentVersion;
+        let newVersion = require("semver").inc(currentVersion, semverLevel as any) || currentVersion;
 
         if (context.branch.prerelease) {
             const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
@@ -26,7 +25,7 @@ export class Version {
 
         const changedFiles = ["package.json", "package-lock.json"];
 
-        if (context.config.publishConfig.includes("lerna")) {
+        if (context.isMonorepo) {
             await utils.lernaVersion(newVersion);
             changedFiles.push("lerna.json");
 
@@ -51,19 +50,19 @@ export class Version {
     }
 
     private static async checkPrForSemverLabel(context: IContext): Promise<string | null> {
-        const octokit = github.getOctokit(context.github.token);
+        const octokit = github.getOctokit(utils.requireEnvVar("GITHUB_TOKEN"));
         const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
-            ...context.repository,
-            commit_sha: context.github.sha
+            ...context.git.repository,
+            commit_sha: context.git.commitSha
         });
 
         if (prs.data.length === 0) {
-            core.warning(`Could not find pull request associated with commit ${context.github.sha}`);
+            core.warning(`Could not find pull request associated with commit ${context.git.commitSha}`);
             return null;
         }
 
         const labels = await octokit.issues.listLabelsOnIssue({
-            ...context.repository,
+            ...context.git.repository,
             issue_number: prs.data[0].number
         });
         const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));

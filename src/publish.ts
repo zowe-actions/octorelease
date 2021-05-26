@@ -12,30 +12,33 @@ export class Publish {
     public static async publish(context: IContext, newVersion: string): Promise<void> {
         this.newVersion = newVersion;
 
-        for (const publishType of context.config.publishConfig) {
+        for (const publishType in context.publishConfig) {
             switch (publishType) {
                 case "github":
                     await this.publishGithub(context);
                     break;
-                case "lerna":
-                    await this.publishLerna(context);
-                    break;
                 case "npm":
-                    await this.publishNpm(context);
+                    if (context.isMonorepo) {
+                        for (const { location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
+                            await this.publishNpm(context, location);
+                        }
+                    } else {
+                        await this.publishNpm(context);
+                    }
                     break;
             }
         }
     }
 
     private static async publishGithub(context: IContext): Promise<void> {
-        const octokit = github.getOctokit(context.github.token);
+        const octokit = github.getOctokit(utils.requireEnvVar("GITHUB_TOKEN"));
         const tagName = `v${this.newVersion}`;
         let release;
 
         // Get release if it already exists
         try {
             release = await octokit.repos.getReleaseByTag({
-                ...context.repository,
+                ...context.git.repository,
                 tag: tagName
             });
         } catch (err) {
@@ -50,14 +53,14 @@ export class Publish {
 
             core.info(`Creating GitHub release with tag ${tagName}`);
             release = await octokit.repos.createRelease({
-                ...context.repository,
+                ...context.git.repository,
                 tag_name: tagName,
                 body: releaseNotes
             });
         }
 
         // Upload artifacts to release
-        const globber = await glob.create("dist/*");
+        const globber = await glob.create(context.publishConfig.github.assets);
         const artifactPaths: string[] = await globber.glob();
         const mime = require("mime-types");
 
@@ -72,7 +75,7 @@ export class Publish {
 
             core.info(`Uploading release asset ${artifactPath}`);
             await octokit.repos.uploadReleaseAsset({
-                ...context.repository,
+                ...context.git.repository,
                 release_id: release.data.id,
                 name: assetName,
                 // Need to upload as buffer because converting to string corrupts binary data
@@ -86,21 +89,25 @@ export class Publish {
         }
     }
 
-    private static async publishLerna(context: IContext): Promise<void> {
-        for (const { location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
-            await this.publishNpm(context, location);
-        }
-    }
-
     private static async publishNpm(context: IContext, inDir?: string): Promise<void> {
         const cwd = inDir || process.cwd();
 
-        if (context.config.publishConfig.includes("github")) {
+        if (context.publishConfig.npm.tarballDir != null) {
             const tgzFile = await utils.npmPack(inDir);
-            fs.renameSync(path.join(cwd, tgzFile), path.join("dist", path.basename(tgzFile)));
+            fs.mkdirSync(context.publishConfig.npm.tarballDir, { recursive: true });
+            fs.renameSync(path.join(cwd, tgzFile), path.join(context.publishConfig.npm.tarballDir, path.basename(tgzFile)));
+        }
+
+        if (!context.publishConfig.npm.npmPublish) {
+            return;
         }
 
         const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+
+        if (packageJson.private) {
+            core.info(`Skipping publish of private package ${packageJson.name}`);
+        }
+
         const npmRegistry: string | undefined = packageJson.publishConfig?.registry;
         let npmScope: string | undefined;
 
@@ -135,7 +142,7 @@ export class Publish {
     }
 
     private static async getReleaseNotes(context: IContext): Promise<string | undefined> {
-        if (context.config.publishConfig.includes("lerna")) {
+        if (context.isMonorepo) {
             let releaseNotes = "";
 
             for (const { name, location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
