@@ -1473,6 +1473,8 @@ class Version {
                 this.updateChangelog("CHANGELOG.md", newVersion);
                 changedFiles.push("CHANGELOG.md");
             }
+            process.env.GIT_COMMITTER_NAME = core.getInput("git-committer-name");
+            process.env.GIT_COMMITTER_EMAIL = core.getInput("git-committer-email");
             yield utils.gitAdd(...changedFiles);
             yield utils.gitCommit(`Bump version to ${newVersion}`);
             yield utils.gitTag(`v${newVersion}`, `Release ${newVersion} to ${context.branch.tag}`);
@@ -5225,7 +5227,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getExecOutput = exports.buildContext = void 0;
 const fs = __importStar(__webpack_require__(747));
 const string_decoder_1 = __webpack_require__(304);
-const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const cosmiconfig_1 = __webpack_require__(471);
 function requireEnvVar(name) {
@@ -5269,10 +5270,6 @@ function buildContext() {
             eventData,
             git: {
                 commitSha: requireEnvVar("GITHUB_SHA"),
-                committer: {
-                    name: core.getInput("git-committer-name"),
-                    email: core.getInput("git-committer-email")
-                },
                 repository: { owner, repo }
             },
             isMonorepo: fs.existsSync("lerna.json"),

@@ -50,10 +50,6 @@ export async function buildContext(): Promise<IContext | undefined> {
         eventData,
         git: {
             commitSha: requireEnvVar("GITHUB_SHA"),
-            committer: {
-                name: core.getInput("git-committer-name"),
-                email: core.getInput("git-committer-email")
-            },
             repository: { owner, repo }
         },
         isMonorepo: fs.existsSync("lerna.json"),

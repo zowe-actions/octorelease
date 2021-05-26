@@ -6,7 +6,6 @@ export interface IContext {
     eventData: any;
     git: {
         commitSha: string,
-        committer: { name: string, email: string },
         repository: { owner: string, repo: string }
     };
     isMonorepo: boolean;
