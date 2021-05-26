@@ -71,7 +71,7 @@ export class Version {
             throw new Error("Detected multiple semver labels on pull request, there should only be one");
         }
 
-        switch (releaseLabels[0].name) {
+        switch (releaseLabels[0]?.name) {
             case "release-major":
                 return "major";
             case "release-minor":

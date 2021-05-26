@@ -1481,6 +1481,7 @@ class Version {
         });
     }
     static checkPrForSemverLabel(context) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const octokit = github.getOctokit(core.getInput("github-token"));
             const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, context.git.repository), { commit_sha: context.git.commitSha }));
@@ -1493,7 +1494,7 @@ class Version {
             if (releaseLabels.length > 1) {
                 throw new Error("Detected multiple semver labels on pull request, there should only be one");
             }
-            switch (releaseLabels[0].name) {
+            switch ((_a = releaseLabels[0]) === null || _a === void 0 ? void 0 : _a.name) {
                 case "release-major":
                     return "major";
                 case "release-minor":
@@ -5242,11 +5243,9 @@ function buildContext() {
         }
         const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
         const micromatch = __webpack_require__(74);
-        console.log("A");
         const branch = config.config.branches
             .map((branch) => typeof branch === "string" ? { name: branch } : branch)
             .find((branch) => micromatch.isMatch(branchName, branch.name));
-        console.log("B");
         if (branch == null) {
             return;
         }
