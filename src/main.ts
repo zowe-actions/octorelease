@@ -1,19 +1,11 @@
-console.log("a");
 import * as core from "@actions/core";
-console.log("b");
 import * as utils from "./utils/core";
-console.log("c");
 import { Publish } from "./publish";
-console.log("d");
 import { Version } from "./version";
-console.log("e");
 
 async function run(): Promise<void> {
-    console.log("f");
     try {
-        console.log("g");
         const context = await utils.buildContext();
-        console.log("z");
 
         if (context == null) {
             core.info("Current branch is not a release branch, exiting now");
