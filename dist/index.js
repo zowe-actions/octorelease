@@ -5242,9 +5242,11 @@ function buildContext() {
         }
         const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
         const micromatch = __webpack_require__(74);
+        console.log("A");
         const branch = config.config.branches
             .map((branch) => typeof branch === "string" ? { name: branch } : branch)
             .find((branch) => micromatch.isMatch(branchName, branch.name));
+        console.log("B");
         if (branch == null) {
             return;
         }
