@@ -2931,7 +2931,7 @@ class Version {
     }
     static checkPrForSemverLabel(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            const octokit = github.getOctokit(utils.requireEnvVar("GITHUB_TOKEN"));
+            const octokit = github.getOctokit(core.getInput("github-token"));
             const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, context.git.repository), { commit_sha: context.git.commitSha }));
             if (prs.data.length === 0) {
                 core.warning(`Could not find pull request associated with commit ${context.git.commitSha}`);
@@ -6954,8 +6954,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
 const string_decoder_1 = __webpack_require__(304);
+const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const cosmiconfig_1 = __webpack_require__(471);
+function requireEnvVar(name) {
+    const value = process.env[name];
+    if (value == null) {
+        throw new Error(`Required environment variable ${name} is not defined`);
+    }
+    return value;
+}
 function buildContext() {
     return __awaiter(this, void 0, void 0, function* () {
         const config = yield cosmiconfig_1.cosmiconfig("release").search();
@@ -6989,8 +6997,8 @@ function buildContext() {
             git: {
                 commitSha: requireEnvVar("GITHUB_SHA"),
                 committer: {
-                    name: requireEnvVar("GIT_COMMITTER_NAME"),
-                    email: requireEnvVar("GIT_COMMITTER_EMAIL")
+                    name: core.getInput("git-committer-name"),
+                    email: core.getInput("git-committer-email")
                 },
                 repository: { owner, repo }
             },
@@ -7032,14 +7040,6 @@ function getExecOutput(commandLine, args, options) {
     });
 }
 exports.getExecOutput = getExecOutput;
-function requireEnvVar(name) {
-    const value = process.env[name];
-    if (value == null) {
-        throw new Error(`Expected environment variable ${name} to be defined but it is not`);
-    }
-    return value;
-}
-exports.requireEnvVar = requireEnvVar;
 
 
 /***/ }),
@@ -13156,7 +13156,7 @@ class Publish {
     }
     static publishGithub(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            const octokit = github.getOctokit(utils.requireEnvVar("GITHUB_TOKEN"));
+            const octokit = github.getOctokit(core.getInput("github-token"));
             const tagName = `v${this.newVersion}`;
             let release;
             // Get release if it already exists
@@ -18153,7 +18153,7 @@ function npmConfig(context, registry, scope) {
         fs.renameSync(".npmrc", ".npmrc.bak");
     }
     // Remove HTTP or HTTPS protocol from front of registry URL
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core_1.requireEnvVar("NPM_TOKEN");
+    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
     const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
     fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
 }

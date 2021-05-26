@@ -50,7 +50,7 @@ export class Version {
     }
 
     private static async checkPrForSemverLabel(context: IContext): Promise<string | null> {
-        const octokit = github.getOctokit(utils.requireEnvVar("GITHUB_TOKEN"));
+        const octokit = github.getOctokit(core.getInput("github-token"));
         const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
             ...context.git.repository,
             commit_sha: context.git.commitSha

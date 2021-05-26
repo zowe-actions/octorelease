@@ -31,7 +31,7 @@ export class Publish {
     }
 
     private static async publishGithub(context: IContext): Promise<void> {
-        const octokit = github.getOctokit(utils.requireEnvVar("GITHUB_TOKEN"));
+        const octokit = github.getOctokit(core.getInput("github-token"));
         const tagName = `v${this.newVersion}`;
         let release;
 

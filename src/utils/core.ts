@@ -1,8 +1,17 @@
 import * as fs from "fs";
 import { StringDecoder } from "string_decoder";
+import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext } from "../doc/IContext";
+
+function requireEnvVar(name: string): string {
+    const value = process.env[name];
+    if (value == null) {
+        throw new Error(`Required environment variable ${name} is not defined`);
+    }
+    return value;
+}
 
 export async function buildContext(): Promise<IContext | undefined> {
     const config = await cosmiconfig("release").search();
@@ -40,8 +49,8 @@ export async function buildContext(): Promise<IContext | undefined> {
         git: {
             commitSha: requireEnvVar("GITHUB_SHA"),
             committer: {
-                name: requireEnvVar("GIT_COMMITTER_NAME"),
-                email: requireEnvVar("GIT_COMMITTER_EMAIL")
+                name: core.getInput("git-committer-name"),
+                email: core.getInput("git-committer-email")
             },
             repository: { owner, repo }
         },
@@ -90,12 +99,4 @@ export async function getExecOutput(commandLine: string, args?: string[], option
     stderr += stderrDecoder.end();
   
     return { exitCode, stdout, stderr };
-}
-
-export function requireEnvVar(name: string): string {
-    const value = process.env[name];
-    if (value == null) {
-        throw new Error(`Expected environment variable ${name} to be defined but it is not`);
-    }
-    return value;
 }

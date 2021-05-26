@@ -1,10 +1,11 @@
 import * as process from 'process'
 import * as cp from 'child_process'
+import * as fs from 'fs'
 import * as path from 'path'
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
-  process.env['VERSION_STRATEGY'] = 'none'
+  fs.writeFileSync(".releaserc", JSON.stringify({ branches: ["master", "next"] }));
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
     env: process.env
