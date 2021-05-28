@@ -1,17 +1,9 @@
 import * as fs from "fs";
 import { StringDecoder } from "string_decoder";
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import * as github from "@actions/github";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext } from "../doc/IContext";
-
-function requireEnvVar(name: string): string {
-    const value = process.env[name];
-    if (value == null) {
-        throw new Error(`Required environment variable ${name} is not defined`);
-    }
-    return value;
-}
 
 export async function buildContext(): Promise<IContext | undefined> {
     const config = await cosmiconfig("release").search();
@@ -19,7 +11,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
-    const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
+    const branchName = github.context.payload.pull_request?.base.ref || github.context.ref.replace(/^refs\/heads\//, "");
     const micromatch = require("micromatch");
     const branch = config.config.branches
         .map((branch: any) => typeof branch === "string" ? { name: branch } : branch)
@@ -28,13 +20,8 @@ export async function buildContext(): Promise<IContext | undefined> {
         return;
     }
     if (branch.tag == null) {
-        branch.tag = (branchName === "main" || branchName === "master") ? "latest" : branchName;
+        branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
     }
-
-    const eventPath: string = requireEnvVar("GITHUB_EVENT_PATH");
-    const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-
-    const [owner, repo] = requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
 
     const publishConfig: any = {};
     for (const pc of config.config.publishConfig) {
@@ -47,11 +34,6 @@ export async function buildContext(): Promise<IContext | undefined> {
 
     return {
         branch,
-        eventData,
-        git: {
-            commitSha: requireEnvVar("GITHUB_SHA"),
-            repository: { owner, repo }
-        },
         isMonorepo: fs.existsSync("lerna.json"),
         publishConfig
     };

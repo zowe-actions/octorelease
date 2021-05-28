@@ -1246,7 +1246,7 @@ var _readFile = __webpack_require__(780);
 
 var _cacheWrapper = __webpack_require__(270);
 
-var _getDirectory = __webpack_require__(898);
+var _getDirectory = __webpack_require__(908);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1486,12 +1486,13 @@ class Version {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const octokit = github.getOctokit(core.getInput("github-token"));
-            const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, context.git.repository), { commit_sha: context.git.commitSha }));
+            const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
             if (prs.data.length === 0) {
-                core.warning(`Could not find pull request associated with commit ${context.git.commitSha}`);
+                core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
                 return null;
             }
-            const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, context.git.repository), { issue_number: prs.data[0].number }));
+            context.prNumber = prs.data[0].number;
+            const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, github.context.repo), { issue_number: context.prNumber }));
             const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
             if (releaseLabels.length > 1) {
                 throw new Error("Detected multiple semver labels on pull request, there should only be one");
@@ -4868,11 +4869,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
+const github = __importStar(__webpack_require__(469));
 const utils = __importStar(__webpack_require__(183));
 const publish_1 = __webpack_require__(446);
 const version_1 = __webpack_require__(52);
 function run() {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const context = yield utils.buildContext();
@@ -4880,7 +4882,7 @@ function run() {
                 core.info("Current branch is not a release branch, exiting now");
                 process.exit();
             }
-            else if (((_b = (_a = context.eventData) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message.indexOf("[ci skip]")) !== -1) {
+            else if (((_a = github.context.payload.head_commit) === null || _a === void 0 ? void 0 : _a.message.indexOf("[ci skip]")) !== -1) {
                 core.info("Commit message contains CI skip phrase, exiting now");
                 process.exit();
             }
@@ -5228,21 +5230,16 @@ exports.getExecOutput = exports.buildContext = void 0;
 const fs = __importStar(__webpack_require__(747));
 const string_decoder_1 = __webpack_require__(304);
 const exec = __importStar(__webpack_require__(986));
+const github = __importStar(__webpack_require__(469));
 const cosmiconfig_1 = __webpack_require__(471);
-function requireEnvVar(name) {
-    const value = process.env[name];
-    if (value == null) {
-        throw new Error(`Required environment variable ${name} is not defined`);
-    }
-    return value;
-}
 function buildContext() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const config = yield cosmiconfig_1.cosmiconfig("release").search();
         if (config == null || config.isEmpty) {
             throw new Error("Failed to load config because file does not exist or is empty");
         }
-        const branchName = process.env.GITHUB_BASE_REF || requireEnvVar("GITHUB_REF").replace(/^refs\/heads\//, "");
+        const branchName = ((_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.ref) || github.context.ref.replace(/^refs\/heads\//, "");
         const micromatch = __webpack_require__(74);
         const branch = config.config.branches
             .map((branch) => typeof branch === "string" ? { name: branch } : branch)
@@ -5251,11 +5248,8 @@ function buildContext() {
             return;
         }
         if (branch.tag == null) {
-            branch.tag = (branchName === "main" || branchName === "master") ? "latest" : branchName;
+            branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
         }
-        const eventPath = requireEnvVar("GITHUB_EVENT_PATH");
-        const eventData = JSON.parse(fs.readFileSync(eventPath).toString());
-        const [owner, repo] = requireEnvVar("GITHUB_REPOSITORY").split("/", 2);
         const publishConfig = {};
         for (const pc of config.config.publishConfig) {
             if (typeof pc === "string") {
@@ -5267,11 +5261,6 @@ function buildContext() {
         }
         return {
             branch,
-            eventData,
-            git: {
-                commitSha: requireEnvVar("GITHUB_SHA"),
-                repository: { owner, repo }
-            },
             isMonorepo: fs.existsSync("lerna.json"),
             publishConfig
         };
@@ -9886,7 +9875,7 @@ var _readFile = __webpack_require__(780);
 
 var _cacheWrapper = __webpack_require__(270);
 
-var _getDirectory = __webpack_require__(898);
+var _getDirectory = __webpack_require__(908);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -11617,7 +11606,7 @@ class Publish {
                         break;
                     case "npm":
                         if (context.isMonorepo) {
-                            for (const { location } of (yield utils.lernaList()).filter(pkg => pkg.changed)) {
+                            for (const { location } of yield utils.lernaList()) {
                                 yield this.publishNpm(context, location);
                             }
                         }
@@ -11626,6 +11615,10 @@ class Publish {
                         }
                         break;
                 }
+            }
+            if (context.prNumber != null) {
+                const octokit = github.getOctokit(core.getInput("github-token"));
+                yield octokit.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: context.prNumber, labels: ["released"] }));
             }
         });
     }
@@ -11636,7 +11629,7 @@ class Publish {
             let release;
             // Get release if it already exists
             try {
-                release = yield octokit.repos.getReleaseByTag(Object.assign(Object.assign({}, context.git.repository), { tag: tagName }));
+                release = yield octokit.repos.getReleaseByTag(Object.assign(Object.assign({}, github.context.repo), { tag: tagName }));
             }
             catch (err) {
                 if (err.status != 404) {
@@ -11647,7 +11640,7 @@ class Publish {
             if (release == null) {
                 const releaseNotes = yield this.getReleaseNotes(context);
                 core.info(`Creating GitHub release with tag ${tagName}`);
-                release = yield octokit.repos.createRelease(Object.assign(Object.assign({}, context.git.repository), { tag_name: tagName, body: releaseNotes }));
+                release = yield octokit.repos.createRelease(Object.assign(Object.assign({}, github.context.repo), { tag_name: tagName, body: releaseNotes }));
             }
             // Upload artifacts to release
             const globber = yield glob.create(context.publishConfig.github.assets);
@@ -11661,7 +11654,7 @@ class Publish {
                     continue;
                 }
                 core.info(`Uploading release asset ${artifactPath}`);
-                yield octokit.repos.uploadReleaseAsset(Object.assign(Object.assign({}, context.git.repository), { release_id: release.data.id, name: assetName, 
+                yield octokit.repos.uploadReleaseAsset(Object.assign(Object.assign({}, github.context.repo), { release_id: release.data.id, name: assetName, 
                     // Need to upload as buffer because converting to string corrupts binary data
                     data: fs.readFileSync(artifactPath), url: release.data.upload_url, headers: {
                         "Content-Length": fs.statSync(artifactPath).size,
@@ -11720,7 +11713,7 @@ class Publish {
         return __awaiter(this, void 0, void 0, function* () {
             if (context.isMonorepo) {
                 let releaseNotes = "";
-                for (const { name, location } of (yield utils.lernaList()).filter(pkg => pkg.changed)) {
+                for (const { name, location } of yield utils.lernaList()) {
                     const changelogFile = path.join(path.relative(process.cwd(), location), "CHANGELOG.md");
                     const packageReleaseNotes = this.getPackageChangelog(changelogFile);
                     if (packageReleaseNotes != null) {
@@ -11772,7 +11765,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var universalUserAgent = __webpack_require__(796);
 var beforeAfterHook = __webpack_require__(523);
 var request = __webpack_require__(753);
-var graphql = __webpack_require__(743);
+var graphql = __webpack_require__(898);
 var authToken = __webpack_require__(813);
 
 function _objectWithoutPropertiesLoose(source, excluded) {
@@ -13715,7 +13708,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOctokit = exports.context = void 0;
 const Context = __importStar(__webpack_require__(262));
-const utils_1 = __webpack_require__(902);
+const utils_1 = __webpack_require__(521);
 exports.context = new Context.Context();
 /**
  * Returns a hydrated octokit ready to use for GitHub Actions
@@ -15266,10 +15259,63 @@ exports.defaultTags = defaultTags;
 /***/ }),
 
 /***/ 521:
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(792).YAML
+"use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
+const Context = __importStar(__webpack_require__(262));
+const Utils = __importStar(__webpack_require__(127));
+// octokit + plugins
+const core_1 = __webpack_require__(448);
+const plugin_rest_endpoint_methods_1 = __webpack_require__(842);
+const plugin_paginate_rest_1 = __webpack_require__(299);
+exports.context = new Context.Context();
+const baseUrl = Utils.getApiBaseUrl();
+const defaults = {
+    baseUrl,
+    request: {
+        agent: Utils.getProxyAgent(baseUrl)
+    }
+};
+exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
+/**
+ * Convience function to correctly format Octokit Options to pass into the constructor.
+ *
+ * @param     token    the repo PAT or GITHUB_TOKEN
+ * @param     options  other options to set
+ */
+function getOctokitOptions(token, options) {
+    const opts = Object.assign({}, options || {}); // Shallow clone - don't mutate the object provided by the caller
+    // Auth
+    const auth = Utils.getAuthString(token, opts);
+    if (auth) {
+        opts.auth = auth;
+    }
+    return opts;
+}
+exports.getOctokitOptions = getOctokitOptions;
+//# sourceMappingURL=utils.js.map
 
 /***/ }),
 
@@ -16531,6 +16577,14 @@ function getExtensionDescription(filepath) {
 
 /***/ }),
 
+/***/ 596:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+module.exports = __webpack_require__(792).YAML
+
+
+/***/ }),
+
 /***/ 597:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -17293,7 +17347,7 @@ let yaml;
 
 const loadYaml = function loadYaml(filepath, content) {
   if (yaml === undefined) {
-    yaml = __webpack_require__(521);
+    yaml = __webpack_require__(596);
   }
 
   try {
@@ -17806,130 +17860,6 @@ exports.matchToToken = function(match) {
   else if (match[12]) token.type = "whitespace"
   return token
 }
-
-
-/***/ }),
-
-/***/ 743:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var request = __webpack_require__(753);
-var universalUserAgent = __webpack_require__(796);
-
-const VERSION = "4.6.2";
-
-class GraphqlError extends Error {
-  constructor(request, response) {
-    const message = response.data.errors[0].message;
-    super(message);
-    Object.assign(this, response.data);
-    Object.assign(this, {
-      headers: response.headers
-    });
-    this.name = "GraphqlError";
-    this.request = request; // Maintains proper stack trace (only available on V8)
-
-    /* istanbul ignore next */
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
-  }
-
-}
-
-const NON_VARIABLE_OPTIONS = ["method", "baseUrl", "url", "headers", "request", "query", "mediaType"];
-const FORBIDDEN_VARIABLE_OPTIONS = ["query", "method", "url"];
-const GHES_V3_SUFFIX_REGEX = /\/api\/v3\/?$/;
-function graphql(request, query, options) {
-  if (options) {
-    if (typeof query === "string" && "query" in options) {
-      return Promise.reject(new Error(`[@octokit/graphql] "query" cannot be used as variable name`));
-    }
-
-    for (const key in options) {
-      if (!FORBIDDEN_VARIABLE_OPTIONS.includes(key)) continue;
-      return Promise.reject(new Error(`[@octokit/graphql] "${key}" cannot be used as variable name`));
-    }
-  }
-
-  const parsedOptions = typeof query === "string" ? Object.assign({
-    query
-  }, options) : query;
-  const requestOptions = Object.keys(parsedOptions).reduce((result, key) => {
-    if (NON_VARIABLE_OPTIONS.includes(key)) {
-      result[key] = parsedOptions[key];
-      return result;
-    }
-
-    if (!result.variables) {
-      result.variables = {};
-    }
-
-    result.variables[key] = parsedOptions[key];
-    return result;
-  }, {}); // workaround for GitHub Enterprise baseUrl set with /api/v3 suffix
-  // https://github.com/octokit/auth-app.js/issues/111#issuecomment-657610451
-
-  const baseUrl = parsedOptions.baseUrl || request.endpoint.DEFAULTS.baseUrl;
-
-  if (GHES_V3_SUFFIX_REGEX.test(baseUrl)) {
-    requestOptions.url = baseUrl.replace(GHES_V3_SUFFIX_REGEX, "/api/graphql");
-  }
-
-  return request(requestOptions).then(response => {
-    if (response.data.errors) {
-      const headers = {};
-
-      for (const key of Object.keys(response.headers)) {
-        headers[key] = response.headers[key];
-      }
-
-      throw new GraphqlError(requestOptions, {
-        headers,
-        data: response.data
-      });
-    }
-
-    return response.data.data;
-  });
-}
-
-function withDefaults(request$1, newDefaults) {
-  const newRequest = request$1.defaults(newDefaults);
-
-  const newApi = (query, options) => {
-    return graphql(newRequest, query, options);
-  };
-
-  return Object.assign(newApi, {
-    defaults: withDefaults.bind(null, newRequest),
-    endpoint: request.request.endpoint
-  });
-}
-
-const graphql$1 = withDefaults(request.request, {
-  headers: {
-    "user-agent": `octokit-graphql.js/${VERSION} ${universalUserAgent.getUserAgent()}`
-  },
-  method: "POST",
-  url: "/graphql"
-});
-function withCustomRequest(customRequest) {
-  return withDefaults(customRequest, {
-    method: "POST",
-    url: "/graphql"
-  });
-}
-
-exports.graphql = graphql$1;
-exports.withCustomRequest = withCustomRequest;
-//# sourceMappingURL=index.js.map
 
 
 /***/ }),
@@ -25744,6 +25674,130 @@ var isArray = Array.isArray || function (xs) {
 "use strict";
 
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var request = __webpack_require__(753);
+var universalUserAgent = __webpack_require__(796);
+
+const VERSION = "4.6.2";
+
+class GraphqlError extends Error {
+  constructor(request, response) {
+    const message = response.data.errors[0].message;
+    super(message);
+    Object.assign(this, response.data);
+    Object.assign(this, {
+      headers: response.headers
+    });
+    this.name = "GraphqlError";
+    this.request = request; // Maintains proper stack trace (only available on V8)
+
+    /* istanbul ignore next */
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+
+}
+
+const NON_VARIABLE_OPTIONS = ["method", "baseUrl", "url", "headers", "request", "query", "mediaType"];
+const FORBIDDEN_VARIABLE_OPTIONS = ["query", "method", "url"];
+const GHES_V3_SUFFIX_REGEX = /\/api\/v3\/?$/;
+function graphql(request, query, options) {
+  if (options) {
+    if (typeof query === "string" && "query" in options) {
+      return Promise.reject(new Error(`[@octokit/graphql] "query" cannot be used as variable name`));
+    }
+
+    for (const key in options) {
+      if (!FORBIDDEN_VARIABLE_OPTIONS.includes(key)) continue;
+      return Promise.reject(new Error(`[@octokit/graphql] "${key}" cannot be used as variable name`));
+    }
+  }
+
+  const parsedOptions = typeof query === "string" ? Object.assign({
+    query
+  }, options) : query;
+  const requestOptions = Object.keys(parsedOptions).reduce((result, key) => {
+    if (NON_VARIABLE_OPTIONS.includes(key)) {
+      result[key] = parsedOptions[key];
+      return result;
+    }
+
+    if (!result.variables) {
+      result.variables = {};
+    }
+
+    result.variables[key] = parsedOptions[key];
+    return result;
+  }, {}); // workaround for GitHub Enterprise baseUrl set with /api/v3 suffix
+  // https://github.com/octokit/auth-app.js/issues/111#issuecomment-657610451
+
+  const baseUrl = parsedOptions.baseUrl || request.endpoint.DEFAULTS.baseUrl;
+
+  if (GHES_V3_SUFFIX_REGEX.test(baseUrl)) {
+    requestOptions.url = baseUrl.replace(GHES_V3_SUFFIX_REGEX, "/api/graphql");
+  }
+
+  return request(requestOptions).then(response => {
+    if (response.data.errors) {
+      const headers = {};
+
+      for (const key of Object.keys(response.headers)) {
+        headers[key] = response.headers[key];
+      }
+
+      throw new GraphqlError(requestOptions, {
+        headers,
+        data: response.data
+      });
+    }
+
+    return response.data.data;
+  });
+}
+
+function withDefaults(request$1, newDefaults) {
+  const newRequest = request$1.defaults(newDefaults);
+
+  const newApi = (query, options) => {
+    return graphql(newRequest, query, options);
+  };
+
+  return Object.assign(newApi, {
+    defaults: withDefaults.bind(null, newRequest),
+    endpoint: request.request.endpoint
+  });
+}
+
+const graphql$1 = withDefaults(request.request, {
+  headers: {
+    "user-agent": `octokit-graphql.js/${VERSION} ${universalUserAgent.getUserAgent()}`
+  },
+  method: "POST",
+  url: "/graphql"
+});
+function withCustomRequest(customRequest) {
+  return withDefaults(customRequest, {
+    method: "POST",
+    url: "/graphql"
+  });
+}
+
+exports.graphql = graphql$1;
+exports.withCustomRequest = withCustomRequest;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 908:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -25780,67 +25834,6 @@ function getDirectorySync(filepath) {
   return directory;
 }
 //# sourceMappingURL=getDirectory.js.map
-
-/***/ }),
-
-/***/ 902:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
-const Context = __importStar(__webpack_require__(262));
-const Utils = __importStar(__webpack_require__(127));
-// octokit + plugins
-const core_1 = __webpack_require__(448);
-const plugin_rest_endpoint_methods_1 = __webpack_require__(842);
-const plugin_paginate_rest_1 = __webpack_require__(299);
-exports.context = new Context.Context();
-const baseUrl = Utils.getApiBaseUrl();
-const defaults = {
-    baseUrl,
-    request: {
-        agent: Utils.getProxyAgent(baseUrl)
-    }
-};
-exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
-/**
- * Convience function to correctly format Octokit Options to pass into the constructor.
- *
- * @param     token    the repo PAT or GITHUB_TOKEN
- * @param     options  other options to set
- */
-function getOctokitOptions(token, options) {
-    const opts = Object.assign({}, options || {}); // Shallow clone - don't mutate the object provided by the caller
-    // Auth
-    const auth = Utils.getAuthString(token, opts);
-    if (auth) {
-        opts.auth = auth;
-    }
-    return opts;
-}
-exports.getOctokitOptions = getOctokitOptions;
-//# sourceMappingURL=utils.js.map
 
 /***/ }),
 

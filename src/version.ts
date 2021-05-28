@@ -54,18 +54,19 @@ export class Version {
     private static async checkPrForSemverLabel(context: IContext): Promise<string | null> {
         const octokit = github.getOctokit(core.getInput("github-token"));
         const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
-            ...context.git.repository,
-            commit_sha: context.git.commitSha
+            ...github.context.repo,
+            commit_sha: github.context.sha
         });
 
         if (prs.data.length === 0) {
-            core.warning(`Could not find pull request associated with commit ${context.git.commitSha}`);
+            core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
             return null;
         }
 
+        context.prNumber = prs.data[0].number;
         const labels = await octokit.issues.listLabelsOnIssue({
-            ...context.git.repository,
-            issue_number: prs.data[0].number
+            ...github.context.repo,
+            issue_number: context.prNumber
         });
         const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
 

@@ -19,7 +19,7 @@ export class Publish {
                     break;
                 case "npm":
                     if (context.isMonorepo) {
-                        for (const { location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
+                        for (const { location } of await utils.lernaList()) {
                             await this.publishNpm(context, location);
                         }
                     } else {
@@ -27,6 +27,15 @@ export class Publish {
                     }
                     break;
             }
+        }
+
+        if (context.prNumber != null) {
+            const octokit = github.getOctokit(core.getInput("github-token"));
+            await octokit.issues.addLabels({
+                ...github.context.repo,
+                issue_number: context.prNumber,
+                labels: ["released"]
+            });
         }
     }
 
@@ -38,7 +47,7 @@ export class Publish {
         // Get release if it already exists
         try {
             release = await octokit.repos.getReleaseByTag({
-                ...context.git.repository,
+                ...github.context.repo,
                 tag: tagName
             });
         } catch (err) {
@@ -53,7 +62,7 @@ export class Publish {
 
             core.info(`Creating GitHub release with tag ${tagName}`);
             release = await octokit.repos.createRelease({
-                ...context.git.repository,
+                ...github.context.repo,
                 tag_name: tagName,
                 body: releaseNotes
             });
@@ -75,7 +84,7 @@ export class Publish {
 
             core.info(`Uploading release asset ${artifactPath}`);
             await octokit.repos.uploadReleaseAsset({
-                ...context.git.repository,
+                ...github.context.repo,
                 release_id: release.data.id,
                 name: assetName,
                 // Need to upload as buffer because converting to string corrupts binary data
@@ -145,7 +154,7 @@ export class Publish {
         if (context.isMonorepo) {
             let releaseNotes = "";
 
-            for (const { name, location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
+            for (const { name, location } of await utils.lernaList()) {
                 const changelogFile = path.join(path.relative(process.cwd(), location), "CHANGELOG.md");
                 const packageReleaseNotes = this.getPackageChangelog(changelogFile);
                 if (packageReleaseNotes != null) {

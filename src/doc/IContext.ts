@@ -3,11 +3,7 @@ import { IProtectedBranch } from "./IProtectedBranch";
 
 export interface IContext {
     branch: IProtectedBranch & { tag: string };
-    eventData: any;
-    git: {
-        commitSha: string,
-        repository: { owner: string, repo: string }
-    };
     isMonorepo: boolean;
+    prNumber?: number;
     publishConfig: { [key in PublishType]: Record<string, any> };
 }
