@@ -1473,8 +1473,7 @@ class Version {
                 this.updateChangelog("CHANGELOG.md", newVersion);
                 changedFiles.push("CHANGELOG.md");
             }
-            process.env.GIT_COMMITTER_NAME = core.getInput("git-committer-name");
-            process.env.GIT_COMMITTER_EMAIL = core.getInput("git-committer-email");
+            utils.gitConfig();
             yield utils.gitAdd(...changedFiles);
             yield utils.gitCommit(`Bump version to ${newVersion}`);
             yield utils.gitTag(`v${newVersion}`, `Release ${newVersion} to ${context.branch.tag}`);
@@ -14139,7 +14138,11 @@ const core_1 = __webpack_require__(183);
 function lernaList() {
     return __awaiter(this, void 0, void 0, function* () {
         const packageInfo = JSON.parse((yield core_1.getExecOutput("npx", ["lerna", "list", "--json", "--toposort"])).stdout);
-        const changedPackages = (yield core_1.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"])).stdout.split(/\r?\n/);
+        let changedPackages = [];
+        try {
+            changedPackages = (yield core_1.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"])).stdout.split(/\r?\n/);
+        }
+        catch ( /* Ignore error if there are no changed packages */_a) { /* Ignore error if there are no changed packages */ }
         for (const pkg of packageInfo) {
             pkg.changed = changedPackages.includes(pkg.name);
         }
@@ -25871,7 +25874,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.gitTag = exports.gitShow = exports.gitPush = exports.gitCommit = exports.gitAdd = void 0;
+exports.gitTag = exports.gitShow = exports.gitPush = exports.gitConfig = exports.gitCommit = exports.gitAdd = void 0;
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const core_1 = __webpack_require__(183);
@@ -25899,6 +25902,11 @@ function gitCommit(message, amend) {
     });
 }
 exports.gitCommit = gitCommit;
+function gitConfig() {
+    core.exportVariable("GIT_COMMITTER_NAME", core.getInput("git-committer-name"));
+    core.exportVariable("GIT_COMMITTER_EMAIL", core.getInput("git-committer-email"));
+}
+exports.gitConfig = gitConfig;
 function gitPush(branch, tags) {
     return __awaiter(this, void 0, void 0, function* () {
         // Check if there is anything to push

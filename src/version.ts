@@ -41,8 +41,7 @@ export class Version {
             changedFiles.push("CHANGELOG.md");
         }
 
-        process.env.GIT_COMMITTER_NAME = core.getInput("git-committer-name");
-        process.env.GIT_COMMITTER_EMAIL = core.getInput("git-committer-email");
+        utils.gitConfig();
         await utils.gitAdd(...changedFiles);
         await utils.gitCommit(`Bump version to ${newVersion}`);
         await utils.gitTag(`v${newVersion}`, `Release ${newVersion} to ${context.branch.tag}`);

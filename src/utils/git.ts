@@ -23,6 +23,11 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
     await exec.exec("git", cmdArgs);
 }
 
+export function gitConfig(): void {
+    core.exportVariable("GIT_COMMITTER_NAME", core.getInput("git-committer-name"));
+    core.exportVariable("GIT_COMMITTER_EMAIL", core.getInput("git-committer-email"));
+}
+
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
     // Check if there is anything to push
     if (!tags) {
