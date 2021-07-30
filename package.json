@@ -39,7 +39,8 @@
     "micromatch": "^4.0.4",
     "mime-types": "^2.1.27",
     "pluralize": "^8.0.0",
-    "semver": "^6.3.0"
+    "semver": "^6.3.0",
+    "semver-diff": "^4.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",

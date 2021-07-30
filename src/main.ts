@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import * as actions from "./actions";
 import * as utils from "./utils/core";
 
 async function run(): Promise<void> {
@@ -15,7 +16,7 @@ async function run(): Promise<void> {
         }
 
         for (const action of core.getInput("actions").split(",")) {
-            const actionHandler = require("./" + action.trim());
+            const actionHandler = (actions as any)[action.trim()];
             await actionHandler(context);
         }
     } catch (error) {

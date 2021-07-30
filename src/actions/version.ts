@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { IContext } from "../doc/IContext";
 import * as utils from "../utils";
@@ -8,7 +9,7 @@ import * as utils from "../utils";
 export default async function (context: IContext): Promise<void> {
     const jsonFile = context.isMonorepo ? "lerna.json" : "package.json";
     const currentVersion: string = JSON.parse(fs.readFileSync(jsonFile, "utf-8")).version;
-    const semverLevel = await checkPrForSemverLabel(context);
+    const semverLevel = await checkPrForSemverLabel() || await comparePackageJsonSemver(currentVersion);
     let newVersion = require("semver").inc(currentVersion, semverLevel as any) || currentVersion;
 
     if (context.branch.prerelease) {
@@ -47,7 +48,7 @@ export default async function (context: IContext): Promise<void> {
     await utils.gitPush(context.branch.name, true);
 }
 
-async function checkPrForSemverLabel(context: IContext): Promise<string | null> {
+async function checkPrForSemverLabel(): Promise<string | null> {
     const octokit = github.getOctokit(core.getInput("github-token"));
     const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
         ...github.context.repo,
@@ -82,6 +83,23 @@ async function checkPrForSemverLabel(context: IContext): Promise<string | null> 
             core.warning("Could not find semver label on pull request");
             return null;
     }
+}
+
+async function comparePackageJsonSemver(currentVersion: string): Promise<string | null> {
+    const baseCommitSha = github.context.payload.before;
+    let oldPackageJson: any = {};
+
+    try {
+        await exec.exec(`git fetch origin ${baseCommitSha}`);
+        const cmdOutput = (await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`])).stdout;
+        oldPackageJson = JSON.parse(cmdOutput);
+    } catch {
+        core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
+        return null;
+    }
+
+    const semverDiff = require("semver-diff");
+    return semverDiff(oldPackageJson.version, currentVersion) || null;
 }
 
 function updateChangelog(changelogFile: string, newVersion: string): void {
