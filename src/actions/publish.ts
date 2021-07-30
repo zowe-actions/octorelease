@@ -103,7 +103,8 @@ async function publishNpm(context: IContext, inDir?: string): Promise<void> {
     if (context.publishConfig.npm.tarballDir != null) {
         const tgzFile = await utils.npmPack(inDir);
         fs.mkdirSync(context.publishConfig.npm.tarballDir, { recursive: true });
-        fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.publishConfig.npm.tarballDir, path.basename(tgzFile)));
+        fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
+        console.log(path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
     }
 
     if (!context.publishConfig.npm.npmPublish) {

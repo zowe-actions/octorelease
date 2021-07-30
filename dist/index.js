@@ -14623,7 +14623,8 @@ function publishNpm(context, inDir) {
         if (context.publishConfig.npm.tarballDir != null) {
             const tgzFile = yield utils.npmPack(inDir);
             fs.mkdirSync(context.publishConfig.npm.tarballDir, { recursive: true });
-            fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.publishConfig.npm.tarballDir, path.basename(tgzFile)));
+            fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
+            console.log(path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
         }
         if (!context.publishConfig.npm.npmPublish) {
             return;
