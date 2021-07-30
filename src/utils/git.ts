@@ -22,9 +22,9 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
     await exec.exec("git", cmdArgs);
 }
 
-export function gitConfig(): void {
-    core.exportVariable("GIT_COMMITTER_NAME", core.getInput("git-committer-name"));
-    core.exportVariable("GIT_COMMITTER_EMAIL", core.getInput("git-committer-email"));
+export async function gitConfig(): Promise<void> {
+    await exec.exec("git", ["config", "--global", "user.name", core.getInput("git-committer-name")]);
+    await exec.exec("git", ["config", "--global", "user.email", core.getInput("git-committer-email")]);
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
@@ -39,7 +39,7 @@ export async function gitPush(branch: string, tags?: boolean): Promise<void> {
 
     const cmdArgs = ["push", "-u", "origin", branch];
     if (tags) {
-        cmdArgs.push("--tags");
+        cmdArgs.push("--follow-tags");
     }
     await exec.exec("git", cmdArgs);
 }

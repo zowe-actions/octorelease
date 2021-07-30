@@ -48,7 +48,7 @@ export default async function (context: IContext): Promise<void> {
         }
     }
 
-    utils.gitConfig();
+    await utils.gitConfig();
     await utils.gitAdd(...changedFiles);
     await utils.gitCommit(`Bump version to ${newVersion}`);
     await utils.gitTag(`v${newVersion}`, `Release ${newVersion} to ${context.branch.tag}`);

@@ -7293,7 +7293,7 @@ function default_1(context) {
                 changedFiles.push("CHANGELOG.md");
             }
         }
-        utils.gitConfig();
+        yield utils.gitConfig();
         yield utils.gitAdd(...changedFiles);
         yield utils.gitCommit(`Bump version to ${newVersion}`);
         yield utils.gitTag(`v${newVersion}`, `Release ${newVersion} to ${context.branch.tag}`);
@@ -29252,8 +29252,10 @@ function gitCommit(message, amend) {
 }
 exports.gitCommit = gitCommit;
 function gitConfig() {
-    core.exportVariable("GIT_COMMITTER_NAME", core.getInput("git-committer-name"));
-    core.exportVariable("GIT_COMMITTER_EMAIL", core.getInput("git-committer-email"));
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("git", ["config", "--global", "user.name", core.getInput("git-committer-name")]);
+        yield exec.exec("git", ["config", "--global", "user.email", core.getInput("git-committer-email")]);
+    });
 }
 exports.gitConfig = gitConfig;
 function gitPush(branch, tags) {
@@ -29268,7 +29270,7 @@ function gitPush(branch, tags) {
         }
         const cmdArgs = ["push", "-u", "origin", branch];
         if (tags) {
-            cmdArgs.push("--tags");
+            cmdArgs.push("--follow-tags");
         }
         yield exec.exec("git", cmdArgs);
     });
