@@ -68,7 +68,6 @@ async function checkPrForSemverLabel(): Promise<string | null> {
     }
 
     const prNumber = prs.data[0].number;
-    core.saveState("pr-number", prNumber);
     const labels = await octokit.issues.listLabelsOnIssue({
         ...github.context.repo,
         issue_number: prNumber

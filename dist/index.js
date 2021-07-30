@@ -7031,7 +7031,6 @@ function checkPrForSemverLabel() {
             return null;
         }
         const prNumber = prs.data[0].number;
-        core.saveState("pr-number", prNumber);
         const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber }));
         const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
         if (releaseLabels.length > 1) {
@@ -14565,10 +14564,10 @@ function default_1(context) {
                     break;
             }
         }
-        const prNumber = core.getState("pr-number");
-        if (prNumber != null) {
-            const octokit = github.getOctokit(core.getInput("github-token"));
-            yield octokit.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, labels: ["released"] }));
+        const octokit = github.getOctokit(core.getInput("github-token"));
+        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
+        if (prs.data.length > 0) {
+            yield octokit.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: prs.data[0].number, labels: ["released"] }));
         }
     });
 }
@@ -14624,7 +14623,6 @@ function publishNpm(context, inDir) {
             const tgzFile = yield utils.npmPack(inDir);
             fs.mkdirSync(context.publishConfig.npm.tarballDir, { recursive: true });
             fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
-            console.log(path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
         }
         if (!context.publishConfig.npm.npmPublish) {
             return;

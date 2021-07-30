@@ -24,12 +24,16 @@ export default async function (context: IContext): Promise<void> {
         }
     }
 
-    const prNumber = core.getState("pr-number");
-    if (prNumber != null) {
-        const octokit = github.getOctokit(core.getInput("github-token"));
+    const octokit = github.getOctokit(core.getInput("github-token"));
+    const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
+        ...github.context.repo,
+        commit_sha: github.context.sha
+    });
+
+    if (prs.data.length > 0) {
         await octokit.issues.addLabels({
             ...github.context.repo,
-            issue_number: prNumber,
+            issue_number: prs.data[0].number,
             labels: ["released"]
         });
     }
@@ -104,7 +108,6 @@ async function publishNpm(context: IContext, inDir?: string): Promise<void> {
         const tgzFile = await utils.npmPack(inDir);
         fs.mkdirSync(context.publishConfig.npm.tarballDir, { recursive: true });
         fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
-        console.log(path.resolve(context.publishConfig.npm.tarballDir, tgzFile));
     }
 
     if (!context.publishConfig.npm.npmPublish) {
