@@ -105,8 +105,7 @@ async function comparePackageJsonSemver(currentVersion: string): Promise<string 
         return null;
     }
 
-    const semverDiff = require("semver-diff");
-    return semverDiff(oldPackageJson.version, currentVersion) || null;
+    return require("semver").diff(oldPackageJson.version, currentVersion) || null;
 }
 
 function updateChangelog(changelogFile: string, newVersion: string): void {
