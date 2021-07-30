@@ -6981,7 +6981,7 @@ function default_1(context) {
     return __awaiter(this, void 0, void 0, function* () {
         const jsonFile = context.isMonorepo ? "lerna.json" : "package.json";
         const currentVersion = JSON.parse(fs.readFileSync(jsonFile, "utf-8")).version;
-        const semverLevel = (yield checkPrForSemverLabel()) || (yield comparePackageJsonSemver(currentVersion));
+        const semverLevel = (yield checkPrForSemverLabel()) || (yield comparePackageJsonSemver(jsonFile, currentVersion));
         let newVersion = __webpack_require__(864).inc(currentVersion, semverLevel) || currentVersion;
         if (context.branch.prerelease) {
             const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
@@ -7049,13 +7049,13 @@ function checkPrForSemverLabel() {
         }
     });
 }
-function comparePackageJsonSemver(currentVersion) {
+function comparePackageJsonSemver(jsonFile, currentVersion) {
     return __awaiter(this, void 0, void 0, function* () {
         const baseCommitSha = github.context.payload.before;
         let oldPackageJson = {};
         try {
             yield exec.exec(`git fetch origin ${baseCommitSha}`);
-            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
+            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:${jsonFile}`]);
             oldPackageJson = JSON.parse(cmdOutput.stdout);
         }
         catch (_a) {

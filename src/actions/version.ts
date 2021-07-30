@@ -9,7 +9,7 @@ import * as utils from "../utils";
 export default async function (context: IContext): Promise<void> {
     const jsonFile = context.isMonorepo ? "lerna.json" : "package.json";
     const currentVersion: string = JSON.parse(fs.readFileSync(jsonFile, "utf-8")).version;
-    const semverLevel = await checkPrForSemverLabel() || await comparePackageJsonSemver(currentVersion);
+    const semverLevel = await checkPrForSemverLabel() || await comparePackageJsonSemver(jsonFile, currentVersion);
     let newVersion = require("semver").inc(currentVersion, semverLevel as any) || currentVersion;
 
     if (context.branch.prerelease) {
@@ -91,13 +91,13 @@ async function checkPrForSemverLabel(): Promise<string | null> {
     }
 }
 
-async function comparePackageJsonSemver(currentVersion: string): Promise<string | null> {
+async function comparePackageJsonSemver(jsonFile: string, currentVersion: string): Promise<string | null> {
     const baseCommitSha = github.context.payload.before;
     let oldPackageJson: any = {};
 
     try {
         await exec.exec(`git fetch origin ${baseCommitSha}`);
-        const cmdOutput = await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
+        const cmdOutput = await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:${jsonFile}`]);
         oldPackageJson = JSON.parse(cmdOutput.stdout);
     } catch {
         core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
