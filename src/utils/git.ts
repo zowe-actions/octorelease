@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import { getExecOutput } from "./core";
 
 export async function gitAdd(...files: string[]): Promise<void> {
     await exec.exec("git", ["add", ...files]);
@@ -9,7 +8,7 @@ export async function gitAdd(...files: string[]): Promise<void> {
 export async function gitCommit(message: string, amend?: boolean): Promise<void> {
     // Check if there is anything to commit
     if (!amend) {
-        const cmdOutput = (await getExecOutput("git", ["diff", "--name-only", "--cached"])).stdout.trim();
+        const cmdOutput = (await exec.getExecOutput("git", ["diff", "--name-only", "--cached"])).stdout.trim();
         if (cmdOutput.length == 0) {
             core.warning("Nothing to commit");
             return;
@@ -31,7 +30,7 @@ export function gitConfig(): void {
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
     // Check if there is anything to push
     if (!tags) {
-        const cmdOutput = (await getExecOutput("git", ["cherry"])).stdout.trim();
+        const cmdOutput = (await exec.getExecOutput("git", ["cherry"])).stdout.trim();
         if (cmdOutput.length == 0) {
             core.warning("Nothing to push");
             return;
@@ -47,7 +46,7 @@ export async function gitPush(branch: string, tags?: boolean): Promise<void> {
 
 export async function gitShow(gitHash: string, filename: string): Promise<string> {
     await exec.exec("git", ["fetch", "origin", gitHash]);
-    return (await getExecOutput("git", ["--no-pager", "show", `${gitHash}:${filename}`])).stdout;
+    return (await exec.getExecOutput("git", ["--no-pager", "show", `${gitHash}:${filename}`])).stdout;
 }
 
 export async function gitTag(tagName: string, message?: string): Promise<void> {

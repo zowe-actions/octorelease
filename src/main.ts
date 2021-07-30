@@ -1,8 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as utils from "./utils/core";
-import { Publish } from "./publish";
-import { Version } from "./version";
 
 async function run(): Promise<void> {
     try {
@@ -16,12 +14,10 @@ async function run(): Promise<void> {
             process.exit();
         }
 
-        const [currentVersion, newVersion] = await Version.version(context);
-        if (newVersion !== currentVersion) {
-            core.setOutput("new-version", newVersion);
+        for (const action of core.getInput("actions").split(",")) {
+            const actionHandler = require("./" + action.trim());
+            await actionHandler(context);
         }
-
-        await Publish.publish(context, newVersion);
     } catch (error) {
         core.setFailed(error.message);
     }

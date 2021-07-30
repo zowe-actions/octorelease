@@ -1,6 +1,4 @@
 import * as fs from "fs";
-import { StringDecoder } from "string_decoder";
-import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext } from "../doc/IContext";
@@ -37,46 +35,4 @@ export async function buildContext(): Promise<IContext | undefined> {
         isMonorepo: fs.existsSync("lerna.json"),
         publishConfig
     };
-}
-
-// https://github.com/actions/toolkit/pull/814
-export async function getExecOutput(commandLine: string, args?: string[], options?: exec.ExecOptions):
-        Promise<{ exitCode: number, stdout: string, stderr: string }> {
-    let stdout = "";
-    let stderr = "";
-  
-    //Using string decoder covers the case where a mult-byte character is split
-    const stdoutDecoder = new StringDecoder("utf8");
-    const stderrDecoder = new StringDecoder("utf8");
-  
-    const originalStdoutListener = options?.listeners?.stdout;
-    const originalStdErrListener = options?.listeners?.stderr;
-  
-    const stdErrListener = (data: Buffer): void => {
-        stderr += stderrDecoder.write(data);
-        if (originalStdErrListener) {
-            originalStdErrListener(data);
-        }
-    }
-  
-    const stdOutListener = (data: Buffer): void => {
-        stdout += stdoutDecoder.write(data);
-        if (originalStdoutListener) {
-            originalStdoutListener(data);
-        }
-    }
-  
-    const listeners = {
-        ...options?.listeners,
-        stdout: stdOutListener,
-        stderr: stdErrListener
-    };
-
-    const exitCode = await exec.exec(commandLine, args, {...options, listeners});
-  
-    //flush any remaining characters
-    stdout += stdoutDecoder.end();
-    stderr += stderrDecoder.end();
-  
-    return { exitCode, stdout, stderr };
 }

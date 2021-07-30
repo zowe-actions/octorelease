@@ -2,6 +2,14 @@ name: 'node-versioner'
 description: 'GitHub Action to version a Node.js project and publish it to GitHub/NPM registry/VS Code Marketplace'
 author: 't1m0thyj'
 inputs:
+  actions:
+    description: 'Comma-separated list of actions to perform'
+    required: false
+    default: 'version,publish'
+  commit-updates:
+    description: 'Specifies whether dependency updates should be committed'
+    required: false
+    default: 'false'
   git-committer-name:
     description: 'Username used to commit changes with Git'
     required: false
@@ -18,9 +26,11 @@ inputs:
     description: 'Token used to publish package to NPM registry'
     required: false
     default: ''
-outputs:
-  new-version:
-    description: 'The new package version if it has changed'
+  # update-changelog:
+  #   description: 'Specifies whether changelog version should be bumped'
+  #   required: false
+  #   default: 'true'
+# outputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'

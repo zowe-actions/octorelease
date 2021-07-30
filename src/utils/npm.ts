@@ -3,7 +3,6 @@ import * as os from "os";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext } from "../doc";
-import { getExecOutput } from "./core";
 
 export async function npmAddTag(pkgName: string, pkgVersion: string, tag: string, inDir?: string): Promise<void> {
     await exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
@@ -24,7 +23,7 @@ export function npmConfig(context: IContext, registry: string, scope?: string): 
 }
 
 export async function npmPack(inDir?: string): Promise<string> {
-    const cmdOutput = await getExecOutput("npm", ["pack"], { cwd: inDir });
+    const cmdOutput = await exec.getExecOutput("npm", ["pack"], { cwd: inDir });
     return cmdOutput.stdout.split("\n").pop() as any;
 }
 
@@ -48,7 +47,7 @@ export async function npmVersion(newVersion: string): Promise<void> {
 
 export async function npmViewVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
     try {
-        return (await getExecOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
+        return (await exec.getExecOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
     } catch {
         core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
     }
