@@ -31,14 +31,21 @@ export default async function (context: IContext): Promise<void> {
 
         for (const { location } of (await utils.lernaList()).filter(pkg => pkg.changed)) {
             const pkgRoot = path.relative(process.cwd(), location);
-            const changelogFile = path.join(pkgRoot, "CHANGELOG.md");
-            updateChangelog(changelogFile, newVersion);
-            changedFiles.push(`${pkgRoot}/CHANGELOG.md`, `${pkgRoot}/package.json`);
+            changedFiles.push(`${pkgRoot}/package.json`);
+
+            if (core.getBooleanInput("update-changelog")) {
+                const changelogFile = path.join(pkgRoot, "CHANGELOG.md");
+                updateChangelog(changelogFile, newVersion);
+                changedFiles.push(`${pkgRoot}/CHANGELOG.md`);
+            }
         }
     } else {
         await utils.npmVersion(newVersion);
-        updateChangelog("CHANGELOG.md", newVersion);
-        changedFiles.push("CHANGELOG.md");
+
+        if (core.getBooleanInput("update-changelog")) {
+            updateChangelog("CHANGELOG.md", newVersion);
+            changedFiles.push("CHANGELOG.md");
+        }
     }
 
     utils.gitConfig();

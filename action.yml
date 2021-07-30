@@ -26,10 +26,10 @@ inputs:
     description: 'Token used to publish package to NPM registry'
     required: false
     default: ''
-  # update-changelog:
-  #   description: 'Specifies whether changelog version should be bumped'
-  #   required: false
-  #   default: 'true'
+  update-changelog:
+    description: 'Specifies whether changelog version should be bumped'
+    required: false
+    default: 'true'
 # outputs:
 runs:
   using: 'node12'
