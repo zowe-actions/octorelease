@@ -24,7 +24,7 @@ export function npmConfig(context: IContext, registry: string, scope?: string): 
 
 export async function npmPack(inDir?: string): Promise<string> {
     const cmdOutput = await exec.getExecOutput("npm", ["pack"], { cwd: inDir });
-    return cmdOutput.stdout.split("\n").pop() as any;
+    return cmdOutput.stdout.trim();
 }
 
 export async function npmPublish(tag: string, inDir?: string): Promise<void> {

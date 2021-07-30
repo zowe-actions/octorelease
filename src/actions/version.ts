@@ -98,8 +98,8 @@ async function comparePackageJsonSemver(currentVersion: string): Promise<string 
 
     try {
         await exec.exec(`git fetch origin ${baseCommitSha}`);
-        const cmdOutput = (await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`])).stdout;
-        oldPackageJson = JSON.parse(cmdOutput);
+        const cmdOutput = await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
+        oldPackageJson = JSON.parse(cmdOutput.stdout);
     } catch {
         core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
         return null;

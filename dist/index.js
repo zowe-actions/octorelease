@@ -7056,8 +7056,8 @@ function comparePackageJsonSemver(currentVersion) {
         let oldPackageJson = {};
         try {
             yield exec.exec(`git fetch origin ${baseCommitSha}`);
-            const cmdOutput = (yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`])).stdout;
-            oldPackageJson = JSON.parse(cmdOutput);
+            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
+            oldPackageJson = JSON.parse(cmdOutput.stdout);
         }
         catch (_a) {
             core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
@@ -16996,7 +16996,7 @@ exports.npmConfig = npmConfig;
 function npmPack(inDir) {
     return __awaiter(this, void 0, void 0, function* () {
         const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
-        return cmdOutput.stdout.split("\n").pop();
+        return cmdOutput.stdout.trim();
     });
 }
 exports.npmPack = npmPack;
