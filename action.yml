@@ -1,35 +1,11 @@
 name: 'node-versioner'
-description: 'GitHub Action to version a Node.js project and publish it to GitHub/NPM registry/VS Code Marketplace'
+description: 'GitHub Action to version and publish a Zowe project'
 author: 't1m0thyj'
 inputs:
-  actions:
-    description: 'Comma-separated list of actions to perform'
-    required: false
-    default: 'version,publish'
-  commit-updates:
-    description: 'Specifies whether dependency updates should be committed'
+  dry-run:
+    description: 'Print the list of actions that would be performed'
     required: false
     default: 'false'
-  git-committer-name:
-    description: 'Username used to commit changes with Git'
-    required: false
-    default: 'github-actions[bot]'
-  git-committer-email:
-    description: 'Email used to commit changes with Git'
-    required: false
-    default: '41898282+github-actions[bot]@users.noreply.github.com'
-  github-token:
-    description: 'Token used to create release in GitHub repo'
-    required: false
-    default: '${{ github.token }}'
-  npm-token:
-    description: 'Token used to publish package to NPM registry'
-    required: false
-    default: ''
-  update-changelog:
-    description: 'Specifies whether changelog version should be bumped'
-    required: false
-    default: 'true'
 # outputs:
 runs:
   using: 'node12'

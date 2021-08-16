@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as actions from "./actions";
-import * as utils from "./utils/core";
+import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {
@@ -15,9 +15,18 @@ async function run(): Promise<void> {
             process.exit();
         }
 
-        for (const action of core.getInput("actions").split(",")) {
-            const actionHandler = (actions as any)[action.trim()];
-            await actionHandler(context);
+        // TODO Implement support for dry run flag on all plugins
+        const pluginsLoaded = await utils.loadPlugins(context);
+        try {
+            await actions.init(context, pluginsLoaded);
+            await utils.postInit(context);
+            await actions.version(context, pluginsLoaded);
+            await actions.publish(context, pluginsLoaded);
+            await actions.success(context, pluginsLoaded);
+        } catch (error) {
+            context.failError = error;
+            await actions.fail(context, pluginsLoaded);
+            throw error;
         }
     } catch (error) {
         core.setFailed(error.message);

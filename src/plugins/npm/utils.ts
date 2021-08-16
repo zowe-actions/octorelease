@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import { IContext } from "../doc";
+import { IContext } from "../../doc";
 
 export async function npmAddTag(pkgName: string, pkgVersion: string, tag: string, inDir?: string): Promise<void> {
     await exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
@@ -17,7 +17,7 @@ export function npmConfig(context: IContext, registry: string, scope?: string): 
     }
 
     // Remove HTTP or HTTPS protocol from front of registry URL
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + core.getInput("npm-token");
+    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.env.NPM_TOKEN;
     const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
     fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
 }

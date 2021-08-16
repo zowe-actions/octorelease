@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import { IContext } from "../../doc";
 
 export async function gitAdd(...files: string[]): Promise<void> {
     await exec.exec("git", ["add", ...files]);
@@ -22,9 +23,9 @@ export async function gitCommit(message: string, amend?: boolean): Promise<void>
     await exec.exec("git", cmdArgs);
 }
 
-export async function gitConfig(): Promise<void> {
-    await exec.exec("git", ["config", "--global", "user.name", core.getInput("git-committer-name")]);
-    await exec.exec("git", ["config", "--global", "user.email", core.getInput("git-committer-email")]);
+export async function gitConfig(context: IContext): Promise<void> {
+    await exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
+    await exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
 }
 
 export async function gitPush(branch: string, tags?: boolean): Promise<void> {
@@ -42,11 +43,6 @@ export async function gitPush(branch: string, tags?: boolean): Promise<void> {
         cmdArgs.push("--follow-tags");
     }
     await exec.exec("git", cmdArgs);
-}
-
-export async function gitShow(gitHash: string, filename: string): Promise<string> {
-    await exec.exec("git", ["fetch", "origin", gitHash]);
-    return (await exec.getExecOutput("git", ["--no-pager", "show", `${gitHash}:${filename}`])).stdout;
 }
 
 export async function gitTag(tagName: string, message?: string): Promise<void> {
