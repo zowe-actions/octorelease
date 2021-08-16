@@ -16869,7 +16869,7 @@ function buildContext() {
             branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
         }
         const pluginConfig = {};
-        for (const pc of config.config.pluginConfig) {
+        for (const pc of config.config.plugins) {
             if (typeof pc === "string") {
                 pluginConfig[pc] = {};
             }
