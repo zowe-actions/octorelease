@@ -16850,13 +16850,6 @@ const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
 const cosmiconfig_1 = __webpack_require__(471);
-const builtinPlugins = {
-    changelog: __webpack_require__(749),
-    git: __webpack_require__(583),
-    github: __webpack_require__(64),
-    lerna: __webpack_require__(680),
-    npm: __webpack_require__(123)
-};
 function buildContext() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -16897,19 +16890,22 @@ function buildContext() {
 exports.buildContext = buildContext;
 function loadPlugins(context) {
     return __awaiter(this, void 0, void 0, function* () {
+        const builtinPlugins = {
+            changelog: __webpack_require__(749),
+            git: __webpack_require__(583),
+            github: __webpack_require__(64),
+            lerna: __webpack_require__(680),
+            npm: __webpack_require__(123)
+        };
         const pluginsLoaded = {};
         for (const pluginName in context.plugins) {
-            let pluginPath;
             if (pluginName.startsWith("_")) {
-                pluginPath = __dirname + "/../lib/" + pluginName.slice(1);
+                pluginsLoaded[pluginName] = builtinPlugins[pluginName.slice(1)];
             }
             else if (pluginName.startsWith("./")) {
-                pluginPath = path.resolve(pluginName);
+                const pluginPath = (pluginName.startsWith("./") ? "" : "./node_modules/") + pluginName;
+                pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
             }
-            else {
-                pluginPath = path.resolve("./node_modules/" + pluginName);
-            }
-            pluginsLoaded[pluginName] = require(pluginPath);
         }
         return pluginsLoaded;
     });
