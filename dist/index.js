@@ -19252,9 +19252,9 @@ const publish_1 = __importDefault(__webpack_require__(964));
 const utils = __importStar(__webpack_require__(83));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        for (const { dir } of yield utils.lernaList()) {
+        for (const { location } of yield utils.lernaList()) {
             // TODO Support Yarn publish as alternative option
-            yield publish_1.default(context, config, dir);
+            yield publish_1.default(context, config, location);
         }
     });
 }
