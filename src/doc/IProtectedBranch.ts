@@ -1,7 +1,6 @@
 export interface IProtectedBranch {
     name: string;
-    tag?: string;
+    channel?: string;
     level?: "major" | "minor" | "patch";
     prerelease?: boolean | string;
-    aliasTags?: string[];
 }

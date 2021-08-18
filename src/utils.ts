@@ -13,14 +13,12 @@ export async function buildContext(): Promise<IContext | undefined> {
 
     const branchName = github.context.payload.pull_request?.base.ref || github.context.ref.replace(/^refs\/heads\//, "");
     const micromatch = require("micromatch");
-    const branch = config.config.branches
-        .map((branch: any) => typeof branch === "string" ? { name: branch } : branch)
-        .find((branch: any) => micromatch.isMatch(branchName, branch.name));
-    if (branch == null) {
+    const branches = config.config.branches.map((branch: any) => typeof branch === "string" ? { name: branch } : branch);
+    const branchIndex = branches.findIndex((branch: any) => micromatch.isMatch(branchName, branch.name));
+    if (branchIndex == -1) {
         return;
-    }
-    if (branch.tag == null) {
-        branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
+    } else if (branchIndex > 0 && branches[branchIndex].channel == null) {
+        branches[branchIndex].channel = branches[branchIndex].name;
     }
 
     const pluginConfig: Record<string, Record<string, any>> = {};
@@ -33,7 +31,7 @@ export async function buildContext(): Promise<IContext | undefined> {
     }
 
     return {
-        branch,
+        branch: branches[branchIndex],
         changedFiles: [],
         dryRun: core.getBooleanInput("dry-run"),
         env: process.env as any,

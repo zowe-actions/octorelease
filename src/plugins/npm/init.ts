@@ -4,6 +4,7 @@ import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { IContext } from "../../doc";
 import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (context.env.NPM_TOKEN == null) {
@@ -11,6 +12,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const baseCommitSha = github.context.payload.before;
+    let publishConfig;
 
     try {
         await exec.exec(`git fetch origin ${baseCommitSha}`);
@@ -21,8 +23,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     try {
-        context.version.new = JSON.parse(fs.readFileSync("package.json", "utf-8")).version;
+        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+        context.version.new = packageJson.version;
+        publishConfig = packageJson.publishConfig;
     } catch {
         core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
+
+    context.branch.channel = context.branch.channel || "latest";
+    await utils.npmConfig(context, publishConfig?.npmRegistry || "https://registry.npmjs.org/");
 }

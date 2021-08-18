@@ -24,36 +24,23 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         core.info(`Skipping publish of private package ${packageJson.name}`);
     }
 
-    const npmRegistry: string | undefined = packageJson.publishConfig?.registry;
-    let npmScope: string | undefined;
+    const npmRegistry: string = packageJson.publishConfig?.registry || "https://registry.npmjs.org/";
+    const packageTag = context.branch.channel as string;
 
-    if (npmRegistry == null) {
-        throw new Error("Expected NPM registry to be defined in package.json but it is not");
+    // Publish package
+    const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
+    if (!alreadyPublished) {
+        await utils.npmPublish(packageTag, npmRegistry, inDir);
+    } else {
+        core.error(`Version ${packageJson.version} has already been published to NPM`);
     }
 
-    if (packageJson.name.includes("/")) {
-        npmScope = packageJson.name.split("/")[0];
-    }
-
-    // TODO Configure .npmrc in the init step
-    utils.npmConfig(context, npmRegistry, npmScope);
-
-    try {
-        // Publish package
-        const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
-        if (!alreadyPublished) {
-            await utils.npmPublish(context.branch.tag, inDir);
-        } else {
-            core.error(`Version ${packageJson.version} has already been published to NPM`);
+    // Add alias tags
+    if (config.aliasTags?.[packageTag] != null) {
+        const aliasTagOrTags = config.aliasTags[packageTag];
+        const aliasTags: string[] = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
+        for (const tag of aliasTags) {
+            await utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
         }
-
-        // Add alias tags
-        if (context.branch.aliasTags) {
-            for (const tag of context.branch.aliasTags) {
-                await utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
-            }
-        }
-    } finally {
-        utils.npmReset();
     }
 }

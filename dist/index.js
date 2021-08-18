@@ -4706,12 +4706,14 @@ const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
+const utils = __importStar(__webpack_require__(838));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.env.NPM_TOKEN == null) {
             throw new Error("Required environment variable NPM_TOKEN is undefined");
         }
         const baseCommitSha = github.context.payload.before;
+        let publishConfig;
         try {
             yield exec.exec(`git fetch origin ${baseCommitSha}`);
             const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
@@ -4721,11 +4723,15 @@ function default_1(context, config) {
             core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
         }
         try {
-            context.version.new = JSON.parse(fs.readFileSync("package.json", "utf-8")).version;
+            const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+            context.version.new = packageJson.version;
+            publishConfig = packageJson.publishConfig;
         }
         catch (_b) {
             core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
         }
+        context.branch.channel = context.branch.channel || "latest";
+        yield utils.npmConfig(context, (publishConfig === null || publishConfig === void 0 ? void 0 : publishConfig.npmRegistry) || "https://registry.npmjs.org/");
     });
 }
 exports.default = default_1;
@@ -5205,14 +5211,13 @@ function buildContext() {
         }
         const branchName = ((_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.ref) || github.context.ref.replace(/^refs\/heads\//, "");
         const micromatch = __webpack_require__(74);
-        const branch = config.config.branches
-            .map((branch) => typeof branch === "string" ? { name: branch } : branch)
-            .find((branch) => micromatch.isMatch(branchName, branch.name));
-        if (branch == null) {
+        const branches = config.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
+        const branchIndex = branches.findIndex((branch) => micromatch.isMatch(branchName, branch.name));
+        if (branchIndex == -1) {
             return;
         }
-        if (branch.tag == null) {
-            branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
+        else if (branchIndex > 0 && branches[branchIndex].channel == null) {
+            branches[branchIndex].channel = branches[branchIndex].name;
         }
         const pluginConfig = {};
         for (const pc of config.config.plugins) {
@@ -5224,7 +5229,7 @@ function buildContext() {
             }
         }
         return {
-            branch,
+            branch: branches[branchIndex],
             changedFiles: [],
             dryRun: core.getBooleanInput("dry-run"),
             env: process.env,
@@ -7233,12 +7238,14 @@ const fs = __importStar(__webpack_require__(747));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const github = __importStar(__webpack_require__(469));
+const npmUtils = __importStar(__webpack_require__(838));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.env.NPM_TOKEN == null) {
             throw new Error("Required environment variable NPM_TOKEN is undefined");
         }
         const baseCommitSha = github.context.payload.before;
+        let publishConfig;
         try {
             yield exec.exec(`git fetch origin ${baseCommitSha}`);
             const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:lerna.json`]);
@@ -7248,7 +7255,9 @@ function default_1(context, config) {
             core.warning(`Missing or invalid lerna.json in commit ${baseCommitSha}`);
         }
         try {
-            context.version.new = JSON.parse(fs.readFileSync("lerna.json", "utf-8")).version;
+            const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
+            context.version.new = lernaJson.version;
+            publishConfig = lernaJson.publish;
         }
         catch (_b) {
             core.warning(`Missing or invalid lerna.json in branch ${context.branch.name}`);
@@ -7259,6 +7268,8 @@ function default_1(context, config) {
         catch (_c) {
             core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
         }
+        context.branch.channel = context.branch.channel || "latest";
+        yield npmUtils.npmConfig(context, (publishConfig === null || publishConfig === void 0 ? void 0 : publishConfig.registry) || "https://registry.npmjs.org/");
     });
 }
 exports.default = default_1;
@@ -10195,10 +10206,29 @@ exports.Explorer = Explorer;
 /***/ }),
 
 /***/ 343:
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10209,6 +10239,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils = __importStar(__webpack_require__(820));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.env.GIT_COMMITTER_NAME == null) {
@@ -10217,6 +10248,7 @@ function default_1(context, config) {
         if (context.env.GIT_COMMITTER_EMAIL == null) {
             throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
         }
+        yield utils.gitConfig(context);
     });
 }
 exports.default = default_1;
@@ -13814,7 +13846,7 @@ const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const utils = __importStar(__webpack_require__(838));
 function default_1(context, config, inDir) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const cwd = inDir || process.cwd();
         if (config.tarballDir != null) {
@@ -13829,34 +13861,23 @@ function default_1(context, config, inDir) {
         if (packageJson.private) {
             core.info(`Skipping publish of private package ${packageJson.name}`);
         }
-        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
-        let npmScope;
-        if (npmRegistry == null) {
-            throw new Error("Expected NPM registry to be defined in package.json but it is not");
+        const npmRegistry = ((_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry) || "https://registry.npmjs.org/";
+        const packageTag = context.branch.channel;
+        // Publish package
+        const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
+        if (!alreadyPublished) {
+            yield utils.npmPublish(packageTag, npmRegistry, inDir);
         }
-        if (packageJson.name.includes("/")) {
-            npmScope = packageJson.name.split("/")[0];
+        else {
+            core.error(`Version ${packageJson.version} has already been published to NPM`);
         }
-        // TODO Configure .npmrc in the init step
-        utils.npmConfig(context, npmRegistry, npmScope);
-        try {
-            // Publish package
-            const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
-            if (!alreadyPublished) {
-                yield utils.npmPublish(context.branch.tag, inDir);
+        // Add alias tags
+        if (((_b = config.aliasTags) === null || _b === void 0 ? void 0 : _b[packageTag]) != null) {
+            const aliasTagOrTags = config.aliasTags[packageTag];
+            const aliasTags = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
+            for (const tag of aliasTags) {
+                yield utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
             }
-            else {
-                core.error(`Version ${packageJson.version} has already been published to NPM`);
-            }
-            // Add alias tags
-            if (context.branch.aliasTags) {
-                for (const tag of context.branch.aliasTags) {
-                    yield utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
-                }
-            }
-        }
-        finally {
-            utils.npmReset();
         }
     });
 }
@@ -19308,13 +19329,11 @@ const utils = __importStar(__webpack_require__(820));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
         const commitMessage = config.commitMessage || "Bump version to {{version}}";
-        const tagMessage = config.tagMessage || `Release {{version}} to ${context.branch.tag}`;
+        const tagMessage = config.tagMessage || (context.branch.channel && `Release {{version}} to ${context.branch.channel}`);
         if (context.version.new != null) {
-            // TODO Configure Git in the init step
-            yield utils.gitConfig(context);
             yield utils.gitAdd(...context.changedFiles);
             yield utils.gitCommit(commitMessage.replace("{{version}}", context.version.new));
-            yield utils.gitTag(`v${context.version.new}`, tagMessage.replace("{{version}}", context.version.new));
+            yield utils.gitTag(`v${context.version.new}`, tagMessage === null || tagMessage === void 0 ? void 0 : tagMessage.replace("{{version}}", context.version.new));
             yield utils.gitPush(context.branch.name, true);
         }
     });
@@ -23456,9 +23475,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.npmViewVersion = exports.npmVersion = exports.npmReset = exports.npmPublish = exports.npmPack = exports.npmConfig = exports.npmAddTag = void 0;
+exports.npmViewVersion = exports.npmVersion = exports.npmPublish = exports.npmPack = exports.npmConfig = exports.npmAddTag = void 0;
 const fs = __importStar(__webpack_require__(747));
 const os = __importStar(__webpack_require__(87));
+const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 function npmAddTag(pkgName, pkgVersion, tag, inDir) {
@@ -23467,16 +23487,14 @@ function npmAddTag(pkgName, pkgVersion, tag, inDir) {
     });
 }
 exports.npmAddTag = npmAddTag;
-function npmConfig(context, registry, scope) {
-    registry = registry.endsWith("/") ? registry : (registry + "/");
-    scope = scope === null || scope === void 0 ? void 0 : scope.toLowerCase();
-    if (fs.existsSync(".npmrc")) {
-        fs.renameSync(".npmrc", ".npmrc.bak");
-    }
-    // Remove HTTP or HTTPS protocol from front of registry URL
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.env.NPM_TOKEN;
-    const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
+function npmConfig(context, registry) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Add trailing slash to end of registry URL and remove protocol at start
+        registry = registry.endsWith("/") ? registry : (registry + "/");
+        const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.env.NPM_TOKEN;
+        fs.appendFileSync(path.join(os.homedir(), ".npmrc"), authLine);
+        yield exec.exec("npm", ["whoami", "--registry", registry]);
+    });
 }
 exports.npmConfig = npmConfig;
 function npmPack(inDir) {
@@ -23486,21 +23504,12 @@ function npmPack(inDir) {
     });
 }
 exports.npmPack = npmPack;
-function npmPublish(tag, inDir) {
+function npmPublish(tag, registry, inDir) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("npm", ["publish", "--tag", tag], { cwd: inDir });
+        yield exec.exec("npm", ["publish", "--tag", tag, "--registry", registry], { cwd: inDir });
     });
 }
 exports.npmPublish = npmPublish;
-function npmReset() {
-    if (fs.existsSync(".npmrc")) {
-        fs.unlinkSync(".npmrc");
-    }
-    if (fs.existsSync(".npmrc.bak")) {
-        fs.renameSync(".npmrc.bak", ".npmrc");
-    }
-}
-exports.npmReset = npmReset;
 function npmVersion(newVersion) {
     return __awaiter(this, void 0, void 0, function* () {
         yield exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
