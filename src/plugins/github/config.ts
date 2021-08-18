@@ -1,3 +1,4 @@
 export interface IPluginConfig {
-    assets: string | string[];
+    assets?: string | string[];
+    checkPrLabels?: boolean;
 }

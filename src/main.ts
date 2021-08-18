@@ -19,7 +19,7 @@ async function run(): Promise<void> {
         const pluginsLoaded = await utils.loadPlugins(context);
         try {
             await actions.init(context, pluginsLoaded);
-            await utils.postInit(context);
+            await utils.verifyConditions(context);
             await actions.version(context, pluginsLoaded);
             await actions.publish(context, pluginsLoaded);
             await actions.success(context, pluginsLoaded);

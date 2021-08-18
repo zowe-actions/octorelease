@@ -10,7 +10,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (context.version.new != null) {
         const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
         const release = await createRelease(octokit, context.version.new, context.releaseNotes);
-        if (config.assets?.length > 0) {
+        if (config.assets != null && config.assets.length > 0) {
             const assetPaths: string[] = (typeof config.assets === "string") ? [config.assets] : config.assets;
             await uploadAssets(octokit, release, assetPaths);
         }

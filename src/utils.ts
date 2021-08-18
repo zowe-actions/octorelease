@@ -62,7 +62,7 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     return pluginsLoaded;
 }
 
-export async function postInit(context: IContext): Promise<void> {
+export async function verifyConditions(context: IContext): Promise<void> {
     if (context.env.GITHUB_TOKEN == null) {
         throw new Error("Required environment variable GITHUB_TOKEN is undefined");
     }
@@ -74,13 +74,9 @@ export async function postInit(context: IContext): Promise<void> {
         }
     }
 
-    const releaseType = await getPrReleaseType(context);
     context.version.new = context.version.new || context.version.old;
-    if (releaseType != null) {
-        context.version.new = require("semver").inc(context.version.old, releaseType);
-    }
+    const semverDiff = require("semver").diff(context.version.old, context.version.new);
 
-    const semverDiff = releaseType || require("semver").diff(context.version.old, context.version.new);
     if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
             (semverDiff === "minor" && context.branch.level === "patch")) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
@@ -90,41 +86,5 @@ export async function postInit(context: IContext): Promise<void> {
         const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
         const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
         context.version.new = `${context.version.new.split("-")[0]}-${prereleaseName}.${timestamp}`;
-    }
-}
-
-async function getPrReleaseType(context: IContext): Promise<string | null> {
-    const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
-    const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
-        ...github.context.repo,
-        commit_sha: github.context.sha
-    });
-
-    if (prs.data.length === 0) {
-        core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
-        return null;
-    }
-
-    const prNumber = prs.data[0].number;
-    const labels = await octokit.issues.listLabelsOnIssue({
-        ...github.context.repo,
-        issue_number: prNumber
-    });
-    const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
-
-    if (releaseLabels.length > 1) {
-        throw new Error("Detected multiple semver labels on pull request, there should only be one");
-    }
-
-    switch (releaseLabels[0]?.name) {
-        case "release-major":
-            return "major";
-        case "release-minor":
-            return "minor";
-        case "release-patch":
-            return "patch";
-        default:
-            core.warning("Could not find semver label on pull request");
-            return null;
     }
 }

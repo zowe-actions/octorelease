@@ -6,17 +6,18 @@ import { IContext } from "../../doc";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    context.releaseNotes = await getReleaseNotes(context, headerLine);
+    context.releaseNotes = await getReleaseNotes(context, changelogFile, headerLine);
 }
 
-async function getReleaseNotes(context: IContext, headerLine: string): Promise<string | undefined> {
+async function getReleaseNotes(context: IContext, changelogFile: string, headerLine: string): Promise<string | undefined> {
     if (context.workspaces != null) {
         const globber = await glob.create(context.workspaces.join("\n"));
         let releaseNotes = "";
 
         for (const packageDir of await globber.glob()) {
-            const packageReleaseNotes = getPackageChangelog(path.join(packageDir, "CHANGELOG.md"), headerLine);
+            const packageReleaseNotes = getPackageChangelog(path.join(packageDir, changelogFile), headerLine);
             if (packageReleaseNotes != null) {
                 // TODO Use package name as header instead of directory name
                 releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
@@ -25,7 +26,7 @@ async function getReleaseNotes(context: IContext, headerLine: string): Promise<s
 
         return releaseNotes || undefined;
     } else {
-        return getPackageChangelog("CHANGELOG.md", headerLine);
+        return getPackageChangelog(changelogFile, headerLine);
     }
 }
 

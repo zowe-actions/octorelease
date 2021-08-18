@@ -4786,18 +4786,19 @@ const core = __importStar(__webpack_require__(470));
 const glob = __importStar(__webpack_require__(281));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
+        const changelogFile = config.changelogFile || "CHANGELOG.md";
         const headerLine = config.headerLine || "## Recent Changes";
-        context.releaseNotes = yield getReleaseNotes(context, headerLine);
+        context.releaseNotes = yield getReleaseNotes(context, changelogFile, headerLine);
     });
 }
 exports.default = default_1;
-function getReleaseNotes(context, headerLine) {
+function getReleaseNotes(context, changelogFile, headerLine) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.workspaces != null) {
             const globber = yield glob.create(context.workspaces.join("\n"));
             let releaseNotes = "";
             for (const packageDir of yield globber.glob()) {
-                const packageReleaseNotes = getPackageChangelog(path.join(packageDir, "CHANGELOG.md"), headerLine);
+                const packageReleaseNotes = getPackageChangelog(path.join(packageDir, changelogFile), headerLine);
                 if (packageReleaseNotes != null) {
                     // TODO Use package name as header instead of directory name
                     releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
@@ -4806,7 +4807,7 @@ function getReleaseNotes(context, headerLine) {
             return releaseNotes || undefined;
         }
         else {
-            return getPackageChangelog("CHANGELOG.md", headerLine);
+            return getPackageChangelog(changelogFile, headerLine);
         }
     });
 }
@@ -5338,7 +5339,7 @@ function run() {
             const pluginsLoaded = yield utils.loadPlugins(context);
             try {
                 yield actions.init(context, pluginsLoaded);
-                yield utils.postInit(context);
+                yield utils.verifyConditions(context);
                 yield actions.version(context, pluginsLoaded);
                 yield actions.publish(context, pluginsLoaded);
                 yield actions.success(context, pluginsLoaded);
@@ -14070,19 +14071,20 @@ const core = __importStar(__webpack_require__(470));
 const glob = __importStar(__webpack_require__(281));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
+        const changelogFile = config.changelogFile || "CHANGELOG.md";
         const headerLine = config.headerLine || "## Recent Changes";
         if (context.version.new != null) {
             if (context.workspaces != null) {
                 const globber = yield glob.create(context.workspaces.join("\n"));
                 for (const packageDir of yield globber.glob()) {
-                    const changelogPath = path.join(packageDir, "CHANGELOG.md");
+                    const changelogPath = path.join(packageDir, changelogFile);
                     if (updateChangelog(changelogPath, headerLine, context.version.new)) {
                         context.changedFiles.push(changelogPath);
                     }
                 }
             }
-            else if (updateChangelog("CHANGELOG.md", headerLine, context.version.new)) {
-                context.changedFiles.push("CHANGELOG.md");
+            else if (updateChangelog(changelogFile, headerLine, context.version.new)) {
+                context.changedFiles.push(changelogFile);
             }
         }
     });
@@ -14253,12 +14255,11 @@ const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const glob = __importStar(__webpack_require__(281));
 function default_1(context, config) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         if (context.version.new != null) {
             const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
             const release = yield createRelease(octokit, context.version.new, context.releaseNotes);
-            if (((_a = config.assets) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            if (config.assets != null && config.assets.length > 0) {
                 const assetPaths = (typeof config.assets === "string") ? [config.assets] : config.assets;
                 yield uploadAssets(octokit, release, assetPaths);
             }
@@ -16844,7 +16845,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postInit = exports.loadPlugins = exports.buildContext = void 0;
+exports.verifyConditions = exports.loadPlugins = exports.buildContext = void 0;
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
@@ -16911,7 +16912,7 @@ function loadPlugins(context) {
     });
 }
 exports.loadPlugins = loadPlugins;
-function postInit(context) {
+function verifyConditions(context) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.env.GITHUB_TOKEN == null) {
             throw new Error("Required environment variable GITHUB_TOKEN is undefined");
@@ -16922,12 +16923,8 @@ function postInit(context) {
                 context.version.old = latestGitTag.slice(1);
             }
         }
-        const releaseType = yield getPrReleaseType(context);
         context.version.new = context.version.new || context.version.old;
-        if (releaseType != null) {
-            context.version.new = __webpack_require__(864).inc(context.version.old, releaseType);
-        }
-        const semverDiff = releaseType || __webpack_require__(864).diff(context.version.old, context.version.new);
+        const semverDiff = __webpack_require__(864).diff(context.version.old, context.version.new);
         if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
             (semverDiff === "minor" && context.branch.level === "patch")) {
             throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
@@ -16939,35 +16936,7 @@ function postInit(context) {
         }
     });
 }
-exports.postInit = postInit;
-function getPrReleaseType(context) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
-        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
-        if (prs.data.length === 0) {
-            core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
-            return null;
-        }
-        const prNumber = prs.data[0].number;
-        const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber }));
-        const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
-        if (releaseLabels.length > 1) {
-            throw new Error("Detected multiple semver labels on pull request, there should only be one");
-        }
-        switch ((_a = releaseLabels[0]) === null || _a === void 0 ? void 0 : _a.name) {
-            case "release-major":
-                return "major";
-            case "release-minor":
-                return "minor";
-            case "release-patch":
-                return "patch";
-            default:
-                core.warning("Could not find semver label on pull request");
-                return null;
-        }
-    });
-}
+exports.verifyConditions = verifyConditions;
 
 
 /***/ }),
@@ -26434,10 +26403,29 @@ module.exports = function(num) {
 /***/ }),
 
 /***/ 919:
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -26448,14 +26436,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const github = __importStar(__webpack_require__(469));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.env.GITHUB_TOKEN == null) {
             throw new Error("Required environment variable GITHUB_TOKEN is undefined");
         }
+        if (config.checkPrLabels) {
+            const releaseType = yield getPrReleaseType(context);
+            if (releaseType != null) {
+                context.version.new = __webpack_require__(864).inc(context.version.old, releaseType);
+            }
+        }
     });
 }
 exports.default = default_1;
+function getPrReleaseType(context) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
+        if (prs.data.length === 0) {
+            core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
+            return null;
+        }
+        const prNumber = prs.data[0].number;
+        const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber }));
+        const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
+        if (releaseLabels.length > 1) {
+            throw new Error("Detected multiple semver labels on pull request, there should only be one");
+        }
+        switch ((_a = releaseLabels[0]) === null || _a === void 0 ? void 0 : _a.name) {
+            case "release-major":
+                return "major";
+            case "release-minor":
+                return "minor";
+            case "release-patch":
+                return "patch";
+            default:
+                core.warning("Could not find semver label on pull request");
+                return null;
+        }
+    });
+}
 
 
 /***/ }),
