@@ -34,7 +34,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(198);
+/******/ 		return __webpack_require__(131);
 /******/ 	};
 /******/ 	// initialize runtime
 /******/ 	runtime(__webpack_require__);
@@ -3180,22 +3180,6 @@ exports.parse = parse;
 
 /***/ }),
 
-/***/ 64:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var init_1 = __webpack_require__(919);
-Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
-var publish_1 = __webpack_require__(492);
-Object.defineProperty(exports, "publish", { enumerable: true, get: function () { return publish_1.default; } });
-var success_1 = __webpack_require__(933);
-Object.defineProperty(exports, "success", { enumerable: true, get: function () { return success_1.default; } });
-
-
-/***/ }),
-
 /***/ 74:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3695,68 +3679,6 @@ function toCommandValue(input) {
 }
 exports.toCommandValue = toCommandValue;
 //# sourceMappingURL=utils.js.map
-
-/***/ }),
-
-/***/ 83:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.lernaVersion = exports.lernaList = void 0;
-const exec = __importStar(__webpack_require__(986));
-function lernaList(onlyChanged) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let cmdOutput = yield exec.getExecOutput("npx", ["lerna", "list", "--json", "--toposort"]);
-        const packageInfo = JSON.parse(cmdOutput.stdout);
-        if (onlyChanged) {
-            try {
-                cmdOutput = yield exec.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"]);
-                const changedPackages = cmdOutput.stdout.split(/\r?\n/);
-                return packageInfo.filter((pkg) => changedPackages.includes(pkg.name));
-            }
-            catch ( /* Ignore error if there are no changed packages */_a) { /* Ignore error if there are no changed packages */ }
-        }
-        return packageInfo;
-    });
-}
-exports.lernaList = lernaList;
-function lernaVersion(newVersion) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("npx", ["lerna", "version", newVersion, "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
-    });
-}
-exports.lernaVersion = lernaVersion;
-
 
 /***/ }),
 
@@ -4746,7 +4668,7 @@ exports.issueCommand = issueCommand;
 
 /***/ }),
 
-/***/ 103:
+/***/ 118:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -4781,73 +4703,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(__webpack_require__(747));
-const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
-const glob = __importStar(__webpack_require__(281));
+const exec = __importStar(__webpack_require__(986));
+const github = __importStar(__webpack_require__(469));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        const changelogFile = config.changelogFile || "CHANGELOG.md";
-        const headerLine = config.headerLine || "## Recent Changes";
-        context.releaseNotes = yield getReleaseNotes(context, changelogFile, headerLine);
+        if (context.env.NPM_TOKEN == null) {
+            throw new Error("Required environment variable NPM_TOKEN is undefined");
+        }
+        const baseCommitSha = github.context.payload.before;
+        try {
+            yield exec.exec(`git fetch origin ${baseCommitSha}`);
+            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
+            context.version.old = JSON.parse(cmdOutput.stdout).version;
+        }
+        catch (_a) {
+            core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
+        }
+        try {
+            context.version.new = JSON.parse(fs.readFileSync("package.json", "utf-8")).version;
+        }
+        catch (_b) {
+            core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
+        }
     });
 }
 exports.default = default_1;
-function getReleaseNotes(context, changelogFile, headerLine) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.workspaces != null) {
-            const globber = yield glob.create(context.workspaces.join("\n"));
-            let releaseNotes = "";
-            for (const packageDir of yield globber.glob()) {
-                const packageReleaseNotes = getPackageChangelog(path.join(packageDir, changelogFile), headerLine);
-                if (packageReleaseNotes != null) {
-                    // TODO Use package name as header instead of directory name
-                    releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
-                }
-            }
-            return releaseNotes || undefined;
-        }
-        else {
-            return getPackageChangelog(changelogFile, headerLine);
-        }
-    });
-}
-function getPackageChangelog(changelogFile, headerLine) {
-    let releaseNotes = "";
-    if (fs.existsSync(changelogFile)) {
-        const changelogLines = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
-        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine));
-        if (lineNum !== -1) {
-            while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {
-                lineNum++;
-                releaseNotes += changelogLines[lineNum] + "\n";
-            }
-            core.info(`Found changelog header in ${changelogFile}`);
-        }
-        else {
-            core.warning(`Missing changelog header in ${changelogFile}`);
-        }
-    }
-    else {
-        core.warning(`Missing changelog file ${changelogFile}`);
-    }
-    return releaseNotes.trim() || undefined;
-}
-
-
-/***/ }),
-
-/***/ 123:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var init_1 = __webpack_require__(870);
-Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
-var publish_1 = __webpack_require__(964);
-Object.defineProperty(exports, "publish", { enumerable: true, get: function () { return publish_1.default; } });
-var version_1 = __webpack_require__(945);
-Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
 
 
 /***/ }),
@@ -4906,6 +4787,82 @@ exports.getApiBaseUrl = getApiBaseUrl;
 /***/ (function(module) {
 
 module.exports = require("child_process");
+
+/***/ }),
+
+/***/ 131:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const github = __importStar(__webpack_require__(469));
+const actions = __importStar(__webpack_require__(645));
+const utils = __importStar(__webpack_require__(163));
+function run() {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const context = yield utils.buildContext();
+            if (context == null) {
+                core.info("Current branch is not a release branch, exiting now");
+                process.exit();
+            }
+            else if (((_a = github.context.payload.head_commit) === null || _a === void 0 ? void 0 : _a.message.indexOf("[ci skip]")) !== -1) {
+                core.info("Commit message contains CI skip phrase, exiting now");
+                process.exit();
+            }
+            // TODO Implement support for dry run flag on all plugins
+            const pluginsLoaded = yield utils.loadPlugins(context);
+            try {
+                yield actions.init(context, pluginsLoaded);
+                yield utils.verifyConditions(context);
+                yield actions.version(context, pluginsLoaded);
+                yield actions.publish(context, pluginsLoaded);
+                yield actions.success(context, pluginsLoaded);
+            }
+            catch (error) {
+                context.failError = error;
+                yield actions.fail(context, pluginsLoaded);
+                throw error;
+            }
+        }
+        catch (error) {
+            core.setFailed(error.message);
+        }
+    });
+}
+run();
+
 
 /***/ }),
 
@@ -5199,6 +5156,133 @@ module.exports = function isArrayish(obj) {
 
 /***/ }),
 
+/***/ 163:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.verifyConditions = exports.loadPlugins = exports.buildContext = void 0;
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+const github = __importStar(__webpack_require__(469));
+const cosmiconfig_1 = __webpack_require__(471);
+function buildContext() {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const config = yield cosmiconfig_1.cosmiconfig("release").search();
+        if (config == null || config.isEmpty) {
+            throw new Error("Failed to load config because file does not exist or is empty");
+        }
+        const branchName = ((_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.ref) || github.context.ref.replace(/^refs\/heads\//, "");
+        const micromatch = __webpack_require__(74);
+        const branch = config.config.branches
+            .map((branch) => typeof branch === "string" ? { name: branch } : branch)
+            .find((branch) => micromatch.isMatch(branchName, branch.name));
+        if (branch == null) {
+            return;
+        }
+        if (branch.tag == null) {
+            branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
+        }
+        const pluginConfig = {};
+        for (const pc of config.config.plugins) {
+            if (typeof pc === "string") {
+                pluginConfig[pc] = {};
+            }
+            else {
+                pluginConfig[pc[0]] = pc[1];
+            }
+        }
+        return {
+            branch,
+            changedFiles: [],
+            dryRun: core.getBooleanInput("dry-run"),
+            env: process.env,
+            plugins: pluginConfig,
+            version: {}
+        };
+    });
+}
+exports.buildContext = buildContext;
+function loadPlugins(context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const builtinPlugins = {
+            changelog: __webpack_require__(609),
+            git: __webpack_require__(566),
+            github: __webpack_require__(467),
+            lerna: __webpack_require__(718),
+            npm: __webpack_require__(505)
+        };
+        const pluginsLoaded = {};
+        for (const pluginName in context.plugins) {
+            if (pluginName.startsWith("_")) {
+                pluginsLoaded[pluginName] = builtinPlugins[pluginName.slice(1)];
+            }
+            else if (pluginName.startsWith("./")) {
+                const pluginPath = (pluginName.startsWith("./") ? "" : "./node_modules/") + pluginName;
+                pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
+            }
+        }
+        return pluginsLoaded;
+    });
+}
+exports.loadPlugins = loadPlugins;
+function verifyConditions(context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (context.version.old == null) {
+            const latestGitTag = (yield exec.getExecOutput("git", ["describe", "--abbrev=0"])).stdout.trim();
+            if (latestGitTag) {
+                context.version.old = latestGitTag.slice(1);
+            }
+        }
+        context.version.new = context.version.new || context.version.old;
+        const semverDiff = __webpack_require__(864).diff(context.version.old, context.version.new);
+        if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
+            (semverDiff === "minor" && context.branch.level === "patch")) {
+            throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
+        }
+        if (context.branch.prerelease && context.version.new != null) {
+            const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
+            const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
+            context.version.new = `${context.version.new.split("-")[0]}-${prereleaseName}.${timestamp}`;
+        }
+    });
+}
+exports.verifyConditions = verifyConditions;
+
+
+/***/ }),
+
 /***/ 194:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -5280,82 +5364,6 @@ models.forEach(function (fromModel) {
 });
 
 module.exports = convert;
-
-
-/***/ }),
-
-/***/ 198:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
-const github = __importStar(__webpack_require__(469));
-const actions = __importStar(__webpack_require__(409));
-const utils = __importStar(__webpack_require__(611));
-function run() {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const context = yield utils.buildContext();
-            if (context == null) {
-                core.info("Current branch is not a release branch, exiting now");
-                process.exit();
-            }
-            else if (((_a = github.context.payload.head_commit) === null || _a === void 0 ? void 0 : _a.message.indexOf("[ci skip]")) !== -1) {
-                core.info("Commit message contains CI skip phrase, exiting now");
-                process.exit();
-            }
-            // TODO Implement support for dry run flag on all plugins
-            const pluginsLoaded = yield utils.loadPlugins(context);
-            try {
-                yield actions.init(context, pluginsLoaded);
-                yield utils.verifyConditions(context);
-                yield actions.version(context, pluginsLoaded);
-                yield actions.publish(context, pluginsLoaded);
-                yield actions.success(context, pluginsLoaded);
-            }
-            catch (error) {
-                context.failError = error;
-                yield actions.fail(context, pluginsLoaded);
-                throw error;
-            }
-        }
-        catch (error) {
-            core.setFailed(error.message);
-        }
-    });
-}
-run();
 
 
 /***/ }),
@@ -5593,6 +5601,60 @@ module.exports = require("https");
 /***/ (function(module) {
 
 module.exports = require("timers");
+
+/***/ }),
+
+/***/ 220:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const path = __importStar(__webpack_require__(622));
+const utils = __importStar(__webpack_require__(557));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (context.version.new != null) {
+            const packageInfo = yield utils.lernaList(true);
+            yield utils.lernaVersion(context.version.new);
+            context.changedFiles.push("lerna.json", "package.json", "package-lock.json");
+            for (const { location } of packageInfo) {
+                const relLocation = path.relative(process.cwd(), location);
+                context.changedFiles.push(path.join(relLocation, "package.json"));
+            }
+        }
+    });
+}
+exports.default = default_1;
+
 
 /***/ }),
 
@@ -6119,6 +6181,107 @@ var LinesAndColumns = (function () {
 }());
 exports.__esModule = true;
 exports["default"] = LinesAndColumns;
+
+
+/***/ }),
+
+/***/ 230:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const publish_1 = __importDefault(__webpack_require__(466));
+const utils = __importStar(__webpack_require__(557));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const { location } of yield utils.lernaList()) {
+            // TODO Support Yarn publish as alternative option
+            yield publish_1.default(context, config, location);
+        }
+    });
+}
+exports.default = default_1;
+
+
+/***/ }),
+
+/***/ 231:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const github = __importStar(__webpack_require__(469));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
+        if (prs.data.length > 0) {
+            yield octokit.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: prs.data[0].number, labels: ["released"] }));
+        }
+    });
+}
+exports.default = default_1;
 
 
 /***/ }),
@@ -7028,6 +7191,77 @@ exports.timestamp = timestamp;
 exports.warn = warn;
 exports.warnFileDeprecation = warnFileDeprecation;
 exports.warnOptionDeprecation = warnOptionDeprecation;
+
+
+/***/ }),
+
+/***/ 290:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+const github = __importStar(__webpack_require__(469));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (context.env.NPM_TOKEN == null) {
+            throw new Error("Required environment variable NPM_TOKEN is undefined");
+        }
+        const baseCommitSha = github.context.payload.before;
+        try {
+            yield exec.exec(`git fetch origin ${baseCommitSha}`);
+            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:lerna.json`]);
+            context.version.old = JSON.parse(cmdOutput.stdout).version;
+        }
+        catch (_a) {
+            core.warning(`Missing or invalid lerna.json in commit ${baseCommitSha}`);
+        }
+        try {
+            context.version.new = JSON.parse(fs.readFileSync("lerna.json", "utf-8")).version;
+        }
+        catch (_b) {
+            core.warning(`Missing or invalid lerna.json in branch ${context.branch.name}`);
+        }
+        try {
+            context.workspaces = JSON.parse(fs.readFileSync("package.json", "utf-8")).workspaces;
+        }
+        catch (_c) {
+            core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
+        }
+    });
+}
+exports.default = default_1;
 
 
 /***/ }),
@@ -9835,59 +10069,6 @@ exports.toJSON = toJSON;
 
 /***/ }),
 
-/***/ 331:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __importStar(__webpack_require__(485));
-function default_1(context, config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const commitMessage = config.commitMessage || "Bump version to {{version}}";
-        const tagMessage = config.tagMessage || `Release {{version}} to ${context.branch.tag}`;
-        if (context.version.new != null) {
-            yield utils.gitConfig(context);
-            yield utils.gitAdd(...context.changedFiles);
-            yield utils.gitCommit(commitMessage.replace("{{version}}", context.version.new));
-            yield utils.gitTag(`v${context.version.new}`, tagMessage.replace("{{version}}", context.version.new));
-            yield utils.gitPush(context.branch.name, true);
-        }
-    });
-}
-exports.default = default_1;
-
-
-/***/ }),
-
 /***/ 341:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -10013,30 +10194,11 @@ exports.Explorer = Explorer;
 
 /***/ }),
 
-/***/ 348:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ 343:
+/***/ (function(__unusedmodule, exports) {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10047,18 +10209,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const path = __importStar(__webpack_require__(622));
-const utils = __importStar(__webpack_require__(83));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (context.version.new != null) {
-            const packageInfo = yield utils.lernaList(true);
-            yield utils.lernaVersion(context.version.new);
-            context.changedFiles.push("lerna.json", "package.json", "package-lock.json");
-            for (const { location } of packageInfo) {
-                const relLocation = path.relative(process.cwd(), location);
-                context.changedFiles.push(path.join(relLocation, "package.json"));
-            }
+        if (context.env.GIT_COMMITTER_NAME == null) {
+            throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
+        }
+        if (context.env.GIT_COMMITTER_EMAIL == null) {
+            throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
         }
     });
 }
@@ -10485,6 +10642,81 @@ module.exports = function (str) {
 
 	return str.replace(matchOperatorsRe, '\\$&');
 };
+
+
+/***/ }),
+
+/***/ 380:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const glob = __importStar(__webpack_require__(281));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const changelogFile = config.changelogFile || "CHANGELOG.md";
+        const headerLine = config.headerLine || "## Recent Changes";
+        if (context.version.new != null) {
+            if (context.workspaces != null) {
+                const globber = yield glob.create(context.workspaces.join("\n"));
+                for (const packageDir of yield globber.glob()) {
+                    const changelogPath = path.join(packageDir, changelogFile);
+                    if (updateChangelog(changelogPath, headerLine, context.version.new)) {
+                        context.changedFiles.push(changelogPath);
+                    }
+                }
+            }
+            else if (updateChangelog(changelogFile, headerLine, context.version.new)) {
+                context.changedFiles.push(changelogFile);
+            }
+        }
+    });
+}
+exports.default = default_1;
+function updateChangelog(changelogFile, headerLine, newVersion) {
+    if (fs.existsSync(changelogFile)) {
+        const oldContents = fs.readFileSync(changelogFile, "utf-8");
+        const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
+        if (newContents !== oldContents) {
+            fs.writeFileSync(changelogFile, newContents);
+            core.info(`Updated version header in ${changelogFile}`);
+            return true;
+        }
+    }
+    return false;
+}
 
 
 /***/ }),
@@ -11279,76 +11511,6 @@ Object.defineProperties(Chalk.prototype, styles);
 module.exports = Chalk(); // eslint-disable-line new-cap
 module.exports.supportsColor = stdoutColor;
 module.exports.default = module.exports; // For TypeScript
-
-
-/***/ }),
-
-/***/ 409:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
-function fail(context, pluginsLoaded) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-            if (pluginModule.fail != null) {
-                yield pluginModule.fail(context, context.plugins[pluginName] || {});
-            }
-        }
-    });
-}
-exports.fail = fail;
-function init(context, pluginsLoaded) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-            if (pluginModule.init != null) {
-                yield pluginModule.init(context, context.plugins[pluginName] || {});
-            }
-        }
-    });
-}
-exports.init = init;
-function publish(context, pluginsLoaded) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-            if (pluginModule.publish != null) {
-                yield pluginModule.publish(context, context.plugins[pluginName] || {});
-            }
-        }
-    });
-}
-exports.publish = publish;
-function success(context, pluginsLoaded) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-            if (pluginModule.success != null) {
-                yield pluginModule.success(context, context.plugins[pluginName] || {});
-            }
-        }
-    });
-}
-exports.success = success;
-function version(context, pluginsLoaded) {
-    return __awaiter(this, void 0, void 0, function* () {
-        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-            if (pluginModule.version != null) {
-                yield pluginModule.version(context, context.plugins[pluginName] || {});
-            }
-        }
-    });
-}
-exports.version = version;
 
 
 /***/ }),
@@ -13613,6 +13775,112 @@ exports.RequestError = RequestError;
 
 /***/ }),
 
+/***/ 466:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const utils = __importStar(__webpack_require__(838));
+function default_1(context, config, inDir) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const cwd = inDir || process.cwd();
+        if (config.tarballDir != null) {
+            const tgzFile = yield utils.npmPack(inDir);
+            fs.mkdirSync(config.tarballDir, { recursive: true });
+            fs.renameSync(path.join(cwd, tgzFile), path.resolve(config.tarballDir, tgzFile));
+        }
+        if (!config.npmPublish) {
+            return;
+        }
+        const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+        if (packageJson.private) {
+            core.info(`Skipping publish of private package ${packageJson.name}`);
+        }
+        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
+        let npmScope;
+        if (npmRegistry == null) {
+            throw new Error("Expected NPM registry to be defined in package.json but it is not");
+        }
+        if (packageJson.name.includes("/")) {
+            npmScope = packageJson.name.split("/")[0];
+        }
+        // TODO Configure .npmrc in the init step
+        utils.npmConfig(context, npmRegistry, npmScope);
+        try {
+            // Publish package
+            const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
+            if (!alreadyPublished) {
+                yield utils.npmPublish(context.branch.tag, inDir);
+            }
+            else {
+                core.error(`Version ${packageJson.version} has already been published to NPM`);
+            }
+            // Add alias tags
+            if (context.branch.aliasTags) {
+                for (const tag of context.branch.aliasTags) {
+                    yield utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
+                }
+            }
+        }
+        finally {
+            utils.npmReset();
+        }
+    });
+}
+exports.default = default_1;
+
+
+/***/ }),
+
+/***/ 467:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var init_1 = __webpack_require__(484);
+Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
+var publish_1 = __webpack_require__(834);
+Object.defineProperty(exports, "publish", { enumerable: true, get: function () { return publish_1.default; } });
+var success_1 = __webpack_require__(231);
+Object.defineProperty(exports, "success", { enumerable: true, get: function () { return success_1.default; } });
+
+
+/***/ }),
+
 /***/ 469:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -14031,7 +14299,7 @@ function normalizeOptions(moduleName, options) {
 
 /***/ }),
 
-/***/ 477:
+/***/ 484:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -14065,143 +14333,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
-const glob = __importStar(__webpack_require__(281));
+const github = __importStar(__webpack_require__(469));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        const changelogFile = config.changelogFile || "CHANGELOG.md";
-        const headerLine = config.headerLine || "## Recent Changes";
-        if (context.version.new != null) {
-            if (context.workspaces != null) {
-                const globber = yield glob.create(context.workspaces.join("\n"));
-                for (const packageDir of yield globber.glob()) {
-                    const changelogPath = path.join(packageDir, changelogFile);
-                    if (updateChangelog(changelogPath, headerLine, context.version.new)) {
-                        context.changedFiles.push(changelogPath);
-                    }
-                }
-            }
-            else if (updateChangelog(changelogFile, headerLine, context.version.new)) {
-                context.changedFiles.push(changelogFile);
+        if (context.env.GITHUB_TOKEN == null) {
+            throw new Error("Required environment variable GITHUB_TOKEN is undefined");
+        }
+        if (config.checkPrLabels) {
+            const releaseType = yield getPrReleaseType(context);
+            if (releaseType != null) {
+                context.version.new = __webpack_require__(864).inc(context.version.old, releaseType);
             }
         }
     });
 }
 exports.default = default_1;
-function updateChangelog(changelogFile, headerLine, newVersion) {
-    if (fs.existsSync(changelogFile)) {
-        const oldContents = fs.readFileSync(changelogFile, "utf-8");
-        const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
-        if (newContents !== oldContents) {
-            fs.writeFileSync(changelogFile, newContents);
-            core.info(`Updated version header in ${changelogFile}`);
-            return true;
-        }
-    }
-    return false;
-}
-
-
-/***/ }),
-
-/***/ 485:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.gitTag = exports.gitPush = exports.gitConfig = exports.gitCommit = exports.gitAdd = void 0;
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-function gitAdd(...files) {
+function getPrReleaseType(context) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("git", ["add", ...files]);
+        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
+        if (prs.data.length === 0) {
+            core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
+            return null;
+        }
+        const prNumber = prs.data[0].number;
+        const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber }));
+        const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
+        if (releaseLabels.length > 1) {
+            throw new Error("Detected multiple semver labels on pull request, there should only be one");
+        }
+        switch ((_a = releaseLabels[0]) === null || _a === void 0 ? void 0 : _a.name) {
+            case "release-major":
+                return "major";
+            case "release-minor":
+                return "minor";
+            case "release-patch":
+                return "patch";
+            default:
+                core.warning("Could not find semver label on pull request");
+                return null;
+        }
     });
 }
-exports.gitAdd = gitAdd;
-function gitCommit(message, amend) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Check if there is anything to commit
-        if (!amend) {
-            const cmdOutput = (yield exec.getExecOutput("git", ["diff", "--name-only", "--cached"])).stdout.trim();
-            if (cmdOutput.length == 0) {
-                core.warning("Nothing to commit");
-                return;
-            }
-        }
-        const cmdArgs = ["commit", "-s", "-m", `${message} [ci skip]`];
-        if (amend) {
-            cmdArgs.push("--amend");
-        }
-        yield exec.exec("git", cmdArgs);
-    });
-}
-exports.gitCommit = gitCommit;
-function gitConfig(context) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
-        yield exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
-    });
-}
-exports.gitConfig = gitConfig;
-function gitPush(branch, tags) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Check if there is anything to push
-        if (!tags) {
-            const cmdOutput = (yield exec.getExecOutput("git", ["cherry"])).stdout.trim();
-            if (cmdOutput.length == 0) {
-                core.warning("Nothing to push");
-                return;
-            }
-        }
-        const cmdArgs = ["push", "-u", "origin", branch];
-        if (tags) {
-            cmdArgs.push("--follow-tags");
-        }
-        yield exec.exec("git", cmdArgs);
-    });
-}
-exports.gitPush = gitPush;
-function gitTag(tagName, message) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const cmdArgs = ["tag", tagName];
-        if (message != null) {
-            cmdArgs.push("-a", "-m", message);
-        }
-        yield exec.exec("git", cmdArgs);
-    });
-}
-exports.gitTag = gitTag;
 
 
 /***/ }),
@@ -14212,105 +14387,6 @@ exports.gitTag = gitTag;
 "use strict";
 
 //# sourceMappingURL=types.js.map
-
-/***/ }),
-
-/***/ 492:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const path = __importStar(__webpack_require__(622));
-const core = __importStar(__webpack_require__(470));
-const github = __importStar(__webpack_require__(469));
-const glob = __importStar(__webpack_require__(281));
-function default_1(context, config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.version.new != null) {
-            const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
-            const release = yield createRelease(octokit, context.version.new, context.releaseNotes);
-            if (config.assets != null && config.assets.length > 0) {
-                const assetPaths = (typeof config.assets === "string") ? [config.assets] : config.assets;
-                yield uploadAssets(octokit, release, assetPaths);
-            }
-        }
-    });
-}
-exports.default = default_1;
-function createRelease(octokit, newVersion, releaseNotes) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const tagName = `v${newVersion}`;
-        let release;
-        // Get release if it already exists
-        try {
-            release = yield octokit.repos.getReleaseByTag(Object.assign(Object.assign({}, github.context.repo), { tag: tagName }));
-        }
-        catch (err) {
-            if (err.status != 404) {
-                throw err;
-            }
-        }
-        // Create release if it doesn't exist and try to add release notes
-        if (release == null) {
-            core.info(`Creating GitHub release with tag ${tagName}`);
-            release = yield octokit.repos.createRelease(Object.assign(Object.assign({}, github.context.repo), { tag_name: tagName, body: releaseNotes }));
-        }
-        return release;
-    });
-}
-function uploadAssets(octokit, release, assetPaths) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const globber = yield glob.create(assetPaths.join("\n"));
-        const artifactPaths = yield globber.glob();
-        const mime = __webpack_require__(779);
-        for (const artifactPath of artifactPaths) {
-            const assetName = path.basename(artifactPath);
-            // Skip uploading asset if one with same name was uploaded previously
-            if (release.data.assets && release.data.assets.findIndex((asset) => asset.name === assetName) !== -1) {
-                core.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
-                continue;
-            }
-            core.info(`Uploading release asset ${artifactPath}`);
-            yield octokit.repos.uploadReleaseAsset(Object.assign(Object.assign({}, github.context.repo), { release_id: release.data.id, name: assetName, 
-                // Need to upload as buffer because converting to string corrupts binary data
-                data: fs.readFileSync(artifactPath), url: release.data.upload_url, headers: {
-                    "Content-Length": fs.statSync(artifactPath).size,
-                    "Content-Type": mime.lookup(artifactPath) || "application/octet-stream"
-                } }));
-        }
-    });
-}
-
 
 /***/ }),
 
@@ -14361,6 +14437,22 @@ exports.isSymlink = isType.bind(null, 'lstat', 'isSymbolicLink');
 exports.isFileSync = isTypeSync.bind(null, 'statSync', 'isFile');
 exports.isDirectorySync = isTypeSync.bind(null, 'statSync', 'isDirectory');
 exports.isSymlinkSync = isTypeSync.bind(null, 'lstatSync', 'isSymbolicLink');
+
+
+/***/ }),
+
+/***/ 505:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var init_1 = __webpack_require__(118);
+Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
+var publish_1 = __webpack_require__(466);
+Object.defineProperty(exports, "publish", { enumerable: true, get: function () { return publish_1.default; } });
+var version_1 = __webpack_require__(928);
+Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
 
 
 /***/ }),
@@ -16475,15 +16567,167 @@ exports.HttpClient = HttpClient;
 
 /***/ }),
 
-/***/ 583:
+/***/ 546:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const glob = __importStar(__webpack_require__(281));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const changelogFile = config.changelogFile || "CHANGELOG.md";
+        const headerLine = config.headerLine || "## Recent Changes";
+        context.releaseNotes = yield getReleaseNotes(context, changelogFile, headerLine);
+    });
+}
+exports.default = default_1;
+function getReleaseNotes(context, changelogFile, headerLine) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (context.workspaces != null) {
+            const globber = yield glob.create(context.workspaces.join("\n"));
+            let releaseNotes = "";
+            for (const packageDir of yield globber.glob()) {
+                const packageReleaseNotes = getPackageChangelog(path.join(packageDir, changelogFile), headerLine);
+                if (packageReleaseNotes != null) {
+                    // TODO Use package name as header instead of directory name
+                    releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
+                }
+            }
+            return releaseNotes || undefined;
+        }
+        else {
+            return getPackageChangelog(changelogFile, headerLine);
+        }
+    });
+}
+function getPackageChangelog(changelogFile, headerLine) {
+    let releaseNotes = "";
+    if (fs.existsSync(changelogFile)) {
+        const changelogLines = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
+        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine));
+        if (lineNum !== -1) {
+            while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {
+                lineNum++;
+                releaseNotes += changelogLines[lineNum] + "\n";
+            }
+            core.info(`Found changelog header in ${changelogFile}`);
+        }
+        else {
+            core.warning(`Missing changelog header in ${changelogFile}`);
+        }
+    }
+    else {
+        core.warning(`Missing changelog file ${changelogFile}`);
+    }
+    return releaseNotes.trim() || undefined;
+}
+
+
+/***/ }),
+
+/***/ 557:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.lernaVersion = exports.lernaList = void 0;
+const exec = __importStar(__webpack_require__(986));
+function lernaList(onlyChanged) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let cmdOutput = yield exec.getExecOutput("npx", ["lerna", "list", "--json", "--toposort"]);
+        const packageInfo = JSON.parse(cmdOutput.stdout);
+        if (onlyChanged) {
+            try {
+                cmdOutput = yield exec.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"]);
+                const changedPackages = cmdOutput.stdout.split(/\r?\n/);
+                return packageInfo.filter((pkg) => changedPackages.includes(pkg.name));
+            }
+            catch ( /* Ignore error if there are no changed packages */_a) { /* Ignore error if there are no changed packages */ }
+        }
+        return packageInfo;
+    });
+}
+exports.lernaList = lernaList;
+function lernaVersion(newVersion) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("npx", ["lerna", "version", newVersion, "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
+    });
+}
+exports.lernaVersion = lernaVersion;
+
+
+/***/ }),
+
+/***/ 566:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var init_1 = __webpack_require__(613);
+var init_1 = __webpack_require__(343);
 Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
-var version_1 = __webpack_require__(331);
+var version_1 = __webpack_require__(768);
 Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
 
 
@@ -16811,129 +17055,16 @@ module.exports = require("http");
 
 /***/ }),
 
-/***/ 611:
+/***/ 609:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyConditions = exports.loadPlugins = exports.buildContext = void 0;
-const path = __importStar(__webpack_require__(622));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-const github = __importStar(__webpack_require__(469));
-const cosmiconfig_1 = __webpack_require__(471);
-function buildContext() {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const config = yield cosmiconfig_1.cosmiconfig("release").search();
-        if (config == null || config.isEmpty) {
-            throw new Error("Failed to load config because file does not exist or is empty");
-        }
-        const branchName = ((_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.ref) || github.context.ref.replace(/^refs\/heads\//, "");
-        const micromatch = __webpack_require__(74);
-        const branch = config.config.branches
-            .map((branch) => typeof branch === "string" ? { name: branch } : branch)
-            .find((branch) => micromatch.isMatch(branchName, branch.name));
-        if (branch == null) {
-            return;
-        }
-        if (branch.tag == null) {
-            branch.tag = ["main", "master"].includes(branchName) ? "latest" : branchName;
-        }
-        const pluginConfig = {};
-        for (const pc of config.config.plugins) {
-            if (typeof pc === "string") {
-                pluginConfig[pc] = {};
-            }
-            else {
-                pluginConfig[pc[0]] = pc[1];
-            }
-        }
-        return {
-            branch,
-            changedFiles: [],
-            dryRun: core.getBooleanInput("dry-run"),
-            env: process.env,
-            plugins: pluginConfig,
-            version: {}
-        };
-    });
-}
-exports.buildContext = buildContext;
-function loadPlugins(context) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const builtinPlugins = {
-            changelog: __webpack_require__(749),
-            git: __webpack_require__(583),
-            github: __webpack_require__(64),
-            lerna: __webpack_require__(680),
-            npm: __webpack_require__(123)
-        };
-        const pluginsLoaded = {};
-        for (const pluginName in context.plugins) {
-            if (pluginName.startsWith("_")) {
-                pluginsLoaded[pluginName] = builtinPlugins[pluginName.slice(1)];
-            }
-            else if (pluginName.startsWith("./")) {
-                const pluginPath = (pluginName.startsWith("./") ? "" : "./node_modules/") + pluginName;
-                pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
-            }
-        }
-        return pluginsLoaded;
-    });
-}
-exports.loadPlugins = loadPlugins;
-function verifyConditions(context) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.version.old == null) {
-            const latestGitTag = (yield exec.getExecOutput("git", ["describe", "--abbrev=0"])).stdout.trim();
-            if (latestGitTag) {
-                context.version.old = latestGitTag.slice(1);
-            }
-        }
-        context.version.new = context.version.new || context.version.old;
-        const semverDiff = __webpack_require__(864).diff(context.version.old, context.version.new);
-        if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
-            (semverDiff === "minor" && context.branch.level === "patch")) {
-            throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
-        }
-        if (context.branch.prerelease && context.version.new != null) {
-            const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
-            const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
-            context.version.new = `${context.version.new.split("-")[0]}-${prereleaseName}.${timestamp}`;
-        }
-    });
-}
-exports.verifyConditions = verifyConditions;
+var init_1 = __webpack_require__(546);
+Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
+var version_1 = __webpack_require__(380);
+Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
 
 
 /***/ }),
@@ -17087,36 +17218,6 @@ module.exports = errorEx;
 
 /***/ }),
 
-/***/ 613:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-function default_1(context, config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.env.GIT_COMMITTER_NAME == null) {
-            throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
-        }
-        if (context.env.GIT_COMMITTER_EMAIL == null) {
-            throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
-        }
-    });
-}
-exports.default = default_1;
-
-
-/***/ }),
-
 /***/ 614:
 /***/ (function(module) {
 
@@ -17216,29 +17317,10 @@ module.exports = {"application/1d-interleaved-parityfec":{"source":"iana"},"appl
 /***/ }),
 
 /***/ 645:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports) {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17249,39 +17331,57 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-const github = __importStar(__webpack_require__(469));
-function default_1(context, config) {
+exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
+function fail(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (context.env.NPM_TOKEN == null) {
-            throw new Error("Required environment variable NPM_TOKEN is undefined");
-        }
-        const baseCommitSha = github.context.payload.before;
-        try {
-            yield exec.exec(`git fetch origin ${baseCommitSha}`);
-            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:lerna.json`]);
-            context.version.old = JSON.parse(cmdOutput.stdout).version;
-        }
-        catch (_a) {
-            core.warning(`Missing or invalid lerna.json in commit ${baseCommitSha}`);
-        }
-        try {
-            context.version.new = JSON.parse(fs.readFileSync("lerna.json", "utf-8")).version;
-        }
-        catch (_b) {
-            core.warning(`Missing or invalid lerna.json in branch ${context.branch.name}`);
-        }
-        try {
-            context.workspaces = JSON.parse(fs.readFileSync("package.json", "utf-8")).workspaces;
-        }
-        catch (_c) {
-            core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
+        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
+            if (pluginModule.fail != null) {
+                yield pluginModule.fail(context, context.plugins[pluginName] || {});
+            }
         }
     });
 }
-exports.default = default_1;
+exports.fail = fail;
+function init(context, pluginsLoaded) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
+            if (pluginModule.init != null) {
+                yield pluginModule.init(context, context.plugins[pluginName] || {});
+            }
+        }
+    });
+}
+exports.init = init;
+function publish(context, pluginsLoaded) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
+            if (pluginModule.publish != null) {
+                yield pluginModule.publish(context, context.plugins[pluginName] || {});
+            }
+        }
+    });
+}
+exports.publish = publish;
+function success(context, pluginsLoaded) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
+            if (pluginModule.success != null) {
+                yield pluginModule.success(context, context.plugins[pluginName] || {});
+            }
+        }
+    });
+}
+exports.success = success;
+function version(context, pluginsLoaded) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
+            if (pluginModule.version != null) {
+                yield pluginModule.version(context, context.plugins[pluginName] || {});
+            }
+        }
+    });
+}
+exports.version = version;
 
 
 /***/ }),
@@ -17593,22 +17693,6 @@ function isIdentifierName(name) {
 
 /***/ }),
 
-/***/ 680:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var init_1 = __webpack_require__(645);
-Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
-var publish_1 = __webpack_require__(755);
-Object.defineProperty(exports, "publish", { enumerable: true, get: function () { return publish_1.default; } });
-var version_1 = __webpack_require__(348);
-Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
-
-
-/***/ }),
-
 /***/ 690:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -17860,6 +17944,22 @@ module.exports = {
 	"yellow": [255, 255, 0],
 	"yellowgreen": [154, 205, 50]
 };
+
+
+/***/ }),
+
+/***/ 718:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var init_1 = __webpack_require__(290);
+Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
+var publish_1 = __webpack_require__(230);
+Object.defineProperty(exports, "publish", { enumerable: true, get: function () { return publish_1.default; } });
+var version_1 = __webpack_require__(220);
+Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
 
 
 /***/ }),
@@ -18295,20 +18395,6 @@ function highlight(code, options = {}) {
     return code;
   }
 }
-
-/***/ }),
-
-/***/ 749:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var init_1 = __webpack_require__(103);
-Object.defineProperty(exports, "init", { enumerable: true, get: function () { return init_1.default; } });
-var version_1 = __webpack_require__(477);
-Object.defineProperty(exports, "version", { enumerable: true, get: function () { return version_1.default; } });
-
 
 /***/ }),
 
@@ -19177,7 +19263,14 @@ exports.request = request;
 
 /***/ }),
 
-/***/ 755:
+/***/ 761:
+/***/ (function(module) {
+
+module.exports = require("zlib");
+
+/***/ }),
+
+/***/ 768:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -19210,29 +19303,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const publish_1 = __importDefault(__webpack_require__(964));
-const utils = __importStar(__webpack_require__(83));
+const utils = __importStar(__webpack_require__(820));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        for (const { location } of yield utils.lernaList()) {
-            // TODO Support Yarn publish as alternative option
-            yield publish_1.default(context, config, location);
+        const commitMessage = config.commitMessage || "Bump version to {{version}}";
+        const tagMessage = config.tagMessage || `Release {{version}} to ${context.branch.tag}`;
+        if (context.version.new != null) {
+            // TODO Configure Git in the init step
+            yield utils.gitConfig(context);
+            yield utils.gitAdd(...context.changedFiles);
+            yield utils.gitCommit(commitMessage.replace("{{version}}", context.version.new));
+            yield utils.gitTag(`v${context.version.new}`, tagMessage.replace("{{version}}", context.version.new));
+            yield utils.gitPush(context.branch.name, true);
         }
     });
 }
 exports.default = default_1;
 
-
-/***/ }),
-
-/***/ 761:
-/***/ (function(module) {
-
-module.exports = require("zlib");
 
 /***/ }),
 
@@ -23117,6 +23205,106 @@ exports.createTokenAuth = createTokenAuth;
 
 /***/ }),
 
+/***/ 820:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.gitTag = exports.gitPush = exports.gitConfig = exports.gitCommit = exports.gitAdd = void 0;
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+function gitAdd(...files) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("git", ["add", ...files]);
+    });
+}
+exports.gitAdd = gitAdd;
+function gitCommit(message, amend) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Check if there is anything to commit
+        if (!amend) {
+            const cmdOutput = (yield exec.getExecOutput("git", ["diff", "--name-only", "--cached"])).stdout.trim();
+            if (cmdOutput.length == 0) {
+                core.warning("Nothing to commit");
+                return;
+            }
+        }
+        const cmdArgs = ["commit", "-s", "-m", `${message} [ci skip]`];
+        if (amend) {
+            cmdArgs.push("--amend");
+        }
+        yield exec.exec("git", cmdArgs);
+    });
+}
+exports.gitCommit = gitCommit;
+function gitConfig(context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
+        yield exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
+    });
+}
+exports.gitConfig = gitConfig;
+function gitPush(branch, tags) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Check if there is anything to push
+        if (!tags) {
+            const cmdOutput = (yield exec.getExecOutput("git", ["cherry"])).stdout.trim();
+            if (cmdOutput.length == 0) {
+                core.warning("Nothing to push");
+                return;
+            }
+        }
+        const cmdArgs = ["push", "-u", "origin", branch];
+        if (tags) {
+            cmdArgs.push("--follow-tags");
+        }
+        yield exec.exec("git", cmdArgs);
+    });
+}
+exports.gitPush = gitPush;
+function gitTag(tagName, message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cmdArgs = ["tag", tagName];
+        if (message != null) {
+            cmdArgs.push("-a", "-m", message);
+        }
+        yield exec.exec("git", cmdArgs);
+    });
+}
+exports.gitTag = gitTag;
+
+
+/***/ }),
+
 /***/ 827:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -23128,10 +23316,209 @@ module.exports = __webpack_require__(366);
 
 /***/ }),
 
+/***/ 834:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(__webpack_require__(747));
+const path = __importStar(__webpack_require__(622));
+const core = __importStar(__webpack_require__(470));
+const github = __importStar(__webpack_require__(469));
+const glob = __importStar(__webpack_require__(281));
+function default_1(context, config) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (context.version.new != null) {
+            const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+            const release = yield createRelease(octokit, context.version.new, context.releaseNotes);
+            if (config.assets != null && config.assets.length > 0) {
+                const assetPaths = (typeof config.assets === "string") ? [config.assets] : config.assets;
+                yield uploadAssets(octokit, release, assetPaths);
+            }
+        }
+    });
+}
+exports.default = default_1;
+function createRelease(octokit, newVersion, releaseNotes) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tagName = `v${newVersion}`;
+        let release;
+        // Get release if it already exists
+        try {
+            release = yield octokit.repos.getReleaseByTag(Object.assign(Object.assign({}, github.context.repo), { tag: tagName }));
+        }
+        catch (err) {
+            if (err.status != 404) {
+                throw err;
+            }
+        }
+        // Create release if it doesn't exist and try to add release notes
+        if (release == null) {
+            core.info(`Creating GitHub release with tag ${tagName}`);
+            release = yield octokit.repos.createRelease(Object.assign(Object.assign({}, github.context.repo), { tag_name: tagName, body: releaseNotes }));
+        }
+        return release;
+    });
+}
+function uploadAssets(octokit, release, assetPaths) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const globber = yield glob.create(assetPaths.join("\n"));
+        const artifactPaths = yield globber.glob();
+        const mime = __webpack_require__(779);
+        for (const artifactPath of artifactPaths) {
+            const assetName = path.basename(artifactPath);
+            // Skip uploading asset if one with same name was uploaded previously
+            if (release.data.assets && release.data.assets.findIndex((asset) => asset.name === assetName) !== -1) {
+                core.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
+                continue;
+            }
+            core.info(`Uploading release asset ${artifactPath}`);
+            yield octokit.repos.uploadReleaseAsset(Object.assign(Object.assign({}, github.context.repo), { release_id: release.data.id, name: assetName, 
+                // Need to upload as buffer because converting to string corrupts binary data
+                data: fs.readFileSync(artifactPath), url: release.data.upload_url, headers: {
+                    "Content-Length": fs.statSync(artifactPath).size,
+                    "Content-Type": mime.lookup(artifactPath) || "application/octet-stream"
+                } }));
+        }
+    });
+}
+
+
+/***/ }),
+
 /***/ 835:
 /***/ (function(module) {
 
 module.exports = require("url");
+
+/***/ }),
+
+/***/ 838:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.npmViewVersion = exports.npmVersion = exports.npmReset = exports.npmPublish = exports.npmPack = exports.npmConfig = exports.npmAddTag = void 0;
+const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+function npmAddTag(pkgName, pkgVersion, tag, inDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
+    });
+}
+exports.npmAddTag = npmAddTag;
+function npmConfig(context, registry, scope) {
+    registry = registry.endsWith("/") ? registry : (registry + "/");
+    scope = scope === null || scope === void 0 ? void 0 : scope.toLowerCase();
+    if (fs.existsSync(".npmrc")) {
+        fs.renameSync(".npmrc", ".npmrc.bak");
+    }
+    // Remove HTTP or HTTPS protocol from front of registry URL
+    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.env.NPM_TOKEN;
+    const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
+    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
+}
+exports.npmConfig = npmConfig;
+function npmPack(inDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
+        return cmdOutput.stdout.trim();
+    });
+}
+exports.npmPack = npmPack;
+function npmPublish(tag, inDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("npm", ["publish", "--tag", tag], { cwd: inDir });
+    });
+}
+exports.npmPublish = npmPublish;
+function npmReset() {
+    if (fs.existsSync(".npmrc")) {
+        fs.unlinkSync(".npmrc");
+    }
+    if (fs.existsSync(".npmrc.bak")) {
+        fs.renameSync(".npmrc.bak", ".npmrc");
+    }
+}
+exports.npmReset = npmReset;
+function npmVersion(newVersion) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
+    });
+}
+exports.npmVersion = npmVersion;
+function npmViewVersion(pkgName, pkgTag) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return (yield exec.getExecOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
+        }
+        catch (_a) {
+            core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
+        }
+    });
+}
+exports.npmViewVersion = npmViewVersion;
+
 
 /***/ }),
 
@@ -26019,71 +26406,6 @@ function removeHook(state, name, method) {
 
 /***/ }),
 
-/***/ 870:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-const github = __importStar(__webpack_require__(469));
-function default_1(context, config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.env.NPM_TOKEN == null) {
-            throw new Error("Required environment variable NPM_TOKEN is undefined");
-        }
-        const baseCommitSha = github.context.payload.before;
-        try {
-            yield exec.exec(`git fetch origin ${baseCommitSha}`);
-            const cmdOutput = yield exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
-            context.version.old = JSON.parse(cmdOutput.stdout).version;
-        }
-        catch (_a) {
-            core.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
-        }
-        try {
-            context.version.new = JSON.parse(fs.readFileSync("package.json", "utf-8")).version;
-        }
-        catch (_b) {
-            core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
-        }
-    });
-}
-exports.default = default_1;
-
-
-/***/ }),
-
 /***/ 896:
 /***/ (function(module) {
 
@@ -26228,106 +26550,6 @@ exports.withCustomRequest = withCustomRequest;
 
 /***/ }),
 
-/***/ 900:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.npmViewVersion = exports.npmVersion = exports.npmReset = exports.npmPublish = exports.npmPack = exports.npmConfig = exports.npmAddTag = void 0;
-const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
-const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
-function npmAddTag(pkgName, pkgVersion, tag, inDir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
-    });
-}
-exports.npmAddTag = npmAddTag;
-function npmConfig(context, registry, scope) {
-    registry = registry.endsWith("/") ? registry : (registry + "/");
-    scope = scope === null || scope === void 0 ? void 0 : scope.toLowerCase();
-    if (fs.existsSync(".npmrc")) {
-        fs.renameSync(".npmrc", ".npmrc.bak");
-    }
-    // Remove HTTP or HTTPS protocol from front of registry URL
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.env.NPM_TOKEN;
-    const registryLine = (scope ? `${scope}:` : "") + `registry=${registry}`;
-    fs.writeFileSync(".npmrc", authLine + os.EOL + registryLine + os.EOL);
-}
-exports.npmConfig = npmConfig;
-function npmPack(inDir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
-        return cmdOutput.stdout.trim();
-    });
-}
-exports.npmPack = npmPack;
-function npmPublish(tag, inDir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("npm", ["publish", "--tag", tag], { cwd: inDir });
-    });
-}
-exports.npmPublish = npmPublish;
-function npmReset() {
-    if (fs.existsSync(".npmrc")) {
-        fs.unlinkSync(".npmrc");
-    }
-    if (fs.existsSync(".npmrc.bak")) {
-        fs.renameSync(".npmrc.bak", ".npmrc");
-    }
-}
-exports.npmReset = npmReset;
-function npmVersion(newVersion) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
-    });
-}
-exports.npmVersion = npmVersion;
-function npmViewVersion(pkgName, pkgTag) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            return (yield exec.getExecOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
-        }
-        catch (_a) {
-            core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
-        }
-    });
-}
-exports.npmViewVersion = npmViewVersion;
-
-
-/***/ }),
-
 /***/ 908:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -26395,88 +26617,6 @@ module.exports = function(num) {
   }
   return false;
 };
-
-
-/***/ }),
-
-/***/ 919:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(__webpack_require__(470));
-const github = __importStar(__webpack_require__(469));
-function default_1(context, config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.env.GITHUB_TOKEN == null) {
-            throw new Error("Required environment variable GITHUB_TOKEN is undefined");
-        }
-        if (config.checkPrLabels) {
-            const releaseType = yield getPrReleaseType(context);
-            if (releaseType != null) {
-                context.version.new = __webpack_require__(864).inc(context.version.old, releaseType);
-            }
-        }
-    });
-}
-exports.default = default_1;
-function getPrReleaseType(context) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
-        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
-        if (prs.data.length === 0) {
-            core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
-            return null;
-        }
-        const prNumber = prs.data[0].number;
-        const labels = yield octokit.issues.listLabelsOnIssue(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber }));
-        const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
-        if (releaseLabels.length > 1) {
-            throw new Error("Detected multiple semver labels on pull request, there should only be one");
-        }
-        switch ((_a = releaseLabels[0]) === null || _a === void 0 ? void 0 : _a.name) {
-            case "release-major":
-                return "major";
-            case "release-minor":
-                return "minor";
-            case "release-patch":
-                return "patch";
-            default:
-                core.warning("Could not find semver label on pull request");
-                return null;
-        }
-    });
-}
 
 
 /***/ }),
@@ -26798,7 +26938,7 @@ module.exports.silent = (fromDir, moduleId) => resolveFrom(fromDir, moduleId, tr
 
 /***/ }),
 
-/***/ 933:
+/***/ 928:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -26832,13 +26972,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const github = __importStar(__webpack_require__(469));
+const utils = __importStar(__webpack_require__(838));
 function default_1(context, config) {
     return __awaiter(this, void 0, void 0, function* () {
-        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
-        const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(Object.assign(Object.assign({}, github.context.repo), { commit_sha: github.context.sha }));
-        if (prs.data.length > 0) {
-            yield octokit.issues.addLabels(Object.assign(Object.assign({}, github.context.repo), { issue_number: prs.data[0].number, labels: ["released"] }));
+        if (context.version.new != null) {
+            yield utils.npmVersion(context.version.new);
+            context.changedFiles.push("package.json", "package-lock.json");
         }
     });
 }
@@ -26976,54 +27115,6 @@ parseJson.noExceptions = (txt, reviver) => {
 
 /***/ }),
 
-/***/ 945:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const utils = __importStar(__webpack_require__(900));
-function default_1(context, config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (context.version.new != null) {
-            yield utils.npmVersion(context.version.new);
-            context.changedFiles.push("package.json", "package-lock.json");
-        }
-    });
-}
-exports.default = default_1;
-
-
-/***/ }),
-
 /***/ 950:
 /***/ (function(__unusedmodule, exports) {
 
@@ -27101,95 +27192,6 @@ module.exports = (flag, argv) => {
 	const terminatorPos = argv.indexOf('--');
 	return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
 };
-
-
-/***/ }),
-
-/***/ 964:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = __importStar(__webpack_require__(747));
-const path = __importStar(__webpack_require__(622));
-const core = __importStar(__webpack_require__(470));
-const utils = __importStar(__webpack_require__(900));
-function default_1(context, config, inDir) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const cwd = inDir || process.cwd();
-        if (config.tarballDir != null) {
-            const tgzFile = yield utils.npmPack(inDir);
-            fs.mkdirSync(config.tarballDir, { recursive: true });
-            fs.renameSync(path.join(cwd, tgzFile), path.resolve(config.tarballDir, tgzFile));
-        }
-        if (!config.npmPublish) {
-            return;
-        }
-        const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
-        if (packageJson.private) {
-            core.info(`Skipping publish of private package ${packageJson.name}`);
-        }
-        const npmRegistry = (_a = packageJson.publishConfig) === null || _a === void 0 ? void 0 : _a.registry;
-        let npmScope;
-        if (npmRegistry == null) {
-            throw new Error("Expected NPM registry to be defined in package.json but it is not");
-        }
-        if (packageJson.name.includes("/")) {
-            npmScope = packageJson.name.split("/")[0];
-        }
-        utils.npmConfig(context, npmRegistry, npmScope);
-        try {
-            // Publish package
-            const alreadyPublished = yield utils.npmViewVersion(packageJson.name, packageJson.version);
-            if (!alreadyPublished) {
-                yield utils.npmPublish(context.branch.tag, inDir);
-            }
-            else {
-                core.error(`Version ${packageJson.version} has already been published to NPM`);
-            }
-            // Add alias tags
-            if (context.branch.aliasTags) {
-                for (const tag of context.branch.aliasTags) {
-                    yield utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
-                }
-            }
-        }
-        finally {
-            utils.npmReset();
-        }
-    });
-}
-exports.default = default_1;
 
 
 /***/ }),

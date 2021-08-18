@@ -7,6 +7,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     const tagMessage = config.tagMessage || `Release {{version}} to ${context.branch.tag}`;
 
     if (context.version.new != null) {
+        // TODO Configure Git in the init step
         await utils.gitConfig(context);
         await utils.gitAdd(...context.changedFiles);
         await utils.gitCommit(commitMessage.replace("{{version}}", context.version.new));

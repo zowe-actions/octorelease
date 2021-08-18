@@ -35,6 +35,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         npmScope = packageJson.name.split("/")[0];
     }
 
+    // TODO Configure .npmrc in the init step
     utils.npmConfig(context, npmRegistry, npmScope);
 
     try {
