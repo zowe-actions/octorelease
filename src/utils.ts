@@ -63,10 +63,6 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
 }
 
 export async function verifyConditions(context: IContext): Promise<void> {
-    if (context.env.GITHUB_TOKEN == null) {
-        throw new Error("Required environment variable GITHUB_TOKEN is undefined");
-    }
-
     if (context.version.old == null) {
         const latestGitTag = (await exec.getExecOutput("git", ["describe", "--abbrev=0"])).stdout.trim();
         if (latestGitTag) {

@@ -16914,9 +16914,6 @@ function loadPlugins(context) {
 exports.loadPlugins = loadPlugins;
 function verifyConditions(context) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (context.env.GITHUB_TOKEN == null) {
-            throw new Error("Required environment variable GITHUB_TOKEN is undefined");
-        }
         if (context.version.old == null) {
             const latestGitTag = (yield exec.getExecOutput("git", ["describe", "--abbrev=0"])).stdout.trim();
             if (latestGitTag) {
