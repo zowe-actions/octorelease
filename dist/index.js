@@ -13876,7 +13876,7 @@ function default_1(context, config, inDir) {
             const aliasTagOrTags = config.aliasTags[packageTag];
             const aliasTags = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
             for (const tag of aliasTags) {
-                yield utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
+                yield utils.npmAddTag(packageJson.name, packageJson.version, tag, npmRegistry, inDir);
             }
         }
     });
@@ -23481,9 +23481,9 @@ const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
-function npmAddTag(pkgName, pkgVersion, tag, inDir) {
+function npmAddTag(pkgName, pkgVersion, tag, registry, inDir) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
+        yield exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry], { cwd: inDir });
     });
 }
 exports.npmAddTag = npmAddTag;

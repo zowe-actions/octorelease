@@ -40,7 +40,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         const aliasTagOrTags = config.aliasTags[packageTag];
         const aliasTags: string[] = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
         for (const tag of aliasTags) {
-            await utils.npmAddTag(packageJson.name, packageJson.version, tag, inDir);
+            await utils.npmAddTag(packageJson.name, packageJson.version, tag, npmRegistry, inDir);
         }
     }
 }

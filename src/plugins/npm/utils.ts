@@ -5,8 +5,8 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext } from "../../doc";
 
-export async function npmAddTag(pkgName: string, pkgVersion: string, tag: string, inDir?: string): Promise<void> {
-    await exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag], { cwd: inDir });
+export async function npmAddTag(pkgName: string, pkgVersion: string, tag: string, registry: string, inDir?: string): Promise<void> {
+    await exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry], { cwd: inDir });
 }
 
 export async function npmConfig(context: IContext, registry: string): Promise<void> {
