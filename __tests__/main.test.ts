@@ -14,7 +14,7 @@ afterAll(() => {
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
   process.env['DRY_RUN'] = 'true'
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
+  const ip = path.join(__dirname, '..', 'packages', 'core', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
     env: process.env
   }
