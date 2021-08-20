@@ -31,5 +31,5 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     context.branch.channel = context.branch.channel || "latest";
-    await utils.npmConfig(context, publishConfig?.npmRegistry || "https://registry.npmjs.org/");
+    await utils.npmConfig(context, publishConfig?.registry || "https://registry.npmjs.org/");
 }
