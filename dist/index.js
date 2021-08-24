@@ -25103,10 +25103,29 @@ module.exports = __nccwpck_require__(5065).YAML
 /***/ }),
 
 /***/ 3678:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -25118,8 +25137,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 function fail(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (shouldSkipStage("fail"))
+            return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.fail != null) {
                 yield pluginModule.fail(context, context.plugins[pluginName] || {});
@@ -25140,6 +25162,8 @@ function init(context, pluginsLoaded) {
 exports.init = init;
 function publish(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (shouldSkipStage("publish"))
+            return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.publish != null) {
                 yield pluginModule.publish(context, context.plugins[pluginName] || {});
@@ -25150,6 +25174,8 @@ function publish(context, pluginsLoaded) {
 exports.publish = publish;
 function success(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (shouldSkipStage("success"))
+            return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.success != null) {
                 yield pluginModule.success(context, context.plugins[pluginName] || {});
@@ -25160,6 +25186,8 @@ function success(context, pluginsLoaded) {
 exports.success = success;
 function version(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
+        if (shouldSkipStage("version"))
+            return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.version != null) {
                 yield pluginModule.version(context, context.plugins[pluginName] || {});
@@ -25168,6 +25196,13 @@ function version(context, pluginsLoaded) {
     });
 }
 exports.version = version;
+function shouldSkipStage(name) {
+    const shouldSkip = core.getInput("skip-stages").split(",").map(s => s.trim()).includes(name);
+    if (shouldSkip) {
+        core.info(`Skipping "${name}" stage`);
+    }
+    return shouldSkip;
+}
 
 
 /***/ }),

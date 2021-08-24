@@ -6,6 +6,10 @@ inputs:
     description: 'Print the list of actions that would be performed'
     required: false
     default: 'false'
+  skip-stages:
+    description: 'Comma-separated list of stages that should be skipped'
+    required: false
+    default: ''
 # outputs:
 runs:
   using: 'node12'
