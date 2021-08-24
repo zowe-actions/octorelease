@@ -33,8 +33,13 @@ async function getPrReleaseType(context: IContext): Promise<string | null> {
         ...github.context.repo,
         issue_number: prNumber
     });
-    const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
 
+    if (labels.data.find(label => label.name === "released")) {
+        core.warning("Pull request already released, no new version detected");
+        return null;
+    }
+
+    const releaseLabels = labels.data.filter(label => label.name.startsWith("release-"));
     if (releaseLabels.length > 1) {
         throw new Error("Detected multiple semver labels on pull request, there should only be one");
     }
