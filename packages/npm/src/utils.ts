@@ -17,6 +17,11 @@ export async function npmConfig(context: IContext, registry: string): Promise<vo
     await exec.exec("npm", ["whoami", "--registry", registry]);
 }
 
+export async function npmInstall(pkgName: string, pkgVersion: string, registry: string, inDir?: string): Promise<void> {
+    const registrySpec = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:registry` : "registry";
+    await exec.exec("npm", ["install", `${pkgName}@${pkgVersion}`, `--${registrySpec}`, registry], { cwd: inDir });
+}
+
 export async function npmPack(inDir?: string): Promise<string> {
     const cmdOutput = await exec.getExecOutput("npm", ["pack"], { cwd: inDir });
     return cmdOutput.stdout.trim();

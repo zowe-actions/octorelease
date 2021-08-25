@@ -36,6 +36,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         dryRun: core.getBooleanInput("dry-run"),
         env: process.env as any,
         plugins: pluginConfig,
+        releasedPackages: {},
         version: {}
     };
 }

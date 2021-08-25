@@ -25355,6 +25355,7 @@ function buildContext() {
             dryRun: core.getBooleanInput("dry-run"),
             env: process.env,
             plugins: pluginConfig,
+            releasedPackages: {},
             version: {}
         };
     });

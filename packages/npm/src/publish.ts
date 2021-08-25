@@ -22,6 +22,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
 
     if (packageJson.private) {
         core.info(`Skipping publish of private package ${packageJson.name}`);
+        return;
     }
 
     const npmRegistry: string = packageJson.publishConfig?.registry || "https://registry.npmjs.org/";
@@ -43,4 +44,13 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
             await utils.npmAddTag(packageJson.name, packageJson.version, tag, npmRegistry, inDir);
         }
     }
+
+    context.releasedPackages.npm = [
+        ...(context.releasedPackages.npm || []),
+        {
+            name: packageJson.name,
+            version: packageJson.version,
+            registry: npmRegistry
+        }
+    ];
 }

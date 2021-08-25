@@ -14,6 +14,7 @@ export interface IContext {
     //     warning: (message: string) => void; 
     // };
     plugins: { [key: string]: Record<string, any> };
+    releasedPackages: { [key: string] : any };
     releaseNotes?: string;
     version: { old?: string; new?: string };
     workspaces?: string[];
