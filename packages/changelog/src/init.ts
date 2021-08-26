@@ -18,7 +18,6 @@ async function getReleaseNotes(context: IContext, changelogFile: string, headerL
         for (const packageDir of await globber.glob()) {
             const packageReleaseNotes = getPackageChangelog(context, path.join(packageDir, changelogFile), headerLine);
             if (packageReleaseNotes != null) {
-                // TODO Use package name as header instead of directory name
                 releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
             }
         }

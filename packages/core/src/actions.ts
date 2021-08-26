@@ -27,7 +27,7 @@ export async function init(context: IContext, pluginsLoaded: IPluginsLoaded): Pr
 }
 
 export async function publish(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage(context, "publish")) return;
+    if (shouldSkipStage("publish")) return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.publish != null) {
             await pluginModule.publish(
@@ -39,7 +39,7 @@ export async function publish(context: IContext, pluginsLoaded: IPluginsLoaded):
 }
 
 export async function success(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage(context, "success")) return;
+    if (shouldSkipStage("success")) return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.success != null) {
             await pluginModule.success(
@@ -51,7 +51,7 @@ export async function success(context: IContext, pluginsLoaded: IPluginsLoaded):
 }
 
 export async function version(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage(context, "version")) return;
+    if (shouldSkipStage("version")) return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.version != null) {
             await pluginModule.version(
@@ -62,10 +62,10 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
     }
 }
 
-function shouldSkipStage(context: IContext, name: "fail" | "publish" | "success" | "version"): boolean {
+function shouldSkipStage(name: "fail" | "publish" | "success" | "version"): boolean {
     const shouldSkip = core.getInput("skip-stages").split(",").map(s => s.trim()).includes(name);
     if (shouldSkip) {
-        context.logger.info(`Skipping "${name}" stage`);
+        core.info(`Skipping "${name}" stage`);
     }
     return shouldSkip;
 }

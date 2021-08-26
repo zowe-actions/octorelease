@@ -25164,7 +25164,7 @@ function init(context, pluginsLoaded) {
 exports.init = init;
 function publish(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (shouldSkipStage(context, "publish"))
+        if (shouldSkipStage("publish"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.publish != null) {
@@ -25176,7 +25176,7 @@ function publish(context, pluginsLoaded) {
 exports.publish = publish;
 function success(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (shouldSkipStage(context, "success"))
+        if (shouldSkipStage("success"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.success != null) {
@@ -25188,7 +25188,7 @@ function success(context, pluginsLoaded) {
 exports.success = success;
 function version(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (shouldSkipStage(context, "version"))
+        if (shouldSkipStage("version"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.version != null) {
@@ -25198,10 +25198,10 @@ function version(context, pluginsLoaded) {
     });
 }
 exports.version = version;
-function shouldSkipStage(context, name) {
+function shouldSkipStage(name) {
     const shouldSkip = core.getInput("skip-stages").split(",").map(s => s.trim()).includes(name);
     if (shouldSkip) {
-        context.logger.info(`Skipping "${name}" stage`);
+        core.info(`Skipping "${name}" stage`);
     }
     return shouldSkip;
 }
@@ -25312,7 +25312,6 @@ function run() {
                 core.info("Commit message contains CI skip phrase, exiting now");
                 process.exit();
             }
-            // TODO Implement support for dry run flag on all plugins
             const pluginsLoaded = yield utils.loadPlugins(context);
             try {
                 yield actions.init(context, pluginsLoaded);

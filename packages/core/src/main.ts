@@ -15,7 +15,6 @@ async function run(): Promise<void> {
             process.exit();
         }
 
-        // TODO Implement support for dry run flag on all plugins
         const pluginsLoaded = await utils.loadPlugins(context);
         try {
             await actions.init(context, pluginsLoaded);
