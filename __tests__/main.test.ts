@@ -12,8 +12,9 @@ afterAll(() => {
 })
 
 // shows how the runner will run a javascript action with env / stdout protocol
-xtest('test runs', () => {
+test('test runs', () => {
   process.env['DRY_RUN'] = 'true'
+  process.env['GITHUB_REF'] = 'deadbeef'
   const ip = path.join(__dirname, '..', 'packages', 'core', 'lib', 'main.js')
   const options: cp.ExecSyncOptions = {
     env: process.env
