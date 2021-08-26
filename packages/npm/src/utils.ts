@@ -2,10 +2,13 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as exec from "@actions/exec";
-import { IContext } from "@octorelease/core";
+import { IContext, utils } from "@octorelease/core";
 
-export async function npmAddTag(pkgName: string, pkgVersion: string, tag: string, registry: string, inDir?: string): Promise<void> {
-    await exec.exec("npm", ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry], { cwd: inDir });
+export async function npmAddTag(context: IContext, pkgName: string, pkgVersion: string, tag: string, registry: string, inDir?: string): Promise<void> {
+    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry];
+    await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec("npm", cmdArgs, { cwd: inDir });
+    });
 }
 
 export async function npmConfig(context: IContext, registry: string): Promise<void> {
@@ -26,8 +29,11 @@ export async function npmPack(inDir?: string): Promise<string> {
     return cmdOutput.stdout.trim();
 }
 
-export async function npmPublish(tag: string, registry: string, inDir?: string): Promise<void> {
-    await exec.exec("npm", ["publish", "--tag", tag, "--registry", registry], { cwd: inDir });
+export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
+    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
+    await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec("npm", cmdArgs, { cwd: inDir });
+    });
 }
 
 export async function npmVersion(newVersion: string): Promise<void> {

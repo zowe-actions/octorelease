@@ -15,7 +15,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
         await utils.gitTag(`v${context.version.new}`, tagMessage?.replace("{{version}}", context.version.new));
 
-        if (!(await utils.gitPush(context.branch.name, true))) {
+        if (!(await utils.gitPush(context, context.branch.name, true))) {
             context.logger.warning("Nothing to push");
         }
     }

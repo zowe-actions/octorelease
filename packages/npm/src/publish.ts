@@ -30,7 +30,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     // Publish package
     const publishedVersions = await utils.npmView(packageJson.name, "versions");
     if (!publishedVersions?.includes(packageJson.version)) {
-        await utils.npmPublish(packageTag, npmRegistry, inDir);
+        await utils.npmPublish(context, packageTag, npmRegistry, inDir);
     } else {
         context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
     }
@@ -40,7 +40,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         const aliasTagOrTags = config.aliasTags[packageTag];
         const aliasTags: string[] = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
         for (const tag of aliasTags) {
-            await utils.npmAddTag(packageJson.name, packageJson.version, tag, npmRegistry, inDir);
+            await utils.npmAddTag(context, packageJson.name, packageJson.version, tag, npmRegistry, inDir);
         }
     }
 

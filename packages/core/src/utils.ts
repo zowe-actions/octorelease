@@ -1,9 +1,9 @@
 import * as path from "path";
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext, IPluginsLoaded } from "./doc";
+import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
 export async function buildContext(): Promise<IContext | undefined> {
@@ -34,13 +34,21 @@ export async function buildContext(): Promise<IContext | undefined> {
     return {
         branch: branches[branchIndex],
         changedFiles: [],
-        dryRun: core.getBooleanInput("dry-run"),
+        dryRun: Inputs.dryRun,
         env: process.env as any,
         logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
         version: {}
     };
+}
+
+export async function dryRunTask<T>(context: IContext, description: string, task: () => Promise<T>): Promise<T | undefined> {
+    if (context.dryRun) {
+        context.logger.info(`Skipping "${description}"`);
+    } else {
+        return task();
+    }
 }
 
 export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {

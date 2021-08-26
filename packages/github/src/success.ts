@@ -1,5 +1,5 @@
 import * as github from "@actions/github";
-import { IContext } from "@octorelease/core";
+import { IContext, utils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -10,10 +10,12 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     });
 
     if (prs.data.length > 0) {
-        await octokit.issues.addLabels({
-            ...github.context.repo,
-            issue_number: prs.data[0].number,
-            labels: ["released"]
+        await utils.dryRunTask(context, "add label to GitHub pull request", async () => {
+            await octokit.issues.addLabels({
+                ...github.context.repo,
+                issue_number: prs.data[0].number,
+                labels: ["released"]
+            });
         });
     }
 }

@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import { IContext, IPluginsLoaded } from "./doc";
+import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
 export async function fail(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
@@ -63,9 +64,9 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
 }
 
 function shouldSkipStage(name: "fail" | "publish" | "success" | "version"): boolean {
-    const shouldSkip = core.getInput("skip-stages").split(",").map(s => s.trim()).includes(name);
-    if (shouldSkip) {
+    if (Inputs.skipStages.includes(name)) {
         core.info(`Skipping "${name}" stage`);
+        return false;
     }
-    return shouldSkip;
+    return true;
 }
