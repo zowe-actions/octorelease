@@ -25440,7 +25440,7 @@ function buildContext() {
             branches[branchIndex].channel = branches[branchIndex].name;
         }
         const pluginConfig = {};
-        for (const pc of config.config.plugins) {
+        for (const pc of (config.config.plugins || [])) {
             if (typeof pc === "string") {
                 pluginConfig[pc] = {};
             }
