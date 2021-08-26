@@ -8,8 +8,15 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     if (context.version.new != null) {
         await utils.gitAdd(...context.changedFiles);
-        await utils.gitCommit(commitMessage.replace("{{version}}", context.version.new));
+
+        if (!(await utils.gitCommit(commitMessage.replace("{{version}}", context.version.new)))) {
+            context.logger.warning("Nothing to commit");
+        }
+
         await utils.gitTag(`v${context.version.new}`, tagMessage?.replace("{{version}}", context.version.new));
-        await utils.gitPush(context.branch.name, true);
+
+        if (!(await utils.gitPush(context.branch.name, true))) {
+            context.logger.warning("Nothing to push");
+        }
     }
 }

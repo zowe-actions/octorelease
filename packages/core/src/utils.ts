@@ -4,6 +4,7 @@ import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext, IPluginsLoaded } from "./doc";
+import { Logger } from "./logger";
 
 export async function buildContext(): Promise<IContext | undefined> {
     const config = await cosmiconfig("release").search();
@@ -35,6 +36,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         changedFiles: [],
         dryRun: core.getBooleanInput("dry-run"),
         env: process.env as any,
+        logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
         version: {}

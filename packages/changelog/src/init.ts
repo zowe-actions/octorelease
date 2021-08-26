@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as core from "@actions/core";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
@@ -17,7 +16,7 @@ async function getReleaseNotes(context: IContext, changelogFile: string, headerL
         let releaseNotes = "";
 
         for (const packageDir of await globber.glob()) {
-            const packageReleaseNotes = getPackageChangelog(path.join(packageDir, changelogFile), headerLine);
+            const packageReleaseNotes = getPackageChangelog(context, path.join(packageDir, changelogFile), headerLine);
             if (packageReleaseNotes != null) {
                 // TODO Use package name as header instead of directory name
                 releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
@@ -26,11 +25,11 @@ async function getReleaseNotes(context: IContext, changelogFile: string, headerL
 
         return releaseNotes || undefined;
     } else {
-        return getPackageChangelog(changelogFile, headerLine);
+        return getPackageChangelog(context, changelogFile, headerLine);
     }
 }
 
-function getPackageChangelog(changelogFile: string, headerLine: string): string | undefined {
+function getPackageChangelog(context: IContext, changelogFile: string, headerLine: string): string | undefined {
     let releaseNotes = "";
 
     if (fs.existsSync(changelogFile)) {
@@ -42,12 +41,12 @@ function getPackageChangelog(changelogFile: string, headerLine: string): string 
                 lineNum++;
                 releaseNotes += changelogLines[lineNum] + "\n";
             }
-            core.info(`Found changelog header in ${changelogFile}`);
+            context.logger.info(`Found changelog header in ${changelogFile}`);
         } else {
-            core.warning(`Missing changelog header in ${changelogFile}`);
+            context.logger.warning(`Missing changelog header in ${changelogFile}`);
         }
     } else {
-        core.warning(`Missing changelog file ${changelogFile}`);
+        context.logger.warning(`Missing changelog file ${changelogFile}`);
     }
 
     return releaseNotes.trim() || undefined;

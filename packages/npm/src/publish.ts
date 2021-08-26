@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as core from "@actions/core";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
@@ -21,7 +20,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
 
     if (packageJson.private) {
-        core.info(`Skipping publish of private package ${packageJson.name}`);
+        context.logger.info(`Skipping publish of private package ${packageJson.name}`);
         return;
     }
 
@@ -29,11 +28,11 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     const packageTag = context.branch.channel as string;
 
     // Publish package
-    const alreadyPublished = await utils.npmViewVersion(packageJson.name, packageJson.version);
-    if (!alreadyPublished) {
+    const publishedVersions = await utils.npmView(packageJson.name, "versions");
+    if (!publishedVersions?.includes(packageJson.version)) {
         await utils.npmPublish(packageTag, npmRegistry, inDir);
     } else {
-        core.error(`Version ${packageJson.version} has already been published to NPM`);
+        context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
     }
 
     // Add alias tags

@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
@@ -24,7 +23,7 @@ async function getPrReleaseType(context: IContext): Promise<string | null> {
     });
 
     if (prs.data.length === 0) {
-        core.warning(`Could not find pull request associated with commit ${github.context.sha}`);
+        context.logger.warning(`Could not find pull request associated with commit ${github.context.sha}`);
         return null;
     }
 
@@ -35,7 +34,7 @@ async function getPrReleaseType(context: IContext): Promise<string | null> {
     });
 
     if (labels.data.find(label => label.name === "released")) {
-        core.warning("Pull request already released, no new version detected");
+        context.logger.warning("Pull request already released, no new version detected");
         return null;
     }
 
@@ -52,7 +51,7 @@ async function getPrReleaseType(context: IContext): Promise<string | null> {
         case "release-patch":
             return "patch";
         default:
-            core.warning("Could not find semver label on pull request");
+            context.logger.warning("Could not find semver label on pull request");
             return null;
     }
 }

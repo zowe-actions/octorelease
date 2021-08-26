@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
@@ -19,7 +18,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         const cmdOutput = await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:lerna.json`]);
         context.version.old = JSON.parse(cmdOutput.stdout).version;
     } catch {
-        core.warning(`Missing or invalid lerna.json in commit ${baseCommitSha}`);
+        context.logger.warning(`Missing or invalid lerna.json in commit ${baseCommitSha}`);
     }
 
     try {
@@ -27,13 +26,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         context.version.new = lernaJson.version;
         publishConfig = lernaJson.publish;
     } catch {
-        core.warning(`Missing or invalid lerna.json in branch ${context.branch.name}`);
+        context.logger.warning(`Missing or invalid lerna.json in branch ${context.branch.name}`);
     }
 
     try {
         context.workspaces = JSON.parse(fs.readFileSync("package.json", "utf-8")).workspaces;
     } catch {
-        core.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
+        context.logger.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
 
     context.branch.channel = context.branch.channel || "latest";

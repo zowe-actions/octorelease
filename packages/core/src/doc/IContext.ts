@@ -1,3 +1,4 @@
+import { Logger } from "../logger";
 import { IProtectedBranch } from "./IProtectedBranch";
 
 export interface IContext {
@@ -6,13 +7,7 @@ export interface IContext {
     dryRun: boolean;
     env: Record<string, string>,
     failError?: Error;
-    // TODO Implement logger class that prefixes messages with plugin names
-    // logger: {
-    //     debug: (message: string) => void;
-    //     error: (message: string) => void;
-    //     info: (message: string) => void;
-    //     warning: (message: string) => void; 
-    // };
+    logger: Logger;
     plugins: { [key: string]: Record<string, any> };
     releasedPackages: { [key: string] : any };
     releaseNotes?: string;

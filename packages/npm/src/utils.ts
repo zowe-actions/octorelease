@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext } from "@octorelease/core";
 
@@ -35,10 +34,13 @@ export async function npmVersion(newVersion: string): Promise<void> {
     await exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
 }
 
-export async function npmViewVersion(pkgName: string, pkgTag: string): Promise<string | undefined> {
-    try {
-        return (await exec.getExecOutput("npm", ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
-    } catch {
-        core.warning(`Failed to get package version for ${pkgName}@${pkgTag}`);
+export async function npmView(pkgSpec: string, property?: string): Promise<any> {
+    const cmdArgs = ["view", `${pkgSpec}`, "--json"];
+    if (property != null) {
+        cmdArgs.push(property);
     }
+    try {
+        const cmdOutput = await exec.getExecOutput("npm", cmdArgs);
+        return JSON.parse(cmdOutput.stdout.trim());
+    } catch { /* Do nothing */ }
 }

@@ -25138,13 +25138,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const logger_1 = __nccwpck_require__(1193);
 function fail(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage("fail"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.fail != null) {
-                yield pluginModule.fail(context, context.plugins[pluginName] || {});
+                yield pluginModule.fail(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
             }
         }
     });
@@ -25152,9 +25153,10 @@ function fail(context, pluginsLoaded) {
 exports.fail = fail;
 function init(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
+        // Init stage is not skippable
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.init != null) {
-                yield pluginModule.init(context, context.plugins[pluginName] || {});
+                yield pluginModule.init(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
             }
         }
     });
@@ -25162,11 +25164,11 @@ function init(context, pluginsLoaded) {
 exports.init = init;
 function publish(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (shouldSkipStage("publish"))
+        if (shouldSkipStage(context, "publish"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.publish != null) {
-                yield pluginModule.publish(context, context.plugins[pluginName] || {});
+                yield pluginModule.publish(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
             }
         }
     });
@@ -25174,11 +25176,11 @@ function publish(context, pluginsLoaded) {
 exports.publish = publish;
 function success(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (shouldSkipStage("success"))
+        if (shouldSkipStage(context, "success"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.success != null) {
-                yield pluginModule.success(context, context.plugins[pluginName] || {});
+                yield pluginModule.success(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
             }
         }
     });
@@ -25186,23 +25188,75 @@ function success(context, pluginsLoaded) {
 exports.success = success;
 function version(context, pluginsLoaded) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (shouldSkipStage("version"))
+        if (shouldSkipStage(context, "version"))
             return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
             if (pluginModule.version != null) {
-                yield pluginModule.version(context, context.plugins[pluginName] || {});
+                yield pluginModule.version(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
             }
         }
     });
 }
 exports.version = version;
-function shouldSkipStage(name) {
+function shouldSkipStage(context, name) {
     const shouldSkip = core.getInput("skip-stages").split(",").map(s => s.trim()).includes(name);
     if (shouldSkip) {
-        core.info(`Skipping "${name}" stage`);
+        context.logger.info(`Skipping "${name}" stage`);
     }
     return shouldSkip;
 }
+
+
+/***/ }),
+
+/***/ 1193:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Logger = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+class Logger {
+    constructor(pluginName) {
+        this.pluginName = pluginName;
+    }
+    debug(message) {
+        core.debug(this.prependPluginName(message));
+    }
+    error(message) {
+        core.error(this.prependPluginName(message));
+    }
+    info(message) {
+        core.info(this.prependPluginName(message));
+    }
+    warning(message) {
+        core.warning(this.prependPluginName(message));
+    }
+    prependPluginName(message) {
+        return this.pluginName ? `[${this.pluginName}] ${message}` : message;
+    }
+}
+exports.Logger = Logger;
 
 
 /***/ }),
@@ -25323,6 +25377,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
 const cosmiconfig_1 = __nccwpck_require__(4066);
+const logger_1 = __nccwpck_require__(1193);
 function buildContext() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -25354,6 +25409,7 @@ function buildContext() {
             changedFiles: [],
             dryRun: core.getBooleanInput("dry-run"),
             env: process.env,
+            logger: new logger_1.Logger(),
             plugins: pluginConfig,
             releasedPackages: {},
             version: {}

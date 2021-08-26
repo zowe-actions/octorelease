@@ -14,7 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.3.0",
     "@actions/exec": "^1.1.0",
     "@actions/github": "^4.0.0",
     "@octorelease/core": "^1.0.0",
