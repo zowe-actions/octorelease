@@ -66,7 +66,7 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
 function shouldSkipStage(name: "fail" | "publish" | "success" | "version"): boolean {
     if (Inputs.skipStages.includes(name)) {
         core.info(`Skipping "${name}" stage`);
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }

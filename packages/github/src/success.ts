@@ -10,7 +10,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     });
 
     if (prs.data.length > 0) {
-        await utils.dryRunTask(context, "add label to GitHub pull request", async () => {
+        await utils.dryRunTask(context, "add released label to pull request", async () => {
             await octokit.issues.addLabels({
                 ...github.context.repo,
                 issue_number: prs.data[0].number,

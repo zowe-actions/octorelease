@@ -6,6 +6,7 @@ export class Inputs {
     }
 
     public static get skipStages(): string[] {
-        return core.getInput("skip-stages").split(",").map(s => s.trim());
+        const input = core.getInput("skip-stages");
+        return input ? input.split(",").map(s => s.trim()) : [];
     }
 }
