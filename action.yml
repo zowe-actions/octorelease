@@ -1,5 +1,5 @@
-name: 'node-versioner'
-description: 'GitHub Action to version and publish a Zowe project'
+name: 'octorelease'
+description: 'Extensible GitHub action to publish semantic releases'
 author: 't1m0thyj'
 inputs:
   dry-run:
