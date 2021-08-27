@@ -25486,7 +25486,7 @@ exports.loadPlugins = loadPlugins;
 function verifyConditions(context) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.version.old == null) {
-            const latestGitTag = (yield exec.getExecOutput("git", ["describe", "--abbrev=0"])).stdout.trim();
+            const latestGitTag = (yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true })).stdout.trim();
             if (latestGitTag) {
                 context.version.old = latestGitTag.slice(1);
             }

@@ -5,11 +5,9 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
     const packageInfo = JSON.parse(cmdOutput.stdout);
 
     if (onlyChanged) {
-        try {
-            cmdOutput = await exec.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"])
-            const changedPackages = cmdOutput.stdout.split(/\r?\n/);
-            return packageInfo.filter((pkg: any) => changedPackages.includes(pkg.name));
-        } catch { /* Ignore error if there are no changed packages */ }
+        cmdOutput = await exec.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"], { ignoreReturnCode: true });
+        const changedPackages = cmdOutput.stdout.split(/\r?\n/);
+        return packageInfo.filter((pkg: any) => changedPackages.includes(pkg.name));
     }
 
     return packageInfo;

@@ -62,7 +62,7 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
 
 export async function verifyConditions(context: IContext): Promise<void> {
     if (context.version.old == null) {
-        const latestGitTag = (await exec.getExecOutput("git", ["describe", "--abbrev=0"])).stdout.trim();
+        const latestGitTag = (await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true })).stdout.trim();
         if (latestGitTag) {
             context.version.old = latestGitTag.slice(1);
         }
