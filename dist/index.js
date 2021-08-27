@@ -25486,10 +25486,8 @@ exports.loadPlugins = loadPlugins;
 function verifyConditions(context) {
     return __awaiter(this, void 0, void 0, function* () {
         if (context.version.old == null) {
-            const latestGitTag = (yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true })).stdout.trim();
-            if (latestGitTag) {
-                context.version.old = latestGitTag.slice(1);
-            }
+            const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
+            context.version.old = cmdOutput.stdout.trim().slice(1) || "0.0.0";
         }
         context.version.new = context.version.new || context.version.old;
         const semverDiff = __nccwpck_require__(6413).diff(context.version.old, context.version.new);

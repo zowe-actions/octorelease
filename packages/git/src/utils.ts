@@ -8,8 +8,8 @@ export async function gitAdd(...files: string[]): Promise<void> {
 export async function gitCommit(message: string, amend?: boolean): Promise<boolean> {
     // Check if there is anything to commit
     if (!amend) {
-        const cmdOutput = (await exec.getExecOutput("git", ["diff", "--name-only", "--cached"])).stdout.trim();
-        if (cmdOutput.length == 0) {
+        const cmdOutput = await exec.getExecOutput("git", ["diff", "--name-only", "--cached"]);
+        if (cmdOutput.stdout.trim().length == 0) {
             return false;
         }
     }
@@ -30,8 +30,8 @@ export async function gitConfig(context: IContext): Promise<void> {
 export async function gitPush(context: IContext, branch: string, tags?: boolean): Promise<boolean> {
     // Check if there is anything to push
     if (!tags) {
-        const cmdOutput = (await exec.getExecOutput("git", ["cherry"])).stdout.trim();
-        if (cmdOutput.length == 0) {
+        const cmdOutput = await exec.getExecOutput("git", ["cherry"]);
+        if (cmdOutput.stdout.trim().length == 0) {
             return false;
         }
     }

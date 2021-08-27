@@ -62,10 +62,8 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
 
 export async function verifyConditions(context: IContext): Promise<void> {
     if (context.version.old == null) {
-        const latestGitTag = (await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true })).stdout.trim();
-        if (latestGitTag) {
-            context.version.old = latestGitTag.slice(1);
-        }
+        const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
+        context.version.old = cmdOutput.stdout.trim().slice(1) || "0.0.0";
     }
 
     context.version.new = context.version.new || context.version.old;
