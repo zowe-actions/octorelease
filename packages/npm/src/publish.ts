@@ -13,7 +13,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         fs.renameSync(path.join(cwd, tgzFile), path.resolve(config.tarballDir, tgzFile));
     }
 
-    if (!config.npmPublish) {
+    if (config.npmPublish === false) {
         return;
     }
 
