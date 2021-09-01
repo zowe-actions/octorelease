@@ -1,5 +1,5 @@
 import * as exec from "@actions/exec";
-import { IContext, utils } from "@octorelease/core";
+import { IContext } from "@octorelease/core";
 
 export async function gitAdd(...files: string[]): Promise<void> {
     await exec.exec("git", ["add", ...files]);
@@ -40,9 +40,10 @@ export async function gitPush(context: IContext, branch: string, tags?: boolean)
     if (tags) {
         cmdArgs.push("--follow-tags");
     }
-    await utils.dryRunTask(context, `git ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec("git", cmdArgs);
-    });
+    if (context.dryRun) {
+        cmdArgs.push("--dry-run");
+    }
+    await exec.exec("git", cmdArgs);
     return true;
 }
 

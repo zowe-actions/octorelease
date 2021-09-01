@@ -31,9 +31,10 @@ export async function npmPack(inDir?: string): Promise<string> {
 
 export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
     const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
-    await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec("npm", cmdArgs, { cwd: inDir });
-    });
+    if (context.dryRun) {
+        cmdArgs.push("--dry-run");
+    }
+    await exec.exec("npm", cmdArgs, { cwd: inDir });
 }
 
 export async function npmVersion(newVersion: string): Promise<void> {
