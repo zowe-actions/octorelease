@@ -25337,6 +25337,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const path = __importStar(__nccwpck_require__(5622));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const actions = __importStar(__nccwpck_require__(3678));
@@ -25345,6 +25346,9 @@ function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            if (core.getInput("working-directory")) {
+                process.chdir(path.resolve(core.getInput("working-directory")));
+            }
             const context = yield utils.buildContext();
             if (context == null) {
                 core.info("Current branch is not a release branch, exiting now");

@@ -1,3 +1,4 @@
+import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as actions from "./actions";
@@ -5,6 +6,9 @@ import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {
+        if (core.getInput("working-directory")) {
+            process.chdir(path.resolve(core.getInput("working-directory")));
+        }
         const context = await utils.buildContext();
 
         if (context == null) {

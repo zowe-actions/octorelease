@@ -3,11 +3,15 @@ description: 'Extensible GitHub action to publish semantic releases'
 author: 't1m0thyj'
 inputs:
   dry-run:
-    description: 'Print the list of actions that would be performed'
+    description: 'Don''t make any changes but report what would have been done'
     required: false
     default: 'false'
   skip-stages:
     description: 'Comma-separated list of stages that should be skipped'
+    required: false
+    default: ''
+  working-directory:
+    description: 'Custom working directory to use instead of the project root'
     required: false
     default: ''
 # outputs:
