@@ -1,3 +1,4 @@
+export * from "./ICiEnv";
 export * from "./IConfig";
 export * from "./IContext";
 export * from "./IPlugin";

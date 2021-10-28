@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as exec from "@actions/exec";
-import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
@@ -10,7 +9,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         throw new Error("Required environment variable NPM_TOKEN is undefined");
     }
 
-    const baseCommitSha = github.context.payload.before;
+    const baseCommitSha = context.ci.payload.before;
     let publishConfig;
 
     try {

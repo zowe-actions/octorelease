@@ -1,21 +1,26 @@
 import * as path from "path";
 import * as exec from "@actions/exec";
-import * as github from "@actions/github";
 import { cosmiconfig } from "cosmiconfig";
 import { IContext, IPluginsLoaded } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
 export async function buildContext(): Promise<IContext | undefined> {
+    const envCi = require("env-ci")();
+    if (envCi.service == null) {
+        throw new Error(`Unsupported CI service detected: ${envCi.service}`);
+    }
+    const [ owner, repo ] = envCi.slug.split("/");
+    envCi.repo = { owner, repo };
+
     const config = await cosmiconfig("release").search();
     if (config == null || config.isEmpty) {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
-    const branchName = github.context.payload.pull_request?.base.ref || github.context.ref.replace(/^refs\/heads\//, "");
     const micromatch = require("micromatch");
     const branches = config.config.branches.map((branch: any) => typeof branch === "string" ? { name: branch } : branch);
-    const branchIndex = branches.findIndex((branch: any) => micromatch.isMatch(branchName, branch.name));
+    const branchIndex = branches.findIndex((branch: any) => micromatch.isMatch(envCi.branch, branch.name));
     if (branchIndex == -1) {
         return;
     } else if (branchIndex > 0 && branches[branchIndex].channel == null) {
@@ -34,6 +39,7 @@ export async function buildContext(): Promise<IContext | undefined> {
     return {
         branch: branches[branchIndex],
         changedFiles: [],
+        ci: envCi,
         dryRun: Inputs.dryRun,
         env: process.env as any,
         logger: new Logger(),
@@ -49,6 +55,11 @@ export async function dryRunTask<T>(context: IContext, description: string, task
     } else {
         return task();
     }
+}
+
+export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
+    const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
+    return cmdOutput.stdout.trim() || undefined;
 }
 
 export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
