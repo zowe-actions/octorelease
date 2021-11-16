@@ -65,28 +65,32 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
         const comment = await octokit.issues.createComment({
             ...github.context.repo,
             issue_number: prNumber,
-            body: `Version information from a repo admin is required to publish a new version.\n\n` +
-                `Please add one of the following labels to the pull request within ${timeoutInMinutes} minutes:\n` +
+            body: `Version info from a repo admin is required to publish a new version. ` +
+                `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
                 `* **${releaseLabels[0]}**: \`${require("semver").major(context.version.old)}\`\n` +
                 `* **${releaseLabels[1]}**: \`${require("semver").minor(context.version.old)}\`\n` +
                 `* **${releaseLabels[2]}**: \`${require("semver").patch(context.version.old)}\`\n` +
                 `* **${releaseLabels[3]}** (default): \`${context.version.old}\`\n\n` +
-                `Powered by Octorelease :rocket:`
+                `<sub>Powered by Octorelease :rocket:</sub>`
         });
 
         // Wait for release label to be added to PR
         const webhooks = new Webhooks({ secret: context.env.GITHUB_TOKEN });
         let server: http.Server | undefined;
-        context.logger.info("Waiting for repo admin to add release label to pull request");
+        context.logger.info("Waiting for repo admin to add release label to pull request...");
         approvedLabelEvents = await new Promise((resolve, reject) => {
             webhooks.onAny((event) => {
-                if (event.name === "label" && releaseLabels.includes(event.payload.label.name) &&
+                if (event.name === "label" && event.payload.action === "created" && releaseLabels.includes(event.payload.label.name) &&
                     isUserAdmin(event.payload.sender.id, collaborators.data)) {
+                    context.logger.info(`Release label "${event.payload.label.name}" was added by ${event.payload.sender.login}`);
                     resolve([event.payload]);
                 }
             });
             server = http.createServer(createNodeMiddleware(webhooks)).listen();
-            setTimeout(() => resolve([]), timeoutInMinutes * 60000);
+            setTimeout(() => {
+                context.logger.info("Timed out waiting for release label");
+                resolve([]);
+            }, timeoutInMinutes * 60000);
         });
         server?.close();
 
@@ -108,6 +112,14 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
 }
 
 function checkPrEventForApprovedLabel(event: any, futureEvents: any[], collaborators: any[], releaseLabels: string[]): boolean {
+    /**
+     * Ignore the following:
+     *  - Other kinds of events besides label creation
+     *  - Labels that were added before the PR was merged
+     *  - Labels that were temporarily added and later removed
+     *  - Labels that were added by user without admin privileges
+     *  - Non-release labels with names we don't care about
+     */
     if (event.event !== "labeled") {
         return false;
     } else if (futureEvents.find(e => e.event === "merged") != null) {
@@ -124,5 +136,5 @@ function checkPrEventForApprovedLabel(event: any, futureEvents: any[], collabora
 }
 
 function isUserAdmin(userId: number, collaborators: any[]): boolean {
-    return collaborators.find(user => user.id === userId && user.permissions?.admin) == null;
+    return collaborators.find(user => user.id === userId && user.permissions?.admin) != null;
 }
