@@ -67,9 +67,9 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
             issue_number: prNumber,
             body: `Version info from a repo admin is required to publish a new version. ` +
                 `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
-                `* **${releaseLabels[0]}**: \`${require("semver").major(context.version.old)}\`\n` +
-                `* **${releaseLabels[1]}**: \`${require("semver").minor(context.version.old)}\`\n` +
-                `* **${releaseLabels[2]}**: \`${require("semver").patch(context.version.old)}\`\n` +
+                `* **${releaseLabels[0]}**: \`${require("semver").inc(context.version.old, "major")}\`\n` +
+                `* **${releaseLabels[1]}**: \`${require("semver").inc(context.version.old, "minor")}\`\n` +
+                `* **${releaseLabels[2]}**: \`${require("semver").inc(context.version.old, "patch")}\`\n` +
                 `* **${releaseLabels[3]}** (default): \`${context.version.old}\`\n\n` +
                 `<sub>Powered by Octorelease :rocket:</sub>`
         });
