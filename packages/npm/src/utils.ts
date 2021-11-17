@@ -41,8 +41,8 @@ export async function npmVersion(newVersion: string): Promise<void> {
     await exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
 }
 
-export async function npmView(pkgSpec: string, property?: string): Promise<any> {
-    const cmdArgs = ["view", `${pkgSpec}`, "--json"];
+export async function npmView(pkgSpec: string, registry: string, property?: string): Promise<any> {
+    const cmdArgs = ["view", `${pkgSpec}`, "--json", "--registry", registry];
     if (property != null) {
         cmdArgs.push(property);
     }

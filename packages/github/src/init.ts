@@ -1,6 +1,6 @@
 import * as github from "@actions/github";
-import delay from "delay";
 import { RequestError } from "@octokit/request-error";
+import delay from "delay";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
@@ -94,22 +94,13 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
             } catch (error) {
                 if (!(error instanceof RequestError && error.status === 304)) {
                     throw error;
-                } else {  // TODO temp for debugging
-                    context.logger.info("etag cached");
                 }
             }
         }
 
-        // If release label was added, react to comment and remove the label
+        // React to comment if release label was added
         if (approvedLabelEvents.length === 1) {
-            const event: any = approvedLabelEvents[0];
-            context.logger.info(`Release label "${event.label.name}" was added by ${event.actor.login}`);
-
-            await octokit.issues.removeLabel({
-                ...github.context.repo,
-                issue_number: prNumber,
-                name: event.label.name
-            });
+            context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ${approvedLabelEvents[0].actor.login}`);
 
             await octokit.reactions.createForIssueComment({
                 ...github.context.repo,
@@ -121,7 +112,13 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
         }
     }
 
-    if (approvedLabelEvents.length === 1 && approvedLabelEvents[0].label?.name != null) {
+    if (approvedLabelEvents.length === 1) {
+        await octokit.issues.removeLabel({
+            ...github.context.repo,
+            issue_number: prNumber,
+            name: approvedLabelEvents[0].label.name
+        });
+
         return [null, "patch", "minor", "major"][releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
     }
 

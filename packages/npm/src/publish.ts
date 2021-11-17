@@ -28,7 +28,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     const packageTag = context.branch.channel as string;
 
     // Publish package
-    const publishedVersions = await utils.npmView(packageJson.name, "versions");
+    const publishedVersions = await utils.npmView(packageJson.name, npmRegistry, "versions");
     if (!publishedVersions?.includes(packageJson.version)) {
         await utils.npmPublish(context, packageTag, npmRegistry, inDir);
     } else {
