@@ -16,7 +16,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             await coreUtils.dryRunTask(context, `install ${name}@${version} from ${registry}`, async () => {
                 await utils.npmInstall(name, version, registry, tmpDir);
             });
-            fs.rmSync(tmpDir, { recursive: true, force: true });
+            fs.rmdirSync(tmpDir, { recursive: true });
         }
     }
 }

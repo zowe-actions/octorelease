@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import { RequestError } from "@octokit/request-error";
 import delay from "delay";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (context.env.GITHUB_TOKEN == null) {
@@ -10,8 +10,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     if (config.checkPrLabels) {
-        const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels :
-            ["no-release", "release-patch", "release-minor", "release-major"];
+        const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
         const releaseType = await getPrReleaseType(context, releaseLabels);
         if (releaseType != null) {
             context.version.new = require("semver").inc(context.version.old, releaseType);
@@ -88,7 +87,6 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
                     issue_number: prNumber,
                     headers: { "if-none-match": lastEtag }
                 });
-
                 approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
                 lastEtag = response.headers.etag;
             } catch (error) {
@@ -98,18 +96,17 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
             }
         }
 
-        // React to comment if release label was added
         if (approvedLabelEvents.length === 1) {
             context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ${approvedLabelEvents[0].actor.login}`);
-
-            await octokit.reactions.createForIssueComment({
-                ...github.context.repo,
-                comment_id: comment.data.id,
-                content: "eyes"
-            });
         } else {
             context.logger.info("Timed out waiting for release label");
         }
+
+        // Delete comment since it is no longer useful
+        await octokit.issues.deleteComment({
+            ...github.context.repo,
+            comment_id: comment.data.id
+        });
     }
 
     if (approvedLabelEvents.length === 1) {
