@@ -1,5 +1,6 @@
 import * as github from "@actions/github";
 import delay from "delay";
+import { RequestError } from "@octokit/request-error";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
@@ -80,17 +81,22 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
         let lastEtag = events.headers.etag;
         while (approvedLabelEvents.length !== 1 && (new Date().getTime() - startTime) < timeoutInMsec) {
             await delay(1000);
-            const response = await octokit.issues.listEvents({
-                ...github.context.repo,
-                issue_number: prNumber,
-                headers: { "if-none-match": lastEtag }
-            });
-            if ((response as any).status === 304) {  // temp for debugging
-                context.logger.info("etag cached");
-            }
-            if (response.status === 200) {
+
+            try {
+                const response = await octokit.issues.listEvents({
+                    ...github.context.repo,
+                    issue_number: prNumber,
+                    headers: { "if-none-match": lastEtag }
+                });
+
                 approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
                 lastEtag = response.headers.etag;
+            } catch (error) {
+                if (!(error instanceof RequestError && error.status === 304)) {
+                    throw error;
+                } else {  // TODO temp for debugging
+                    context.logger.info("etag cached");
+                }
             }
         }
 
