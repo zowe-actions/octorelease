@@ -20,8 +20,8 @@ export async function npmConfig(context: IContext, registry: string): Promise<vo
 }
 
 export async function npmInstall(pkgName: string, pkgVersion: string, registry: string, inDir?: string): Promise<void> {
-    const registrySpec = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:registry` : "registry";
-    await exec.exec("npm", ["install", `${pkgName}@${pkgVersion}`, `--${registrySpec}`, registry], { cwd: inDir });
+    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
+    await exec.exec("npm", ["install", `${pkgName}@${pkgVersion}`, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
 }
 
 export async function npmPack(inDir?: string): Promise<string> {
