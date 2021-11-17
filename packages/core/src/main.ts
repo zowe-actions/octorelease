@@ -27,12 +27,14 @@ async function run(): Promise<void> {
             await actions.publish(context, pluginsLoaded);
             await actions.success(context, pluginsLoaded);
         } catch (error) {
-            context.failError = error;
-            await actions.fail(context, pluginsLoaded);
+            if (error instanceof Error) {
+                context.failError = error;
+                await actions.fail(context, pluginsLoaded);
+            }
             throw error;
         }
     } catch (error) {
-        core.setFailed(error.message);
+        core.setFailed(error as any);
     }
 }
 
