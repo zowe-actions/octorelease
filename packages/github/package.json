@@ -16,8 +16,8 @@
   "dependencies": {
     "@actions/github": "^4.0.0",
     "@actions/glob": "^0.1.0",
-    "@octokit/webhooks": "^9.17.0",
     "@octorelease/core": "^1.0.0",
+    "delay": "^5.0.0",
     "mime-types": "^2.1.27",
     "semver": "^6.3.0"
   }
