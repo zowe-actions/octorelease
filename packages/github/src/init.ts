@@ -48,7 +48,7 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
     const collaborators = await octokit.repos.listCollaborators(github.context.repo);
     let approvedLabelEvents = findApprovedLabelEvents(events.data, collaborators.data, releaseLabels);
 
-    if (approvedLabelEvents.length !== 1) {
+    if (approvedLabelEvents.length !== 1 && !context.dryRun) {
         const timeoutInMinutes = 30;
 
         // Remove unapproved release labels
@@ -110,12 +110,6 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
     }
 
     if (approvedLabelEvents.length === 1) {
-        await octokit.issues.removeLabel({
-            ...github.context.repo,
-            issue_number: prNumber,
-            name: approvedLabelEvents[0].label.name
-        });
-
         return [null, "patch", "minor", "major"][releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
     }
 
