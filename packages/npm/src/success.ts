@@ -10,11 +10,11 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (config.smokeTest && context.releasedPackages.npm != null) {
         context.logger.info("Performing smoke test, installing released package(s)");
 
-        for (const { name, version, registry } of context.releasedPackages.npm) {
+        for (const { name, registry } of context.releasedPackages.npm) {
             const tmpDir = path.join(os.tmpdir(), github.context.runId.toString(), name);
             fs.mkdirSync(tmpDir, { recursive: true });
-            await coreUtils.dryRunTask(context, `install ${name}@${version} from ${registry}`, async () => {
-                await utils.npmInstall(name, version, registry, tmpDir);
+            await coreUtils.dryRunTask(context, `install ${name} from ${registry}`, async () => {
+                await utils.npmInstall(name, registry, tmpDir);
             });
             fs.rmdirSync(tmpDir, { recursive: true });
         }

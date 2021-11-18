@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
@@ -24,7 +24,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         return;
     }
 
-    const npmRegistry: string = packageJson.publishConfig?.registry || "https://registry.npmjs.org/";
+    const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
     const packageTag = context.branch.channel as string;
 
     // Publish package
@@ -47,8 +47,9 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     context.releasedPackages.npm = [
         ...(context.releasedPackages.npm || []),
         {
-            name: packageJson.name,
-            version: packageJson.version,
+            name: `${packageJson.name}@${packageJson.version}`,
+            url: npmRegistry === DEFAULT_NPM_REGISTRY ?
+                `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : undefined,
             registry: npmRegistry
         }
     ];

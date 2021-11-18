@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -30,5 +30,5 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     context.branch.channel = context.branch.channel || "latest";
-    await utils.npmConfig(context, publishConfig?.registry || "https://registry.npmjs.org/");
+    await utils.npmConfig(context, publishConfig?.registry || DEFAULT_NPM_REGISTRY);
 }
