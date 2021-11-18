@@ -30,9 +30,9 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 await octokit.issues.createComment({
                     ...github.context.repo,
                     issue_number: prs.data[0].number,
-                    body: `Release succeeded for the \`${context.branch}\` branch. :tada:\n\n` +
+                    body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:\n\n` +
                     `The following packages have been published:\n` +
-                    packageList.map(line => `* ${line}`).join("\n") + `\n` +
+                    packageList.map(line => `* ${line}`).join("\n") + `\n\n` +
                     `<sub>Powered by Octorelease :rocket:</sub>`
                 });
             });

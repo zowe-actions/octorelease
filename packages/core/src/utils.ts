@@ -12,9 +12,17 @@ export async function buildContext(): Promise<IContext | undefined> {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
+    const extends_ = (typeof config.config.extends === "string") ? [config.config.extends] : config.config.extends;
+    let sharedConfig: any = {};
+    for (const configName of (extends_ || [])) {
+        const configPath = (configName.startsWith("./") ? "" : "./node_modules/") + configName;
+        sharedConfig = { ...sharedConfig, ...require(path.resolve(configPath)) };
+    }
+    const mergedConfig = { ...sharedConfig, ...config.config };
+
     const branchName = github.context.payload.pull_request?.base.ref || github.context.ref.replace(/^refs\/heads\//, "");
     const micromatch = require("micromatch");
-    const branches = config.config.branches.map((branch: any) => typeof branch === "string" ? { name: branch } : branch);
+    const branches = mergedConfig.branches.map((branch: any) => typeof branch === "string" ? { name: branch } : branch);
     const branchIndex = branches.findIndex((branch: any) => micromatch.isMatch(branchName, branch.name));
     if (branchIndex == -1) {
         return;
@@ -23,7 +31,7 @@ export async function buildContext(): Promise<IContext | undefined> {
     }
 
     const pluginConfig: Record<string, Record<string, any>> = {};
-    for (const pc of (config.config.plugins || [])) {
+    for (const pc of (mergedConfig.plugins || [])) {
         if (typeof pc === "string") {
             pluginConfig[pc] = {};
         } else {
