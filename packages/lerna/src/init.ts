@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as exec from "@actions/exec";
 import { IContext } from "@octorelease/core";
-import { utils as npmUtils } from "@octorelease/npm";
+import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -35,5 +35,5 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     context.branch.channel = context.branch.channel || "latest";
-    await npmUtils.npmConfig(context, publishConfig?.registry || "https://registry.npmjs.org/");
+    await npmUtils.npmConfig(context, publishConfig?.registry || DEFAULT_NPM_REGISTRY);
 }

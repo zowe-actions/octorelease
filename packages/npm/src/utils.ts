@@ -19,9 +19,9 @@ export async function npmConfig(context: IContext, registry: string): Promise<vo
     await exec.exec("npm", ["whoami", "--registry", registry]);
 }
 
-export async function npmInstall(pkgName: string, pkgVersion: string, registry: string, inDir?: string): Promise<void> {
-    const registrySpec = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:registry` : "registry";
-    await exec.exec("npm", ["install", `${pkgName}@${pkgVersion}`, `--${registrySpec}`, registry], { cwd: inDir });
+export async function npmInstall(pkgSpec: string, registry: string, inDir?: string): Promise<void> {
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    await exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
 }
 
 export async function npmPack(inDir?: string): Promise<string> {
@@ -41,8 +41,8 @@ export async function npmVersion(newVersion: string): Promise<void> {
     await exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
 }
 
-export async function npmView(pkgSpec: string, property?: string): Promise<any> {
-    const cmdArgs = ["view", `${pkgSpec}`, "--json"];
+export async function npmView(pkgSpec: string, registry: string, property?: string): Promise<any> {
+    const cmdArgs = ["view", `${pkgSpec}`, "--json", "--registry", registry];
     if (property != null) {
         cmdArgs.push(property);
     }

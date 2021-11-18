@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as github from "@actions/github";
 import * as glob from "@actions/glob";
+import { RequestError } from "@octokit/request-error";
 import { IContext, utils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
@@ -26,9 +27,9 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
             ...context.ci.repo,
             tag: tagName
         });
-    } catch (err) {
-        if (err.status != 404) {
-            throw err;
+    } catch (error) {
+        if (!(error instanceof RequestError && error.status === 404)) {
+            throw error;
         }
     }
 

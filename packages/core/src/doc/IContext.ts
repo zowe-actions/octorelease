@@ -19,7 +19,7 @@ export interface IContext {
     failError?: Error;
     logger: Logger;
     plugins: { [key: string]: Record<string, any> };
-    releasedPackages: { [key: string] : any };
+    releasedPackages: { [key: string]: { name: string; url?: string; [key: string]: any }[] };
     releaseNotes?: string;
     version: {
         old?: string;
