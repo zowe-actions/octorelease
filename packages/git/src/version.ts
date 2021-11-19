@@ -4,7 +4,7 @@ import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const commitMessage = config.commitMessage || "Bump version to {{version}}";
-    const tagMessage = config.tagMessage || (context.branch.channel && `Release {{version}} to ${context.branch.channel}`);
+    let tagMessage = config.tagMessage || (context.branch.channel && `Release {{version}} to ${context.branch.channel}`);
 
     if (context.version.new != null) {
         await utils.gitAdd(...context.changedFiles);
@@ -13,7 +13,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             context.logger.warning("Nothing to commit");
         }
 
-        await utils.gitTag(`v${context.version.new}`, tagMessage?.replace("{{version}}", context.version.new));
+        tagMessage = tagMessage?.replace("{{version}}", context.version.new);
+        if (!(await utils.gitTag(`v${context.version.new}`, tagMessage))) {
+            context.logger.warning("Git tag already exists");
+        }
 
         if (!(await utils.gitPush(context, context.branch.name, true))) {
             context.logger.warning("Nothing to push");

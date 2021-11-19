@@ -11,11 +11,18 @@ export async function npmAddTag(context: IContext, pkgName: string, pkgVersion: 
     });
 }
 
-export async function npmConfig(context: IContext, registry: string): Promise<void> {
+export async function npmConfig(context: IContext, registry: string, useToken = true): Promise<void> {
+    const npmrcLines: string[] = [];
     // Add trailing slash to end of registry URL and remove protocol at start
-    registry = registry.endsWith("/") ? registry : (registry + "/");
-    const authLine = registry.replace(/^\w+:/, "") + ":_authToken=" + context.env.NPM_TOKEN;
-    fs.appendFileSync(path.join(os.homedir(), ".npmrc"), authLine);
+    const registrySpec = (registry.endsWith("/") ? registry : (registry + "/")).replace(/^\w+:/, "");
+    if (useToken) {
+        npmrcLines.push(`${registrySpec}:_authToken=${context.env.NPM_TOKEN}`);
+    } else {
+        const b64Auth = Buffer.from(`${context.env.NPM_USERNAME}:${context.env.NPM_PASSWORD}`).toString("base64");
+        npmrcLines.push(`${registrySpec}:_auth=${b64Auth}`);
+        npmrcLines.push(`${registrySpec}:email=${context.env.NPM_EMAIL}`);
+    }
+    fs.appendFileSync(path.join(os.homedir(), ".npmrc"), npmrcLines.join("\n"));
     await exec.exec("npm", ["whoami", "--registry", registry]);
 }
 
