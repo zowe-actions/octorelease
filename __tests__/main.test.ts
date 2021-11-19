@@ -1,24 +1,24 @@
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
+import * as cp from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 
-beforeAll(() => {
-  fs.writeFileSync('.releaserc', JSON.stringify({ branches: ['master', 'next'] }))
-})
+describe("CI tests", () => {
+    beforeAll(() => {
+        fs.writeFileSync(".releaserc", JSON.stringify({ branches: ["master", "next"] }));
+    });
 
-afterAll(() => {
-  fs.unlinkSync('.releaserc')
-})
+    afterAll(() => {
+        fs.unlinkSync(".releaserc");
+    });
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['GITHUB_REF'] = 'deadbeef'
-  process.env['INPUT_DRY-RUN'] = 'true'
-  const ip = path.join(__dirname, '..', 'packages', 'core', 'lib', 'main.js')
-  const options: cp.ExecSyncOptions = {
-    env: process.env
-  }
-  console.log(`node ${ip}`, options)
-  console.log(cp.execSync(`node ${ip}`, options).toString())
-})
+    // shows how the runner will run a javascript action with env / stdout protocol
+    (process.env.CI ? it : it.skip)("test runs", () => {
+        process.env["INPUT_DRY-RUN"] = "true";
+        const ip = path.join(__dirname, "..", "packages", "core", "lib", "main.js");
+        const options: cp.ExecSyncOptions = {
+            env: process.env
+        };
+        console.log(`node ${ip}`, options);
+        console.log(cp.execSync(`node ${ip}`, options).toString());
+    });
+});

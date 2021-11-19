@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as exec from "@actions/exec";
 import { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
 import { IPluginConfig } from "./config";
@@ -9,17 +8,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         throw new Error("Required environment variable NPM_TOKEN is undefined");
     }
 
-    const baseCommitSha = context.ci.payload.before
     let publishConfig;
-
-    try {
-        await exec.exec(`git fetch origin ${baseCommitSha}`);
-        const cmdOutput = await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:lerna.json`]);
-        context.version.old = JSON.parse(cmdOutput.stdout).version;
-    } catch {
-        context.logger.warning(`Missing or invalid lerna.json in commit ${baseCommitSha}`);
-    }
-
     try {
         const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"))
         context.version.new = lernaJson.version;

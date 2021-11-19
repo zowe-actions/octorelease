@@ -6,7 +6,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
     const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
-        commit_sha: context.ci.sha
+        commit_sha: context.ci.commit
     });
 
     if (prs.data.length > 0) {

@@ -6,25 +6,11 @@ import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
 export async function buildContext(): Promise<IContext | undefined> {
-    const envCi = require("env-ci")();
-    if (envCi.service == null) {
-        throw new Error(`Unsupported CI service detected: ${envCi.service}`);
-    }
-    const [ owner, repo ] = envCi.slug.split("/");
-    envCi.repo = { owner, repo };
-
+    const envCi = await loadCiEnv();
     const config = await cosmiconfig("release").search();
     if (config == null || config.isEmpty) {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
-
-    const extends_ = (typeof config.config.extends === "string") ? [config.config.extends] : config.config.extends;
-    let sharedConfig: any = {};
-    for (const configName of (extends_ || [])) {
-        const configPath = (configName.startsWith("./") ? "" : "./node_modules/") + configName;
-        sharedConfig = { ...sharedConfig, ...require(path.resolve(configPath)) };
-    }
-    const mergedConfig = { ...sharedConfig, ...config.config };
 
     const micromatch = require("micromatch");
     const branches = config.config.branches.map((branch: any) => typeof branch === "string" ? { name: branch } : branch);
@@ -36,13 +22,16 @@ export async function buildContext(): Promise<IContext | undefined> {
     }
 
     const pluginConfig: Record<string, Record<string, any>> = {};
-    for (const pc of (mergedConfig.plugins || [])) {
+    for (const pc of (config.config.plugins || [])) {
         if (typeof pc === "string") {
             pluginConfig[pc] = {};
         } else {
             pluginConfig[pc[0]] = pc[1];
         }
     }
+
+    const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
+    const oldVersion = cmdOutput.stdout.trim().slice(1) || "0.0.0";
 
     return {
         branch: branches[branchIndex],
@@ -53,7 +42,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
-        version: {}
+        version: { old: oldVersion }
     };
 }
 
@@ -65,9 +54,18 @@ export async function dryRunTask<T>(context: IContext, description: string, task
     }
 }
 
-export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
+export async function getLastCommitMessage(): Promise<string | undefined> {
     const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
     return cmdOutput.stdout.trim() || undefined;
+}
+
+export async function loadCiEnv(): Promise<any> {
+    const envCi = require("env-ci")();
+    if (envCi.service == null) {
+        throw new Error(`Unsupported CI service detected: ${envCi.service}`);
+    }
+    const [ owner, repo ] = envCi.slug.split("/");
+    return { ...envCi, repo: { owner, repo } };
 }
 
 export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
@@ -80,11 +78,6 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
 }
 
 export async function verifyConditions(context: IContext): Promise<void> {
-    if (context.version.old == null) {
-        const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
-        context.version.old = cmdOutput.stdout.trim().slice(1) || "0.0.0";
-    }
-
     context.version.new = context.version.new || context.version.old;
     const semverDiff = require("semver").diff(context.version.old, context.version.new);
 

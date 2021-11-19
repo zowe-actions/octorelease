@@ -8,12 +8,12 @@ async function run(): Promise<void> {
         if (core.getInput("working-directory")) {
             process.chdir(path.resolve(core.getInput("working-directory")));
         }
-        const context = await utils.buildContext();
 
+        const context = await utils.buildContext();
         if (context == null) {
             core.info("Current branch is not a release branch, exiting now");
             process.exit();
-        } else if ((await utils.getLastCommitMessage(context))?.includes("[ci skip]")) {
+        } else if ((await utils.getLastCommitMessage())?.includes("[ci skip]")) {
             core.info("Commit message contains CI skip phrase, exiting now");
             process.exit();
         }
