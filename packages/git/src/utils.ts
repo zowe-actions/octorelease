@@ -47,10 +47,17 @@ export async function gitPush(context: IContext, branch: string, tags?: boolean)
     return true;
 }
 
-export async function gitTag(tagName: string, message?: string): Promise<void> {
+export async function gitTag(tagName: string, message?: string): Promise<boolean> {
+    // Check if tag already exists
+    const cmdOutput = await exec.getExecOutput("git", ["tag", "-l", tagName]);
+    if (cmdOutput.stdout.trim().length > 0) {
+        return false;
+    }
+
     const cmdArgs = ["tag", tagName];
     if (message != null) {
         cmdArgs.push("-a", "-m", message);
     }
     await exec.exec("git", cmdArgs);
+    return true;
 }

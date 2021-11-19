@@ -3,12 +3,13 @@ import * as path from "path";
 import * as github from "@actions/github";
 import * as glob from "@actions/glob";
 import { RequestError } from "@octokit/request-error";
-import { IContext, utils } from "@octorelease/core";
+import { IContext, utils as coreUtils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (context.version.new != null) {
-        const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+        const octokit = utils.getOctokit(context, config);
         const release = await createRelease(context, octokit);
         if (config.assets != null && config.assets.length > 0) {
             const assetPaths: string[] = (typeof config.assets === "string") ? [config.assets] : config.assets;
@@ -36,7 +37,7 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
     // Create release if it doesn't exist and try to add release notes
     if (release == null) {
         context.logger.info(`Creating GitHub release with tag ${tagName}`);
-        release = await utils.dryRunTask(context, "create GitHub release", async () => {
+        release = await coreUtils.dryRunTask(context, "create GitHub release", async () => {
             return octokit.repos.createRelease({
                 ...context.ci.repo,
                 tag_name: tagName,
@@ -63,7 +64,7 @@ async function uploadAssets(context: IContext, octokit: any, release: any, asset
         }
 
         context.logger.info(`Uploading release asset ${artifactPath}`);
-        await utils.dryRunTask(context, "upload GitHub release asset", async () => {
+        await coreUtils.dryRunTask(context, "upload GitHub release asset", async () => {
             await octokit.repos.uploadReleaseAsset({
                 ...context.ci.repo,
                 release_id: release.data.id,

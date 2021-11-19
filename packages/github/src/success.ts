@@ -1,16 +1,16 @@
-import * as github from "@actions/github";
-import { IContext, utils } from "@octorelease/core";
+import { IContext, utils as coreUtils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+    const octokit = utils.getOctokit(context, config);
     const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
         commit_sha: context.ci.commit
     });
 
     if (prs.data.length > 0) {
-        await utils.dryRunTask(context, "add released label to pull request", async () => {
+        await coreUtils.dryRunTask(context, "add released label to pull request", async () => {
             await octokit.issues.addLabels({
                 ...context.ci.repo,
                 issue_number: prs.data[0].number,
@@ -26,9 +26,9 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                     packageList.push(`**${pkgType}**: ${pkgName}`);
                 }
             }
-            await utils.dryRunTask(context, "create success comment on pull request", async () => {
+            await coreUtils.dryRunTask(context, "create success comment on pull request", async () => {
                 await octokit.issues.createComment({
-                    ...github.context.repo,
+                    ...context.ci.repo,
                     issue_number: prs.data[0].number,
                     body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:\n\n` +
                     `The following packages have been published:\n` +

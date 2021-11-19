@@ -1,8 +1,8 @@
-import * as github from "@actions/github";
 import { RequestError } from "@octokit/request-error";
 import delay from "delay";
 import { IContext } from "@octorelease/core";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (context.env.GITHUB_TOKEN == null) {
@@ -10,16 +10,15 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     if (config.checkPrLabels) {
-        const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-        const releaseType = await getPrReleaseType(context, releaseLabels);
+        const releaseType = await getPrReleaseType(context, config);
         if (releaseType != null) {
             context.version.new = require("semver").inc(context.version.old, releaseType);
         }
     }
 }
 
-async function getPrReleaseType(context: IContext, releaseLabels: string[]): Promise<string | null> {
-    const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
+async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<string | null> {
+    const octokit = utils.getOctokit(context, config);
     const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
         commit_sha: context.ci.commit
@@ -42,10 +41,11 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
     }
 
     const events = await octokit.issues.listEvents({
-        ...github.context.repo,
+        ...context.ci.repo,
         issue_number: prNumber
     });
-    const collaborators = await octokit.repos.listCollaborators(github.context.repo);
+    const collaborators = await octokit.repos.listCollaborators(context.ci.repo);
+    const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
     let approvedLabelEvents = findApprovedLabelEvents(events.data, collaborators.data, releaseLabels);
 
     if (approvedLabelEvents.length !== 1 && !context.dryRun) {
@@ -54,7 +54,7 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
         // Remove unapproved release labels
         for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
             await octokit.issues.removeLabel({
-                ...github.context.repo,
+                ...context.ci.repo,
                 issue_number: prNumber,
                 name
             });
@@ -62,7 +62,7 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
 
         // Comment on PR to request version approval
         const comment = await octokit.issues.createComment({
-            ...github.context.repo,
+            ...context.ci.repo,
             issue_number: prNumber,
             body: `Version info from a repo admin is required to publish a new version. ` +
                 `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
@@ -83,7 +83,7 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
 
             try {
                 const response = await octokit.issues.listEvents({
-                    ...github.context.repo,
+                    ...context.ci.repo,
                     issue_number: prNumber,
                     headers: { "if-none-match": lastEtag }
                 });
@@ -104,7 +104,7 @@ async function getPrReleaseType(context: IContext, releaseLabels: string[]): Pro
 
         // Delete comment since it is no longer useful
         await octokit.issues.deleteComment({
-            ...github.context.repo,
+            ...context.ci.repo,
             comment_id: comment.data.id
         });
     }
