@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as core from "@actions/core";
-import * as github from "@actions/github";
 import * as actions from "./actions";
 import * as utils from "./utils";
 
@@ -9,12 +8,12 @@ async function run(): Promise<void> {
         if (core.getInput("working-directory")) {
             process.chdir(path.resolve(core.getInput("working-directory")));
         }
-        const context = await utils.buildContext();
 
+        const context = await utils.buildContext();
         if (context == null) {
             core.info("Current branch is not a release branch, exiting now");
             process.exit();
-        } else if (github.context.payload.head_commit?.message.indexOf("[ci skip]") !== -1) {
+        } else if ((await utils.getLastCommitMessage())?.includes("[ci skip]")) {
             core.info("Commit message contains CI skip phrase, exiting now");
             process.exit();
         }

@@ -21,18 +21,18 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 async function getPrReleaseType(context: IContext, releaseLabels: string[]): Promise<string | null> {
     const octokit = github.getOctokit(context.env.GITHUB_TOKEN);
     const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
-        ...github.context.repo,
-        commit_sha: github.context.sha
+        ...context.ci.repo,
+        commit_sha: context.ci.commit
     });
 
     if (prs.data.length === 0) {
-        context.logger.warning(`Could not find pull request associated with commit ${github.context.sha}`);
+        context.logger.warning(`Could not find pull request associated with commit ${context.ci.commit}`);
         return null;
     }
 
     const prNumber = prs.data[0].number;
     const labels = await octokit.issues.listLabelsOnIssue({
-        ...github.context.repo,
+        ...context.ci.repo,
         issue_number: prNumber
     });
 

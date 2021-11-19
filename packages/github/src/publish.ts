@@ -24,7 +24,7 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
     // Get release if it already exists
     try {
         release = await octokit.repos.getReleaseByTag({
-            ...github.context.repo,
+            ...context.ci.repo,
             tag: tagName
         });
     } catch (error) {
@@ -38,7 +38,7 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
         context.logger.info(`Creating GitHub release with tag ${tagName}`);
         release = await utils.dryRunTask(context, "create GitHub release", async () => {
             return octokit.repos.createRelease({
-                ...github.context.repo,
+                ...context.ci.repo,
                 tag_name: tagName,
                 body: context.releaseNotes
             });
@@ -65,7 +65,7 @@ async function uploadAssets(context: IContext, octokit: any, release: any, asset
         context.logger.info(`Uploading release asset ${artifactPath}`);
         await utils.dryRunTask(context, "upload GitHub release asset", async () => {
             await octokit.repos.uploadReleaseAsset({
-                ...github.context.repo,
+                ...context.ci.repo,
                 release_id: release.data.id,
                 name: assetName,
                 // Need to upload as buffer because converting to string corrupts binary data

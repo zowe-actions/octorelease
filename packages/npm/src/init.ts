@@ -1,6 +1,4 @@
 import * as fs from "fs";
-import * as exec from "@actions/exec";
-import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
 import * as utils from "./utils";
@@ -10,17 +8,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         throw new Error("Required environment variable NPM_TOKEN is undefined");
     }
 
-    const baseCommitSha = github.context.payload.before;
     let publishConfig;
-
-    try {
-        await exec.exec(`git fetch origin ${baseCommitSha}`);
-        const cmdOutput = await exec.getExecOutput("git", ["--no-pager", "show", `${baseCommitSha}:package.json`]);
-        context.version.old = JSON.parse(cmdOutput.stdout).version;
-    } catch {
-        context.logger.warning(`Missing or invalid package.json in commit ${baseCommitSha}`);
-    }
-
     try {
         const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         context.version.new = packageJson.version;
