@@ -1,12 +1,13 @@
 import * as path from "path";
 import * as core from "@actions/core";
 import * as actions from "./actions";
+import { Inputs } from "./inputs";
 import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {
-        if (core.getInput("working-directory")) {
-            process.chdir(path.resolve(core.getInput("working-directory")));
+        if (Inputs.workingDirectory) {
+            process.chdir(path.resolve(Inputs.workingDirectory));
         }
 
         const context = await utils.buildContext();
@@ -33,7 +34,7 @@ async function run(): Promise<void> {
             throw error;
         }
     } catch (error) {
-        core.setFailed(error as any);
+        core.setFailed((error as any).stack);
     }
 }
 

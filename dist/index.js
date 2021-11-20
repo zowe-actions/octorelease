@@ -21309,6 +21309,9 @@ class Inputs {
         const input = core.getInput("skip-stages");
         return input ? input.split(",").map(s => s.trim()) : [];
     }
+    static get workingDirectory() {
+        return core.getInput("working-directory");
+    }
 }
 exports.Inputs = Inputs;
 
@@ -21404,13 +21407,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const path = __importStar(__nccwpck_require__(5622));
 const core = __importStar(__nccwpck_require__(2186));
 const actions = __importStar(__nccwpck_require__(3678));
+const inputs_1 = __nccwpck_require__(7050);
 const utils = __importStar(__nccwpck_require__(4036));
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (core.getInput("working-directory")) {
-                process.chdir(path.resolve(core.getInput("working-directory")));
+            if (inputs_1.Inputs.workingDirectory) {
+                process.chdir(path.resolve(inputs_1.Inputs.workingDirectory));
             }
             const context = yield utils.buildContext();
             if (context == null) {
@@ -21438,7 +21442,7 @@ function run() {
             }
         }
         catch (error) {
-            core.setFailed(error);
+            core.setFailed(error.stack);
         }
     });
 }
@@ -21552,7 +21556,12 @@ function loadCiEnv() {
         if (envCi.service == null) {
             throw new Error(`Unsupported CI service detected: ${envCi.service}`);
         }
-        const [owner, repo] = envCi.slug.split("/");
+        let repoSlug = envCi.slug || process.env.GIT_URL;
+        if (repoSlug == null) {
+            const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+            repoSlug = cmdOutput.stdout.trim().slice(0, -4).split("/").slice(-2).join("/");
+        }
+        const [owner, repo] = repoSlug.split("/");
         return Object.assign(Object.assign({}, envCi), { repo: { owner, repo } });
     });
 }

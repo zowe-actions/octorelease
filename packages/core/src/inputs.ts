@@ -9,4 +9,8 @@ export class Inputs {
         const input = core.getInput("skip-stages");
         return input ? input.split(",").map(s => s.trim()) : [];
     }
+
+    public static get workingDirectory(): string {
+        return core.getInput("working-directory");
+    }
 }
