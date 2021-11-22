@@ -2,7 +2,14 @@ import * as core from "@actions/core";
 
 export class Inputs {
     public static get dryRun(): boolean {
-        return core.getBooleanInput("dry-run");
+        try {
+            return core.getBooleanInput("dry-run");
+        } catch (error) {
+            if (error instanceof TypeError) {
+                return false;
+            }
+            throw error;
+        }
     }
 
     public static get skipStages(): string[] {

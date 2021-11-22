@@ -65,12 +65,21 @@ export async function loadCiEnv(): Promise<any> {
         throw new Error(`Unsupported CI service detected: ${envCi.service}`);
     }
 
-    let repoSlug = envCi.slug || process.env.GIT_URL;
-    if (repoSlug == null) {
-        const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
-        repoSlug = cmdOutput.stdout.trim().slice(0, -4).split("/").slice(-2).join("/");
+    if (envCi.branch == null) {
+        const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+        envCi.branch = cmdOutput.stdout.trim();
     }
-    const [ owner, repo ] = repoSlug.split("/");
+
+    if (envCi.commit == null) {
+        const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "HEAD"]);
+        envCi.commit = cmdOutput.stdout.trim();
+    }
+
+    if (envCi.slug == null) {
+        const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+        envCi.slug = cmdOutput.stdout.trim().slice(0, -4).split("/").slice(-2).join("/");
+    }
+    const [ owner, repo ] = envCi.slug.split("/");
 
     return { ...envCi, repo: { owner, repo } };
 }

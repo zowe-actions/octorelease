@@ -14785,7 +14785,15 @@ exports.Inputs = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 class Inputs {
     static get dryRun() {
-        return core.getBooleanInput("dry-run");
+        try {
+            return core.getBooleanInput("dry-run");
+        }
+        catch (error) {
+            if (error instanceof TypeError) {
+                return false;
+            }
+            throw error;
+        }
     }
     static get skipStages() {
         const input = core.getInput("skip-stages");
@@ -14957,12 +14965,19 @@ function loadCiEnv() {
         if (envCi.service == null) {
             throw new Error(`Unsupported CI service detected: ${envCi.service}`);
         }
-        let repoSlug = envCi.slug || process.env.GIT_URL;
-        if (repoSlug == null) {
-            const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
-            repoSlug = cmdOutput.stdout.trim().slice(0, -4).split("/").slice(-2).join("/");
+        if (envCi.branch == null) {
+            const cmdOutput = yield exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+            envCi.branch = cmdOutput.stdout.trim();
         }
-        const [owner, repo] = repoSlug.split("/");
+        if (envCi.commit == null) {
+            const cmdOutput = yield exec.getExecOutput("git", ["rev-parse", "HEAD"]);
+            envCi.commit = cmdOutput.stdout.trim();
+        }
+        if (envCi.slug == null) {
+            const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+            envCi.slug = cmdOutput.stdout.trim().slice(0, -4).split("/").slice(-2).join("/");
+        }
+        const [owner, repo] = envCi.slug.split("/");
         return Object.assign(Object.assign({}, envCi), { repo: { owner, repo } });
     });
 }
