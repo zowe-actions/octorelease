@@ -1,4 +1,5 @@
-#!/usr/bin/env node/******/ (() => { // webpackBootstrap
+#!/usr/bin/env node
+/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 7351:
