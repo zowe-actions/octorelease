@@ -3,6 +3,9 @@
   "private": true,
   "description": "Extensible GitHub action to publish semantic releases",
   "main": "index.js",
+  "bin": {
+    "octorelease": "dist/main.js"
+  },
   "scripts": {
     "build": "lerna run build",
     "lint": "eslint packages/**/*.ts",
