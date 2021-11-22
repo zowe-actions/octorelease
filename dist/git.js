@@ -1357,6 +1357,7 @@ function default_1(context, config) {
         if (context.env.GIT_COMMITTER_EMAIL == null) {
             throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
         }
+        // TODO Check if Git credentials are set
         yield utils.gitConfig(context);
     });
 }
@@ -1399,6 +1400,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.gitTag = exports.gitPush = exports.gitConfig = exports.gitCommit = exports.gitAdd = void 0;
+const fs = __importStar(__nccwpck_require__(147));
+const os = __importStar(__nccwpck_require__(37));
+const path = __importStar(__nccwpck_require__(17));
+const url = __importStar(__nccwpck_require__(310));
 const exec = __importStar(__nccwpck_require__(514));
 function gitAdd(...files) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1428,6 +1433,12 @@ function gitConfig(context) {
     return __awaiter(this, void 0, void 0, function* () {
         yield exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
         yield exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
+        if (context.env.GIT_CREDENTIALS != null) {
+            yield exec.exec("git", ["config", "--global", "credential.helper", "store"]);
+            const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+            const gitUrl = new url.URL(cmdOutput.stdout);
+            fs.appendFileSync(path.join(os.homedir(), ".git-credentials"), `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
+        }
     });
 }
 exports.gitConfig = gitConfig;
@@ -1583,6 +1594,13 @@ module.exports = require("string_decoder");
 /***/ ((module) => {
 
 module.exports = require("timers");
+
+/***/ }),
+
+/***/ 310:
+/***/ ((module) => {
+
+module.exports = require("url");
 
 /***/ }),
 

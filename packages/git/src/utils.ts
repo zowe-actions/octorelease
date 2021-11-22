@@ -1,3 +1,7 @@
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as url from "url";
 import * as exec from "@actions/exec";
 import { IContext } from "@octorelease/core";
 
@@ -25,6 +29,14 @@ export async function gitCommit(message: string, amend?: boolean): Promise<boole
 export async function gitConfig(context: IContext): Promise<void> {
     await exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
     await exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
+
+    if (context.env.GIT_CREDENTIALS != null) {
+        await exec.exec("git", ["config", "--global", "credential.helper", "store"]);
+        const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+        const gitUrl = new url.URL(cmdOutput.stdout);
+        fs.appendFileSync(path.join(os.homedir(), ".git-credentials"),
+            `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
+    }
 }
 
 export async function gitPush(context: IContext, branch: string, tags?: boolean): Promise<boolean> {
