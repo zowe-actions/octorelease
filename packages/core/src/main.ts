@@ -5,6 +5,7 @@ import { Inputs } from "./inputs";
 import * as utils from "./utils";
 
 async function run(): Promise<void> {
+    console.log("Hello world");
     try {
         if (Inputs.workingDirectory) {
             process.chdir(path.resolve(Inputs.workingDirectory));

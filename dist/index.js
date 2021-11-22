@@ -14789,6 +14789,7 @@ const utils = __importStar(__nccwpck_require__(4036));
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("Hello world");
         try {
             if (inputs_1.Inputs.workingDirectory) {
                 process.chdir(path.resolve(inputs_1.Inputs.workingDirectory));
