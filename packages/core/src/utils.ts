@@ -78,7 +78,12 @@ export async function loadCiEnv(): Promise<any> {
 export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     const pluginsLoaded: IPluginsLoaded = {};
     for (const pluginName in context.plugins) {
-        const pluginPath = (pluginName.startsWith("./") ? "" : "./node_modules/") + pluginName;
+        let pluginPath = pluginName;
+        if (pluginName.startsWith("@octorelease/")) {
+            pluginPath = __dirname + "/" + pluginName.split("/")[1] + ".js";
+        } else if (!pluginName.startsWith("./")) {
+            pluginPath = `./node_modules/${pluginName}`;
+        }
         pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
     }
     return pluginsLoaded;

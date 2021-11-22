@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as github from "@actions/github";
 import * as glob from "@actions/glob";
 import { RequestError } from "@octokit/request-error";
 import { IContext, utils as coreUtils } from "@octorelease/core";
