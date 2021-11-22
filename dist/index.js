@@ -14781,7 +14781,6 @@ const utils = __importStar(__nccwpck_require__(4036));
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(__dirname);
         try {
             if (inputs_1.Inputs.workingDirectory) {
                 process.chdir(path.resolve(inputs_1.Inputs.workingDirectory));
@@ -14942,7 +14941,7 @@ function loadPlugins(context) {
         for (const pluginName in context.plugins) {
             let pluginPath = pluginName;
             if (pluginName.startsWith("@octorelease/")) {
-                pluginPath = __nccwpck_require__.ab + "lib/" + pluginName.split("/")[1] + '.js';
+                pluginPath = pluginName.replace("@octorelease", __dirname);
             }
             else if (!pluginName.startsWith("./")) {
                 pluginPath = `./node_modules/${pluginName}`;

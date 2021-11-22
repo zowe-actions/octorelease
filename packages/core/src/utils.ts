@@ -80,7 +80,7 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     for (const pluginName in context.plugins) {
         let pluginPath = pluginName;
         if (pluginName.startsWith("@octorelease/")) {
-            pluginPath = __dirname + "/" + pluginName.split("/")[1] + ".js";
+            pluginPath = pluginName.replace("@octorelease", __dirname);
         } else if (!pluginName.startsWith("./")) {
             pluginPath = `./node_modules/${pluginName}`;
         }

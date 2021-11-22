@@ -32976,7 +32976,7 @@ function loadPlugins(context) {
         for (const pluginName in context.plugins) {
             let pluginPath = pluginName;
             if (pluginName.startsWith("@octorelease/")) {
-                pluginPath = __nccwpck_require__.ab + "lib/" + pluginName.split("/")[1] + '.js';
+                pluginPath = pluginName.replace("@octorelease", __dirname);
             }
             else if (!pluginName.startsWith("./")) {
                 pluginPath = `./node_modules/${pluginName}`;
