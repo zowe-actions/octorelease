@@ -1,4 +1,4 @@
-/******/ (() => { // webpackBootstrap
+#!/usr/bin/env node/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 7351:
@@ -14752,6 +14752,7 @@ exports.Logger = Logger;
 
 "use strict";
 
+
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -14789,7 +14790,6 @@ const utils = __importStar(__nccwpck_require__(4036));
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("Hello world");
         try {
             if (inputs_1.Inputs.workingDirectory) {
                 process.chdir(path.resolve(inputs_1.Inputs.workingDirectory));

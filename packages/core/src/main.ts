@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as path from "path";
 import * as core from "@actions/core";
 import * as actions from "./actions";
@@ -5,7 +6,6 @@ import { Inputs } from "./inputs";
 import * as utils from "./utils";
 
 async function run(): Promise<void> {
-    console.log("Hello world");
     try {
         if (Inputs.workingDirectory) {
             process.chdir(path.resolve(Inputs.workingDirectory));
