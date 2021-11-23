@@ -34632,7 +34632,7 @@ function coerce (version, options) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DEFAULT_RELEASE_LABELS = void 0;
-exports.DEFAULT_RELEASE_LABELS = ["no-release", "release-patch", "release-minor", "release-major"];
+exports.DEFAULT_RELEASE_LABELS = ["release-none", "release-patch", "release-minor", "release-major"];
 
 
 /***/ }),
@@ -34806,7 +34806,7 @@ function getPrReleaseType(context, config) {
             // Comment on PR to request version approval
             const comment = yield octokit.issues.createComment(Object.assign(Object.assign({}, context.ci.repo), { issue_number: prNumber, body: `Version info from a repo admin is required to publish a new version. ` +
                     `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
-                    `* **${releaseLabels[0]}** (default): \`${context.version.old}\`\n` +
+                    `* **${releaseLabels[0]}**: \`${context.version.old}\` (default)\n` +
                     `* **${releaseLabels[1]}**: \`${(__nccwpck_require__(9336).inc)(context.version.old, "patch")}\`\n` +
                     `* **${releaseLabels[2]}**: \`${(__nccwpck_require__(9336).inc)(context.version.old, "minor")}\`\n` +
                     `* **${releaseLabels[3]}**: \`${(__nccwpck_require__(9336).inc)(context.version.old, "major")}\`\n\n` +

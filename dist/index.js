@@ -14821,7 +14821,10 @@ function run() {
             }
         }
         catch (error) {
-            core.setFailed(error.stack);
+            if (error instanceof Error) {
+                core.error(error.stack || error.message);
+            }
+            core.setFailed(error);
         }
     });
 }

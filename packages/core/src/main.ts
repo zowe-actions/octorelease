@@ -35,7 +35,10 @@ async function run(): Promise<void> {
             throw error;
         }
     } catch (error) {
-        core.setFailed((error as any).stack);
+        if (error instanceof Error) {
+            core.error(error.stack || error.message);
+        }
+        core.setFailed(error as Error);
     }
 }
 

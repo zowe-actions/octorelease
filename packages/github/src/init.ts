@@ -66,10 +66,10 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
             issue_number: prNumber,
             body: `Version info from a repo admin is required to publish a new version. ` +
                 `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
-                `* **${releaseLabels[0]}** (default): \`${context.version.old}\`\n` +
+                `* **${releaseLabels[0]}**: \`${context.version.old}\` (default)\n` +
                 `* **${releaseLabels[1]}**: \`${require("semver").inc(context.version.old, "patch")}\`\n` +
                 `* **${releaseLabels[2]}**: \`${require("semver").inc(context.version.old, "minor")}\`\n` +
-                `* **${releaseLabels[3]}**: \`${require("semver").inc(context.version.old, "major")}\`\n\n` +                
+                `* **${releaseLabels[3]}**: \`${require("semver").inc(context.version.old, "major")}\`\n\n` +
                 `<sub>Powered by Octorelease :rocket:</sub>`
         });
 
