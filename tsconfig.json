@@ -14,7 +14,19 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../core"
+      "path": "packages/changelog"
+    },
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/git"
+    },
+    {
+      "path": "packages/github"
+    },
+    {
+      "path": "packages/npm"
     }
   ]
 }

@@ -1,13 +1,12 @@
 {
   "name": "@octorelease/changelog",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Octorelease plugin to read and update changelogs.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "lint": "eslint src/**/*.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rimraf lib",
     "watch": "tsc -w"
   },
   "keywords": [],
@@ -15,6 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "@actions/glob": "^0.1.0",
-    "@octorelease/core": "^1.0.0"
+    "@octorelease/core": "^0.0.1"
   }
 }
