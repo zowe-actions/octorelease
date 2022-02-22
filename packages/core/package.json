@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint src/**/*.ts",
+    "pack": "esbuild src/main.ts --bundle --outfile=../../dist/index.js --platform=node",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w"
   },
