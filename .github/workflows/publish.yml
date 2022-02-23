@@ -34,7 +34,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       with:
-        config-dir: .github
+        config-dir: ${{ github.workspace }}/.github
         dry-run: true
         new-version: ${{ github.events.inputs.version }}
         working-dir: packages/${{ github.event.inputs.package }}
