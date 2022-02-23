@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Octorelease plugin to perform actions related to NPM.",
   "main": "lib/index.js",
+  "files": [
+    "lib",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint src/**/*.ts",
@@ -15,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@actions/exec": "^1.1.0",
-    "@octorelease/core": "^0.0.1"
+    "@octorelease/core": "^0.0.1",
+    "find-up": "^5.0.0"
   }
 }

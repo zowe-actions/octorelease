@@ -20,5 +20,5 @@ module.exports = {
         }],
         "@octorelease/git"
     ],
-    tagPrefix: require("./package.json").name + "@"
+    tagPrefix: require("path").basename(process.env["INPUT_WORKING-DIR"]) + "-"
 };
