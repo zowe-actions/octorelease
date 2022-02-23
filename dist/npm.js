@@ -18918,7 +18918,7 @@ function version_default(context, config) {
     if (context.version.new != null) {
       yield npmVersion(context.version.new);
       context.changedFiles.push("package.json");
-      const lockfilePath = yield (0, import_find_up.findUp)(["package-lock.json", "npm-shrinkwrap.json"]);
+      const lockfilePath = yield (0, import_find_up.default)(["package-lock.json", "npm-shrinkwrap.json"]);
       if (lockfilePath != null) {
         context.changedFiles.push(path4.relative(process.cwd(), lockfilePath));
       } else {

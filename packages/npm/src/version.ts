@@ -1,5 +1,5 @@
 import * as path from "path";
-import { findUp } from "find-up";
+import findUp from "find-up";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
