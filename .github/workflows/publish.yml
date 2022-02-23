@@ -35,6 +35,5 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       with:
         config-dir: .github
-        dry-run: true
         new-version: ${{ github.events.inputs.version }}
         working-dir: packages/${{ github.event.inputs.package }}
