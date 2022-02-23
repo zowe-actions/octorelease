@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Octorelease plugin to perform actions on a Git repository.",
   "main": "lib/index.js",
+  "files": [
+    "lib",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint src/**/*.ts",

@@ -6,6 +6,10 @@
   "bin": {
     "octorelease": "lib/main.js"
   },
+  "files": [
+    "lib",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint src/**/*.ts",

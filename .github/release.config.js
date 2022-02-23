@@ -1,7 +1,7 @@
 module.exports = {
     branches: [
         {
-            name: "test-timothy",
+            name: "master",
             level: "minor"
         },
         {
@@ -20,5 +20,5 @@ module.exports = {
         }],
         "@octorelease/git"
     ],
-    tagPrefix: "@octorelease/" + require("path").basename(process.env["INPUT_WORKING-DIR"]) + "@"
+    tagPrefix: require("path").basename(process.env["INPUT_WORKING-DIR"]) + "-"
 };
