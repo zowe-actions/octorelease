@@ -2,11 +2,13 @@ import * as core from "@actions/core";
 import * as actions from "../src/actions";
 import { IContext } from "../src/doc";
 import { Inputs } from "../src/inputs";
+import { Logger } from "../src/logger";
 
 const testPlugin = "sample-plugin";
 
 function buildContext(action: string): Partial<IContext> {
     return {
+        logger: new Logger(),
         plugins: {
             [testPlugin]: { action }
         }
