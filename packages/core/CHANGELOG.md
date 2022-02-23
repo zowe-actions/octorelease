@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `0.0.2`
 
 * Fixed source code missing from NPM package
 
