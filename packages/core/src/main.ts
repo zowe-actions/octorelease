@@ -7,6 +7,7 @@ import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {
+        console.log(process.env);
         if (Inputs.workingDir != null) {
             process.chdir(path.resolve(Inputs.workingDir));
         }

@@ -18104,6 +18104,7 @@ function run() {
   return __async(this, null, function* () {
     var _a;
     try {
+      console.log(process.env);
       if (Inputs.workingDir != null) {
         process.chdir(path3.resolve(Inputs.workingDir));
       }
