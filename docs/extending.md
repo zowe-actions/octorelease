@@ -23,7 +23,7 @@
 
 ### Community plugins
 
-[Open a Pull Request](https://github.com/t1m0thyj/octorelease/blob/master/CONTRIBUTING.md#submitting-a-pull-request) to add your plugin to the list.
+[Open a Pull Request](https://github.com/octorelease/octorelease/blob/master/CONTRIBUTING.md#submitting-a-pull-request) to add your plugin to the list.
 
 ## Shareable configurations list
 

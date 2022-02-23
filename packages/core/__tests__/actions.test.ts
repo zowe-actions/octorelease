@@ -17,7 +17,7 @@ describe("Core actions", () => {
     const testHandler = jest.fn(async (context: IContext, config: any) => {
         context.logger.info(config.action);
     });
-    let oldProcessEnv;
+    let oldProcessEnv: any;
 
     beforeAll(() => {
         oldProcessEnv = process.env;

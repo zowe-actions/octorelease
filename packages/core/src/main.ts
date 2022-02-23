@@ -7,8 +7,8 @@ import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {
-        if (Inputs.workingDirectory) {
-            process.chdir(path.resolve(Inputs.workingDirectory));
+        if (Inputs.workingDir != null) {
+            process.chdir(path.resolve(Inputs.workingDir));
         }
 
         const context = await utils.buildContext();

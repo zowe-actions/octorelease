@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/t1m0thyj/octorelease.git"
+    "url": "git+https://github.com/octorelease/octorelease.git"
   },
   "keywords": [],
   "author": "t1m0thyj",

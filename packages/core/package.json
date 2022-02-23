@@ -1,7 +1,7 @@
 {
   "name": "@octorelease/core",
   "version": "0.0.1",
-  "description": "",
+  "description": "Octorelease core package containing the CLI and APIs for plugins.",
   "main": "lib/index.js",
   "bin": {
     "octorelease": "lib/main.js"

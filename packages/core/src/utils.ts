@@ -7,7 +7,7 @@ import { Logger } from "./logger";
 
 export async function buildContext(): Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
-    const config = await cosmiconfig("release").search();
+    const config = await cosmiconfig("release").search(Inputs.configDir);
     if (config == null || config.isEmpty) {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
@@ -32,7 +32,7 @@ export async function buildContext(): Promise<IContext | undefined> {
 
     const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
     const tagPrefix = config.config.tagPrefix || "v";
-    const oldVersion = cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
+    const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
 
     return {
         branch: branches[branchIndex],
@@ -44,7 +44,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         plugins: pluginConfig,
         releasedPackages: {},
         tagPrefix,
-        version: { old: oldVersion }
+        version: { old: oldVersion, new: Inputs.newVersion }
     };
 }
 
@@ -58,7 +58,7 @@ export async function dryRunTask<T>(context: IContext, description: string, task
 
 export async function getLastCommitMessage(): Promise<string | undefined> {
     const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-    return cmdOutput.stdout.trim() || undefined;
+    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
 }
 
 export async function loadCiEnv(): Promise<any> {

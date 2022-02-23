@@ -17879,6 +17879,9 @@ var core3 = __toESM(require_core());
 // src/inputs.ts
 var core = __toESM(require_core());
 var Inputs = class {
+  static get configDir() {
+    return core.getInput("config-dir") || void 0;
+  }
   static get dryRun() {
     try {
       return core.getBooleanInput("dry-run");
@@ -17889,12 +17892,15 @@ var Inputs = class {
       throw error3;
     }
   }
+  static get newVersion() {
+    return core.getInput("new-version") || void 0;
+  }
   static get skipStages() {
     const input = core.getInput("skip-stages");
     return input ? input.split(",").map((s) => s.trim()) : [];
   }
-  static get workingDirectory() {
-    return core.getInput("working-directory");
+  static get workingDir() {
+    return core.getInput("working-dir") || void 0;
   }
 };
 
@@ -17995,7 +18001,7 @@ var import_cosmiconfig = __toESM(require_dist3());
 function buildContext() {
   return __async(this, null, function* () {
     const envCi = yield loadCiEnv();
-    const config = yield (0, import_cosmiconfig.cosmiconfig)("release").search();
+    const config = yield (0, import_cosmiconfig.cosmiconfig)("release").search(Inputs.configDir);
     if (config == null || config.isEmpty) {
       throw new Error("Failed to load config because file does not exist or is empty");
     }
@@ -18017,7 +18023,7 @@ function buildContext() {
     }
     const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
     const tagPrefix = config.config.tagPrefix || "v";
-    const oldVersion = cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
+    const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
     return {
       branch: branches[branchIndex],
       changedFiles: [],
@@ -18028,14 +18034,14 @@ function buildContext() {
       plugins: pluginConfig,
       releasedPackages: {},
       tagPrefix,
-      version: { old: oldVersion }
+      version: { old: oldVersion, new: Inputs.newVersion }
     };
   });
 }
 function getLastCommitMessage() {
   return __async(this, null, function* () {
     const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-    return cmdOutput.stdout.trim() || void 0;
+    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
   });
 }
 function loadCiEnv() {
@@ -18095,8 +18101,8 @@ function run() {
   return __async(this, null, function* () {
     var _a;
     try {
-      if (Inputs.workingDirectory) {
-        process.chdir(path2.resolve(Inputs.workingDirectory));
+      if (Inputs.workingDir != null) {
+        process.chdir(path2.resolve(Inputs.workingDir));
       }
       const context = yield buildContext();
       if (context == null) {

@@ -1,0 +1,40 @@
+name: Publish Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package name to publish (e.g., core)
+        required: true
+        type: choice
+        default: core
+        options: [changelog, core, git, github, npm]
+      version:
+        description: Version number to publish (e.g., 1.0.0)
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 'lts/*'
+
+    - uses: ./
+      env:
+        GIT_COMMITTER_NAME: GitHub Actions
+        GIT_COMMITTER_EMAIL: actions@github.com
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      with:
+        config-dir: .github
+        dry-run: true
+        new-version: ${{ github.events.inputs.version }}
+        working-dir: packages/${{ github.event.inputs.package }}

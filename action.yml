@@ -2,15 +2,23 @@ name: 'octorelease'
 description: 'Extensible GitHub action to publish semantic releases'
 author: 't1m0thyj'
 inputs:
+  config-dir:
+    description: 'Custom directory to search for release configuration'
+    required: false
+    default: ''
   dry-run:
     description: 'Don''t make any changes but report what would have been done'
     required: false
     default: 'false'
+  new-version:
+    description: 'New version number that should be released'
+    required: false
+    default: ''
   skip-stages:
     description: 'Comma-separated list of stages that should be skipped'
     required: false
     default: ''
-  working-directory:
+  working-dir:
     description: 'Custom working directory to use instead of the project root'
     required: false
     default: ''
