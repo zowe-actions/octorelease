@@ -28,6 +28,11 @@ jobs:
       with:
         node-version: 'lts/*'
 
+    - run: |
+        npm install
+        npm run build
+      working-directory: packages/${{ github.event.inputs.package }}
+
     - uses: ./
       env:
         GIT_COMMITTER_NAME: GitHub Actions

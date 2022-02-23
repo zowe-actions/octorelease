@@ -15154,8 +15154,13 @@ var require_inputs = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Inputs = void 0;
+    var path2 = __importStar(require("path"));
     var core = __importStar(require_core());
     var Inputs = class {
+      static get configDir() {
+        const input = core.getInput("config-dir");
+        return input ? path2.resolve(this.rootDir, input) : void 0;
+      }
       static get dryRun() {
         try {
           return core.getBooleanInput("dry-run");
@@ -15166,15 +15171,19 @@ var require_inputs = __commonJS({
           throw error;
         }
       }
+      static get newVersion() {
+        return core.getInput("new-version") || void 0;
+      }
       static get skipStages() {
         const input = core.getInput("skip-stages");
         return input ? input.split(",").map((s) => s.trim()) : [];
       }
-      static get workingDirectory() {
-        return core.getInput("working-directory");
+      static get workingDir() {
+        return core.getInput("working-dir") || void 0;
       }
     };
     exports.Inputs = Inputs;
+    Inputs.rootDir = process.cwd();
   }
 });
 
@@ -31979,7 +31988,7 @@ var require_utils8 = __commonJS({
     function buildContext() {
       return __awaiter(this, void 0, void 0, function* () {
         const envCi = yield loadCiEnv();
-        const config = yield (0, cosmiconfig_1.cosmiconfig)("release").search();
+        const config = yield (0, cosmiconfig_1.cosmiconfig)("release").search(inputs_1.Inputs.configDir);
         if (config == null || config.isEmpty) {
           throw new Error("Failed to load config because file does not exist or is empty");
         }
@@ -32001,7 +32010,7 @@ var require_utils8 = __commonJS({
         }
         const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
         const tagPrefix = config.config.tagPrefix || "v";
-        const oldVersion = cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
+        const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         return {
           branch: branches[branchIndex],
           changedFiles: [],
@@ -32012,7 +32021,7 @@ var require_utils8 = __commonJS({
           plugins: pluginConfig,
           releasedPackages: {},
           tagPrefix,
-          version: { old: oldVersion }
+          version: { old: oldVersion, new: inputs_1.Inputs.newVersion }
         };
       });
     }
@@ -32030,7 +32039,7 @@ var require_utils8 = __commonJS({
     function getLastCommitMessage() {
       return __awaiter(this, void 0, void 0, function* () {
         const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-        return cmdOutput.stdout.trim() || void 0;
+        return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
       });
     }
     exports.getLastCommitMessage = getLastCommitMessage;
@@ -32062,7 +32071,7 @@ var require_utils8 = __commonJS({
         const pluginsLoaded = {};
         for (const pluginName in context.plugins) {
           let pluginPath = pluginName;
-          if (pluginName.startsWith("@octorelease/")) {
+          if (pluginName.startsWith("@octorelease/") && path2.basename(__dirname) === "dist") {
             pluginPath = pluginName.replace("@octorelease", __dirname);
           } else if (!pluginName.startsWith("./")) {
             pluginPath = `./node_modules/${pluginName}`;
