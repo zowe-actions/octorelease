@@ -17,6 +17,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@actions/github": "^4.0.0",
     "@actions/glob": "^0.1.0",

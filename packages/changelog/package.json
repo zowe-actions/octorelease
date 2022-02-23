@@ -17,6 +17,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@actions/glob": "^0.1.0",
     "@octorelease/core": "^0.0.1"
