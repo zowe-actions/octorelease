@@ -1,8 +1,12 @@
+import * as path from "path";
 import * as core from "@actions/core";
 
 export class Inputs {
+    private static readonly rootDir = process.cwd();
+
     public static get configDir(): string | undefined {
-        return core.getInput("config-dir") || undefined;
+        const input = core.getInput("config-dir");
+        return input ? path.resolve(this.rootDir, input) : undefined;
     }
 
     public static get dryRun(): boolean {

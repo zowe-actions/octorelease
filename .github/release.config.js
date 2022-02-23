@@ -20,5 +20,5 @@ module.exports = {
         }],
         "@octorelease/git"
     ],
-    tagPrefix: require(`./${process.env["INPUT_working-dir"]}/package.json`).name + "@"
+    tagPrefix: require("./package.json").name + "@"
 };
