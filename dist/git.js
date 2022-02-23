@@ -1212,7 +1212,7 @@ function version_default(context, config) {
         context.logger.warning("Nothing to commit");
       }
       tagMessage = tagMessage == null ? void 0 : tagMessage.replace("{{version}}", context.version.new);
-      if (!(yield gitTag(`v${context.version.new}`, tagMessage))) {
+      if (!(yield gitTag(context.tagPrefix + context.version.new, tagMessage))) {
         context.logger.warning("Git tag already exists");
       }
       if (!(yield gitPush(context, context.branch.name, true))) {

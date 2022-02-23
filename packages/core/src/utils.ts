@@ -31,7 +31,8 @@ export async function buildContext(): Promise<IContext | undefined> {
     }
 
     const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
-    const oldVersion = cmdOutput.stdout.trim().slice(1) || "0.0.0";
+    const tagPrefix = config.config.tagPrefix || "v";
+    const oldVersion = cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
 
     return {
         branch: branches[branchIndex],
@@ -42,6 +43,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
+        tagPrefix,
         version: { old: oldVersion }
     };
 }

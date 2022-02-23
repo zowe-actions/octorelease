@@ -24,6 +24,7 @@ export interface IContext {
         [key: string]: any;
     }[] };
     releaseNotes?: string;
+    tagPrefix: string;
     version: {
         old?: string;
         new?: string;

@@ -14,7 +14,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
 
         tagMessage = tagMessage?.replace("{{version}}", context.version.new);
-        if (!(await utils.gitTag(`v${context.version.new}`, tagMessage))) {
+        if (!(await utils.gitTag(context.tagPrefix + context.version.new, tagMessage))) {
             context.logger.warning("Git tag already exists");
         }
 

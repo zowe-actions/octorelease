@@ -32000,7 +32000,8 @@ var require_utils8 = __commonJS({
           }
         }
         const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
-        const oldVersion = cmdOutput.stdout.trim().slice(1) || "0.0.0";
+        const tagPrefix = config.config.tagPrefix || "v";
+        const oldVersion = cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         return {
           branch: branches[branchIndex],
           changedFiles: [],
@@ -32010,6 +32011,7 @@ var require_utils8 = __commonJS({
           logger: new logger_1.Logger(),
           plugins: pluginConfig,
           releasedPackages: {},
+          tagPrefix,
           version: { old: oldVersion }
         };
       });

@@ -1,7 +1,7 @@
 import { Inputs } from "../src/inputs";
 
 describe("Inputs class", () => {
-    let oldProcessEnv;
+    let oldProcessEnv: any;
 
     beforeAll(() => {
         oldProcessEnv = process.env;
