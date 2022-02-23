@@ -40881,7 +40881,7 @@ function publish_default(context, config) {
 }
 function createRelease(context, octokit) {
   return __async(this, null, function* () {
-    const tagName = `v${context.version.new}`;
+    const tagName = context.tagPrefix + context.version.new;
     let release;
     try {
       release = yield octokit.repos.getReleaseByTag(__spreadProps(__spreadValues({}, context.ci.repo), {

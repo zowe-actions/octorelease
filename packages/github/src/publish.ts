@@ -18,7 +18,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 }
 
 async function createRelease(context: IContext, octokit: any): Promise<any> {
-    const tagName = `v${context.version.new}`;
+    const tagName = context.tagPrefix + context.version.new;
     let release: any;
 
     // Get release if it already exists
