@@ -18567,7 +18567,7 @@ var require_utils5 = __commonJS({
         for (const pluginName in context.plugins) {
           let pluginPath = pluginName;
           if (pluginName.startsWith("@octorelease/") && path2.basename(__dirname) === "dist") {
-            const bundledPath = pluginName.replace("@octorelease", __dirname);
+            const bundledPath = pluginName.replace("@octorelease", __dirname) + ".js";
             if (fs2.existsSync(bundledPath)) {
               pluginPath = bundledPath;
             }
