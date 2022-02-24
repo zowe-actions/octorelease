@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
@@ -86,8 +87,12 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     for (const pluginName in context.plugins) {
         let pluginPath = pluginName;
         if (pluginName.startsWith("@octorelease/") && path.basename(__dirname) === "dist") {
-            pluginPath = pluginName.replace("@octorelease", __dirname);
-        } else if (!pluginName.startsWith("./")) {
+            const bundledPath = pluginName.replace("@octorelease", __dirname);
+            if (fs.existsSync(bundledPath)) {
+                pluginPath = bundledPath;
+            }
+        }
+        if (!pluginName.startsWith("./") && !path.isAbsolute(pluginPath)) {
             pluginPath = `./node_modules/${pluginName}`;
         }
         pluginsLoaded[pluginName] = require(path.resolve(pluginPath));

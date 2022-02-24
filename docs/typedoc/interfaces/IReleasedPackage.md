@@ -27,7 +27,7 @@ Package name
 
 #### Defined in
 
-doc/IReleasedPackage.ts:8
+[doc/IReleasedPackage.ts:8](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IReleasedPackage.ts#L8)
 
 ___
 
@@ -39,4 +39,4 @@ URL to download package
 
 #### Defined in
 
-doc/IReleasedPackage.ts:13
+[doc/IReleasedPackage.ts:13](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IReleasedPackage.ts#L13)

@@ -28,7 +28,7 @@ Global context object for Octorelease
 
 #### Defined in
 
-[utils.ts:12](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/utils.ts#L12)
+[utils.ts:13](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L13)
 
 ___
 
@@ -58,7 +58,7 @@ In dry run mode skip the task, otherwise run it.
 
 #### Defined in
 
-[utils.ts:60](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/utils.ts#L60)
+[utils.ts:61](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L61)
 
 ___
 
@@ -76,7 +76,7 @@ Commit message or undefined if there is no Git history
 
 #### Defined in
 
-[utils.ts:72](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/utils.ts#L72)
+[utils.ts:73](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L73)
 
 ___
 
@@ -102,7 +102,7 @@ Key-value pairs of plugin names and loaded modules
 
 #### Defined in
 
-[utils.ts:84](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/utils.ts#L84)
+[utils.ts:85](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L85)
 
 ___
 
@@ -127,4 +127,4 @@ branch rules.
 
 #### Defined in
 
-[utils.ts:105](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/utils.ts#L105)
+[utils.ts:110](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L110)

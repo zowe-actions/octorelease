@@ -211,7 +211,7 @@ var require_file_command = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.issueCommand = void 0;
-    var fs = __importStar(require("fs"));
+    var fs2 = __importStar(require("fs"));
     var os = __importStar(require("os"));
     var utils_1 = require_utils();
     function issueCommand(command, message) {
@@ -219,10 +219,10 @@ var require_file_command = __commonJS({
       if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
       }
-      if (!fs.existsSync(filePath)) {
+      if (!fs2.existsSync(filePath)) {
         throw new Error(`Missing file at path: ${filePath}`);
       }
-      fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+      fs2.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
         encoding: "utf8"
       });
     }
@@ -1395,9 +1395,9 @@ var require_io_util = __commonJS({
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-    var fs = __importStar(require("fs"));
+    var fs2 = __importStar(require("fs"));
     var path4 = __importStar(require("path"));
-    _a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+    _a = fs2.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
     exports.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -2389,7 +2389,7 @@ var require_resolve_from = __commonJS({
     "use strict";
     var path4 = require("path");
     var Module = require("module");
-    var fs = require("fs");
+    var fs2 = require("fs");
     var resolveFrom = (fromDir, moduleId, silent) => {
       if (typeof fromDir !== "string") {
         throw new TypeError(`Expected \`fromDir\` to be of type \`string\`, got \`${typeof fromDir}\``);
@@ -2398,7 +2398,7 @@ var require_resolve_from = __commonJS({
         throw new TypeError(`Expected \`moduleId\` to be of type \`string\`, got \`${typeof moduleId}\``);
       }
       try {
-        fromDir = fs.realpathSync(fromDir);
+        fromDir = fs2.realpathSync(fromDir);
       } catch (err) {
         if (err.code === "ENOENT") {
           fromDir = path4.resolve(fromDir);
@@ -10778,13 +10778,13 @@ var require_path_type = __commonJS({
   "../../node_modules/path-type/index.js"(exports) {
     "use strict";
     var { promisify } = require("util");
-    var fs = require("fs");
+    var fs2 = require("fs");
     async function isType(fsStatType, statsMethodName, filePath) {
       if (typeof filePath !== "string") {
         throw new TypeError(`Expected a string, got ${typeof filePath}`);
       }
       try {
-        const stats = await promisify(fs[fsStatType])(filePath);
+        const stats = await promisify(fs2[fsStatType])(filePath);
         return stats[statsMethodName]();
       } catch (error3) {
         if (error3.code === "ENOENT") {
@@ -10798,7 +10798,7 @@ var require_path_type = __commonJS({
         throw new TypeError(`Expected a string, got ${typeof filePath}`);
       }
       try {
-        return fs[fsStatType](filePath)[statsMethodName]();
+        return fs2[fsStatType](filePath)[statsMethodName]();
       } catch (error3) {
         if (error3.code === "ENOENT") {
           return false;
@@ -14916,7 +14916,7 @@ var require_windows = __commonJS({
   "../../node_modules/isexe/windows.js"(exports, module2) {
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs = require("fs");
+    var fs2 = require("fs");
     function checkPathExt(path4, options) {
       var pathext = options.pathExt !== void 0 ? options.pathExt : process.env.PATHEXT;
       if (!pathext) {
@@ -14941,12 +14941,12 @@ var require_windows = __commonJS({
       return checkPathExt(path4, options);
     }
     function isexe(path4, options, cb) {
-      fs.stat(path4, function(er, stat) {
+      fs2.stat(path4, function(er, stat) {
         cb(er, er ? false : checkStat(stat, path4, options));
       });
     }
     function sync(path4, options) {
-      return checkStat(fs.statSync(path4), path4, options);
+      return checkStat(fs2.statSync(path4), path4, options);
     }
   }
 });
@@ -14956,14 +14956,14 @@ var require_mode = __commonJS({
   "../../node_modules/isexe/mode.js"(exports, module2) {
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs = require("fs");
+    var fs2 = require("fs");
     function isexe(path4, options, cb) {
-      fs.stat(path4, function(er, stat) {
+      fs2.stat(path4, function(er, stat) {
         cb(er, er ? false : checkStat(stat, options));
       });
     }
     function sync(path4, options) {
-      return checkStat(fs.statSync(path4), options);
+      return checkStat(fs2.statSync(path4), options);
     }
     function checkStat(stat, options) {
       return stat.isFile() && checkMode(stat, options);
@@ -14987,7 +14987,7 @@ var require_mode = __commonJS({
 // ../../node_modules/isexe/index.js
 var require_isexe = __commonJS({
   "../../node_modules/isexe/index.js"(exports, module2) {
-    var fs = require("fs");
+    var fs2 = require("fs");
     var core5;
     if (process.platform === "win32" || global.TESTING_WINDOWS) {
       core5 = require_windows();
@@ -15249,16 +15249,16 @@ var require_shebang_command = __commonJS({
 var require_readShebang = __commonJS({
   "../../node_modules/cross-spawn/lib/util/readShebang.js"(exports, module2) {
     "use strict";
-    var fs = require("fs");
+    var fs2 = require("fs");
     var shebangCommand = require_shebang_command();
     function readShebang(command) {
       const size = 150;
       const buffer = Buffer.alloc(size);
       let fd;
       try {
-        fd = fs.openSync(command, "r");
-        fs.readSync(fd, buffer, 0, size, 0);
-        fs.closeSync(fd);
+        fd = fs2.openSync(command, "r");
+        fs2.readSync(fd, buffer, 0, size, 0);
+        fs2.closeSync(fd);
       } catch (e) {
       }
       return shebangCommand(buffer.toString());
@@ -17998,6 +17998,7 @@ function shouldSkipStage(name) {
 }
 
 // src/utils.ts
+var fs = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_cosmiconfig = __toESM(require_dist3());
@@ -18052,8 +18053,12 @@ function loadPlugins(context) {
     for (const pluginName in context.plugins) {
       let pluginPath = pluginName;
       if (pluginName.startsWith("@octorelease/") && path2.basename(__dirname) === "dist") {
-        pluginPath = pluginName.replace("@octorelease", __dirname);
-      } else if (!pluginName.startsWith("./")) {
+        const bundledPath = pluginName.replace("@octorelease", __dirname);
+        if (fs.existsSync(bundledPath)) {
+          pluginPath = bundledPath;
+        }
+      }
+      if (!pluginName.startsWith("./") && !path2.isAbsolute(pluginPath)) {
         pluginPath = `./node_modules/${pluginName}`;
       }
       pluginsLoaded[pluginName] = require(path2.resolve(pluginPath));

@@ -21,7 +21,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/glob": "^0.1.0",
-    "@octorelease/core": "^0.0.2"
+    "@actions/glob": "^0.1.0"
+  },
+  "peerDependencies": {
+    "@octorelease/core": "^0.1.0"
   }
 }

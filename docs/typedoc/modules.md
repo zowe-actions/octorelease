@@ -40,7 +40,7 @@ or object containing branch config.
 
 #### Defined in
 
-[doc/IConfig.ts:7](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/doc/IConfig.ts#L7)
+[doc/IConfig.ts:7](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IConfig.ts#L7)
 
 ___
 
@@ -53,4 +53,4 @@ or tuple containing plugin name and configuration object.
 
 #### Defined in
 
-[doc/IConfig.ts:13](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/doc/IConfig.ts#L13)
+[doc/IConfig.ts:13](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IConfig.ts#L13)

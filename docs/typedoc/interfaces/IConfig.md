@@ -22,7 +22,7 @@ Array of protected branch configurations
 
 #### Defined in
 
-[doc/IConfig.ts:22](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/doc/IConfig.ts#L22)
+[doc/IConfig.ts:22](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IConfig.ts#L22)
 
 ___
 
@@ -34,7 +34,7 @@ Array of Octorelease plugin configurations
 
 #### Defined in
 
-[doc/IConfig.ts:27](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/doc/IConfig.ts#L27)
+[doc/IConfig.ts:27](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IConfig.ts#L27)
 
 ___
 
@@ -46,4 +46,4 @@ Git tag prefix that precedes version number (default is "v")
 
 #### Defined in
 
-[doc/IConfig.ts:32](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/doc/IConfig.ts#L32)
+[doc/IConfig.ts:32](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IConfig.ts#L32)

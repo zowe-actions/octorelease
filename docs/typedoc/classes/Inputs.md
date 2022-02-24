@@ -39,7 +39,7 @@ associated with the "INPUT_DRY-RUN" environment variable.
 
 #### Defined in
 
-[inputs.ts:11](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/inputs.ts#L11)
+[inputs.ts:11](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/inputs.ts#L11)
 
 ## Accessors
 
@@ -55,7 +55,7 @@ Custom directory to search for release configuration.
 
 #### Defined in
 
-[inputs.ts:16](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/inputs.ts#L16)
+[inputs.ts:16](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/inputs.ts#L16)
 
 ___
 
@@ -71,7 +71,7 @@ Don't make any changes but report what would have been done.
 
 #### Defined in
 
-[inputs.ts:24](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/inputs.ts#L24)
+[inputs.ts:24](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/inputs.ts#L24)
 
 ___
 
@@ -87,7 +87,7 @@ New version number that should be released.
 
 #### Defined in
 
-[inputs.ts:38](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/inputs.ts#L38)
+[inputs.ts:38](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/inputs.ts#L38)
 
 ___
 
@@ -103,7 +103,7 @@ Comma-separated list of stages that should be skipped.
 
 #### Defined in
 
-[inputs.ts:45](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/inputs.ts#L45)
+[inputs.ts:45](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/inputs.ts#L45)
 
 ___
 
@@ -119,4 +119,4 @@ Custom working directory to use instead of the project root.
 
 #### Defined in
 
-[inputs.ts:53](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/inputs.ts#L53)
+[inputs.ts:53](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/inputs.ts#L53)

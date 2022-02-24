@@ -18498,6 +18498,7 @@ var require_utils5 = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.verifyConditions = exports.loadPlugins = exports.getLastCommitMessage = exports.dryRunTask = exports.buildContext = void 0;
+    var fs2 = __importStar(require("fs"));
     var path2 = __importStar(require("path"));
     var exec = __importStar(require_exec());
     var cosmiconfig_1 = require_dist3();
@@ -18566,8 +18567,12 @@ var require_utils5 = __commonJS({
         for (const pluginName in context.plugins) {
           let pluginPath = pluginName;
           if (pluginName.startsWith("@octorelease/") && path2.basename(__dirname) === "dist") {
-            pluginPath = pluginName.replace("@octorelease", __dirname);
-          } else if (!pluginName.startsWith("./")) {
+            const bundledPath = pluginName.replace("@octorelease", __dirname);
+            if (fs2.existsSync(bundledPath)) {
+              pluginPath = bundledPath;
+            }
+          }
+          if (!pluginName.startsWith("./") && !path2.isAbsolute(pluginPath)) {
             pluginPath = `./node_modules/${pluginName}`;
           }
           pluginsLoaded[pluginName] = require(path2.resolve(pluginPath));

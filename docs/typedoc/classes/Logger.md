@@ -32,7 +32,7 @@ Class for logging messages to the console.
 
 #### Defined in
 
-[logger.ts:7](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/logger.ts#L7)
+[logger.ts:7](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/logger.ts#L7)
 
 ## Methods
 
@@ -54,7 +54,7 @@ Output debug level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:13](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/logger.ts#L13)
+[logger.ts:13](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/logger.ts#L13)
 
 ___
 
@@ -76,7 +76,7 @@ Output error level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:21](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/logger.ts#L21)
+[logger.ts:21](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/logger.ts#L21)
 
 ___
 
@@ -98,7 +98,7 @@ Output info level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:29](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/logger.ts#L29)
+[logger.ts:29](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/logger.ts#L29)
 
 ___
 
@@ -122,7 +122,7 @@ Text with plugin name prepended
 
 #### Defined in
 
-[logger.ts:46](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/logger.ts#L46)
+[logger.ts:46](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/logger.ts#L46)
 
 ___
 
@@ -144,4 +144,4 @@ Output warning level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:37](https://github.com/t1m0thyj/octorelease/blob/efddc9a/packages/core/src/logger.ts#L37)
+[logger.ts:37](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/logger.ts#L37)
