@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `0.1.0`
 
 * Added typedoc to exported APIs
 
