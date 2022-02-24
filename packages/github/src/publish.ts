@@ -7,13 +7,11 @@ import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    if (context.version.new != null) {
-        const octokit = utils.getOctokit(context, config);
-        const release = await createRelease(context, octokit);
-        if (config.assets != null && config.assets.length > 0) {
-            const assetPaths: string[] = (typeof config.assets === "string") ? [config.assets] : config.assets;
-            await uploadAssets(context, octokit, release, assetPaths);
-        }
+    const octokit = utils.getOctokit(context, config);
+    const release = await createRelease(context, octokit);
+    if (config.assets != null && config.assets.length > 0) {
+        const assetPaths: string[] = (typeof config.assets === "string") ? [config.assets] : config.assets;
+        await uploadAssets(context, octokit, release, assetPaths);
     }
 }
 

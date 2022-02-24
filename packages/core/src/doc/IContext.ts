@@ -26,8 +26,9 @@ export interface IContext {
     releaseNotes?: string;
     tagPrefix: string;
     version: {
-        old?: string;
-        new?: string;
+        old: string;
+        new: string;
+        prerelease?: string;
     };
     workspaces?: string[];
 }

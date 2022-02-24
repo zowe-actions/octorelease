@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IPluginsLoaded } from "./doc";
+import { IContext, IPluginsLoaded, IProtectedBranch } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
@@ -30,9 +30,8 @@ export async function buildContext(): Promise<IContext | undefined> {
         }
     }
 
-    const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
     const tagPrefix = config.config.tagPrefix || "v";
-    const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
+    const versionInfo = await buildVersionInfo(branches[branchIndex], tagPrefix);
 
     return {
         branch: branches[branchIndex],
@@ -44,7 +43,7 @@ export async function buildContext(): Promise<IContext | undefined> {
         plugins: pluginConfig,
         releasedPackages: {},
         tagPrefix,
-        version: { old: oldVersion, new: Inputs.newVersion }
+        version: versionInfo
     };
 }
 
@@ -61,7 +60,48 @@ export async function getLastCommitMessage(): Promise<string | undefined> {
     return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
 }
 
-export async function loadCiEnv(): Promise<any> {
+export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
+    const pluginsLoaded: IPluginsLoaded = {};
+    for (const pluginName in context.plugins) {
+        let pluginPath = pluginName;
+        if (pluginName.startsWith("@octorelease/") && path.basename(__dirname) === "dist") {
+            pluginPath = pluginName.replace("@octorelease", __dirname);
+        } else if (!pluginName.startsWith("./")) {
+            pluginPath = `./node_modules/${pluginName}`;
+        }
+        pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
+    }
+    return pluginsLoaded;
+}
+
+export async function verifyConditions(context: IContext): Promise<void> {
+    context.version.new = Inputs.newVersion || context.version.new;
+    if (context.version.prerelease != null) {
+        context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
+    }
+
+    const semverDiff = require("semver").diff(context.version.old, context.version.new);
+    if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
+            (semverDiff === "minor" && context.branch.level === "patch")) {
+        throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
+    }
+}
+
+async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Promise<any> {
+    const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
+    const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
+
+    let prerelease: string | undefined = undefined;
+    if (branch.prerelease) {
+        const prereleaseName = (typeof branch.prerelease === "string") ? branch.prerelease : branch.name;
+        const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
+        prerelease = `${prereleaseName}.${timestamp}`;
+    }
+
+    return { old: oldVersion, new: oldVersion, prerelease };
+}
+
+async function loadCiEnv(): Promise<any> {
     const envCi = require("env-ci")();
     if (envCi.service == null) {
         throw new Error(`Unsupported CI service detected: ${envCi.service}`);
@@ -84,34 +124,4 @@ export async function loadCiEnv(): Promise<any> {
     const [ owner, repo ] = envCi.slug.split("/");
 
     return { ...envCi, repo: { owner, repo } };
-}
-
-export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
-    const pluginsLoaded: IPluginsLoaded = {};
-    for (const pluginName in context.plugins) {
-        let pluginPath = pluginName;
-        if (pluginName.startsWith("@octorelease/") && path.basename(__dirname) === "dist") {
-            pluginPath = pluginName.replace("@octorelease", __dirname);
-        } else if (!pluginName.startsWith("./")) {
-            pluginPath = `./node_modules/${pluginName}`;
-        }
-        pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
-    }
-    return pluginsLoaded;
-}
-
-export async function verifyConditions(context: IContext): Promise<void> {
-    context.version.new = context.version.new || context.version.old;
-    const semverDiff = require("semver").diff(context.version.old, context.version.new);
-
-    if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
-            (semverDiff === "minor" && context.branch.level === "patch")) {
-        throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
-    }
-
-    if (context.branch.prerelease && context.version.new != null) {
-        const prereleaseName = (typeof context.branch.prerelease === "string") ? context.branch.prerelease : context.branch.name;
-        const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
-        context.version.new = `${context.version.new.split("-")[0]}-${prereleaseName}.${timestamp}`;
-    }
 }

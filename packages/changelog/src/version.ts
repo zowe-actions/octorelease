@@ -7,18 +7,16 @@ import { IPluginConfig } from "./config";
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    if (context.version.new != null) {
-        if (context.workspaces != null) {
-            const globber = await glob.create(context.workspaces.join("\n"));
-            for (const packageDir of await globber.glob()) {
-                const changelogPath = path.join(packageDir, changelogFile);
-                if (updateChangelog(context, changelogPath, headerLine)) {
-                    context.changedFiles.push(changelogPath);
-                }
+    if (context.workspaces != null) {
+        const globber = await glob.create(context.workspaces.join("\n"));
+        for (const packageDir of await globber.glob()) {
+            const changelogPath = path.join(packageDir, changelogFile);
+            if (updateChangelog(context, changelogPath, headerLine)) {
+                context.changedFiles.push(changelogPath);
             }
-        } else if (updateChangelog(context, changelogFile, headerLine)) {
-            context.changedFiles.push(changelogFile);
         }
+    } else if (updateChangelog(context, changelogFile, headerLine)) {
+        context.changedFiles.push(changelogFile);
     }
 }
 

@@ -3092,18 +3092,16 @@ function version_default(context, config) {
   return __async(this, null, function* () {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    if (context.version.new != null) {
-      if (context.workspaces != null) {
-        const globber = yield glob2.create(context.workspaces.join("\n"));
-        for (const packageDir of yield globber.glob()) {
-          const changelogPath = path2.join(packageDir, changelogFile);
-          if (updateChangelog(context, changelogPath, headerLine)) {
-            context.changedFiles.push(changelogPath);
-          }
+    if (context.workspaces != null) {
+      const globber = yield glob2.create(context.workspaces.join("\n"));
+      for (const packageDir of yield globber.glob()) {
+        const changelogPath = path2.join(packageDir, changelogFile);
+        if (updateChangelog(context, changelogPath, headerLine)) {
+          context.changedFiles.push(changelogPath);
         }
-      } else if (updateChangelog(context, changelogFile, headerLine)) {
-        context.changedFiles.push(changelogFile);
       }
+    } else if (updateChangelog(context, changelogFile, headerLine)) {
+      context.changedFiles.push(changelogFile);
     }
   });
 }

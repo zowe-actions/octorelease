@@ -1,6 +1,6 @@
 import { RequestError } from "@octokit/request-error";
 import delay from "delay";
-import { IContext } from "@octorelease/core";
+import { IContext, Inputs } from "@octorelease/core";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
 import * as utils from "./utils";
 
@@ -9,7 +9,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         throw new Error("Required environment variable GITHUB_TOKEN is undefined");
     }
 
-    if (config.checkPrLabels) {
+    if (config.checkPrLabels && Inputs.newVersion == null) {
         const releaseType = await getPrReleaseType(context, config);
         if (releaseType != null) {
             context.version.new = require("semver").inc(context.version.old, releaseType);
@@ -61,15 +61,17 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         }
 
         // Comment on PR to request version approval
+        const oldVersion = (context.version.prerelease != null) ?
+            `${context.version.old.split("-")[0]}-${context.version.prerelease}` : context.version.old;
         const comment = await octokit.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
             body: `Version info from a repo admin is required to publish a new version. ` +
                 `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
-                `* **${releaseLabels[0]}**: \`${context.version.old}\` (default)\n` +
-                `* **${releaseLabels[1]}**: \`${require("semver").inc(context.version.old, "patch")}\`\n` +
-                `* **${releaseLabels[2]}**: \`${require("semver").inc(context.version.old, "minor")}\`\n` +
-                `* **${releaseLabels[3]}**: \`${require("semver").inc(context.version.old, "major")}\`\n\n` +
+                `* **${releaseLabels[0]}**: \`${oldVersion}\` (default)\n` +
+                `* **${releaseLabels[1]}**: \`${require("semver").inc(oldVersion, "patch")}\`\n` +
+                `* **${releaseLabels[2]}**: \`${require("semver").inc(oldVersion, "minor")}\`\n` +
+                `* **${releaseLabels[3]}**: \`${require("semver").inc(oldVersion, "major")}\`\n\n` +
                 `<sub>Powered by Octorelease :rocket:</sub>`
         });
 
