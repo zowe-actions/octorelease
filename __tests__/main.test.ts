@@ -4,7 +4,7 @@ import * as path from "path";
 
 describe("CI tests", () => {
     beforeAll(() => {
-        fs.writeFileSync(".releaserc", JSON.stringify({ branches: ["master", "next"] }));
+        fs.writeFileSync(".releaserc", JSON.stringify({ branches: ["invalid-branch"] }));
     });
 
     afterAll(() => {

@@ -1,28 +1,39 @@
-name: "build-test"
-on: # rebuild any PRs and main branch changes
-  pull_request:
-  push:
-    branches:
-      - master
-      - 'releases/*'
+name: Test
+
+on: [push, pull_request]
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
+  build-test:
+    if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) && !contains(github.event.head_commit.message, '[ci skip]')
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [12.x, 14.x, 16.x]
+        os: [ubuntu-latest]
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+
     - uses: actions/setup-node@v2
       with:
-        node-version: 'lts/*'
+        node-version: ${{ matrix.node-version }}
+
     - run: |
-        npm install
+        npm ci
         npm run all
-  test: # make sure the action works on a clean machine without building
+
+  smoke-test:
+    if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) && !contains(github.event.head_commit.message, '[ci skip]')
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+
     - run: |
-        echo '{branches: ["master", "next"]}' > .releaserc
+        echo '{"branches": ["invalid-branch"]}' > .releaserc
+
     - uses: ./
       with:
         dry-run: true
