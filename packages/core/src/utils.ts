@@ -1,10 +1,14 @@
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IPluginsLoaded, IProtectedBranch } from "./doc";
+import { IContext, IPluginsLoaded, IProtectedBranch, IVersionInfo } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
+/**
+ * Build global context object that is passed to all plugin handlers.
+ * @returns Global context object for Octorelease
+ */
 export async function buildContext(): Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
     const config = await cosmiconfig("release").search(Inputs.configDir);
@@ -47,6 +51,12 @@ export async function buildContext(): Promise<IContext | undefined> {
     };
 }
 
+/**
+ * In dry run mode skip the task, otherwise run it.
+ * @param context Global context object for Octorelease
+ * @param description Description to log when task is skipped
+ * @param task Callback to execute when not in dry run mode
+ */
 export async function dryRunTask<T>(context: IContext, description: string, task: () => Promise<T>): Promise<T | undefined> {
     if (context.dryRun) {
         context.logger.info(`Skipping "${description}"`);
@@ -55,11 +65,22 @@ export async function dryRunTask<T>(context: IContext, description: string, task
     }
 }
 
+/**
+ * Retrieve most recent Git commit message if there is one.
+ * @returns Commit message or undefined if there is no Git history
+ */
 export async function getLastCommitMessage(): Promise<string | undefined> {
     const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
     return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
 }
 
+/**
+ * Load plugins listed in config by requiring their modules from disk.
+ * If running as a GitHub Action, @octorelease-scoped plugins are loaded from
+ * the "dist" folder where they are bundled.
+ * @param context Global context object for Octorelease
+ * @returns Key-value pairs of plugin names and loaded modules
+ */
 export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     const pluginsLoaded: IPluginsLoaded = {};
     for (const pluginName in context.plugins) {
@@ -74,6 +95,13 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     return pluginsLoaded;
 }
 
+/**
+ * Verify release conditions after plugins have initialized before proceeding.
+ * This finalizes the new version by appending a prerelease string if one is
+ * defined and failing the build if the version bump is prohibited by protected
+ * branch rules.
+ * @param context Global context object for Octorelease
+ */
 export async function verifyConditions(context: IContext): Promise<void> {
     context.version.new = Inputs.newVersion || context.version.new;
     if (context.version.prerelease != null) {
@@ -87,7 +115,13 @@ export async function verifyConditions(context: IContext): Promise<void> {
     }
 }
 
-async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Promise<any> {
+/**
+ * Find old version in Git history and generate prerelease string if needed.
+ * @param branch Protected branch info
+ * @param tagPrefix Git tag prefix that precedes version number
+ * @returns Version info for the `context.version` property
+ */
+async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Promise<IVersionInfo> {
     const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
     const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
 
@@ -101,6 +135,10 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
     return { old: oldVersion, new: oldVersion, prerelease };
 }
 
+/**
+ * Load CI properties like branch name, commit SHA, and repository slug.
+ * @returns CI environment for the `context.ci` property
+ */
 async function loadCiEnv(): Promise<any> {
     const envCi = require("env-ci")();
     if (envCi.service == null) {

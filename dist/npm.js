@@ -1139,6 +1139,22 @@ var require_IProtectedBranch = __commonJS({
   }
 });
 
+// ../core/lib/doc/IReleasedPackage.js
+var require_IReleasedPackage = __commonJS({
+  "../core/lib/doc/IReleasedPackage.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IVersionInfo.js
+var require_IVersionInfo = __commonJS({
+  "../core/lib/doc/IVersionInfo.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
 // ../core/lib/doc/index.js
 var require_doc = __commonJS({
   "../core/lib/doc/index.js"(exports) {
@@ -1165,6 +1181,8 @@ var require_doc = __commonJS({
     __exportStar(require_IPlugin(), exports);
     __exportStar(require_IPluginsLoaded(), exports);
     __exportStar(require_IProtectedBranch(), exports);
+    __exportStar(require_IReleasedPackage(), exports);
+    __exportStar(require_IVersionInfo(), exports);
   }
 });
 
@@ -2569,9 +2587,9 @@ var require_logger = __commonJS({
   }
 });
 
-// ../core/lib/actions.js
-var require_actions = __commonJS({
-  "../core/lib/actions.js"(exports) {
+// ../core/lib/stages.js
+var require_stages = __commonJS({
+  "../core/lib/stages.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -2639,7 +2657,7 @@ var require_actions = __commonJS({
           return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.fail != null) {
-            context.logger.info(`Running "fail" action for plugin ${pluginName}`);
+            context.logger.info(`Running "fail" stage for plugin ${pluginName}`);
             yield pluginModule.fail(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
           }
         }
@@ -2650,7 +2668,7 @@ var require_actions = __commonJS({
       return __awaiter(this, void 0, void 0, function* () {
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.init != null) {
-            context.logger.info(`Running "init" action for plugin ${pluginName}`);
+            context.logger.info(`Running "init" stage for plugin ${pluginName}`);
             yield pluginModule.init(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
           }
         }
@@ -2663,7 +2681,7 @@ var require_actions = __commonJS({
           return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.publish != null) {
-            context.logger.info(`Running "publish" action for plugin ${pluginName}`);
+            context.logger.info(`Running "publish" stage for plugin ${pluginName}`);
             yield pluginModule.publish(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
           }
         }
@@ -2676,7 +2694,7 @@ var require_actions = __commonJS({
           return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.success != null) {
-            context.logger.info(`Running "success" action for plugin ${pluginName}`);
+            context.logger.info(`Running "success" stage for plugin ${pluginName}`);
             yield pluginModule.success(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
           }
         }
@@ -2689,7 +2707,7 @@ var require_actions = __commonJS({
           return;
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.version != null) {
-            context.logger.info(`Running "version" action for plugin ${pluginName}`);
+            context.logger.info(`Running "version" stage for plugin ${pluginName}`);
             yield pluginModule.version(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
           }
         }
@@ -18420,11 +18438,11 @@ var require_lib4 = __commonJS({
       return result;
     };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.utils = exports.actions = void 0;
+    exports.utils = exports.stages = void 0;
     __exportStar(require_doc(), exports);
-    exports.actions = __importStar(require_actions());
     __exportStar(require_inputs(), exports);
     __exportStar(require_logger(), exports);
+    exports.stages = __importStar(require_stages());
     exports.utils = __importStar(require_utils5());
   }
 });

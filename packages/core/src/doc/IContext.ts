@@ -1,34 +1,87 @@
 import { KnownCiEnv } from "env-ci";
 import { Logger } from "../logger";
 import { IProtectedBranch } from "./IProtectedBranch";
+import { IReleasedPackage } from "./IReleasedPackage";
+import { IVersionInfo } from "./IVersionInfo";
 
+/**
+ * Global context object for Octorelease
+ */
 export interface IContext {
-    branch: IProtectedBranch & {
-        tag: string;
-    };
+    /**
+     * Properties for current Git branch
+     * @example { name: "master", level: "minor" }
+     */
+    branch: IProtectedBranch;
+
+    /**
+     * List of changed files to stage
+     * @example ["package.json", "package-lock.json"]
+     */
     changedFiles: string[];
+
+    /**
+     * Properties for current CI environment
+     * @example { branch: "master", commit: "deadbeef", repo: { owner: "octorelease", repo: "octorelease" } }
+     */
     ci: KnownCiEnv & {
         repo: {
             owner: string;
             repo: string;
         };
     };
+
+    /**
+     * If true, don't make any changes but report what would have been done
+     */
     dryRun: boolean;
+
+    /**
+     * Environment variables
+     */
     env: Record<string, string>,
+
+    /**
+     * Error object defined for "fail" stage
+     */
     failError?: Error;
+
+    /**
+     * Logger for writing to console
+     */
     logger: Logger;
+
+    /**
+     * Key-value pairs of plugin names and configuration objects
+     * @example { "@octorelease/changelog": {}, "@octorelease/github": { assets: "*.tgz" } }
+     */
     plugins: { [key: string]: Record<string, any> };
-    releasedPackages: { [key: string]: {
-        name: string;
-        url?: string;
-        [key: string]: any;
-    }[] };
+
+    /**
+     * Key-value pairs of release types and released package info
+     * @example { npm: [{ name: "@octorelease/core" }] }
+     */
+    releasedPackages: { [key: string]: IReleasedPackage[] };
+
+    /**
+     * Multi-line string containing changelog
+     */
     releaseNotes?: string;
+
+    /**
+     * Git tag prefix that precedes version number (default is "v")
+     */
     tagPrefix: string;
-    version: {
-        old: string;
-        new: string;
-        prerelease?: string;
-    };
+
+    /**
+     * Version info including old and new project version
+     * @example { old: "1.0.0", new: "1.0.1" }
+     */
+    version: IVersionInfo;
+
+    /**
+     * Subpackage paths or globs for monorepo
+     * @example ["packages/*"]
+     */
     workspaces?: string[];
 }

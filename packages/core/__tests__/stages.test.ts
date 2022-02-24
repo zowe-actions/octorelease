@@ -1,23 +1,23 @@
 import * as core from "@actions/core";
-import * as actions from "../src/actions";
 import { IContext } from "../src/doc";
 import { Inputs } from "../src/inputs";
 import { Logger } from "../src/logger";
+import * as stages from "../src/stages";
 
 const testPlugin = "sample-plugin";
 
-function buildContext(action: string): Partial<IContext> {
+function buildContext(stage: string): Partial<IContext> {
     return {
         logger: new Logger(),
         plugins: {
-            [testPlugin]: { action }
+            [testPlugin]: { stage }
         }
     };
 }
 
-describe("Core actions", () => {
+describe("Core stages", () => {
     const testHandler = jest.fn(async (context: IContext, config: any) => {
-        context.logger.info(config.action);
+        context.logger.info(config.stage);
     });
     let oldProcessEnv: any;
 
@@ -33,7 +33,7 @@ describe("Core actions", () => {
     it("should execute fail handler on plugins", async () => {
         const context = buildContext("fail");
         const pluginsLoaded = { [testPlugin]: { fail: testHandler } };
-        await actions.fail(context as IContext, pluginsLoaded);
+        await stages.fail(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
         expect(core.info).toHaveBeenCalledWith(`[${testPlugin}] fail`);
     });
@@ -42,14 +42,14 @@ describe("Core actions", () => {
         const context = buildContext("fail");
         const pluginsLoaded = { [testPlugin]: { fail: testHandler } };
         jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["fail"]);
-        await actions.fail(context as IContext, pluginsLoaded);
+        await stages.fail(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
 
     it("should execute init handler on plugins", async () => {
         const context = buildContext("init");
         const pluginsLoaded = { [testPlugin]: { init: testHandler } };
-        await actions.init(context as IContext, pluginsLoaded);
+        await stages.init(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
         expect(core.info).toHaveBeenCalledWith(`[${testPlugin}] init`);
     });
@@ -58,14 +58,14 @@ describe("Core actions", () => {
         const context = buildContext("init");
         const pluginsLoaded = { [testPlugin]: { init: testHandler } };
         jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["init"]);
-        await actions.init(context as IContext, pluginsLoaded);
+        await stages.init(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
     });
 
     it("should execute publish handler on plugins", async () => {
         const context = buildContext("publish");
         const pluginsLoaded = { [testPlugin]: { publish: testHandler } };
-        await actions.publish(context as IContext, pluginsLoaded);
+        await stages.publish(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
         expect(core.info).toHaveBeenCalledWith(`[${testPlugin}] publish`);
     });
@@ -74,14 +74,14 @@ describe("Core actions", () => {
         const context = buildContext("publish");
         const pluginsLoaded = { [testPlugin]: { publish: testHandler } };
         jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["publish"]);
-        await actions.publish(context as IContext, pluginsLoaded);
+        await stages.publish(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
 
     it("should execute success handler on plugins", async () => {
         const context = buildContext("success");
         const pluginsLoaded = { [testPlugin]: { success: testHandler } };
-        await actions.success(context as IContext, pluginsLoaded);
+        await stages.success(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
         expect(core.info).toHaveBeenCalledWith(`[${testPlugin}] success`);
     });
@@ -90,14 +90,14 @@ describe("Core actions", () => {
         const context = buildContext("success");
         const pluginsLoaded = { [testPlugin]: { success: testHandler } };
         jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["success"]);
-        await actions.success(context as IContext, pluginsLoaded);
+        await stages.success(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
 
     it("should execute version handler on plugins", async () => {
         const context = buildContext("version");
         const pluginsLoaded = { [testPlugin]: { version: testHandler } };
-        await actions.version(context as IContext, pluginsLoaded);
+        await stages.version(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
         expect(core.info).toHaveBeenCalledWith(`[${testPlugin}] version`);
     });
@@ -106,7 +106,7 @@ describe("Core actions", () => {
         const context = buildContext("version");
         const pluginsLoaded = { [testPlugin]: { fail: testHandler } };
         jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["version"]);
-        await actions.version(context as IContext, pluginsLoaded);
+        await stages.version(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
 });

@@ -17873,9 +17873,6 @@ var require_env_ci = __commonJS({
 var path3 = __toESM(require("path"));
 var core4 = __toESM(require_core());
 
-// src/actions.ts
-var core3 = __toESM(require_core());
-
 // src/inputs.ts
 var path = __toESM(require("path"));
 var core = __toESM(require_core());
@@ -17907,6 +17904,9 @@ var Inputs = class {
 };
 Inputs.rootDir = process.cwd();
 
+// src/stages.ts
+var core3 = __toESM(require_core());
+
 // src/logger.ts
 var core2 = __toESM(require_core());
 var Logger = class {
@@ -17930,14 +17930,14 @@ var Logger = class {
   }
 };
 
-// src/actions.ts
+// src/stages.ts
 function fail(context, pluginsLoaded) {
   return __async(this, null, function* () {
     if (shouldSkipStage("fail"))
       return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.fail != null) {
-        context.logger.info(`Running "fail" action for plugin ${pluginName}`);
+        context.logger.info(`Running "fail" stage for plugin ${pluginName}`);
         yield pluginModule.fail(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
       }
     }
@@ -17947,7 +17947,7 @@ function init(context, pluginsLoaded) {
   return __async(this, null, function* () {
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.init != null) {
-        context.logger.info(`Running "init" action for plugin ${pluginName}`);
+        context.logger.info(`Running "init" stage for plugin ${pluginName}`);
         yield pluginModule.init(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
       }
     }
@@ -17959,7 +17959,7 @@ function publish(context, pluginsLoaded) {
       return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.publish != null) {
-        context.logger.info(`Running "publish" action for plugin ${pluginName}`);
+        context.logger.info(`Running "publish" stage for plugin ${pluginName}`);
         yield pluginModule.publish(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
       }
     }
@@ -17971,7 +17971,7 @@ function success(context, pluginsLoaded) {
       return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.success != null) {
-        context.logger.info(`Running "success" action for plugin ${pluginName}`);
+        context.logger.info(`Running "success" stage for plugin ${pluginName}`);
         yield pluginModule.success(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
       }
     }
@@ -17983,7 +17983,7 @@ function version(context, pluginsLoaded) {
       return;
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.version != null) {
-        context.logger.info(`Running "version" action for plugin ${pluginName}`);
+        context.logger.info(`Running "version" stage for plugin ${pluginName}`);
         yield pluginModule.version(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
       }
     }
