@@ -20,9 +20,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - run: |
-        npm install
-        npm run all
+    - if: matrix.node-version != '16.x'
+      run: npm install -g npm@7
+
+    - run: npm install
+    
+    - run: npm run all
 
   smoke-test:
     if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) && !contains(github.event.head_commit.message, '[ci skip]')
