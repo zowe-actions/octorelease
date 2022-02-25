@@ -14,10 +14,17 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "license-header"
     ],
     "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-var-requires": "off"
+        "@typescript-eslint/no-unused-vars": ["warn",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "@typescript-eslint/no-var-requires": "off",
+        "license-header/header": ["error", "./LICENSE_HEADER"]
     }
 };

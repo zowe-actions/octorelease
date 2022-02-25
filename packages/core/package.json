@@ -18,9 +18,20 @@
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "changelog",
+    "cli",
+    "git",
+    "github",
+    "npm",
+    "octorelease",
+    "publish",
+    "semver",
+    "release",
+    "version"
+  ],
+  "author": "t1m0thyj",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
@@ -32,5 +43,11 @@
     "env-ci": "^5.4.0",
     "micromatch": "^4.0.4",
     "semver": "^6.3.0"
+  },
+  "optionalDependencies": {
+    "@octorelease/changelog": "^0.0.1",
+    "@octorelease/git": "^0.0.1",
+    "@octorelease/github": "^0.0.1",
+    "@octorelease/npm": "^0.0.1"
   }
 }

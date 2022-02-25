@@ -1,3 +1,4 @@
+const package = require("path").basename(process.env["INPUT_WORKING-DIR"]);
 module.exports = {
     branches: [
         {
@@ -18,7 +19,9 @@ module.exports = {
         ["@octorelease/github", {
             assets: "dist/*.tgz"
         }],
-        "@octorelease/git"
+        ["@octorelease/git", {
+            commitMessage: "Bump " + package + " version to {{version}}"
+        }]
     ],
-    tagPrefix: require("path").basename(process.env["INPUT_WORKING-DIR"]) + "-"
+    tagPrefix: package + "-"
 };

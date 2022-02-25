@@ -15,9 +15,14 @@
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "github",
+    "octorelease",
+    "plugin",
+    "publish"
+  ],
+  "author": "t1m0thyj",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
