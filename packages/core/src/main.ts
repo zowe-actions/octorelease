@@ -15,9 +15,6 @@ async function run(): Promise<void> {
         if (context == null) {
             core.info("Current branch is not a release branch, exiting now");
             process.exit();
-        } else if ((await utils.getLastCommitMessage())?.includes("[ci skip]")) {
-            core.info("Commit message contains CI skip phrase, exiting now");
-            process.exit();
         }
 
         const pluginsLoaded = await utils.loadPlugins(context);

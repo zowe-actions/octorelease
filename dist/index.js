@@ -18041,12 +18041,6 @@ function buildContext() {
     };
   });
 }
-function getLastCommitMessage() {
-  return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
-  });
-}
 function loadPlugins(context) {
   return __async(this, null, function* () {
     const pluginsLoaded = {};
@@ -18114,7 +18108,6 @@ function loadCiEnv() {
 // src/main.ts
 function run() {
   return __async(this, null, function* () {
-    var _a;
     try {
       if (Inputs.workingDir != null) {
         process.chdir(path3.resolve(Inputs.workingDir));
@@ -18122,9 +18115,6 @@ function run() {
       const context = yield buildContext();
       if (context == null) {
         core4.info("Current branch is not a release branch, exiting now");
-        process.exit();
-      } else if ((_a = yield getLastCommitMessage()) == null ? void 0 : _a.includes("[ci skip]")) {
-        core4.info("Commit message contains CI skip phrase, exiting now");
         process.exit();
       }
       const pluginsLoaded = yield loadPlugins(context);

@@ -67,15 +67,6 @@ export async function dryRunTask<T>(context: IContext, description: string, task
 }
 
 /**
- * Retrieve most recent Git commit message if there is one.
- * @returns Commit message or undefined if there is no Git history
- */
-export async function getLastCommitMessage(): Promise<string | undefined> {
-    const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
-}
-
-/**
  * Load plugins listed in config by requiring their modules from disk.
  * If running as a GitHub Action, @octorelease-scoped plugins missing from
  * node_modules are loaded from the "dist" folder where they are bundled.
