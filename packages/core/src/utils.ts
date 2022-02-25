@@ -77,8 +77,8 @@ export async function getLastCommitMessage(): Promise<string | undefined> {
 
 /**
  * Load plugins listed in config by requiring their modules from disk.
- * If running as a GitHub Action, @octorelease-scoped plugins are loaded from
- * the "dist" folder where they are bundled.
+ * If running as a GitHub Action, @octorelease-scoped plugins missing from
+ * node_modules are loaded from the "dist" folder where they are bundled.
  * @param context Global context object for Octorelease
  * @returns Key-value pairs of plugin names and loaded modules
  */
@@ -86,14 +86,11 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
     const pluginsLoaded: IPluginsLoaded = {};
     for (const pluginName in context.plugins) {
         let pluginPath = pluginName;
-        if (pluginName.startsWith("@octorelease/") && path.basename(__dirname) === "dist") {
-            const bundledPath = pluginName.replace("@octorelease", __dirname) + ".js";
-            if (fs.existsSync(bundledPath)) {
-                pluginPath = bundledPath;
-            }
-        }
-        if (!pluginName.startsWith("./") && !path.isAbsolute(pluginPath)) {
+        if (!pluginName.startsWith("./")) {
             pluginPath = `./node_modules/${pluginName}`;
+        }
+        if (pluginName.startsWith("@octorelease/") && !fs.existsSync(pluginPath)) {
+            pluginPath = pluginName.replace("@octorelease", __dirname);
         }
         pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
     }

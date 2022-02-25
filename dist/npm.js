@@ -18339,14 +18339,11 @@ var require_utils5 = __commonJS({
         const pluginsLoaded = {};
         for (const pluginName in context.plugins) {
           let pluginPath = pluginName;
-          if (pluginName.startsWith("@octorelease/") && path5.basename(__dirname) === "dist") {
-            const bundledPath = pluginName.replace("@octorelease", __dirname) + ".js";
-            if (fs5.existsSync(bundledPath)) {
-              pluginPath = bundledPath;
-            }
-          }
-          if (!pluginName.startsWith("./") && !path5.isAbsolute(pluginPath)) {
+          if (!pluginName.startsWith("./")) {
             pluginPath = `./node_modules/${pluginName}`;
+          }
+          if (pluginName.startsWith("@octorelease/") && !fs5.existsSync(pluginPath)) {
+            pluginPath = pluginName.replace("@octorelease", __dirname);
           }
           pluginsLoaded[pluginName] = require(path5.resolve(pluginPath));
         }
