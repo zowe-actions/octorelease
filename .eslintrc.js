@@ -8,6 +8,10 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
         "plugin:jest/recommended"
     ],
+    "ignorePatterns": [
+        "**/*.js",
+        "**/*.d.ts"
+    ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": 11,
@@ -18,6 +22,10 @@ module.exports = {
         "license-header"
     ],
     "rules": {
+        "max-len": ["warn", 120],
+        "no-console": "error",
+        "no-multiple-empty-lines": "warn",
+        "no-trailing-spaces": "warn",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-vars": ["warn",
             {

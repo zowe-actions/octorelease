@@ -34,7 +34,8 @@ export async function buildContext(): Promise<IContext | undefined> {
     }
 
     const micromatch = require("micromatch");
-    const branches = config.config.branches.map((branch: any) => typeof branch === "string" ? { name: branch } : branch);
+    const branches = config.config.branches.map((branch: any) => typeof branch === "string" ?
+        { name: branch } : branch);
     const branchIndex = branches.findIndex((branch: any) => micromatch.isMatch(envCi.branch, branch.name));
     if (branchIndex == -1) {
         return;
@@ -74,7 +75,8 @@ export async function buildContext(): Promise<IContext | undefined> {
  * @param description Description to log when task is skipped
  * @param task Callback to execute when not in dry run mode
  */
-export async function dryRunTask<T>(context: IContext, description: string, task: () => Promise<T>): Promise<T | undefined> {
+export async function dryRunTask<T>(context: IContext, description: string, task: () => Promise<T>):
+    Promise<T | undefined> {
     if (context.dryRun) {
         context.logger.info(`Skipping "${description}"`);
     } else {

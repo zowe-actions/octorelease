@@ -20,18 +20,19 @@ import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
-export async function npmAddTag(context: IContext, pkgName: string, pkgVersion: string, tag: string, registry: string, inDir?: string): Promise<void> {
+export async function npmAddTag(context: IContext, pkgName: string, pkgVersion: string, tag: string, registry: string,
+    inDir?: string): Promise<void> {
     const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry];
     await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npm", cmdArgs, { cwd: inDir });
     });
 }
 
-export async function npmConfig(context: IContext, registry: string, useToken = true): Promise<void> {
+export async function npmConfig(context: IContext, registry: string, useTokenAuth = true): Promise<void> {
     const npmrcLines: string[] = [];
     // Add trailing slash to end of registry URL and remove protocol at start
     const registrySpec = (registry.endsWith("/") ? registry : (registry + "/")).replace(/^\w+:/, "");
-    if (useToken) {
+    if (useTokenAuth) {
         npmrcLines.push(`${registrySpec}:_authToken=${context.env.NPM_TOKEN}`);
     } else {
         const b64Auth = Buffer.from(`${context.env.NPM_USERNAME}:${context.env.NPM_PASSWORD}`).toString("base64");
@@ -73,4 +74,20 @@ export async function npmView(pkgSpec: string, registry: string, property?: stri
         const cmdOutput = await exec.getExecOutput("npm", cmdArgs);
         return JSON.parse(cmdOutput.stdout.trim());
     } catch { /* Do nothing */ }
+}
+
+export function verifyConditions(context: IContext): boolean {
+    const useTokenAuth = context.env.NPM_USERNAME == null && context.env.NPM_PASSWORD == null &&
+        context.env.NPM_EMAIL == null;
+    if (useTokenAuth && context.env.NPM_TOKEN == null) {
+        throw new Error("Required environment variable NPM_TOKEN is undefined");
+    } else if (!useTokenAuth) {
+        const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter(name => context.env[name] == null);
+        if (missingEnvVars.length == 1) {
+            throw new Error(`Required environment variable ${missingEnvVars[0]} is undefined`);
+        } else if (missingEnvVars.length > 1) {
+            throw new Error(`Required environment variables ${missingEnvVars.join(", ")} are undefined`);
+        }
+    }
+    return useTokenAuth;
 }

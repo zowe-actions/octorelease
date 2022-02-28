@@ -115,7 +115,8 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         }
 
         if (approvedLabelEvents.length === 1) {
-            context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ${approvedLabelEvents[0].actor.login}`);
+            context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ` +
+                approvedLabelEvents[0].actor.login);
         } else {
             context.logger.info("Timed out waiting for release label");
         }
@@ -157,7 +158,7 @@ function findApprovedLabelEvents(events: any[], collaborators: any[], releaseLab
         } else if (!releaseLabels.includes(event.label.name)) {
             return false;
         }
-    
+
         return true;
     });
 }

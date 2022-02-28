@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/git",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Octorelease plugin to perform actions on a Git repository.",
   "main": "lib/index.js",
   "files": [

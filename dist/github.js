@@ -40866,7 +40866,7 @@ function getPrReleaseType(context, config) {
         }
       }
       if (approvedLabelEvents.length === 1) {
-        context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ${approvedLabelEvents[0].actor.login}`);
+        context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ` + approvedLabelEvents[0].actor.login);
       } else {
         context.logger.info("Timed out waiting for release label");
       }

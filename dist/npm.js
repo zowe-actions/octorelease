@@ -18351,7 +18351,7 @@ var require_utils5 = __commonJS({
       });
     }
     exports.loadPlugins = loadPlugins;
-    function verifyConditions(context) {
+    function verifyConditions2(context) {
       return __awaiter(this, void 0, void 0, function* () {
         context.version.new = inputs_1.Inputs.newVersion || context.version.new;
         if (context.version.prerelease != null) {
@@ -18363,7 +18363,7 @@ var require_utils5 = __commonJS({
         }
       });
     }
-    exports.verifyConditions = verifyConditions;
+    exports.verifyConditions = verifyConditions2;
     function buildVersionInfo(branch, tagPrefix) {
       return __awaiter(this, void 0, void 0, function* () {
         const cmdOutput = yield exec3.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
@@ -18784,7 +18784,8 @@ __export(utils_exports, {
   npmPack: () => npmPack,
   npmPublish: () => npmPublish,
   npmVersion: () => npmVersion,
-  npmView: () => npmView
+  npmView: () => npmView,
+  verifyConditions: () => verifyConditions
 });
 var fs = __toESM(require("fs"));
 var os = __toESM(require("os"));
@@ -18799,11 +18800,11 @@ function npmAddTag(context, pkgName, pkgVersion, tag, registry, inDir) {
     }));
   });
 }
-function npmConfig(context, registry, useToken = true) {
+function npmConfig(context, registry, useTokenAuth = true) {
   return __async(this, null, function* () {
     const npmrcLines = [];
     const registrySpec = (registry.endsWith("/") ? registry : registry + "/").replace(/^\w+:/, "");
-    if (useToken) {
+    if (useTokenAuth) {
       npmrcLines.push(`${registrySpec}:_authToken=${context.env.NPM_TOKEN}`);
     } else {
       const b64Auth = Buffer.from(`${context.env.NPM_USERNAME}:${context.env.NPM_PASSWORD}`).toString("base64");
@@ -18853,21 +18854,24 @@ function npmView(pkgSpec, registry, property) {
     }
   });
 }
+function verifyConditions(context) {
+  const useTokenAuth = context.env.NPM_USERNAME == null && context.env.NPM_PASSWORD == null && context.env.NPM_EMAIL == null;
+  if (useTokenAuth && context.env.NPM_TOKEN == null) {
+    throw new Error("Required environment variable NPM_TOKEN is undefined");
+  } else if (!useTokenAuth) {
+    const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter((name) => context.env[name] == null);
+    if (missingEnvVars.length == 1) {
+      throw new Error(`Required environment variable ${missingEnvVars[0]} is undefined`);
+    } else if (missingEnvVars.length > 1) {
+      throw new Error(`Required environment variables ${missingEnvVars.join(", ")} are undefined`);
+    }
+  }
+  return useTokenAuth;
+}
 
 // src/init.ts
 function init_default(context, config) {
   return __async(this, null, function* () {
-    const useToken = context.env.NPM_USERNAME == null && context.env.NPM_PASSWORD == null && context.env.NPM_EMAIL == null;
-    if (useToken && context.env.NPM_TOKEN == null) {
-      throw new Error("Required environment variable NPM_TOKEN is undefined");
-    } else if (!useToken) {
-      const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter((name) => context.env[name] == null);
-      if (missingEnvVars.length == 1) {
-        throw new Error(`Required environment variable ${missingEnvVars[0]} is undefined`);
-      } else if (missingEnvVars.length > 1) {
-        throw new Error(`Required environment variables ${missingEnvVars.join(", ")} are undefined`);
-      }
-    }
     let publishConfig;
     try {
       const packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
@@ -18877,7 +18881,11 @@ function init_default(context, config) {
       context.logger.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
     context.branch.channel = context.branch.channel || "latest";
-    yield npmConfig(context, (publishConfig == null ? void 0 : publishConfig.registry) || DEFAULT_NPM_REGISTRY, useToken);
+    if (config.npmPublish === false) {
+      return;
+    }
+    const useTokenAuth = verifyConditions(context);
+    yield npmConfig(context, (publishConfig == null ? void 0 : publishConfig.registry) || DEFAULT_NPM_REGISTRY, useTokenAuth);
   });
 }
 
@@ -18951,7 +18959,7 @@ function success_default(context, config) {
 // src/version.ts
 var path4 = __toESM(require("path"));
 var import_find_up = __toESM(require_find_up());
-function version_default(context, config) {
+function version_default(context, _config) {
   return __async(this, null, function* () {
     yield npmVersion(context.version.new);
     context.changedFiles.push("package.json");

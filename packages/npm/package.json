@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/npm",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Octorelease plugin to perform actions related to NPM.",
   "main": "lib/index.js",
   "files": [

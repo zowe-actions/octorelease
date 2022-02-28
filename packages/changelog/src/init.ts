@@ -26,7 +26,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     context.releaseNotes = await getReleaseNotes(context, changelogFile, headerLine);
 }
 
-async function getReleaseNotes(context: IContext, changelogFile: string, headerLine: string): Promise<string | undefined> {
+async function getReleaseNotes(context: IContext, changelogFile: string, headerLine: string):
+    Promise<string | undefined> {
     if (context.workspaces != null) {
         const globber = await glob.create(context.workspaces.join("\n"));
         let releaseNotes = "";
@@ -64,5 +65,6 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
         context.logger.warning(`Missing changelog file ${changelogFile}`);
     }
 
+    context.logger.info(`*${releaseNotes.trim()}*`);
     return releaseNotes.trim() || undefined;
 }

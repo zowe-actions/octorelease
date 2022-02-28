@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/changelog",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Octorelease plugin to read and update changelogs.",
   "main": "lib/index.js",
   "files": [

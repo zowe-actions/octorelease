@@ -1,5 +1,12 @@
 # Changelog
 
+## Recent Changes
+
+* Fix scoped plugins failing to load from node_modules
+* Filter Git tags in monorepo based on prefix
+* Remove check for CI skip phrase in last commit message
+* License project under Apache-2.0
+
 ## `0.1.0`
 
 * Added typedoc to exported APIs

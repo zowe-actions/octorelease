@@ -1189,7 +1189,7 @@ function gitTag(tagName, message) {
 }
 
 // src/init.ts
-function init_default(context, config) {
+function init_default(context, _config) {
   return __async(this, null, function* () {
     if (context.env.GIT_COMMITTER_NAME == null) {
       throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");

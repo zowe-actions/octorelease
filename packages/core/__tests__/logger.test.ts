@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/* eslint-disable no-console */
 import * as core from "@actions/core";
 import { Logger } from "../src/logger";
 
