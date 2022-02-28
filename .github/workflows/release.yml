@@ -14,7 +14,7 @@ on:
         required: false
         type: string
       dry-run:
-        description: Specify true to skip publishing
+        description: Dry run mode
         required: false
         type: boolean
 
@@ -44,6 +44,6 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       with:
         config-dir: .github
-        dry-run: ${{ github.events.inputs.dry-run }}
-        new-version: ${{ github.events.inputs.version }}
+        dry-run: ${{ github.event.inputs.dry-run }}
+        new-version: ${{ github.event.inputs.version }}
         working-dir: packages/${{ github.event.inputs.package }}
