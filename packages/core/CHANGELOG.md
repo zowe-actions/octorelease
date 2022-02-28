@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `0.1.1`
 
 * Fix scoped plugins failing to load from node_modules
 * Filter Git tags in monorepo based on prefix
