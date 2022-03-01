@@ -3081,7 +3081,6 @@ function getPackageChangelog(context, changelogFile, headerLine) {
   } else {
     context.logger.warning(`Missing changelog file ${changelogFile}`);
   }
-  context.logger.info(`*${releaseNotes.trim()}*`);
   return releaseNotes.trim() || void 0;
 }
 

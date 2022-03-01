@@ -65,6 +65,5 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
         context.logger.warning(`Missing changelog file ${changelogFile}`);
     }
 
-    context.logger.info(`*${releaseNotes.trim()}*`);
     return releaseNotes.trim() || undefined;
 }
