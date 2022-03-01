@@ -18878,7 +18878,7 @@ function init_default(context, config) {
       context.version.new = packageJson.version;
       publishConfig = packageJson.publishConfig;
     } catch (e) {
-      context.logger.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
+      context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
     context.branch.channel = context.branch.channel || "latest";
     if (config.npmPublish === false) {
@@ -18967,7 +18967,7 @@ function version_default(context, _config) {
     if (lockfilePath != null) {
       context.changedFiles.push(path4.relative(process.cwd(), lockfilePath));
     } else {
-      context.logger.warning("Could not find lockfile to update version in");
+      context.logger.warn("Could not find lockfile to update version in");
     }
   });
 }

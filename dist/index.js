@@ -17922,7 +17922,7 @@ var Logger = class {
   info(message) {
     core2.info(this.prependPluginName(message));
   }
-  warning(message) {
+  warn(message) {
     core2.warning(this.prependPluginName(message));
   }
   prependPluginName(message) {

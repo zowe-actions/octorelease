@@ -34,7 +34,7 @@ Properties for current Git branch
 
 #### Defined in
 
-[doc/IContext.ts:15](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L15)
+[doc/IContext.ts:31](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L31)
 
 ___
 
@@ -48,7 +48,7 @@ List of changed files to stage
 
 #### Defined in
 
-[doc/IContext.ts:21](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L21)
+[doc/IContext.ts:37](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L37)
 
 ___
 
@@ -62,7 +62,7 @@ Properties for current CI environment
 
 #### Defined in
 
-[doc/IContext.ts:27](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L27)
+[doc/IContext.ts:43](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L43)
 
 ___
 
@@ -74,7 +74,7 @@ If true, don't make any changes but report what would have been done
 
 #### Defined in
 
-[doc/IContext.ts:37](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L37)
+[doc/IContext.ts:53](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L53)
 
 ___
 
@@ -86,7 +86,7 @@ Environment variables
 
 #### Defined in
 
-[doc/IContext.ts:42](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L42)
+[doc/IContext.ts:58](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L58)
 
 ___
 
@@ -98,7 +98,7 @@ Error object defined for "fail" stage
 
 #### Defined in
 
-[doc/IContext.ts:47](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L47)
+[doc/IContext.ts:63](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L63)
 
 ___
 
@@ -110,7 +110,7 @@ Logger for writing to console
 
 #### Defined in
 
-[doc/IContext.ts:52](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L52)
+[doc/IContext.ts:68](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L68)
 
 ___
 
@@ -128,7 +128,7 @@ Key-value pairs of plugin names and configuration objects
 
 #### Defined in
 
-[doc/IContext.ts:58](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L58)
+[doc/IContext.ts:74](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L74)
 
 ___
 
@@ -140,7 +140,7 @@ Multi-line string containing changelog
 
 #### Defined in
 
-[doc/IContext.ts:69](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L69)
+[doc/IContext.ts:85](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L85)
 
 ___
 
@@ -158,7 +158,7 @@ Key-value pairs of release types and released package info
 
 #### Defined in
 
-[doc/IContext.ts:64](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L64)
+[doc/IContext.ts:80](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L80)
 
 ___
 
@@ -170,7 +170,7 @@ Git tag prefix that precedes version number (default is "v")
 
 #### Defined in
 
-[doc/IContext.ts:74](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L74)
+[doc/IContext.ts:90](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L90)
 
 ___
 
@@ -184,7 +184,7 @@ Version info including old and new project version
 
 #### Defined in
 
-[doc/IContext.ts:80](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L80)
+[doc/IContext.ts:96](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L96)
 
 ___
 
@@ -198,4 +198,4 @@ Subpackage paths or globs for monorepo
 
 #### Defined in
 
-[doc/IContext.ts:86](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IContext.ts#L86)
+[doc/IContext.ts:102](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L102)

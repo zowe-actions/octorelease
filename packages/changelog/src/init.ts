@@ -59,10 +59,10 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
             }
             context.logger.info(`Found changelog header in ${changelogFile}`);
         } else {
-            context.logger.warning(`Missing changelog header in ${changelogFile}`);
+            context.logger.warn(`Missing changelog header in ${changelogFile}`);
         }
     } else {
-        context.logger.warning(`Missing changelog file ${changelogFile}`);
+        context.logger.warn(`Missing changelog file ${changelogFile}`);
     }
 
     return releaseNotes.trim() || undefined;

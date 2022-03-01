@@ -8,7 +8,6 @@
 
 - [buildContext](utils.md#buildcontext)
 - [dryRunTask](utils.md#dryruntask)
-- [getLastCommitMessage](utils.md#getlastcommitmessage)
 - [loadPlugins](utils.md#loadplugins)
 - [verifyConditions](utils.md#verifyconditions)
 
@@ -28,7 +27,7 @@ Global context object for Octorelease
 
 #### Defined in
 
-[utils.ts:13](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L13)
+[utils.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L29)
 
 ___
 
@@ -58,25 +57,7 @@ In dry run mode skip the task, otherwise run it.
 
 #### Defined in
 
-[utils.ts:61](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L61)
-
-___
-
-### getLastCommitMessage
-
-▸ **getLastCommitMessage**(): `Promise`<`string` \| `undefined`\>
-
-Retrieve most recent Git commit message if there is one.
-
-#### Returns
-
-`Promise`<`string` \| `undefined`\>
-
-Commit message or undefined if there is no Git history
-
-#### Defined in
-
-[utils.ts:73](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L73)
+[utils.ts:78](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L78)
 
 ___
 
@@ -85,8 +66,8 @@ ___
 ▸ **loadPlugins**(`context`): `Promise`<[`IPluginsLoaded`](../interfaces/IPluginsLoaded.md)\>
 
 Load plugins listed in config by requiring their modules from disk.
-If running as a GitHub Action, @octorelease-scoped plugins are loaded from
-the "dist" folder where they are bundled.
+If running as a GitHub Action, @octorelease-scoped plugins missing from
+node_modules are loaded from the "dist" folder where they are bundled.
 
 #### Parameters
 
@@ -102,7 +83,7 @@ Key-value pairs of plugin names and loaded modules
 
 #### Defined in
 
-[utils.ts:85](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L85)
+[utils.ts:94](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L94)
 
 ___
 
@@ -127,4 +108,4 @@ branch rules.
 
 #### Defined in
 
-[utils.ts:110](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/utils.ts#L110)
+[utils.ts:116](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L116)

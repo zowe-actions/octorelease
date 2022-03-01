@@ -50,7 +50,7 @@ export class Logger {
      * Output warning level message with plugin name prepended.
      * @param message Text to output
      */
-    public warning(message: string): void {
+    public warn(message: string): void {
         core.warning(this.prependPluginName(message));
     }
 

@@ -41,7 +41,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     });
 
     if (prs.data.length === 0) {
-        context.logger.warning(`Could not find pull request associated with commit ${context.ci.commit}`);
+        context.logger.warn(`Could not find pull request associated with commit ${context.ci.commit}`);
         return null;
     }
 
@@ -52,7 +52,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     });
 
     if (labels.data.findIndex(label => label.name === "released") !== -1) {
-        context.logger.warning("Pull request already released, no new version detected");
+        context.logger.warn("Pull request already released, no new version detected");
         return null;
     }
 

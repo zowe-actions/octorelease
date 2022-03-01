@@ -40810,7 +40810,7 @@ function getPrReleaseType(context, config) {
       commit_sha: context.ci.commit
     }));
     if (prs.data.length === 0) {
-      context.logger.warning(`Could not find pull request associated with commit ${context.ci.commit}`);
+      context.logger.warn(`Could not find pull request associated with commit ${context.ci.commit}`);
       return null;
     }
     const prNumber = prs.data[0].number;
@@ -40818,7 +40818,7 @@ function getPrReleaseType(context, config) {
       issue_number: prNumber
     }));
     if (labels.data.findIndex((label) => label.name === "released") !== -1) {
-      context.logger.warning("Pull request already released, no new version detected");
+      context.logger.warn("Pull request already released, no new version detected");
       return null;
     }
     const events = yield octokit.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {

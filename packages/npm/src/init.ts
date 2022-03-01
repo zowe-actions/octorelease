@@ -26,7 +26,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         context.version.new = packageJson.version;
         publishConfig = packageJson.publishConfig;
     } catch {
-        context.logger.warning(`Missing or invalid package.json in branch ${context.branch.name}`);
+        context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
 
     context.branch.channel = context.branch.channel || "latest";

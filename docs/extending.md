@@ -1,8 +1,6 @@
 # Extending
 
-## Plugins list
-
-### Official plugins
+## Official plugins
 
 - [@octorelease/changelog](https://github.com/octorelease/octorelease/tree/master/packages/changelog)
   - **Note:** this is already part of @octorelease/core and does not have to be installed separately
@@ -33,19 +31,13 @@
   - `init`: Validate plugin configuration
   - `version`: Prune unwanted dependencies from npm shrinkwrap file
 <!-- - [@octorelease/vsce](https://github.com/octorelease/vsce)
-  - `init`: abc
-  - `publish`: def -->
+  - `init`: TODO
+  - `publish`: TODO -->
 
-### Community plugins
-
-To get started, use the sample plugin repository as a template: https://github.com/octorelease/sample-plugin
+## Community plugins
 
 [Open a Pull Request](https://github.com/octorelease/octorelease/blob/master/CONTRIBUTING.md#submitting-a-pull-request) to add your plugin to the list.
 
-<!-- ## Shareable configurations list
+<!-- ## Shareable configurations
 
-### Official configurations
-
-- [@octorelease/zowe-config](https://github.com/octorelease/zowe-config) - Octorelease shareable configuration for releasing Zowe packages
-
-### Community configurations -->
+- [octorelease-zowe-config](https://github.com/t1m0thyj/octorelease-zowe-config) - Octorelease shareable configuration for releasing Zowe packages -->

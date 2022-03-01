@@ -27,6 +27,6 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
     if (lockfilePath != null) {
         context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
     } else {
-        context.logger.warning("Could not find lockfile to update version in");
+        context.logger.warn("Could not find lockfile to update version in");
     }
 }

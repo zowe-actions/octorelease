@@ -23,7 +23,7 @@ Release channel (e.g., NPM tag)
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:13](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IProtectedBranch.ts#L13)
+[doc/IProtectedBranch.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IProtectedBranch.ts#L29)
 
 ___
 
@@ -35,7 +35,7 @@ Maximum semver bump level allowed
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:18](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IProtectedBranch.ts#L18)
+[doc/IProtectedBranch.ts:34](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IProtectedBranch.ts#L34)
 
 ___
 
@@ -47,7 +47,7 @@ Branch name
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:8](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IProtectedBranch.ts#L8)
+[doc/IProtectedBranch.ts:24](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IProtectedBranch.ts#L24)
 
 ___
 
@@ -59,4 +59,4 @@ Prerelease name (defaults to branch name if `true`)
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:23](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IProtectedBranch.ts#L23)
+[doc/IProtectedBranch.ts:39](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IProtectedBranch.ts#L39)

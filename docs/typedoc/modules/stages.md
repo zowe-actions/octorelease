@@ -34,7 +34,7 @@ If "fail" is included in `Inputs.skipStages`, this stage will be skipped.
 
 #### Defined in
 
-[stages.ts:12](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/stages.ts#L12)
+[stages.ts:28](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/stages.ts#L28)
 
 ___
 
@@ -58,7 +58,7 @@ The "init" stage cannot be skipped.
 
 #### Defined in
 
-[stages.ts:31](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/stages.ts#L31)
+[stages.ts:47](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/stages.ts#L47)
 
 ___
 
@@ -82,7 +82,7 @@ If "publish" is included in `Inputs.skipStages`, this stage will be skipped.
 
 #### Defined in
 
-[stages.ts:49](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/stages.ts#L49)
+[stages.ts:65](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/stages.ts#L65)
 
 ___
 
@@ -106,7 +106,7 @@ If "success" is included in `Inputs.skipStages`, this stage will be skipped.
 
 #### Defined in
 
-[stages.ts:68](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/stages.ts#L68)
+[stages.ts:84](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/stages.ts#L84)
 
 ___
 
@@ -130,4 +130,4 @@ If "version" is included in `Inputs.skipStages`, this stage will be skipped.
 
 #### Defined in
 
-[stages.ts:87](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/stages.ts#L87)
+[stages.ts:103](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/stages.ts#L103)

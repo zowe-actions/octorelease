@@ -1208,14 +1208,14 @@ function version_default(context, config) {
     let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
     yield gitAdd(...context.changedFiles);
     if (!(yield gitCommit(commitMessage.replace("{{version}}", context.version.new)))) {
-      context.logger.warning("Nothing to commit");
+      context.logger.warn("Nothing to commit");
     }
     tagMessage = tagMessage == null ? void 0 : tagMessage.replace("{{version}}", context.version.new);
     if (!(yield gitTag(context.tagPrefix + context.version.new, tagMessage))) {
-      context.logger.warning("Git tag already exists");
+      context.logger.warn("Git tag already exists");
     }
     if (!(yield gitPush(context, context.branch.name, true))) {
-      context.logger.warning("Nothing to push");
+      context.logger.warn("Nothing to push");
     }
   });
 }

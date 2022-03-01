@@ -35,7 +35,7 @@ Handler for "fail" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:12](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IPlugin.ts#L12)
+[doc/IPlugin.ts:28](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L28)
 
 ___
 
@@ -58,7 +58,7 @@ Handler for "init" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:19](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IPlugin.ts#L19)
+[doc/IPlugin.ts:35](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L35)
 
 ___
 
@@ -81,7 +81,7 @@ Handler for "publish" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:26](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IPlugin.ts#L26)
+[doc/IPlugin.ts:42](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L42)
 
 ___
 
@@ -104,7 +104,7 @@ Handler for "success" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:33](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IPlugin.ts#L33)
+[doc/IPlugin.ts:49](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L49)
 
 ___
 
@@ -127,4 +127,4 @@ Handler for "version" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:40](https://github.com/t1m0thyj/octorelease/blob/efbfdf0/packages/core/src/doc/IPlugin.ts#L40)
+[doc/IPlugin.ts:56](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L56)

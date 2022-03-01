@@ -3076,10 +3076,10 @@ function getPackageChangelog(context, changelogFile, headerLine) {
       }
       context.logger.info(`Found changelog header in ${changelogFile}`);
     } else {
-      context.logger.warning(`Missing changelog header in ${changelogFile}`);
+      context.logger.warn(`Missing changelog header in ${changelogFile}`);
     }
   } else {
-    context.logger.warning(`Missing changelog file ${changelogFile}`);
+    context.logger.warn(`Missing changelog file ${changelogFile}`);
   }
   return releaseNotes.trim() || void 0;
 }

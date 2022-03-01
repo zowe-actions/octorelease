@@ -60,7 +60,7 @@ describe("Logger class", () => {
 
     it("should log WARNING message to console", () => {
         jest.spyOn(core, "warning").mockImplementationOnce(console.warn);
-        new Logger().warning(testMessage);
+        new Logger().warn(testMessage);
         expect(core.warning).toHaveBeenCalledWith(testMessage);
     });
 

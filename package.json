@@ -1,7 +1,7 @@
 {
   "name": "octorelease",
   "private": true,
-  "description": "Extensible GitHub action to publish semantic releases",
+  "description": "Extensible GitHub action to publish semantic releases.",
   "main": "index.js",
   "bin": "dist/index.js",
   "scripts": {
