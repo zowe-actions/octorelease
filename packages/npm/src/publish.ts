@@ -47,6 +47,16 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     const publishedVersions = await utils.npmView(packageJson.name, npmRegistry, "versions");
     if (!publishedVersions?.includes(packageJson.version)) {
         await utils.npmPublish(context, packageTag, npmRegistry, inDir);
+
+        context.releasedPackages.npm = [
+            ...(context.releasedPackages.npm || []),
+            {
+                name: `${packageJson.name}@${packageJson.version}`,
+                url: npmRegistry === DEFAULT_NPM_REGISTRY ?
+                    `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : undefined,
+                registry: npmRegistry
+            }
+        ];
     } else {
         context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
     }
@@ -59,14 +69,4 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
             await utils.npmAddTag(context, packageJson.name, packageJson.version, tag, npmRegistry, inDir);
         }
     }
-
-    context.releasedPackages.npm = [
-        ...(context.releasedPackages.npm || []),
-        {
-            name: `${packageJson.name}@${packageJson.version}`,
-            url: npmRegistry === DEFAULT_NPM_REGISTRY ?
-                `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : undefined,
-            registry: npmRegistry
-        }
-    ];
 }

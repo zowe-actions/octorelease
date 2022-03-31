@@ -1753,7 +1753,7 @@ var require_logger = __commonJS({
       info(message) {
         core.info(this.prependPluginName(message));
       }
-      warning(message) {
+      warn(message) {
         core.warning(this.prependPluginName(message));
       }
       prependPluginName(message) {
@@ -18497,7 +18497,7 @@ var require_utils5 = __commonJS({
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.verifyConditions = exports.loadPlugins = exports.getLastCommitMessage = exports.dryRunTask = exports.buildContext = void 0;
+    exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
     var fs2 = __importStar(require("fs"));
     var path2 = __importStar(require("path"));
     var exec = __importStar(require_exec());
@@ -18554,13 +18554,6 @@ var require_utils5 = __commonJS({
       });
     }
     exports.dryRunTask = dryRunTask;
-    function getLastCommitMessage() {
-      return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-        return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
-      });
-    }
-    exports.getLastCommitMessage = getLastCommitMessage;
     function loadPlugins(context) {
       return __awaiter(this, void 0, void 0, function* () {
         const pluginsLoaded = {};
@@ -18593,7 +18586,7 @@ var require_utils5 = __commonJS({
     exports.verifyConditions = verifyConditions;
     function buildVersionInfo(branch, tagPrefix) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
+        const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
         const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         let prerelease = void 0;
         if (branch.prerelease) {
@@ -40909,6 +40902,9 @@ var import_request_error2 = __toESM(require_dist_node2());
 var import_core2 = __toESM(require_lib4());
 function publish_default(context, config) {
   return __async(this, null, function* () {
+    if (!config.createRelease && !config.assets) {
+      return;
+    }
     const octokit = getOctokit2(context, config);
     const release = yield createRelease(context, octokit);
     if (config.assets != null && config.assets.length > 0) {

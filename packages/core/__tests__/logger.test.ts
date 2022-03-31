@@ -66,7 +66,7 @@ describe("Logger class", () => {
 
     it("should log WARNING message to console with plugin name prepended", () => {
         jest.spyOn(core, "warning").mockImplementationOnce(console.warn);
-        new Logger(testPlugin).warning(testMessage);
+        new Logger(testPlugin).warn(testMessage);
         expect(core.warning).toHaveBeenCalledWith(`[${testPlugin}] ${testMessage}`);
     });
 });

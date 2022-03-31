@@ -2576,7 +2576,7 @@ var require_logger = __commonJS({
       info(message) {
         core.info(this.prependPluginName(message));
       }
-      warning(message) {
+      warn(message) {
         core.warning(this.prependPluginName(message));
       }
       prependPluginName(message) {
@@ -18270,7 +18270,7 @@ var require_utils5 = __commonJS({
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.verifyConditions = exports.loadPlugins = exports.getLastCommitMessage = exports.dryRunTask = exports.buildContext = void 0;
+    exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
     var fs5 = __importStar(require("fs"));
     var path5 = __importStar(require("path"));
     var exec3 = __importStar(require_exec());
@@ -18327,13 +18327,6 @@ var require_utils5 = __commonJS({
       });
     }
     exports.dryRunTask = dryRunTask;
-    function getLastCommitMessage() {
-      return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec3.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
-        return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
-      });
-    }
-    exports.getLastCommitMessage = getLastCommitMessage;
     function loadPlugins(context) {
       return __awaiter(this, void 0, void 0, function* () {
         const pluginsLoaded = {};
@@ -18366,7 +18359,7 @@ var require_utils5 = __commonJS({
     exports.verifyConditions = verifyConditions2;
     function buildVersionInfo(branch, tagPrefix) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec3.getExecOutput("git", ["describe", "--abbrev=0"], { ignoreReturnCode: true });
+        const cmdOutput = yield exec3.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
         const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         let prerelease = void 0;
         if (branch.prerelease) {
@@ -18914,6 +18907,14 @@ function publish_default(context, config, inDir) {
     const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
     if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
       yield npmPublish(context, packageTag, npmRegistry, inDir);
+      context.releasedPackages.npm = [
+        ...context.releasedPackages.npm || [],
+        {
+          name: `${packageJson.name}@${packageJson.version}`,
+          url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
+          registry: npmRegistry
+        }
+      ];
     } else {
       context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
     }
@@ -18924,14 +18925,6 @@ function publish_default(context, config, inDir) {
         yield npmAddTag(context, packageJson.name, packageJson.version, tag, npmRegistry, inDir);
       }
     }
-    context.releasedPackages.npm = [
-      ...context.releasedPackages.npm || [],
-      {
-        name: `${packageJson.name}@${packageJson.version}`,
-        url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
-        registry: npmRegistry
-      }
-    ];
   });
 }
 
