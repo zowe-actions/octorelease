@@ -18442,6 +18442,68 @@ var require_lib4 = __commonJS({
   }
 });
 
+// ../../node_modules/delay/index.js
+var require_delay = __commonJS({
+  "../../node_modules/delay/index.js"(exports, module2) {
+    "use strict";
+    var randomInteger = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
+    var createAbortError = () => {
+      const error = new Error("Delay aborted");
+      error.name = "AbortError";
+      return error;
+    };
+    var createDelay = ({ clearTimeout: defaultClear, setTimeout: set, willResolve }) => (ms, { value, signal } = {}) => {
+      if (signal && signal.aborted) {
+        return Promise.reject(createAbortError());
+      }
+      let timeoutId;
+      let settle;
+      let rejectFn;
+      const clear = defaultClear || clearTimeout;
+      const signalListener = () => {
+        clear(timeoutId);
+        rejectFn(createAbortError());
+      };
+      const cleanup = () => {
+        if (signal) {
+          signal.removeEventListener("abort", signalListener);
+        }
+      };
+      const delayPromise = new Promise((resolve2, reject) => {
+        settle = () => {
+          cleanup();
+          if (willResolve) {
+            resolve2(value);
+          } else {
+            reject(value);
+          }
+        };
+        rejectFn = reject;
+        timeoutId = (set || setTimeout)(settle, ms);
+      });
+      if (signal) {
+        signal.addEventListener("abort", signalListener, { once: true });
+      }
+      delayPromise.clear = () => {
+        clear(timeoutId);
+        timeoutId = null;
+        settle();
+      };
+      return delayPromise;
+    };
+    var createWithTimers = (clearAndSet) => {
+      const delay3 = createDelay({ ...clearAndSet, willResolve: true });
+      delay3.reject = createDelay({ ...clearAndSet, willResolve: false });
+      delay3.range = (minimum, maximum, options) => delay3(randomInteger(minimum, maximum), options);
+      return delay3;
+    };
+    var delay2 = createWithTimers();
+    delay2.createWithTimers = createWithTimers;
+    module2.exports = delay2;
+    module2.exports.default = delay2;
+  }
+});
+
 // ../../node_modules/yocto-queue/index.js
 var require_yocto_queue = __commonJS({
   "../../node_modules/yocto-queue/index.js"(exports, module2) {
@@ -18933,6 +18995,7 @@ var fs4 = __toESM(require("fs"));
 var os2 = __toESM(require("os"));
 var path3 = __toESM(require("path"));
 var import_core2 = __toESM(require_lib4());
+var import_delay = __toESM(require_delay());
 function success_default(context, config) {
   return __async(this, null, function* () {
     if (config.smokeTest && context.releasedPackages.npm != null) {
@@ -18940,6 +19003,11 @@ function success_default(context, config) {
       for (const { name, registry } of context.releasedPackages.npm) {
         const tmpDir = path3.join(os2.tmpdir(), context.ci.build, name);
         fs4.mkdirSync(tmpDir, { recursive: true });
+        let tries = 0;
+        while ((yield npmView(name, registry)) == null && tries < 60) {
+          yield (0, import_delay.default)(1e3);
+          tries += 1;
+        }
         yield import_core2.utils.dryRunTask(context, `install ${name} from ${registry}`, () => __async(this, null, function* () {
           yield npmInstall(name, registry, tmpDir);
         }));

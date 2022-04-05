@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@actions/exec": "^1.1.0",
+    "delay": "^5.0.0",
     "find-up": "^5.0.0"
   },
   "peerDependencies": {
