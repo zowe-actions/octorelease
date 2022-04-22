@@ -28,7 +28,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (config.checkPrLabels && Inputs.newVersion == null) {
         const releaseType = await getPrReleaseType(context, config);
         if (releaseType != null) {
-            context.version.new = require("semver").inc(context.version.old, releaseType);
+            context.version.new = require("semver").inc(context.version.old.split("-")[0], releaseType);
         }
     }
 }
@@ -77,18 +77,23 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         }
 
         // Comment on PR to request version approval
-        const oldVersion = (context.version.prerelease != null) ?
-            `${context.version.old.split("-")[0]}-${context.version.prerelease}` : context.version.old;
+        const oldVersion = context.version.old.split("-")[0];
+        const prereleaseSuffix = (context.version.prerelease != null) ? `-${context.version.prerelease}` : "";
+        const semverInc = require("semver/functions/inc");
+        let commentBody = `Version info from a repo admin is required to publish a new version. ` +
+            `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
+            `* **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)\n` +
+            `* **${releaseLabels[1]}**: \`${semverInc(oldVersion, "patch")}${prereleaseSuffix}\`\n`;
+        if (context.branch.level !== "patch") {
+            commentBody += `* **${releaseLabels[2]}**: \`${semverInc(oldVersion, "minor")}${prereleaseSuffix}\`\n`;
+        }
+        if (context.branch.level !== "patch" && context.branch.level !== "minor") {
+            commentBody += `* **${releaseLabels[3]}**: \`${semverInc(oldVersion, "major")}${prereleaseSuffix}\`\n`;
+        }
         const comment = await octokit.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
-            body: `Version info from a repo admin is required to publish a new version. ` +
-                `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
-                `* **${releaseLabels[0]}**: \`${oldVersion}\` (default)\n` +
-                `* **${releaseLabels[1]}**: \`${require("semver").inc(oldVersion, "patch")}\`\n` +
-                `* **${releaseLabels[2]}**: \`${require("semver").inc(oldVersion, "minor")}\`\n` +
-                `* **${releaseLabels[3]}**: \`${require("semver").inc(oldVersion, "major")}\`\n\n` +
-                `<sub>Powered by Octorelease :rocket:</sub>`
+            body: commentBody + "\n<sub>Powered by Octorelease :rocket:</sub>"
         });
 
         // Wait for release label to be added to PR
