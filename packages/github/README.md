@@ -69,7 +69,7 @@ To check pull request labels for a semver bump level:
 {
   "plugins": [
     ["@octorelease/github", {
-      "checkPrLabels": ["release-none", "release-patch", "release-minor", "release-major"]
+      "checkPrLabels": ["release-current", "release-patch", "release-minor", "release-major"]
     }]
   ]
 }

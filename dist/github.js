@@ -41125,7 +41125,7 @@ var import_delay = __toESM(require_delay());
 var import_core = __toESM(require_lib4());
 
 // src/config.ts
-var DEFAULT_RELEASE_LABELS = ["release-none", "release-patch", "release-minor", "release-major"];
+var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor", "release-major"];
 
 // src/utils.ts
 var utils_exports = {};
@@ -41154,9 +41154,7 @@ function init_default(context, config) {
     }
     if (config.checkPrLabels && import_core.Inputs.newVersion == null) {
       const releaseType = yield getPrReleaseType(context, config);
-      if (releaseType != null) {
-        context.version.new = require_semver2().inc(context.version.old.split("-")[0], releaseType);
-      }
+      context.version.new = releaseType != null ? require_semver2().inc(context.version.old.split("-")[0], releaseType) : context.version.old.split("-")[0];
     }
   });
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export const DEFAULT_RELEASE_LABELS = ["release-none", "release-patch", "release-minor", "release-major"];
+export const DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor", "release-major"];
 
 export interface IPluginConfig {
     assets?: string | string[];

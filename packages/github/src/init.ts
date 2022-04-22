@@ -27,9 +27,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     if (config.checkPrLabels && Inputs.newVersion == null) {
         const releaseType = await getPrReleaseType(context, config);
-        if (releaseType != null) {
-            context.version.new = require("semver").inc(context.version.old.split("-")[0], releaseType);
-        }
+        context.version.new = releaseType != null ?
+            require("semver").inc(context.version.old.split("-")[0], releaseType) : context.version.old.split("-")[0];
     }
 }
 
