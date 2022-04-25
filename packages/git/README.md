@@ -37,6 +37,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | -------- | ----------- |
 | `GIT_COMMITTER_NAME` | User name of the Git committer. |
 | `GIT_COMMITTER_EMAIL` | Email address of the Git committer. |
+| `GIT_CREDENTIALS` | Authentication to Git repository (in format `user:password`). |
 
 ### Options
 

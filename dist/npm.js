@@ -18303,7 +18303,7 @@ var require_utils5 = __commonJS({
         const tagPrefix = config.config.tagPrefix || "v";
         const versionInfo = yield buildVersionInfo(branches[branchIndex], tagPrefix);
         return {
-          branch: branches[branchIndex],
+          branch: Object.assign(Object.assign({}, branches[branchIndex]), { name: envCi.branch }),
           changedFiles: [],
           ci: envCi,
           dryRun: inputs_1.Inputs.dryRun,

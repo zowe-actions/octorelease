@@ -56,7 +56,7 @@ export async function buildContext(): Promise<IContext | undefined> {
     const versionInfo = await buildVersionInfo(branches[branchIndex], tagPrefix);
 
     return {
-        branch: branches[branchIndex],
+        branch: { ...branches[branchIndex], name: envCi.branch },
         changedFiles: [],
         ci: envCi,
         dryRun: Inputs.dryRun,

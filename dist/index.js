@@ -18028,7 +18028,7 @@ function buildContext() {
     const tagPrefix = config.config.tagPrefix || "v";
     const versionInfo = yield buildVersionInfo(branches[branchIndex], tagPrefix);
     return {
-      branch: branches[branchIndex],
+      branch: __spreadProps(__spreadValues({}, branches[branchIndex]), { name: envCi.branch }),
       changedFiles: [],
       ci: envCi,
       dryRun: Inputs.dryRun,
