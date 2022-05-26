@@ -98,10 +98,12 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         // Wait for release label to be added to PR
         context.logger.info("Waiting for repo admin to add release label to pull request...");
         const startTime = new Date().getTime();
-        const timeoutInMsec = timeoutInMinutes * 60000;
+        const oneMinute = 60000;
+        const timeoutInMsec = timeoutInMinutes * oneMinute;
         let lastEtag = events.headers.etag;
         while (approvedLabelEvents.length !== 1 && (new Date().getTime() - startTime) < timeoutInMsec) {
-            await delay(1000);
+            const oneSec = 1000;
+            await delay(oneSec);
 
             try {
                 const response = await octokit.issues.listEvents({
@@ -112,7 +114,8 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
                 approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
                 lastEtag = response.headers.etag;
             } catch (error) {
-                if (!(error instanceof RequestError && error.status === 304)) {
+                const notModified = 304;
+                if (!(error instanceof RequestError && error.status === notModified)) {
                     throw error;
                 }
             }

@@ -16,29 +16,24 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import * as glob from "@actions/glob";
-import { IContext, IWorkspaceInfo } from "@octorelease/core";
+import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
-export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+export default function (context: IContext, config: IPluginConfig): void {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    context.releaseNotes = await getReleaseNotes(context, changelogFile, headerLine);
+    context.releaseNotes = getReleaseNotes(context, changelogFile, headerLine);
 }
 
-async function getReleaseNotes(context: IContext, changelogFile: string, headerLine: string):
-    Promise<string | undefined> {
+function getReleaseNotes(context: IContext, changelogFile: string, headerLine: string): string | undefined {
     if (context.workspaces != null) {
-        const globber = await glob.create(context.workspaces.map(w => (w as IWorkspaceInfo).path ?? w).join("\n"));
         let releaseNotes = "";
-
-        for (const packageDir of await globber.glob()) {
-            const packageReleaseNotes = getPackageChangelog(context, path.join(packageDir, changelogFile), headerLine);
+        for (const w of context.workspaces) {
+            const packageReleaseNotes = getPackageChangelog(context, path.join(w.path, changelogFile), headerLine);
             if (packageReleaseNotes != null) {
-                releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
+                releaseNotes += `**${w.name ?? path.basename(w.path)}**\n${packageReleaseNotes}\n\n`;
             }
         }
-
         return releaseNotes || undefined;
     } else {
         return getPackageChangelog(context, changelogFile, headerLine);

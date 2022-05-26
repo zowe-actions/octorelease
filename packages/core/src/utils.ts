@@ -76,7 +76,7 @@ export async function buildContext(): Promise<IContext | undefined> {
  * @param task Callback to execute when not in dry run mode
  */
 export async function dryRunTask<T>(context: IContext, description: string, task: () => Promise<T>):
-    Promise<T | undefined> {
+Promise<T | undefined> {
     if (context.dryRun) {
         context.logger.info(`Skipping "${description}"`);
     } else {
@@ -140,7 +140,8 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
     let prerelease: string | undefined = undefined;
     if (branch.prerelease) {
         const prereleaseName = (typeof branch.prerelease === "string") ? branch.prerelease : branch.name;
-        const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
+        const removeSeconds = 12;
+        const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, removeSeconds);
         prerelease = `${prereleaseName}.${timestamp}`;
     }
 

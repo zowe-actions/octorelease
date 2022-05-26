@@ -16,17 +16,15 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import * as glob from "@actions/glob";
-import { IContext, IWorkspaceInfo } from "@octorelease/core";
+import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
-export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+export default function (context: IContext, config: IPluginConfig): void {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
     if (context.workspaces != null) {
-        const globber = await glob.create(context.workspaces.map(w => (w as IWorkspaceInfo)?.path ?? w).join("\n"));
-        for (const packageDir of await globber.glob()) {
-            const changelogPath = path.join(packageDir, changelogFile);
+        for (const w of context.workspaces) {
+            const changelogPath = path.join(w.path, changelogFile);
             if (updateChangelog(context, changelogPath, headerLine)) {
                 context.changedFiles.push(changelogPath);
             }
@@ -43,7 +41,7 @@ function updateChangelog(context: IContext, changelogFile: string, headerLine: s
 
         if (newContents !== oldContents) {
             fs.writeFileSync(changelogFile, newContents);
-            context.logger.info(`Updated version header in ${changelogFile}`)
+            context.logger.info(`Updated version header in ${changelogFile}`);
             return true;
         }
     }

@@ -30,8 +30,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             const tmpDir = path.join(os.tmpdir(), (context.ci as any).build, name);
             fs.mkdirSync(tmpDir, { recursive: true });
             let tries = 0;
-            while (await utils.npmView(name, registry) == null && tries < 60) {
-                await delay(1000);
+            const totalTries = 60;
+            while (await utils.npmView(name, registry) == null && tries < totalTries) {
+                const oneSec = 1000;
+                await delay(oneSec);
                 tries += 1;
             }
             await coreUtils.dryRunTask(context, `install ${name} from ${registry}`, async () => {

@@ -104,5 +104,5 @@ export interface IContext {
      *  { path: "packages/changelog", name: "Changelog plugin for Octorelease" }
      * ]
      */
-    workspaces?: (IWorkspaceInfo | string)[];
+    workspaces?: IWorkspaceInfo[];
 }

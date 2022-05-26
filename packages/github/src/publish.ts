@@ -46,7 +46,8 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
             tag: tagName
         });
     } catch (error) {
-        if (!(error instanceof RequestError && error.status === 404)) {
+        const notFound = 404;
+        if (!(error instanceof RequestError && error.status === notFound)) {
             throw error;
         }
     }
@@ -94,6 +95,6 @@ async function uploadAssets(context: IContext, octokit: any, release: any, asset
                     "Content-Type": mime.lookup(artifactPath) || "application/octet-stream"
                 }
             });
-        })
+        });
     }
 }
