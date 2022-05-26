@@ -19,6 +19,7 @@ import { Logger } from "../logger";
 import { IProtectedBranch } from "./IProtectedBranch";
 import { IReleasedPackage } from "./IReleasedPackage";
 import { IVersionInfo } from "./IVersionInfo";
+import { IWorkspaceInfo } from "./IWorkspaceInfo";
 
 /**
  * Global context object for Octorelease
@@ -98,6 +99,10 @@ export interface IContext {
     /**
      * Subpackage paths or globs for monorepo
      * @example ["packages/*"]
+     * @example [
+     *  { path: "packages/npm", name: "NPM plugin for Octorelease" },
+     *  { path: "packages/changelog", name: "Changelog plugin for Octorelease" }
+     * ]
      */
-    workspaces?: string[];
+    workspaces?: (IWorkspaceInfo | string)[];
 }

@@ -17,14 +17,14 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
-import { IContext } from "@octorelease/core";
+import { IContext, IWorkspaceInfo } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
     if (context.workspaces != null) {
-        const globber = await glob.create(context.workspaces.join("\n"));
+        const globber = await glob.create(context.workspaces.map(w => (w as IWorkspaceInfo)?.path ?? w).join("\n"));
         for (const packageDir of await globber.glob()) {
             const changelogPath = path.join(packageDir, changelogFile);
             if (updateChangelog(context, changelogPath, headerLine)) {

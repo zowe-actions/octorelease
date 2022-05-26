@@ -17,7 +17,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
-import { IContext } from "@octorelease/core";
+import { IContext, IWorkspaceInfo } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -29,7 +29,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 async function getReleaseNotes(context: IContext, changelogFile: string, headerLine: string):
     Promise<string | undefined> {
     if (context.workspaces != null) {
-        const globber = await glob.create(context.workspaces.join("\n"));
+        const globber = await glob.create(context.workspaces.map(w => (w as IWorkspaceInfo).path ?? w).join("\n"));
         let releaseNotes = "";
 
         for (const packageDir of await globber.glob()) {
