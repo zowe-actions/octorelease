@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `0.1.2`
 
 * Fixed prerelease tags on versions not being handled correctly
 * Fixed branch name not being set correctly when wildcard is used in config
