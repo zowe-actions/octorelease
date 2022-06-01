@@ -1,11 +1,17 @@
 # Changelog
 
+## Recent Changes
+
+* Fixed prerelease tags on versions not being handled correctly
+* Fixed branch name not being set correctly when wildcard is used in config
+* Added option to override branch name on `buildContext` method
+
 ## `0.1.1`
 
-* Fix scoped plugins failing to load from node_modules
-* Filter Git tags in monorepo based on prefix
-* Remove check for CI skip phrase in last commit message
-* License project under Apache-2.0
+* Fixed scoped plugins failing to load from node_modules
+* Filtered Git tags in monorepo based on prefix
+* Removed check for CI skip phrase in last commit message
+* Licensed project under Apache-2.0
 
 ## `0.1.0`
 

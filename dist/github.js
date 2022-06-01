@@ -18504,7 +18504,7 @@ var require_utils5 = __commonJS({
     var cosmiconfig_1 = require_dist3();
     var inputs_1 = require_inputs();
     var logger_1 = require_logger();
-    function buildContext() {
+    function buildContext(opts) {
       return __awaiter(this, void 0, void 0, function* () {
         const envCi = yield loadCiEnv();
         const config = yield (0, cosmiconfig_1.cosmiconfig)("release").search(inputs_1.Inputs.configDir);
@@ -18513,7 +18513,7 @@ var require_utils5 = __commonJS({
         }
         const micromatch = require_micromatch();
         const branches = config.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
-        const branchIndex = branches.findIndex((branch) => micromatch.isMatch(envCi.branch, branch.name));
+        const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch, branch.name));
         if (branchIndex == -1) {
           return;
         } else if (branchIndex > 0 && branches[branchIndex].channel == null) {

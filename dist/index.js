@@ -18002,7 +18002,7 @@ var fs = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_cosmiconfig = __toESM(require_dist3());
-function buildContext() {
+function buildContext(opts) {
   return __async(this, null, function* () {
     const envCi = yield loadCiEnv();
     const config = yield (0, import_cosmiconfig.cosmiconfig)("release").search(Inputs.configDir);
@@ -18011,7 +18011,7 @@ function buildContext() {
     }
     const micromatch = require_micromatch();
     const branches = config.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
-    const branchIndex = branches.findIndex((branch) => micromatch.isMatch(envCi.branch, branch.name));
+    const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts == null ? void 0 : opts.branch) || envCi.branch, branch.name));
     if (branchIndex == -1) {
       return;
     } else if (branchIndex > 0 && branches[branchIndex].channel == null) {

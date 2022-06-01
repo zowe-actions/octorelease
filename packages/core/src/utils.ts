@@ -26,7 +26,7 @@ import { Logger } from "./logger";
  * Build global context object that is passed to all plugin handlers.
  * @returns Global context object for Octorelease
  */
-export async function buildContext(): Promise<IContext | undefined> {
+export async function buildContext(opts?: { branch?: string }): Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
     const config = await cosmiconfig("release").search(Inputs.configDir);
     if (config == null || config.isEmpty) {
@@ -36,7 +36,8 @@ export async function buildContext(): Promise<IContext | undefined> {
     const micromatch = require("micromatch");
     const branches = config.config.branches.map((branch: any) => typeof branch === "string" ?
         { name: branch } : branch);
-    const branchIndex = branches.findIndex((branch: any) => micromatch.isMatch(envCi.branch, branch.name));
+    const branchIndex = branches.findIndex((branch: any) =>
+        micromatch.isMatch(opts?.branch || envCi.branch, branch.name));
     if (branchIndex == -1) {
         return;
     } else if (branchIndex > 0 && branches[branchIndex].channel == null) {
