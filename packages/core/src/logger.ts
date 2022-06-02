@@ -20,7 +20,15 @@ import * as core from "@actions/core";
  * Class for logging messages to the console.
  */
 export class Logger {
-    constructor(private pluginName?: string) {}
+    /**
+     * Plugin name to prepend to log messages.
+     * @internal
+     */
+    public pluginName?: string;
+
+    constructor(pluginName?: string) {
+        this.pluginName = pluginName;
+    }
 
     /**
      * Output debug level message with plugin name prepended.

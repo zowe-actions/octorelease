@@ -17,7 +17,6 @@
 import * as core from "@actions/core";
 import { IContext, IPluginsLoaded } from "./doc";
 import { Inputs } from "./inputs";
-import { Logger } from "./logger";
 
 /**
  * Run "fail" stage for loaded plugins that have a "fail" handler.
@@ -30,10 +29,12 @@ export async function fail(context: IContext, pluginsLoaded: IPluginsLoaded): Pr
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.fail != null) {
             context.logger.info(`Running "fail" stage for plugin ${pluginName}`);
-            await pluginModule.fail(
-                { ...context, logger: new Logger(pluginName) },
-                context.plugins[pluginName] || {}
-            );
+            context.logger.pluginName = pluginName;
+            try {
+                await pluginModule.fail(context, context.plugins[pluginName] || {});
+            } finally {
+                context.logger.pluginName = undefined;
+            }
         }
     }
 }
@@ -48,10 +49,12 @@ export async function init(context: IContext, pluginsLoaded: IPluginsLoaded): Pr
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.init != null) {
             context.logger.info(`Running "init" stage for plugin ${pluginName}`);
-            await pluginModule.init(
-                { ...context, logger: new Logger(pluginName) },
-                context.plugins[pluginName] || {}
-            );
+            context.logger.pluginName = pluginName;
+            try {
+                await pluginModule.init(context, context.plugins[pluginName] || {});
+            } finally {
+                context.logger.pluginName = undefined;
+            }
         }
     }
 }
@@ -67,10 +70,12 @@ export async function publish(context: IContext, pluginsLoaded: IPluginsLoaded):
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.publish != null) {
             context.logger.info(`Running "publish" stage for plugin ${pluginName}`);
-            await pluginModule.publish(
-                { ...context, logger: new Logger(pluginName) },
-                context.plugins[pluginName] || {}
-            );
+            context.logger.pluginName = pluginName;
+            try {
+                await pluginModule.publish(context, context.plugins[pluginName] || {});
+            } finally {
+                context.logger.pluginName = undefined;
+            }
         }
     }
 }
@@ -86,10 +91,12 @@ export async function success(context: IContext, pluginsLoaded: IPluginsLoaded):
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.success != null) {
             context.logger.info(`Running "success" stage for plugin ${pluginName}`);
-            await pluginModule.success(
-                { ...context, logger: new Logger(pluginName) },
-                context.plugins[pluginName] || {}
-            );
+            context.logger.pluginName = pluginName;
+            try {
+                await pluginModule.success(context, context.plugins[pluginName] || {});
+            } finally {
+                context.logger.pluginName = undefined;
+            }
         }
     }
 }
@@ -105,10 +112,12 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule.version != null) {
             context.logger.info(`Running "version" stage for plugin ${pluginName}`);
-            await pluginModule.version(
-                { ...context, logger: new Logger(pluginName) },
-                context.plugins[pluginName] || {}
-            );
+            context.logger.pluginName = pluginName;
+            try {
+                await pluginModule.version(context, context.plugins[pluginName] || {});
+            } finally {
+                context.logger.pluginName = undefined;
+            }
         }
     }
 }

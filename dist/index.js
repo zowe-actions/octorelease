@@ -17905,32 +17905,7 @@ var Inputs = class {
 Inputs.rootDir = process.cwd();
 
 // src/stages.ts
-var core3 = __toESM(require_core());
-
-// src/logger.ts
 var core2 = __toESM(require_core());
-var Logger = class {
-  constructor(pluginName) {
-    this.pluginName = pluginName;
-  }
-  debug(message) {
-    core2.debug(this.prependPluginName(message));
-  }
-  error(message) {
-    core2.error(this.prependPluginName(message));
-  }
-  info(message) {
-    core2.info(this.prependPluginName(message));
-  }
-  warn(message) {
-    core2.warning(this.prependPluginName(message));
-  }
-  prependPluginName(message) {
-    return this.pluginName ? `[${this.pluginName}] ${message}` : message;
-  }
-};
-
-// src/stages.ts
 function fail(context, pluginsLoaded) {
   return __async(this, null, function* () {
     if (shouldSkipStage("fail"))
@@ -17938,7 +17913,12 @@ function fail(context, pluginsLoaded) {
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.fail != null) {
         context.logger.info(`Running "fail" stage for plugin ${pluginName}`);
-        yield pluginModule.fail(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
+        context.logger.pluginName = pluginName;
+        try {
+          yield pluginModule.fail(context, context.plugins[pluginName] || {});
+        } finally {
+          context.logger.pluginName = void 0;
+        }
       }
     }
   });
@@ -17948,7 +17928,12 @@ function init(context, pluginsLoaded) {
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.init != null) {
         context.logger.info(`Running "init" stage for plugin ${pluginName}`);
-        yield pluginModule.init(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
+        context.logger.pluginName = pluginName;
+        try {
+          yield pluginModule.init(context, context.plugins[pluginName] || {});
+        } finally {
+          context.logger.pluginName = void 0;
+        }
       }
     }
   });
@@ -17960,7 +17945,12 @@ function publish(context, pluginsLoaded) {
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.publish != null) {
         context.logger.info(`Running "publish" stage for plugin ${pluginName}`);
-        yield pluginModule.publish(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
+        context.logger.pluginName = pluginName;
+        try {
+          yield pluginModule.publish(context, context.plugins[pluginName] || {});
+        } finally {
+          context.logger.pluginName = void 0;
+        }
       }
     }
   });
@@ -17972,7 +17962,12 @@ function success(context, pluginsLoaded) {
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.success != null) {
         context.logger.info(`Running "success" stage for plugin ${pluginName}`);
-        yield pluginModule.success(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
+        context.logger.pluginName = pluginName;
+        try {
+          yield pluginModule.success(context, context.plugins[pluginName] || {});
+        } finally {
+          context.logger.pluginName = void 0;
+        }
       }
     }
   });
@@ -17984,14 +17979,19 @@ function version(context, pluginsLoaded) {
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule.version != null) {
         context.logger.info(`Running "version" stage for plugin ${pluginName}`);
-        yield pluginModule.version(__spreadProps(__spreadValues({}, context), { logger: new Logger(pluginName) }), context.plugins[pluginName] || {});
+        context.logger.pluginName = pluginName;
+        try {
+          yield pluginModule.version(context, context.plugins[pluginName] || {});
+        } finally {
+          context.logger.pluginName = void 0;
+        }
       }
     }
   });
 }
 function shouldSkipStage(name) {
   if (Inputs.skipStages.includes(name)) {
-    core3.info(`Skipping "${name}" stage`);
+    core2.info(`Skipping "${name}" stage`);
     return true;
   }
   return false;
@@ -18002,6 +18002,31 @@ var fs = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_cosmiconfig = __toESM(require_dist3());
+
+// src/logger.ts
+var core3 = __toESM(require_core());
+var Logger = class {
+  constructor(pluginName) {
+    this.pluginName = pluginName;
+  }
+  debug(message) {
+    core3.debug(this.prependPluginName(message));
+  }
+  error(message) {
+    core3.error(this.prependPluginName(message));
+  }
+  info(message) {
+    core3.info(this.prependPluginName(message));
+  }
+  warn(message) {
+    core3.warning(this.prependPluginName(message));
+  }
+  prependPluginName(message) {
+    return this.pluginName ? `[${this.pluginName}] ${message}` : message;
+  }
+};
+
+// src/utils.ts
 function buildContext(opts) {
   return __async(this, null, function* () {
     const envCi = yield loadCiEnv();

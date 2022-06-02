@@ -3040,7 +3040,6 @@ function version_default(context, config) {
   return __async(this, null, function* () {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    context.logger.info(require("util").inspect(context));
     if (context.workspaces != null) {
       const globber = yield glob.create(context.workspaces.join("\n"));
       let releaseNotes = "";

@@ -23,8 +23,6 @@ import { IPluginConfig } from "./config";
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    // TODO Remove this temporary line for testing purposes
-    context.logger.info(require("util").inspect(context));
 
     if (context.workspaces != null) {
         const globber = await glob.create(context.workspaces.join("\n"));

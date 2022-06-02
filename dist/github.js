@@ -1827,7 +1827,6 @@ var require_stages = __commonJS({
     exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
     var core = __importStar(require_core());
     var inputs_1 = require_inputs();
-    var logger_1 = require_logger();
     function fail(context, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage("fail"))
@@ -1835,7 +1834,12 @@ var require_stages = __commonJS({
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.fail != null) {
             context.logger.info(`Running "fail" stage for plugin ${pluginName}`);
-            yield pluginModule.fail(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule.fail(context, context.plugins[pluginName] || {});
+            } finally {
+              context.logger.pluginName = void 0;
+            }
           }
         }
       });
@@ -1846,7 +1850,12 @@ var require_stages = __commonJS({
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.init != null) {
             context.logger.info(`Running "init" stage for plugin ${pluginName}`);
-            yield pluginModule.init(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule.init(context, context.plugins[pluginName] || {});
+            } finally {
+              context.logger.pluginName = void 0;
+            }
           }
         }
       });
@@ -1859,7 +1868,12 @@ var require_stages = __commonJS({
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.publish != null) {
             context.logger.info(`Running "publish" stage for plugin ${pluginName}`);
-            yield pluginModule.publish(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule.publish(context, context.plugins[pluginName] || {});
+            } finally {
+              context.logger.pluginName = void 0;
+            }
           }
         }
       });
@@ -1872,7 +1886,12 @@ var require_stages = __commonJS({
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.success != null) {
             context.logger.info(`Running "success" stage for plugin ${pluginName}`);
-            yield pluginModule.success(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule.success(context, context.plugins[pluginName] || {});
+            } finally {
+              context.logger.pluginName = void 0;
+            }
           }
         }
       });
@@ -1885,7 +1904,12 @@ var require_stages = __commonJS({
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule.version != null) {
             context.logger.info(`Running "version" stage for plugin ${pluginName}`);
-            yield pluginModule.version(Object.assign(Object.assign({}, context), { logger: new logger_1.Logger(pluginName) }), context.plugins[pluginName] || {});
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule.version(context, context.plugins[pluginName] || {});
+            } finally {
+              context.logger.pluginName = void 0;
+            }
           }
         }
       });
