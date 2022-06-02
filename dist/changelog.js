@@ -3040,37 +3040,29 @@ function version_default(context, config) {
   return __async(this, null, function* () {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    context.releaseNotes = yield getReleaseNotes(context, changelogFile, headerLine);
-    if (context.workspaces != null) {
-      const globber = yield glob.create(context.workspaces.join("\n"));
-      for (const packageDir of yield globber.glob()) {
-        const changelogPath = path.join(packageDir, changelogFile);
-        if (updateChangelog(context, changelogPath, headerLine)) {
-          context.changedFiles.push(changelogPath);
-        }
-      }
-    } else if (updateChangelog(context, changelogFile, headerLine)) {
-      context.changedFiles.push(changelogFile);
-    }
-  });
-}
-function getReleaseNotes(context, changelogFile, headerLine) {
-  return __async(this, null, function* () {
+    context.logger.info(require("util").inspect(context));
     if (context.workspaces != null) {
       const globber = yield glob.create(context.workspaces.join("\n"));
       let releaseNotes = "";
       for (const packageDir of yield globber.glob()) {
-        const packageReleaseNotes = getPackageChangelog(context, path.join(packageDir, changelogFile), headerLine);
+        const changelogPath = path.join(packageDir, changelogFile);
+        const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
         if (packageReleaseNotes != null) {
           releaseNotes += `**${path.basename(packageDir)}**
 ${packageReleaseNotes}
 
 `;
         }
+        if (updatePackageChangelog(context, changelogPath, headerLine)) {
+          context.changedFiles.push(changelogPath);
+        }
       }
-      return releaseNotes || void 0;
+      context.releaseNotes = releaseNotes || void 0;
     } else {
-      return getPackageChangelog(context, changelogFile, headerLine);
+      context.releaseNotes = getPackageChangelog(context, changelogFile, headerLine);
+      if (updatePackageChangelog(context, changelogFile, headerLine)) {
+        context.changedFiles.push(changelogFile);
+      }
     }
   });
 }
@@ -3093,7 +3085,7 @@ function getPackageChangelog(context, changelogFile, headerLine) {
   }
   return releaseNotes.trim() || void 0;
 }
-function updateChangelog(context, changelogFile, headerLine) {
+function updatePackageChangelog(context, changelogFile, headerLine) {
   if (fs.existsSync(changelogFile)) {
     const oldContents = fs.readFileSync(changelogFile, "utf-8");
     const newContents = oldContents.replace(headerLine, `## \`${context.version.new}\``);
