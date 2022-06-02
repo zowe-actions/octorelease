@@ -3026,6 +3026,339 @@ var require_glob = __commonJS({
   }
 });
 
+// node_modules/mimic-fn/index.js
+var require_mimic_fn = __commonJS({
+  "node_modules/mimic-fn/index.js"(exports, module2) {
+    "use strict";
+    var copyProperty = (to, from, property, ignoreNonConfigurable) => {
+      if (property === "length" || property === "prototype") {
+        return;
+      }
+      if (property === "arguments" || property === "caller") {
+        return;
+      }
+      const toDescriptor = Object.getOwnPropertyDescriptor(to, property);
+      const fromDescriptor = Object.getOwnPropertyDescriptor(from, property);
+      if (!canCopyProperty(toDescriptor, fromDescriptor) && ignoreNonConfigurable) {
+        return;
+      }
+      Object.defineProperty(to, property, fromDescriptor);
+    };
+    var canCopyProperty = function(toDescriptor, fromDescriptor) {
+      return toDescriptor === void 0 || toDescriptor.configurable || toDescriptor.writable === fromDescriptor.writable && toDescriptor.enumerable === fromDescriptor.enumerable && toDescriptor.configurable === fromDescriptor.configurable && (toDescriptor.writable || toDescriptor.value === fromDescriptor.value);
+    };
+    var changePrototype = (to, from) => {
+      const fromPrototype = Object.getPrototypeOf(from);
+      if (fromPrototype === Object.getPrototypeOf(to)) {
+        return;
+      }
+      Object.setPrototypeOf(to, fromPrototype);
+    };
+    var wrappedToString = (withName, fromBody) => `/* Wrapped ${withName}*/
+${fromBody}`;
+    var toStringDescriptor = Object.getOwnPropertyDescriptor(Function.prototype, "toString");
+    var toStringName = Object.getOwnPropertyDescriptor(Function.prototype.toString, "name");
+    var changeToString = (to, from, name) => {
+      const withName = name === "" ? "" : `with ${name.trim()}() `;
+      const newToString = wrappedToString.bind(null, withName, from.toString());
+      Object.defineProperty(newToString, "name", toStringName);
+      Object.defineProperty(to, "toString", { ...toStringDescriptor, value: newToString });
+    };
+    var mimicFn = (to, from, { ignoreNonConfigurable = false } = {}) => {
+      const { name } = to;
+      for (const property of Reflect.ownKeys(from)) {
+        copyProperty(to, from, property, ignoreNonConfigurable);
+      }
+      changePrototype(to, from);
+      changeToString(to, from, name);
+      return to;
+    };
+    module2.exports = mimicFn;
+  }
+});
+
+// ../../node_modules/p-defer/index.js
+var require_p_defer = __commonJS({
+  "../../node_modules/p-defer/index.js"(exports, module2) {
+    "use strict";
+    module2.exports = () => {
+      const ret = {};
+      ret.promise = new Promise((resolve, reject) => {
+        ret.resolve = resolve;
+        ret.reject = reject;
+      });
+      return ret;
+    };
+  }
+});
+
+// ../../node_modules/map-age-cleaner/dist/index.js
+var require_dist = __commonJS({
+  "../../node_modules/map-age-cleaner/dist/index.js"(exports, module2) {
+    "use strict";
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : new P(function(resolve2) {
+            resolve2(result.value);
+          }).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    var __importDefault = exports && exports.__importDefault || function(mod) {
+      return mod && mod.__esModule ? mod : { "default": mod };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var p_defer_1 = __importDefault(require_p_defer());
+    function mapAgeCleaner(map, property = "maxAge") {
+      let processingKey;
+      let processingTimer;
+      let processingDeferred;
+      const cleanup = () => __awaiter(this, void 0, void 0, function* () {
+        if (processingKey !== void 0) {
+          return;
+        }
+        const setupTimer = (item) => __awaiter(this, void 0, void 0, function* () {
+          processingDeferred = p_defer_1.default();
+          const delay = item[1][property] - Date.now();
+          if (delay <= 0) {
+            map.delete(item[0]);
+            processingDeferred.resolve();
+            return;
+          }
+          processingKey = item[0];
+          processingTimer = setTimeout(() => {
+            map.delete(item[0]);
+            if (processingDeferred) {
+              processingDeferred.resolve();
+            }
+          }, delay);
+          if (typeof processingTimer.unref === "function") {
+            processingTimer.unref();
+          }
+          return processingDeferred.promise;
+        });
+        try {
+          for (const entry of map) {
+            yield setupTimer(entry);
+          }
+        } catch (_a) {
+        }
+        processingKey = void 0;
+      });
+      const reset = () => {
+        processingKey = void 0;
+        if (processingTimer !== void 0) {
+          clearTimeout(processingTimer);
+          processingTimer = void 0;
+        }
+        if (processingDeferred !== void 0) {
+          processingDeferred.reject(void 0);
+          processingDeferred = void 0;
+        }
+      };
+      const originalSet = map.set.bind(map);
+      map.set = (key, value) => {
+        if (map.has(key)) {
+          map.delete(key);
+        }
+        const result = originalSet(key, value);
+        if (processingKey && processingKey === key) {
+          reset();
+        }
+        cleanup();
+        return result;
+      };
+      cleanup();
+      return map;
+    }
+    exports.default = mapAgeCleaner;
+    module2.exports = mapAgeCleaner;
+    module2.exports.default = mapAgeCleaner;
+  }
+});
+
+// ../../node_modules/p-reflect/index.js
+var require_p_reflect = __commonJS({
+  "../../node_modules/p-reflect/index.js"(exports, module2) {
+    "use strict";
+    var pReflect = async (promise) => {
+      try {
+        const value = await promise;
+        return {
+          isFulfilled: true,
+          isRejected: false,
+          value
+        };
+      } catch (error) {
+        return {
+          isFulfilled: false,
+          isRejected: true,
+          reason: error
+        };
+      }
+    };
+    module2.exports = pReflect;
+    module2.exports.default = pReflect;
+  }
+});
+
+// ../../node_modules/p-try/index.js
+var require_p_try = __commonJS({
+  "../../node_modules/p-try/index.js"(exports, module2) {
+    "use strict";
+    var pTry = (fn, ...arguments_) => new Promise((resolve) => {
+      resolve(fn(...arguments_));
+    });
+    module2.exports = pTry;
+    module2.exports.default = pTry;
+  }
+});
+
+// ../../node_modules/p-limit/index.js
+var require_p_limit = __commonJS({
+  "../../node_modules/p-limit/index.js"(exports, module2) {
+    "use strict";
+    var pTry = require_p_try();
+    var pLimit = (concurrency) => {
+      if (!((Number.isInteger(concurrency) || concurrency === Infinity) && concurrency > 0)) {
+        return Promise.reject(new TypeError("Expected `concurrency` to be a number from 1 and up"));
+      }
+      const queue = [];
+      let activeCount = 0;
+      const next = () => {
+        activeCount--;
+        if (queue.length > 0) {
+          queue.shift()();
+        }
+      };
+      const run = (fn, resolve, ...args) => {
+        activeCount++;
+        const result = pTry(fn, ...args);
+        resolve(result);
+        result.then(next, next);
+      };
+      const enqueue = (fn, resolve, ...args) => {
+        if (activeCount < concurrency) {
+          run(fn, resolve, ...args);
+        } else {
+          queue.push(run.bind(null, fn, resolve, ...args));
+        }
+      };
+      const generator = (fn, ...args) => new Promise((resolve) => enqueue(fn, resolve, ...args));
+      Object.defineProperties(generator, {
+        activeCount: {
+          get: () => activeCount
+        },
+        pendingCount: {
+          get: () => queue.length
+        },
+        clearQueue: {
+          value: () => {
+            queue.length = 0;
+          }
+        }
+      });
+      return generator;
+    };
+    module2.exports = pLimit;
+    module2.exports.default = pLimit;
+  }
+});
+
+// ../../node_modules/p-settle/index.js
+var require_p_settle = __commonJS({
+  "../../node_modules/p-settle/index.js"(exports, module2) {
+    "use strict";
+    var pReflect = require_p_reflect();
+    var pLimit = require_p_limit();
+    module2.exports = async (array, options = {}) => {
+      const { concurrency = Infinity } = options;
+      const limit = pLimit(concurrency);
+      return Promise.all(array.map((element) => {
+        if (element && typeof element.then === "function") {
+          return pReflect(element);
+        }
+        if (typeof element === "function") {
+          return pReflect(limit(() => element()));
+        }
+        return pReflect(Promise.resolve(element));
+      }));
+    };
+  }
+});
+
+// node_modules/p-memoize/index.js
+var require_p_memoize = __commonJS({
+  "node_modules/p-memoize/index.js"(exports, module2) {
+    "use strict";
+    var mimicFn = require_mimic_fn();
+    var mapAgeCleaner = require_dist();
+    var pSettle = require_p_settle();
+    var cacheStore = /* @__PURE__ */ new WeakMap();
+    var pMemoize2 = (fn, { cachePromiseRejection = false, ...options } = {}) => {
+      const { maxAge, cacheKey } = options;
+      const cache = options.cache || /* @__PURE__ */ new Map();
+      if (Number.isSafeInteger(maxAge)) {
+        mapAgeCleaner(cache);
+      } else if (typeof maxAge !== "undefined") {
+        throw new TypeError("maxAge is not a safe integer.");
+      }
+      const memoized = async function(...arguments_) {
+        const key = cacheKey ? cacheKey(arguments_) : arguments_[0];
+        const cacheItem = cache.get(key);
+        if (cacheItem) {
+          return cacheItem.data;
+        }
+        const promise = fn.apply(this, arguments_);
+        cache.set(key, {
+          data: promise,
+          maxAge: 2 ** 31 - 1
+        });
+        const [{ reason }] = await pSettle([promise]);
+        if (!cachePromiseRejection && reason) {
+          cache.delete(key);
+        } else if (maxAge) {
+          cache.set(key, {
+            data: promise,
+            maxAge: Date.now() + maxAge
+          });
+        }
+        return promise;
+      };
+      mimicFn(memoized, fn);
+      cacheStore.set(memoized, cache);
+      return memoized;
+    };
+    module2.exports = pMemoize2;
+    module2.exports.clear = (memoized) => {
+      if (!cacheStore.has(memoized)) {
+        throw new Error("Can't clear a function that was not memoized!");
+      }
+      const cache = cacheStore.get(memoized);
+      if (typeof cache.clear !== "function") {
+        throw new TypeError("The cache Map can't be cleared!");
+      }
+      cache.clear();
+    };
+  }
+});
+
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
@@ -3037,11 +3370,14 @@ __export(src_exports, {
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var glob = __toESM(require_glob());
+var import_p_memoize = __toESM(require_p_memoize());
 function init_default(context, config) {
   return __async(this, null, function* () {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    context.releaseNotes = yield getReleaseNotes(context, changelogFile, headerLine);
+    context.getReleaseNotes = (0, import_p_memoize.default)(() => __async(this, null, function* () {
+      return yield getReleaseNotes(context, changelogFile, headerLine);
+    }));
   });
 }
 function getReleaseNotes(context, changelogFile, headerLine) {

@@ -62,6 +62,7 @@ export async function buildContext(opts?: { branch?: string }): Promise<IContext
         ci: envCi,
         dryRun: Inputs.dryRun,
         env: process.env as any,
+        getReleaseNotes: async () => undefined,
         logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
@@ -125,6 +126,8 @@ export async function verifyConditions(context: IContext): Promise<void> {
             (semverDiff === "minor" && context.branch.level === "patch")) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
     }
+
+    await context.getReleaseNotes();
 }
 
 /**

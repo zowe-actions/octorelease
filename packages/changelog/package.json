@@ -27,7 +27,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/glob": "^0.1.0"
+    "@actions/glob": "^0.1.0",
+    "p-memoize": "^4.0.4"
   },
   "peerDependencies": {
     "@octorelease/core": "^0.1.0"

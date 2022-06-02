@@ -58,6 +58,11 @@ export interface IContext {
     env: Record<string, string>,
 
     /**
+     * Callback that returns multi-line string containing changelog
+     */
+    getReleaseNotes: () => Promise<string | undefined>;
+
+    /**
      * Error object defined for "fail" stage
      */
     failError?: Error;
@@ -78,11 +83,6 @@ export interface IContext {
      * @example { npm: [{ name: "@octorelease/core" }] }
      */
     releasedPackages: { [key: string]: IReleasedPackage[] };
-
-    /**
-     * Multi-line string containing changelog
-     */
-    releaseNotes?: string;
 
     /**
      * Git tag prefix that precedes version number (default is "v")

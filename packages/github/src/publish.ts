@@ -58,7 +58,7 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
             return octokit.repos.createRelease({
                 ...context.ci.repo,
                 tag_name: tagName,
-                body: context.releaseNotes
+                body: await context.getReleaseNotes()
             });
         }) || { data: {} };
     }

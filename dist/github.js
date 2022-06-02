@@ -18535,6 +18535,9 @@ var require_utils5 = __commonJS({
           ci: envCi,
           dryRun: inputs_1.Inputs.dryRun,
           env: process.env,
+          getReleaseNotes: () => __awaiter(this, void 0, void 0, function* () {
+            return void 0;
+          }),
           logger: new logger_1.Logger(),
           plugins: pluginConfig,
           releasedPackages: {},
@@ -18581,6 +18584,7 @@ var require_utils5 = __commonJS({
         if (semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch") || semverDiff === "minor" && context.branch.level === "patch") {
           throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
         }
+        yield context.getReleaseNotes();
       });
     }
     exports.verifyConditions = verifyConditions;
@@ -41301,7 +41305,7 @@ function createRelease(context, octokit) {
       release = (yield import_core2.utils.dryRunTask(context, "create GitHub release", () => __async(this, null, function* () {
         return octokit.repos.createRelease(__spreadProps(__spreadValues({}, context.ci.repo), {
           tag_name: tagName,
-          body: context.releaseNotes
+          body: yield context.getReleaseNotes()
         }));
       }))) || { data: {} };
     }

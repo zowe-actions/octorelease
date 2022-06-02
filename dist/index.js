@@ -18033,6 +18033,9 @@ function buildContext(opts) {
       ci: envCi,
       dryRun: Inputs.dryRun,
       env: process.env,
+      getReleaseNotes: () => __async(this, null, function* () {
+        return void 0;
+      }),
       logger: new Logger(),
       plugins: pluginConfig,
       releasedPackages: {},
@@ -18067,6 +18070,7 @@ function verifyConditions(context) {
     if (semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch") || semverDiff === "minor" && context.branch.level === "patch") {
       throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
     }
+    yield context.getReleaseNotes();
   });
 }
 function buildVersionInfo(branch, tagPrefix) {
