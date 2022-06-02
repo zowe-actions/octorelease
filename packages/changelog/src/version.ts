@@ -25,11 +25,11 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     const headerLine = config.headerLine || "## Recent Changes";
 
     if (context.workspaces != null) {
-        const globber = await glob.create(context.workspaces.join("\n"));
+        const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
         let releaseNotes = "";
 
         for (const packageDir of await globber.glob()) {
-            const changelogPath = path.join(packageDir, changelogFile);
+            const changelogPath = path.join(path.relative(process.cwd(), packageDir), changelogFile);
             const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
             if (packageReleaseNotes != null) {
                 releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
