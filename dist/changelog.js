@@ -202,7 +202,7 @@ var require_file_command = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.issueCommand = void 0;
-    var fs3 = __importStar(require("fs"));
+    var fs2 = __importStar(require("fs"));
     var os = __importStar(require("os"));
     var utils_1 = require_utils();
     function issueCommand(command, message) {
@@ -210,10 +210,10 @@ var require_file_command = __commonJS({
       if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
       }
-      if (!fs3.existsSync(filePath)) {
+      if (!fs2.existsSync(filePath)) {
         throw new Error(`Missing file at path: ${filePath}`);
       }
-      fs3.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+      fs2.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
         encoding: "utf8"
       });
     }
@@ -1186,7 +1186,7 @@ var require_core = __commonJS({
     var file_command_1 = require_file_command();
     var utils_1 = require_utils();
     var os = __importStar(require("os"));
-    var path3 = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var oidc_utils_1 = require_oidc_utils();
     var ExitCode;
     (function(ExitCode2) {
@@ -1217,7 +1217,7 @@ var require_core = __commonJS({
       } else {
         command_1.issueCommand("add-path", {}, inputPath);
       }
-      process.env["PATH"] = `${inputPath}${path3.delimiter}${process.env["PATH"]}`;
+      process.env["PATH"] = `${inputPath}${path2.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
     function getInput(name, options) {
@@ -1422,7 +1422,7 @@ var require_internal_path_helper = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.safeTrimTrailingSeparator = exports.normalizeSeparators = exports.hasRoot = exports.hasAbsoluteRoot = exports.ensureAbsoluteRoot = exports.dirname = void 0;
-    var path3 = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var assert_1 = __importDefault(require("assert"));
     var IS_WINDOWS = process.platform === "win32";
     function dirname(p) {
@@ -1430,7 +1430,7 @@ var require_internal_path_helper = __commonJS({
       if (IS_WINDOWS && /^\\\\[^\\]+(\\[^\\]+)?$/.test(p)) {
         return p;
       }
-      let result = path3.dirname(p);
+      let result = path2.dirname(p);
       if (IS_WINDOWS && /^\\\\[^\\]+\\[^\\]+\\$/.test(result)) {
         result = safeTrimTrailingSeparator(result);
       }
@@ -1468,7 +1468,7 @@ var require_internal_path_helper = __commonJS({
       assert_1.default(hasAbsoluteRoot(root), `ensureAbsoluteRoot parameter 'root' must have an absolute root`);
       if (root.endsWith("/") || IS_WINDOWS && root.endsWith("\\")) {
       } else {
-        root += path3.sep;
+        root += path2.sep;
       }
       return root + itemPath;
     }
@@ -1506,10 +1506,10 @@ var require_internal_path_helper = __commonJS({
         return "";
       }
       p = normalizeSeparators(p);
-      if (!p.endsWith(path3.sep)) {
+      if (!p.endsWith(path2.sep)) {
         return p;
       }
-      if (p === path3.sep) {
+      if (p === path2.sep) {
         return p;
       }
       if (IS_WINDOWS && /^[A-Z]:\\$/i.test(p)) {
@@ -1855,9 +1855,9 @@ var require_minimatch = __commonJS({
   "../../node_modules/minimatch/minimatch.js"(exports, module2) {
     module2.exports = minimatch;
     minimatch.Minimatch = Minimatch;
-    var path3 = { sep: "/" };
+    var path2 = { sep: "/" };
     try {
-      path3 = require("path");
+      path2 = require("path");
     } catch (er) {
     }
     var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {};
@@ -1940,8 +1940,8 @@ var require_minimatch = __commonJS({
       if (!options)
         options = {};
       pattern = pattern.trim();
-      if (path3.sep !== "/") {
-        pattern = pattern.split(path3.sep).join("/");
+      if (path2.sep !== "/") {
+        pattern = pattern.split(path2.sep).join("/");
       }
       this.options = options;
       this.set = [];
@@ -2308,8 +2308,8 @@ var require_minimatch = __commonJS({
       if (f === "/" && partial)
         return true;
       var options = this.options;
-      if (path3.sep !== "/") {
-        f = f.split(path3.sep).join("/");
+      if (path2.sep !== "/") {
+        f = f.split(path2.sep).join("/");
       }
       f = f.split(slashSplit);
       this.debug(this.pattern, "split", f);
@@ -2455,7 +2455,7 @@ var require_internal_path = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Path = void 0;
-    var path3 = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var pathHelper = __importStar(require_internal_path_helper());
     var assert_1 = __importDefault(require("assert"));
     var IS_WINDOWS = process.platform === "win32";
@@ -2466,12 +2466,12 @@ var require_internal_path = __commonJS({
           assert_1.default(itemPath, `Parameter 'itemPath' must not be empty`);
           itemPath = pathHelper.safeTrimTrailingSeparator(itemPath);
           if (!pathHelper.hasRoot(itemPath)) {
-            this.segments = itemPath.split(path3.sep);
+            this.segments = itemPath.split(path2.sep);
           } else {
             let remaining = itemPath;
             let dir = pathHelper.dirname(remaining);
             while (dir !== remaining) {
-              const basename2 = path3.basename(remaining);
+              const basename2 = path2.basename(remaining);
               this.segments.unshift(basename2);
               remaining = dir;
               dir = pathHelper.dirname(remaining);
@@ -2489,7 +2489,7 @@ var require_internal_path = __commonJS({
               assert_1.default(segment === pathHelper.dirname(segment), `Parameter 'itemPath' root segment contains information for multiple segments`);
               this.segments.push(segment);
             } else {
-              assert_1.default(!segment.includes(path3.sep), `Parameter 'itemPath' contains unexpected path separators`);
+              assert_1.default(!segment.includes(path2.sep), `Parameter 'itemPath' contains unexpected path separators`);
               this.segments.push(segment);
             }
           }
@@ -2497,12 +2497,12 @@ var require_internal_path = __commonJS({
       }
       toString() {
         let result = this.segments[0];
-        let skipSlash = result.endsWith(path3.sep) || IS_WINDOWS && /^[A-Z]:$/i.test(result);
+        let skipSlash = result.endsWith(path2.sep) || IS_WINDOWS && /^[A-Z]:$/i.test(result);
         for (let i = 1; i < this.segments.length; i++) {
           if (skipSlash) {
             skipSlash = false;
           } else {
-            result += path3.sep;
+            result += path2.sep;
           }
           result += this.segments[i];
         }
@@ -2551,7 +2551,7 @@ var require_internal_pattern = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Pattern = void 0;
     var os = __importStar(require("os"));
-    var path3 = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var pathHelper = __importStar(require_internal_path_helper());
     var assert_1 = __importDefault(require("assert"));
     var minimatch_1 = require_minimatch();
@@ -2580,7 +2580,7 @@ var require_internal_pattern = __commonJS({
         }
         pattern = Pattern.fixupPattern(pattern, homedir);
         this.segments = new internal_path_1.Path(pattern).segments;
-        this.trailingSeparator = pathHelper.normalizeSeparators(pattern).endsWith(path3.sep);
+        this.trailingSeparator = pathHelper.normalizeSeparators(pattern).endsWith(path2.sep);
         pattern = pathHelper.safeTrimTrailingSeparator(pattern);
         let foundGlob = false;
         const searchSegments = this.segments.map((x) => Pattern.getLiteral(x)).filter((x) => !foundGlob && !(foundGlob = x === ""));
@@ -2601,8 +2601,8 @@ var require_internal_pattern = __commonJS({
       match(itemPath) {
         if (this.segments[this.segments.length - 1] === "**") {
           itemPath = pathHelper.normalizeSeparators(itemPath);
-          if (!itemPath.endsWith(path3.sep) && this.isImplicitPattern === false) {
-            itemPath = `${itemPath}${path3.sep}`;
+          if (!itemPath.endsWith(path2.sep) && this.isImplicitPattern === false) {
+            itemPath = `${itemPath}${path2.sep}`;
           }
         } else {
           itemPath = pathHelper.safeTrimTrailingSeparator(itemPath);
@@ -2628,9 +2628,9 @@ var require_internal_pattern = __commonJS({
         assert_1.default(literalSegments.every((x, i) => (x !== "." || i === 0) && x !== ".."), `Invalid pattern '${pattern}'. Relative pathing '.' and '..' is not allowed.`);
         assert_1.default(!pathHelper.hasRoot(pattern) || literalSegments[0], `Invalid pattern '${pattern}'. Root segment must not contain globs.`);
         pattern = pathHelper.normalizeSeparators(pattern);
-        if (pattern === "." || pattern.startsWith(`.${path3.sep}`)) {
+        if (pattern === "." || pattern.startsWith(`.${path2.sep}`)) {
           pattern = Pattern.globEscape(process.cwd()) + pattern.substr(1);
-        } else if (pattern === "~" || pattern.startsWith(`~${path3.sep}`)) {
+        } else if (pattern === "~" || pattern.startsWith(`~${path2.sep}`)) {
           homedir = homedir || os.homedir();
           assert_1.default(homedir, "Unable to determine HOME directory");
           assert_1.default(pathHelper.hasAbsoluteRoot(homedir), `Expected HOME directory to be a rooted path. Actual '${homedir}'`);
@@ -2706,8 +2706,8 @@ var require_internal_search_state = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SearchState = void 0;
     var SearchState = class {
-      constructor(path3, level) {
-        this.path = path3;
+      constructor(path2, level) {
+        this.path = path2;
         this.level = level;
       }
     };
@@ -2836,9 +2836,9 @@ var require_internal_globber = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DefaultGlobber = void 0;
     var core = __importStar(require_core());
-    var fs3 = __importStar(require("fs"));
+    var fs2 = __importStar(require("fs"));
     var globOptionsHelper = __importStar(require_internal_glob_options_helper());
-    var path3 = __importStar(require("path"));
+    var path2 = __importStar(require("path"));
     var patternHelper = __importStar(require_internal_pattern_helper());
     var internal_match_kind_1 = require_internal_match_kind();
     var internal_pattern_1 = require_internal_pattern();
@@ -2890,7 +2890,7 @@ var require_internal_globber = __commonJS({
           for (const searchPath of patternHelper.getSearchPaths(patterns)) {
             core.debug(`Search path '${searchPath}'`);
             try {
-              yield __await(fs3.promises.lstat(searchPath));
+              yield __await(fs2.promises.lstat(searchPath));
             } catch (err) {
               if (err.code === "ENOENT") {
                 continue;
@@ -2918,7 +2918,7 @@ var require_internal_globber = __commonJS({
                 continue;
               }
               const childLevel = item.level + 1;
-              const childItems = (yield __await(fs3.promises.readdir(item.path))).map((x) => new internal_search_state_1.SearchState(path3.join(item.path, x), childLevel));
+              const childItems = (yield __await(fs2.promises.readdir(item.path))).map((x) => new internal_search_state_1.SearchState(path2.join(item.path, x), childLevel));
               stack.push(...childItems.reverse());
             } else if (match & internal_match_kind_1.MatchKind.File) {
               yield yield __await(item.path);
@@ -2950,7 +2950,7 @@ var require_internal_globber = __commonJS({
           let stats;
           if (options.followSymbolicLinks) {
             try {
-              stats = yield fs3.promises.stat(item.path);
+              stats = yield fs2.promises.stat(item.path);
             } catch (err) {
               if (err.code === "ENOENT") {
                 if (options.omitBrokenSymbolicLinks) {
@@ -2962,10 +2962,10 @@ var require_internal_globber = __commonJS({
               throw err;
             }
           } else {
-            stats = yield fs3.promises.lstat(item.path);
+            stats = yield fs2.promises.lstat(item.path);
           }
           if (stats.isDirectory() && options.followSymbolicLinks) {
-            const realPath = yield fs3.promises.realpath(item.path);
+            const realPath = yield fs2.promises.realpath(item.path);
             while (traversalChain.length >= item.level) {
               traversalChain.pop();
             }
@@ -3017,367 +3017,41 @@ var require_glob = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.create = void 0;
     var internal_globber_1 = require_internal_globber();
-    function create3(patterns, options) {
+    function create2(patterns, options) {
       return __awaiter(this, void 0, void 0, function* () {
         return yield internal_globber_1.DefaultGlobber.create(patterns, options);
       });
     }
-    exports.create = create3;
-  }
-});
-
-// node_modules/mimic-fn/index.js
-var require_mimic_fn = __commonJS({
-  "node_modules/mimic-fn/index.js"(exports, module2) {
-    "use strict";
-    var copyProperty = (to, from, property, ignoreNonConfigurable) => {
-      if (property === "length" || property === "prototype") {
-        return;
-      }
-      if (property === "arguments" || property === "caller") {
-        return;
-      }
-      const toDescriptor = Object.getOwnPropertyDescriptor(to, property);
-      const fromDescriptor = Object.getOwnPropertyDescriptor(from, property);
-      if (!canCopyProperty(toDescriptor, fromDescriptor) && ignoreNonConfigurable) {
-        return;
-      }
-      Object.defineProperty(to, property, fromDescriptor);
-    };
-    var canCopyProperty = function(toDescriptor, fromDescriptor) {
-      return toDescriptor === void 0 || toDescriptor.configurable || toDescriptor.writable === fromDescriptor.writable && toDescriptor.enumerable === fromDescriptor.enumerable && toDescriptor.configurable === fromDescriptor.configurable && (toDescriptor.writable || toDescriptor.value === fromDescriptor.value);
-    };
-    var changePrototype = (to, from) => {
-      const fromPrototype = Object.getPrototypeOf(from);
-      if (fromPrototype === Object.getPrototypeOf(to)) {
-        return;
-      }
-      Object.setPrototypeOf(to, fromPrototype);
-    };
-    var wrappedToString = (withName, fromBody) => `/* Wrapped ${withName}*/
-${fromBody}`;
-    var toStringDescriptor = Object.getOwnPropertyDescriptor(Function.prototype, "toString");
-    var toStringName = Object.getOwnPropertyDescriptor(Function.prototype.toString, "name");
-    var changeToString = (to, from, name) => {
-      const withName = name === "" ? "" : `with ${name.trim()}() `;
-      const newToString = wrappedToString.bind(null, withName, from.toString());
-      Object.defineProperty(newToString, "name", toStringName);
-      Object.defineProperty(to, "toString", { ...toStringDescriptor, value: newToString });
-    };
-    var mimicFn = (to, from, { ignoreNonConfigurable = false } = {}) => {
-      const { name } = to;
-      for (const property of Reflect.ownKeys(from)) {
-        copyProperty(to, from, property, ignoreNonConfigurable);
-      }
-      changePrototype(to, from);
-      changeToString(to, from, name);
-      return to;
-    };
-    module2.exports = mimicFn;
-  }
-});
-
-// ../../node_modules/p-defer/index.js
-var require_p_defer = __commonJS({
-  "../../node_modules/p-defer/index.js"(exports, module2) {
-    "use strict";
-    module2.exports = () => {
-      const ret = {};
-      ret.promise = new Promise((resolve, reject) => {
-        ret.resolve = resolve;
-        ret.reject = reject;
-      });
-      return ret;
-    };
-  }
-});
-
-// ../../node_modules/map-age-cleaner/dist/index.js
-var require_dist = __commonJS({
-  "../../node_modules/map-age-cleaner/dist/index.js"(exports, module2) {
-    "use strict";
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
-      return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator["throw"](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : new P(function(resolve2) {
-            resolve2(result.value);
-          }).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    };
-    var __importDefault = exports && exports.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var p_defer_1 = __importDefault(require_p_defer());
-    function mapAgeCleaner(map, property = "maxAge") {
-      let processingKey;
-      let processingTimer;
-      let processingDeferred;
-      const cleanup = () => __awaiter(this, void 0, void 0, function* () {
-        if (processingKey !== void 0) {
-          return;
-        }
-        const setupTimer = (item) => __awaiter(this, void 0, void 0, function* () {
-          processingDeferred = p_defer_1.default();
-          const delay = item[1][property] - Date.now();
-          if (delay <= 0) {
-            map.delete(item[0]);
-            processingDeferred.resolve();
-            return;
-          }
-          processingKey = item[0];
-          processingTimer = setTimeout(() => {
-            map.delete(item[0]);
-            if (processingDeferred) {
-              processingDeferred.resolve();
-            }
-          }, delay);
-          if (typeof processingTimer.unref === "function") {
-            processingTimer.unref();
-          }
-          return processingDeferred.promise;
-        });
-        try {
-          for (const entry of map) {
-            yield setupTimer(entry);
-          }
-        } catch (_a) {
-        }
-        processingKey = void 0;
-      });
-      const reset = () => {
-        processingKey = void 0;
-        if (processingTimer !== void 0) {
-          clearTimeout(processingTimer);
-          processingTimer = void 0;
-        }
-        if (processingDeferred !== void 0) {
-          processingDeferred.reject(void 0);
-          processingDeferred = void 0;
-        }
-      };
-      const originalSet = map.set.bind(map);
-      map.set = (key, value) => {
-        if (map.has(key)) {
-          map.delete(key);
-        }
-        const result = originalSet(key, value);
-        if (processingKey && processingKey === key) {
-          reset();
-        }
-        cleanup();
-        return result;
-      };
-      cleanup();
-      return map;
-    }
-    exports.default = mapAgeCleaner;
-    module2.exports = mapAgeCleaner;
-    module2.exports.default = mapAgeCleaner;
-  }
-});
-
-// ../../node_modules/p-reflect/index.js
-var require_p_reflect = __commonJS({
-  "../../node_modules/p-reflect/index.js"(exports, module2) {
-    "use strict";
-    var pReflect = async (promise) => {
-      try {
-        const value = await promise;
-        return {
-          isFulfilled: true,
-          isRejected: false,
-          value
-        };
-      } catch (error) {
-        return {
-          isFulfilled: false,
-          isRejected: true,
-          reason: error
-        };
-      }
-    };
-    module2.exports = pReflect;
-    module2.exports.default = pReflect;
-  }
-});
-
-// ../../node_modules/p-try/index.js
-var require_p_try = __commonJS({
-  "../../node_modules/p-try/index.js"(exports, module2) {
-    "use strict";
-    var pTry = (fn, ...arguments_) => new Promise((resolve) => {
-      resolve(fn(...arguments_));
-    });
-    module2.exports = pTry;
-    module2.exports.default = pTry;
-  }
-});
-
-// ../../node_modules/p-limit/index.js
-var require_p_limit = __commonJS({
-  "../../node_modules/p-limit/index.js"(exports, module2) {
-    "use strict";
-    var pTry = require_p_try();
-    var pLimit = (concurrency) => {
-      if (!((Number.isInteger(concurrency) || concurrency === Infinity) && concurrency > 0)) {
-        return Promise.reject(new TypeError("Expected `concurrency` to be a number from 1 and up"));
-      }
-      const queue = [];
-      let activeCount = 0;
-      const next = () => {
-        activeCount--;
-        if (queue.length > 0) {
-          queue.shift()();
-        }
-      };
-      const run = (fn, resolve, ...args) => {
-        activeCount++;
-        const result = pTry(fn, ...args);
-        resolve(result);
-        result.then(next, next);
-      };
-      const enqueue = (fn, resolve, ...args) => {
-        if (activeCount < concurrency) {
-          run(fn, resolve, ...args);
-        } else {
-          queue.push(run.bind(null, fn, resolve, ...args));
-        }
-      };
-      const generator = (fn, ...args) => new Promise((resolve) => enqueue(fn, resolve, ...args));
-      Object.defineProperties(generator, {
-        activeCount: {
-          get: () => activeCount
-        },
-        pendingCount: {
-          get: () => queue.length
-        },
-        clearQueue: {
-          value: () => {
-            queue.length = 0;
-          }
-        }
-      });
-      return generator;
-    };
-    module2.exports = pLimit;
-    module2.exports.default = pLimit;
-  }
-});
-
-// ../../node_modules/p-settle/index.js
-var require_p_settle = __commonJS({
-  "../../node_modules/p-settle/index.js"(exports, module2) {
-    "use strict";
-    var pReflect = require_p_reflect();
-    var pLimit = require_p_limit();
-    module2.exports = async (array, options = {}) => {
-      const { concurrency = Infinity } = options;
-      const limit = pLimit(concurrency);
-      return Promise.all(array.map((element) => {
-        if (element && typeof element.then === "function") {
-          return pReflect(element);
-        }
-        if (typeof element === "function") {
-          return pReflect(limit(() => element()));
-        }
-        return pReflect(Promise.resolve(element));
-      }));
-    };
-  }
-});
-
-// node_modules/p-memoize/index.js
-var require_p_memoize = __commonJS({
-  "node_modules/p-memoize/index.js"(exports, module2) {
-    "use strict";
-    var mimicFn = require_mimic_fn();
-    var mapAgeCleaner = require_dist();
-    var pSettle = require_p_settle();
-    var cacheStore = /* @__PURE__ */ new WeakMap();
-    var pMemoize2 = (fn, { cachePromiseRejection = false, ...options } = {}) => {
-      const { maxAge, cacheKey } = options;
-      const cache = options.cache || /* @__PURE__ */ new Map();
-      if (Number.isSafeInteger(maxAge)) {
-        mapAgeCleaner(cache);
-      } else if (typeof maxAge !== "undefined") {
-        throw new TypeError("maxAge is not a safe integer.");
-      }
-      const memoized = async function(...arguments_) {
-        const key = cacheKey ? cacheKey(arguments_) : arguments_[0];
-        const cacheItem = cache.get(key);
-        if (cacheItem) {
-          return cacheItem.data;
-        }
-        const promise = fn.apply(this, arguments_);
-        cache.set(key, {
-          data: promise,
-          maxAge: 2 ** 31 - 1
-        });
-        const [{ reason }] = await pSettle([promise]);
-        if (!cachePromiseRejection && reason) {
-          cache.delete(key);
-        } else if (maxAge) {
-          cache.set(key, {
-            data: promise,
-            maxAge: Date.now() + maxAge
-          });
-        }
-        return promise;
-      };
-      mimicFn(memoized, fn);
-      cacheStore.set(memoized, cache);
-      return memoized;
-    };
-    module2.exports = pMemoize2;
-    module2.exports.clear = (memoized) => {
-      if (!cacheStore.has(memoized)) {
-        throw new Error("Can't clear a function that was not memoized!");
-      }
-      const cache = cacheStore.get(memoized);
-      if (typeof cache.clear !== "function") {
-        throw new TypeError("The cache Map can't be cleared!");
-      }
-      cache.clear();
-    };
+    exports.create = create2;
   }
 });
 
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  init: () => init_default,
   version: () => version_default
 });
 
-// src/init.ts
+// src/version.ts
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var glob = __toESM(require_glob());
-var import_p_memoize = __toESM(require_p_memoize());
-function init_default(context, config) {
+function version_default(context, config) {
   return __async(this, null, function* () {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
-    context.getReleaseNotes = (0, import_p_memoize.default)(() => __async(this, null, function* () {
-      return yield getReleaseNotes(context, changelogFile, headerLine);
-    }));
+    context.releaseNotes = yield getReleaseNotes(context, changelogFile, headerLine);
+    if (context.workspaces != null) {
+      const globber = yield glob.create(context.workspaces.join("\n"));
+      for (const packageDir of yield globber.glob()) {
+        const changelogPath = path.join(packageDir, changelogFile);
+        if (updateChangelog(context, changelogPath, headerLine)) {
+          context.changedFiles.push(changelogPath);
+        }
+      }
+    } else if (updateChangelog(context, changelogFile, headerLine)) {
+      context.changedFiles.push(changelogFile);
+    }
   });
 }
 function getReleaseNotes(context, changelogFile, headerLine) {
@@ -3419,34 +3093,12 @@ function getPackageChangelog(context, changelogFile, headerLine) {
   }
   return releaseNotes.trim() || void 0;
 }
-
-// src/version.ts
-var fs2 = __toESM(require("fs"));
-var path2 = __toESM(require("path"));
-var glob2 = __toESM(require_glob());
-function version_default(context, config) {
-  return __async(this, null, function* () {
-    const changelogFile = config.changelogFile || "CHANGELOG.md";
-    const headerLine = config.headerLine || "## Recent Changes";
-    if (context.workspaces != null) {
-      const globber = yield glob2.create(context.workspaces.join("\n"));
-      for (const packageDir of yield globber.glob()) {
-        const changelogPath = path2.join(packageDir, changelogFile);
-        if (updateChangelog(context, changelogPath, headerLine)) {
-          context.changedFiles.push(changelogPath);
-        }
-      }
-    } else if (updateChangelog(context, changelogFile, headerLine)) {
-      context.changedFiles.push(changelogFile);
-    }
-  });
-}
 function updateChangelog(context, changelogFile, headerLine) {
-  if (fs2.existsSync(changelogFile)) {
-    const oldContents = fs2.readFileSync(changelogFile, "utf-8");
+  if (fs.existsSync(changelogFile)) {
+    const oldContents = fs.readFileSync(changelogFile, "utf-8");
     const newContents = oldContents.replace(headerLine, `## \`${context.version.new}\``);
     if (newContents !== oldContents) {
-      fs2.writeFileSync(changelogFile, newContents);
+      fs.writeFileSync(changelogFile, newContents);
       context.logger.info(`Updated version header in ${changelogFile}`);
       return true;
     }
@@ -3456,6 +3108,5 @@ function updateChangelog(context, changelogFile, headerLine) {
 module.exports = __toCommonJS(src_exports);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  init,
   version
 });

@@ -8,8 +8,7 @@
 
 | Step | Description |
 |------|-------------|
-| `init` | Gather release notes from the package changelog(s). |
-| `version` | Update the version numbers in the package changelog(s). |
+| `version` | Gather release notes from and update version numbers in the package changelog(s). |
 
 ## Install
 
