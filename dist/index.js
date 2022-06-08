@@ -1333,6 +1333,68 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
   }
 });
 
+// ../../node_modules/delay/index.js
+var require_delay = __commonJS({
+  "../../node_modules/delay/index.js"(exports, module2) {
+    "use strict";
+    var randomInteger = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
+    var createAbortError = () => {
+      const error3 = new Error("Delay aborted");
+      error3.name = "AbortError";
+      return error3;
+    };
+    var createDelay = ({ clearTimeout: defaultClear, setTimeout: set, willResolve }) => (ms, { value, signal } = {}) => {
+      if (signal && signal.aborted) {
+        return Promise.reject(createAbortError());
+      }
+      let timeoutId;
+      let settle;
+      let rejectFn;
+      const clear = defaultClear || clearTimeout;
+      const signalListener = () => {
+        clear(timeoutId);
+        rejectFn(createAbortError());
+      };
+      const cleanup = () => {
+        if (signal) {
+          signal.removeEventListener("abort", signalListener);
+        }
+      };
+      const delayPromise = new Promise((resolve4, reject) => {
+        settle = () => {
+          cleanup();
+          if (willResolve) {
+            resolve4(value);
+          } else {
+            reject(value);
+          }
+        };
+        rejectFn = reject;
+        timeoutId = (set || setTimeout)(settle, ms);
+      });
+      if (signal) {
+        signal.addEventListener("abort", signalListener, { once: true });
+      }
+      delayPromise.clear = () => {
+        clear(timeoutId);
+        timeoutId = null;
+        settle();
+      };
+      return delayPromise;
+    };
+    var createWithTimers = (clearAndSet) => {
+      const delay3 = createDelay({ ...clearAndSet, willResolve: true });
+      delay3.reject = createDelay({ ...clearAndSet, willResolve: false });
+      delay3.range = (minimum, maximum, options) => delay3(randomInteger(minimum, maximum), options);
+      return delay3;
+    };
+    var delay2 = createWithTimers();
+    delay2.createWithTimers = createWithTimers;
+    module2.exports = delay2;
+    module2.exports.default = delay2;
+  }
+});
+
 // ../../node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
   "../../node_modules/@actions/io/lib/io-util.js"(exports) {
@@ -17872,6 +17934,7 @@ var require_env_ci = __commonJS({
 // src/main.ts
 var path3 = __toESM(require("path"));
 var core4 = __toESM(require_core());
+var import_delay = __toESM(require_delay());
 
 // src/inputs.ts
 var path = __toESM(require("path"));
@@ -18150,6 +18213,7 @@ function run() {
         yield publish(context, pluginsLoaded);
         yield success(context, pluginsLoaded);
       } catch (error3) {
+        yield (0, import_delay.default)(1e3);
         if (error3 instanceof Error) {
           context.failError = error3;
           yield fail(context, pluginsLoaded);
