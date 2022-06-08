@@ -22,7 +22,8 @@ import { IContext, utils } from "@octorelease/core";
 
 export async function npmAddTag(context: IContext, pkgName: string, pkgVersion: string, tag: string, registry: string,
     inDir?: string): Promise<void> {
-    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry];
+    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
+    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, `--${registryPrefix}registry=${registry}`];
     await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npm", cmdArgs, { cwd: inDir });
     });
@@ -54,7 +55,9 @@ export async function npmPack(inDir?: string): Promise<string> {
 }
 
 export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry, "--quiet"];
+    const pkgName = JSON.parse(fs.readFileSync("package.json", "utf-8")).name;
+    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
+    const cmdArgs = ["publish", "--tag", tag, `--${registryPrefix}registry=${registry}`];
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }
@@ -66,7 +69,8 @@ export async function npmVersion(newVersion: string): Promise<void> {
 }
 
 export async function npmView(pkgSpec: string, registry: string, property?: string): Promise<any> {
-    const cmdArgs = ["view", `${pkgSpec}`, "--json", "--registry", registry];
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["view", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
     if (property != null) {
         cmdArgs.push(property);
     }

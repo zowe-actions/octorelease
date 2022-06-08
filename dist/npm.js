@@ -11065,7 +11065,7 @@ var require_readFile = __commonJS({
       value: true
     });
     exports.readFile = readFile;
-    exports.readFileSync = readFileSync3;
+    exports.readFileSync = readFileSync4;
     var _fs = _interopRequireDefault(require("fs"));
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : { default: obj };
@@ -11093,7 +11093,7 @@ var require_readFile = __commonJS({
         throw error;
       }
     }
-    function readFileSync3(filepath, options = {}) {
+    function readFileSync4(filepath, options = {}) {
       const throwNotFound = options.throwNotFound === true;
       try {
         const content = _fs.default.readFileSync(filepath, "utf8");
@@ -18873,7 +18873,8 @@ var exec = __toESM(require_exec());
 var import_core = __toESM(require_lib4());
 function npmAddTag(context, pkgName, pkgVersion, tag, registry, inDir) {
   return __async(this, null, function* () {
-    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry];
+    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
+    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, `--${registryPrefix}registry=${registry}`];
     yield import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npm", cmdArgs, { cwd: inDir });
     }));
@@ -18908,7 +18909,9 @@ function npmPack(inDir) {
 }
 function npmPublish(context, tag, registry, inDir) {
   return __async(this, null, function* () {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry, "--quiet"];
+    const pkgName = JSON.parse(fs.readFileSync("package.json", "utf-8")).name;
+    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
+    const cmdArgs = ["publish", "--tag", tag, `--${registryPrefix}registry=${registry}`];
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
@@ -18922,7 +18925,8 @@ function npmVersion(newVersion) {
 }
 function npmView(pkgSpec, registry, property) {
   return __async(this, null, function* () {
-    const cmdArgs = ["view", `${pkgSpec}`, "--json", "--registry", registry];
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["view", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
     if (property != null) {
       cmdArgs.push(property);
     }
