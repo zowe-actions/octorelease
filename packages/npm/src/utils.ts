@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -58,10 +59,8 @@ export async function npmPublish(context: IContext, tag: string, registry: strin
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }
-    const cmdOutput = await exec.getExecOutput("npm", cmdArgs, { cwd: inDir, delay: 30000, ignoreReturnCode: true });
-    if (cmdOutput.exitCode !== 0) {
-        throw new Error(cmdOutput.stderr.toString());
-    }
+    // await exec.exec("npm", cmdArgs, { cwd: inDir });
+    await require("util").promisify(childProcess.exec)("npm " + cmdArgs.join(" "), { cwd: inDir });
 }
 
 export async function npmVersion(newVersion: string): Promise<void> {

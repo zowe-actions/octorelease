@@ -18,7 +18,6 @@
 
 import * as path from "path";
 import * as core from "@actions/core";
-import delay from "delay";
 import { Inputs } from "./inputs";
 import * as stages from "./stages";
 import * as utils from "./utils";
@@ -43,7 +42,6 @@ async function run(): Promise<void> {
             await stages.publish(context, pluginsLoaded);
             await stages.success(context, pluginsLoaded);
         } catch (error) {
-            await delay(1000);  // Test to fix truncated output
             if (error instanceof Error) {
                 context.failError = error;
                 await stages.fail(context, pluginsLoaded);
