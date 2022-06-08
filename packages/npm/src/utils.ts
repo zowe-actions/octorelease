@@ -58,7 +58,10 @@ export async function npmPublish(context: IContext, tag: string, registry: strin
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }
-    await exec.exec("npm", cmdArgs, { cwd: inDir });
+    const cmdOutput = await exec.getExecOutput("npm", cmdArgs, { cwd: inDir, delay: 30000, ignoreReturnCode: true });
+    if (cmdOutput.exitCode !== 0) {
+        throw new Error(cmdOutput.stderr.toString());
+    }
 }
 
 export async function npmVersion(newVersion: string): Promise<void> {

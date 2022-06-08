@@ -18912,7 +18912,10 @@ function npmPublish(context, tag, registry, inDir) {
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
-    yield exec.exec("npm", cmdArgs, { cwd: inDir });
+    const cmdOutput = yield exec.getExecOutput("npm", cmdArgs, { cwd: inDir, delay: 3e4, ignoreReturnCode: true });
+    if (cmdOutput.exitCode !== 0) {
+      throw new Error(cmdOutput.stderr.toString());
+    }
   });
 }
 function npmVersion(newVersion) {
