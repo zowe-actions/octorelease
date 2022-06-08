@@ -287,12 +287,12 @@ var require_io = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
     var assert_1 = require("assert");
-    var childProcess2 = __importStar(require("child_process"));
+    var childProcess = __importStar(require("child_process"));
     var path5 = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec4 = util_1.promisify(childProcess2.exec);
-    var execFile = util_1.promisify(childProcess2.execFile);
+    var exec3 = util_1.promisify(childProcess.exec);
+    var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
         const { force, recursive, copySourceDirectory } = readCopyOptions(options);
@@ -350,11 +350,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec4(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath }
               });
             } else {
-              yield exec4(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath }
               });
             }
@@ -1050,7 +1050,7 @@ var require_exec = __commonJS({
     exports.getExecOutput = exports.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec4(commandLine, args, options) {
+    function exec3(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -1062,7 +1062,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec4;
+    exports.exec = exec3;
     function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -1085,7 +1085,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec4(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -16982,7 +16982,7 @@ var require_execa = __commonJS({
   "../../node_modules/execa/index.js"(exports, module2) {
     "use strict";
     var path5 = require("path");
-    var childProcess2 = require("child_process");
+    var childProcess = require("child_process");
     var crossSpawn = require_cross_spawn();
     var stripFinalNewline = require_strip_final_newline();
     var npmRunPath = require_npm_run_path();
@@ -17044,9 +17044,9 @@ var require_execa = __commonJS({
       validateTimeout(parsed.options);
       let spawned;
       try {
-        spawned = childProcess2.spawn(parsed.file, parsed.args, parsed.options);
+        spawned = childProcess.spawn(parsed.file, parsed.args, parsed.options);
       } catch (error) {
-        const dummySpawned = new childProcess2.ChildProcess();
+        const dummySpawned = new childProcess.ChildProcess();
         const errorPromise = Promise.reject(makeError({
           error,
           stdout: "",
@@ -17118,7 +17118,7 @@ var require_execa = __commonJS({
       validateInputSync(parsed.options);
       let result;
       try {
-        result = childProcess2.spawnSync(parsed.file, parsed.args, parsed.options);
+        result = childProcess.spawnSync(parsed.file, parsed.args, parsed.options);
       } catch (error) {
         throw makeError({
           error,
@@ -18297,7 +18297,7 @@ var require_utils5 = __commonJS({
     exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
     var fs5 = __importStar(require("fs"));
     var path5 = __importStar(require("path"));
-    var exec4 = __importStar(require_exec());
+    var exec3 = __importStar(require_exec());
     var cosmiconfig_1 = require_dist3();
     var inputs_1 = require_inputs();
     var logger_1 = require_logger();
@@ -18383,7 +18383,7 @@ var require_utils5 = __commonJS({
     exports.verifyConditions = verifyConditions2;
     function buildVersionInfo(branch, tagPrefix) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec4.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
+        const cmdOutput = yield exec3.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
         const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         let prerelease = void 0;
         if (branch.prerelease) {
@@ -18401,15 +18401,15 @@ var require_utils5 = __commonJS({
           throw new Error(`Unsupported CI service detected: ${envCi.service}`);
         }
         if (envCi.branch == null) {
-          const cmdOutput = yield exec4.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
           envCi.branch = cmdOutput.stdout.trim();
         }
         if (envCi.commit == null) {
-          const cmdOutput = yield exec4.getExecOutput("git", ["rev-parse", "HEAD"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["rev-parse", "HEAD"]);
           envCi.commit = cmdOutput.stdout.trim();
         }
         if (envCi.slug == null) {
-          const cmdOutput = yield exec4.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
           envCi.slug = cmdOutput.stdout.trim().replace(/\.git$/, "").split("/").slice(-2).join("/");
         }
         const [owner, repo] = envCi.slug.split("/");
@@ -18866,17 +18866,16 @@ __export(utils_exports, {
   npmView: () => npmView,
   verifyConditions: () => verifyConditions
 });
-var childProcess = __toESM(require("child_process"));
 var fs = __toESM(require("fs"));
 var os = __toESM(require("os"));
 var path = __toESM(require("path"));
-var exec2 = __toESM(require_exec());
+var exec = __toESM(require_exec());
 var import_core = __toESM(require_lib4());
 function npmAddTag(context, pkgName, pkgVersion, tag, registry, inDir) {
   return __async(this, null, function* () {
     const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, "--registry", registry];
     yield import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
-      yield exec2.exec("npm", cmdArgs, { cwd: inDir });
+      yield exec.exec("npm", cmdArgs, { cwd: inDir });
     }));
   });
 }
@@ -18892,33 +18891,33 @@ function npmConfig(context, registry, useTokenAuth = true) {
       npmrcLines.push(`${registrySpec}:email=${context.env.NPM_EMAIL}`);
     }
     fs.appendFileSync(path.join(os.homedir(), ".npmrc"), npmrcLines.join("\n"));
-    yield exec2.exec("npm", ["whoami", "--registry", registry]);
+    yield exec.exec("npm", ["whoami", "--registry", registry]);
   });
 }
 function npmInstall(pkgSpec, registry, inDir) {
   return __async(this, null, function* () {
     const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    yield exec2.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
+    yield exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
   });
 }
 function npmPack(inDir) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec2.getExecOutput("npm", ["pack"], { cwd: inDir });
+    const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
     return cmdOutput.stdout.trim();
   });
 }
 function npmPublish(context, tag, registry, inDir) {
   return __async(this, null, function* () {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
+    const cmdArgs = ["publish", "--tag", tag, "--registry", registry, "--quiet"];
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
-    yield require("util").promisify(childProcess.exec)("npm " + cmdArgs.join(" "), { cwd: inDir });
+    yield exec.exec("npm", cmdArgs, { cwd: inDir });
   });
 }
 function npmVersion(newVersion) {
   return __async(this, null, function* () {
-    yield exec2.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
+    yield exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
   });
 }
 function npmView(pkgSpec, registry, property) {
@@ -18928,7 +18927,7 @@ function npmView(pkgSpec, registry, property) {
       cmdArgs.push(property);
     }
     try {
-      const cmdOutput = yield exec2.getExecOutput("npm", cmdArgs);
+      const cmdOutput = yield exec.getExecOutput("npm", cmdArgs);
       return JSON.parse(cmdOutput.stdout.trim());
     } catch (e) {
     }

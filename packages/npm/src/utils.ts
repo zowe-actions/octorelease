@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as childProcess from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -55,12 +54,11 @@ export async function npmPack(inDir?: string): Promise<string> {
 }
 
 export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
+    const cmdArgs = ["publish", "--tag", tag, "--registry", registry, "--quiet"];
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }
-    // await exec.exec("npm", cmdArgs, { cwd: inDir });
-    await require("util").promisify(childProcess.exec)("npm " + cmdArgs.join(" "), { cwd: inDir });
+    await exec.exec("npm", cmdArgs, { cwd: inDir });
 }
 
 export async function npmVersion(newVersion: string): Promise<void> {
