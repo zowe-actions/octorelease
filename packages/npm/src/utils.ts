@@ -20,10 +20,9 @@ import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
-export async function npmAddTag(context: IContext, pkgName: string, pkgVersion: string, tag: string, registry: string,
-    inDir?: string): Promise<void> {
-    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
-    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, `--${registryPrefix}registry=${registry}`];
+export async function npmAddTag(context: IContext, pkgSpec: string, tag: string, registry: string,
+        inDir?: string): Promise<void> {
+    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, "--registry", registry];
     await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npm", cmdArgs, { cwd: inDir });
     });
@@ -55,9 +54,7 @@ export async function npmPack(inDir?: string): Promise<string> {
 }
 
 export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
-    const pkgName = JSON.parse(fs.readFileSync("package.json", "utf-8")).name;
-    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
-    const cmdArgs = ["publish", "--tag", tag, `--${registryPrefix}registry=${registry}`];
+    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }
