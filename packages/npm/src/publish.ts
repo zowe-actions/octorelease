@@ -31,42 +31,50 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
 
     if (config.npmPublish === false) {
         return;
+    } else if (fs.existsSync(".npmrc")) {
+        fs.renameSync(".npmrc", ".npmrc.bak");
     }
 
-    const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+    try {
+        const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
 
-    if (packageJson.private) {
-        context.logger.info(`Skipping publish of private package ${packageJson.name}`);
-        return;
-    }
+        if (packageJson.private) {
+            context.logger.info(`Skipping publish of private package ${packageJson.name}`);
+            return;
+        }
 
-    const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
-    const packageTag = context.branch.channel as string;
+        const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
+        const packageTag = context.branch.channel as string;
 
-    // Publish package
-    const publishedVersions = await utils.npmView(packageJson.name, npmRegistry, "versions");
-    if (!publishedVersions?.includes(packageJson.version)) {
-        await utils.npmPublish(context, packageTag, npmRegistry, inDir);
+        // Publish package
+        const publishedVersions = await utils.npmView(packageJson.name, npmRegistry, "versions");
+        if (!publishedVersions?.includes(packageJson.version)) {
+            await utils.npmPublish(context, packageTag, npmRegistry, inDir);
 
-        context.releasedPackages.npm = [
-            ...(context.releasedPackages.npm || []),
-            {
-                name: `${packageJson.name}@${packageJson.version}`,
-                url: npmRegistry === DEFAULT_NPM_REGISTRY ?
-                    `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : undefined,
-                registry: npmRegistry
+            context.releasedPackages.npm = [
+                ...(context.releasedPackages.npm || []),
+                {
+                    name: `${packageJson.name}@${packageJson.version}`,
+                    url: npmRegistry === DEFAULT_NPM_REGISTRY ?
+                        `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : undefined,
+                    registry: npmRegistry
+                }
+            ];
+        } else {
+            context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
+        }
+
+        // Add alias tags
+        if (config.aliasTags?.[packageTag] != null) {
+            const aliasTagOrTags = config.aliasTags[packageTag];
+            const aliasTags: string[] = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
+            for (const tag of aliasTags) {
+                await utils.npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
             }
-        ];
-    } else {
-        context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
-    }
-
-    // Add alias tags
-    if (config.aliasTags?.[packageTag] != null) {
-        const aliasTagOrTags = config.aliasTags[packageTag];
-        const aliasTags: string[] = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
-        for (const tag of aliasTags) {
-            await utils.npmAddTag(context, packageJson.name, packageJson.version, tag, npmRegistry, inDir);
+        }
+    } finally {
+        if (fs.existsSync(".npmrc.bak")) {
+            fs.renameSync(".npmrc.bak", ".npmrc");
         }
     }
 }

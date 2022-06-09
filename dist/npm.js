@@ -11065,7 +11065,7 @@ var require_readFile = __commonJS({
       value: true
     });
     exports.readFile = readFile;
-    exports.readFileSync = readFileSync4;
+    exports.readFileSync = readFileSync3;
     var _fs = _interopRequireDefault(require("fs"));
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : { default: obj };
@@ -11093,7 +11093,7 @@ var require_readFile = __commonJS({
         throw error;
       }
     }
-    function readFileSync4(filepath, options = {}) {
+    function readFileSync3(filepath, options = {}) {
       const throwNotFound = options.throwNotFound === true;
       try {
         const content = _fs.default.readFileSync(filepath, "utf8");
@@ -18871,10 +18871,9 @@ var os = __toESM(require("os"));
 var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_core = __toESM(require_lib4());
-function npmAddTag(context, pkgName, pkgVersion, tag, registry, inDir) {
+function npmAddTag(context, pkgSpec, tag, registry, inDir) {
   return __async(this, null, function* () {
-    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
-    const cmdArgs = ["dist-tag", "add", `${pkgName}@${pkgVersion}`, tag, `--${registryPrefix}registry=${registry}`];
+    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, "--registry", registry];
     yield import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npm", cmdArgs, { cwd: inDir });
     }));
@@ -18909,9 +18908,7 @@ function npmPack(inDir) {
 }
 function npmPublish(context, tag, registry, inDir) {
   return __async(this, null, function* () {
-    const pkgName = JSON.parse(fs.readFileSync("package.json", "utf-8")).name;
-    const registryPrefix = pkgName.startsWith("@") ? `${pkgName.split("/")[0]}:` : "";
-    const cmdArgs = ["publish", "--tag", tag, `--${registryPrefix}registry=${registry}`];
+    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
@@ -18986,33 +18983,41 @@ function publish_default(context, config, inDir) {
     }
     if (config.npmPublish === false) {
       return;
+    } else if (fs3.existsSync(".npmrc")) {
+      fs3.renameSync(".npmrc", ".npmrc.bak");
     }
-    const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
-    if (packageJson.private) {
-      context.logger.info(`Skipping publish of private package ${packageJson.name}`);
-      return;
-    }
-    const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
-    const packageTag = context.branch.channel;
-    const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
-    if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
-      yield npmPublish(context, packageTag, npmRegistry, inDir);
-      context.releasedPackages.npm = [
-        ...context.releasedPackages.npm || [],
-        {
-          name: `${packageJson.name}@${packageJson.version}`,
-          url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
-          registry: npmRegistry
+    try {
+      const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+      if (packageJson.private) {
+        context.logger.info(`Skipping publish of private package ${packageJson.name}`);
+        return;
+      }
+      const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
+      const packageTag = context.branch.channel;
+      const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
+      if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
+        yield npmPublish(context, packageTag, npmRegistry, inDir);
+        context.releasedPackages.npm = [
+          ...context.releasedPackages.npm || [],
+          {
+            name: `${packageJson.name}@${packageJson.version}`,
+            url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
+            registry: npmRegistry
+          }
+        ];
+      } else {
+        context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
+      }
+      if (((_b = config.aliasTags) == null ? void 0 : _b[packageTag]) != null) {
+        const aliasTagOrTags = config.aliasTags[packageTag];
+        const aliasTags = typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags;
+        for (const tag of aliasTags) {
+          yield npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
         }
-      ];
-    } else {
-      context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
-    }
-    if (((_b = config.aliasTags) == null ? void 0 : _b[packageTag]) != null) {
-      const aliasTagOrTags = config.aliasTags[packageTag];
-      const aliasTags = typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags;
-      for (const tag of aliasTags) {
-        yield npmAddTag(context, packageJson.name, packageJson.version, tag, npmRegistry, inDir);
+      }
+    } finally {
+      if (fs3.existsSync(".npmrc.bak")) {
+        fs3.renameSync(".npmrc.bak", ".npmrc");
       }
     }
   });
