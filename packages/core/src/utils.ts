@@ -149,6 +149,15 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
 }
 
 /**
+ * Retrieve most recent Git commit message if there is one.
+ * @returns Commit message or undefined if there is no Git history
+ */
+export async function getLastCommitMessage(): Promise<string | undefined> {
+    const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
+    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
+}
+
+/**
  * Load CI properties like branch name, commit SHA, and repository slug.
  * @returns CI environment for the `context.ci` property
  */

@@ -27,6 +27,20 @@ export class Inputs {
     private static readonly rootDir = process.cwd();
 
     /**
+     * Specify whether to detect [ci skip] in last commit message
+     */
+    public static get ciSkip(): boolean {
+        try {
+            return core.getBooleanInput("ci-skip");
+        } catch (error) {
+            if (error instanceof TypeError) {
+                return true;
+            }
+            throw error;
+        }
+    }
+
+    /**
      * Custom directory to search for release configuration.
      */
     public static get configDir(): string | undefined {
