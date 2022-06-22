@@ -2,6 +2,10 @@ name: 'octorelease'
 description: 'Extensible GitHub action to publish semantic releases'
 author: 't1m0thyj'
 inputs:
+  ci-skip:
+    description: 'Specify whether to detect [ci skip] in last commit message'
+    required: false
+    default: 'true'
   config-dir:
     description: 'Custom directory to search for release configuration'
     required: false

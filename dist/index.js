@@ -17877,6 +17877,16 @@ var core4 = __toESM(require_core());
 var path = __toESM(require("path"));
 var core = __toESM(require_core());
 var Inputs = class {
+  static get ciSkip() {
+    try {
+      return core.getBooleanInput("ci-skip");
+    } catch (error3) {
+      if (error3 instanceof TypeError) {
+        return true;
+      }
+      throw error3;
+    }
+  }
   static get configDir() {
     const input = core.getInput("config-dir");
     return input ? path.resolve(this.rootDir, input) : void 0;
@@ -18107,6 +18117,12 @@ function buildVersionInfo(branch, tagPrefix) {
     return { old: oldVersion, new: oldVersion, prerelease };
   });
 }
+function getLastCommitMessage() {
+  return __async(this, null, function* () {
+    const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
+    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
+  });
+}
 function loadCiEnv() {
   return __async(this, null, function* () {
     const envCi = require_env_ci()();
@@ -18133,6 +18149,7 @@ function loadCiEnv() {
 // src/main.ts
 function run() {
   return __async(this, null, function* () {
+    var _a;
     try {
       if (Inputs.workingDir != null) {
         process.chdir(path3.resolve(Inputs.workingDir));
@@ -18140,6 +18157,9 @@ function run() {
       const context = yield buildContext();
       if (context == null) {
         core4.info("Current branch is not a release branch, exiting now");
+        process.exit();
+      } else if (Inputs.ciSkip && ((_a = yield getLastCommitMessage()) == null ? void 0 : _a.includes("[ci skip]"))) {
+        core4.info("Commit message contains CI skip phrase, exiting now");
         process.exit();
       }
       const pluginsLoaded = yield loadPlugins(context);

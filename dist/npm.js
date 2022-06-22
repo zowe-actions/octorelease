@@ -2498,6 +2498,16 @@ var require_inputs = __commonJS({
     var path5 = __importStar(require("path"));
     var core = __importStar(require_core());
     var Inputs = class {
+      static get ciSkip() {
+        try {
+          return core.getBooleanInput("ci-skip");
+        } catch (error) {
+          if (error instanceof TypeError) {
+            return true;
+          }
+          throw error;
+        }
+      }
       static get configDir() {
         const input = core.getInput("config-dir");
         return input ? path5.resolve(this.rootDir, input) : void 0;
@@ -18294,7 +18304,7 @@ var require_utils5 = __commonJS({
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
+    exports.getLastCommitMessage = exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
     var fs5 = __importStar(require("fs"));
     var path5 = __importStar(require("path"));
     var exec3 = __importStar(require_exec());
@@ -18394,6 +18404,13 @@ var require_utils5 = __commonJS({
         return { old: oldVersion, new: oldVersion, prerelease };
       });
     }
+    function getLastCommitMessage() {
+      return __awaiter(this, void 0, void 0, function* () {
+        const cmdOutput = yield exec3.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
+        return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
+      });
+    }
+    exports.getLastCommitMessage = getLastCommitMessage;
     function loadCiEnv() {
       return __awaiter(this, void 0, void 0, function* () {
         const envCi = require_env_ci()();
