@@ -40,8 +40,11 @@ export async function buildContext(opts?: { branch?: string }): Promise<IContext
         micromatch.isMatch(opts?.branch || envCi.branch, branch.name));
     if (branchIndex == -1) {
         return;
-    } else if (branchIndex > 0 && branches[branchIndex].channel == null) {
-        branches[branchIndex].channel = branches[branchIndex].name;
+    } else {
+        branches[branchIndex].name = envCi.branch;
+        if (branchIndex > 0 && branches[branchIndex].channel == null) {
+            branches[branchIndex].channel = branches[branchIndex].name;
+        }
     }
 
     const pluginConfig: Record<string, Record<string, any>> = {};
@@ -57,7 +60,7 @@ export async function buildContext(opts?: { branch?: string }): Promise<IContext
     const versionInfo = await buildVersionInfo(branches[branchIndex], tagPrefix);
 
     return {
-        branch: { ...branches[branchIndex], name: envCi.branch },
+        branch: branches[branchIndex],
         changedFiles: [],
         ci: envCi,
         dryRun: Inputs.dryRun,

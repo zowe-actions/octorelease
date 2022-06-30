@@ -18550,8 +18550,11 @@ var require_utils5 = __commonJS({
         const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch, branch.name));
         if (branchIndex == -1) {
           return;
-        } else if (branchIndex > 0 && branches[branchIndex].channel == null) {
-          branches[branchIndex].channel = branches[branchIndex].name;
+        } else {
+          branches[branchIndex].name = envCi.branch;
+          if (branchIndex > 0 && branches[branchIndex].channel == null) {
+            branches[branchIndex].channel = branches[branchIndex].name;
+          }
         }
         const pluginConfig = {};
         for (const pc of config.config.plugins || []) {
@@ -18564,7 +18567,7 @@ var require_utils5 = __commonJS({
         const tagPrefix = config.config.tagPrefix || "v";
         const versionInfo = yield buildVersionInfo(branches[branchIndex], tagPrefix);
         return {
-          branch: Object.assign(Object.assign({}, branches[branchIndex]), { name: envCi.branch }),
+          branch: branches[branchIndex],
           changedFiles: [],
           ci: envCi,
           dryRun: inputs_1.Inputs.dryRun,
