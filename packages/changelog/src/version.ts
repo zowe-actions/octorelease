@@ -73,7 +73,7 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
 }
 
 function updatePackageChangelog(context: IContext, changelogFile: string, headerLine: string): boolean {
-    if (fs.existsSync(changelogFile)) {
+    if (context.version.new !== context.version.old && fs.existsSync(changelogFile)) {
         const oldContents = fs.readFileSync(changelogFile, "utf-8");
         const newContents = oldContents.replace(headerLine, `## \`${context.version.new}\``);
 
