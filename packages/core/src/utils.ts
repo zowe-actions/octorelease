@@ -41,7 +41,7 @@ export async function buildContext(opts?: { branch?: string }): Promise<IContext
     if (branchIndex == -1) {
         return;
     } else {
-        branches[branchIndex].name = envCi.branch;
+        branches[branchIndex].name = opts?.branch || envCi.branch;
         if (branchIndex > 0 && branches[branchIndex].channel == null) {
             branches[branchIndex].channel = branches[branchIndex].name;
         }

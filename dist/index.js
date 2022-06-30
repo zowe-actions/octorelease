@@ -18050,7 +18050,7 @@ function buildContext(opts) {
     if (branchIndex == -1) {
       return;
     } else {
-      branches[branchIndex].name = envCi.branch;
+      branches[branchIndex].name = (opts == null ? void 0 : opts.branch) || envCi.branch;
       if (branchIndex > 0 && branches[branchIndex].channel == null) {
         branches[branchIndex].channel = branches[branchIndex].name;
       }
