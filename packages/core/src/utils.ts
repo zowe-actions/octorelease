@@ -156,8 +156,8 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
  * @returns Commit message or undefined if there is no Git history
  */
 export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
-    const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.branch.name],
-        { ignoreReturnCode: true });
+    const cmdOutput = await exec.getExecOutput("git",
+        ["log", "-1", "--pretty=format:%s", `origin/${context.branch.name}`], { ignoreReturnCode: true });
     return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
 }
 

@@ -18122,7 +18122,7 @@ function buildVersionInfo(branch, tagPrefix) {
 }
 function getLastCommitMessage(context) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.branch.name], { ignoreReturnCode: true });
+    const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s", `origin/${context.branch.name}`], { ignoreReturnCode: true });
     return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
   });
 }
