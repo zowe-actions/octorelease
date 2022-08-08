@@ -1,5 +1,9 @@
 # Changelog
 
+## Recent Changes
+
+* Fixed CI skip may be detected in wrong commit message
+
 ## `0.1.2`
 
 * Fixed prerelease tags on versions not being handled correctly

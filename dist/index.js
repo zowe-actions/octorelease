@@ -18120,9 +18120,9 @@ function buildVersionInfo(branch, tagPrefix) {
     return { old: oldVersion, new: oldVersion, prerelease };
   });
 }
-function getLastCommitMessage() {
+function getLastCommitMessage(context) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
+    const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.branch.name], { ignoreReturnCode: true });
     return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
   });
 }
@@ -18161,7 +18161,7 @@ function run() {
       if (context == null) {
         core4.info("Current branch is not a release branch, exiting now");
         process.exit();
-      } else if (Inputs.ciSkip && ((_a = yield getLastCommitMessage()) == null ? void 0 : _a.includes("[ci skip]"))) {
+      } else if (Inputs.ciSkip && ((_a = yield getLastCommitMessage(context)) == null ? void 0 : _a.includes("[ci skip]"))) {
         core4.info("Commit message contains CI skip phrase, exiting now");
         process.exit();
       }
