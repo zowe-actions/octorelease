@@ -43,7 +43,7 @@ jobs:
         GIT_COMMITTER_NAME: GitHub Actions
         GIT_COMMITTER_EMAIL: actions@github.com
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_TOKEN: ${{ secrets.ZOWE_ACTIONS_NPM_TOKEN }}
       with:
         config-dir: .github
         dry-run: ${{ github.event.inputs.dry-run }}
