@@ -65,12 +65,13 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         }
 
         // Add alias tags
+        const aliasTags: string[] = [];
         if (config.aliasTags?.[packageTag] != null) {
             const aliasTagOrTags = config.aliasTags[packageTag];
-            const aliasTags: string[] = (typeof aliasTagOrTags === "string") ? [aliasTagOrTags] : aliasTagOrTags;
-            for (const tag of aliasTags) {
-                await utils.npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
-            }
+            aliasTags.push(...(typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags));
+        }
+        for (const tag of [packageTag, ...aliasTags]) {
+            await utils.npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
         }
     } finally {
         if (fs.existsSync(".npmrc.bak")) {
