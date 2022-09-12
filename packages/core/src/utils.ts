@@ -157,7 +157,7 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
  */
 export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
     const cmdOutput = await exec.getExecOutput("git",
-        ["log", "-1", "--pretty=format:%s", `origin/${context.branch.name}`], { ignoreReturnCode: true });
+        ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
     return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
 }
 
