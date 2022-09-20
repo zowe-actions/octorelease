@@ -19892,12 +19892,13 @@ function publish_default(context, config, inDir) {
       } else {
         context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
       }
+      const aliasTags = [];
       if (((_b = config.aliasTags) == null ? void 0 : _b[packageTag]) != null) {
         const aliasTagOrTags = config.aliasTags[packageTag];
-        const aliasTags = typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags;
-        for (const tag of aliasTags) {
-          yield npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
-        }
+        aliasTags.push(...typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags);
+      }
+      for (const tag of [packageTag, ...aliasTags]) {
+        yield npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
       }
     } finally {
       if (fs3.existsSync(".npmrc.bak")) {
