@@ -9,7 +9,7 @@
 | Step | Description |
 |------|-------------|
 | `init` | Prompt for semantic release label on associated pull request. |
-| `version` | Publish a new release to GitHub and upload assets. |
+| `publish` | Publish a new release to GitHub and upload assets. |
 | `success` | Add "released" label to associated pull request. |
 | `fail` | Remove semantic release label on associated pull request. |
 
