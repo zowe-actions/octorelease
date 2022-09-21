@@ -19271,9 +19271,9 @@ var require_utils5 = __commonJS({
         return { old: oldVersion, new: oldVersion, prerelease };
       });
     }
-    function getLastCommitMessage() {
+    function getLastCommitMessage(context) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec3.getExecOutput("git", ["log", "-1", "--pretty=format:%s"], { ignoreReturnCode: true });
+        const cmdOutput = yield exec3.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
         return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
       });
     }
@@ -19787,7 +19787,7 @@ function npmInstall(pkgSpec, registry, inDir) {
 function npmPack(inDir) {
   return __async(this, null, function* () {
     const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
-    return cmdOutput.stdout.trim();
+    return cmdOutput.stdout.trim().split(" ").pop();
   });
 }
 function npmPublish(context, tag, registry, inDir) {
