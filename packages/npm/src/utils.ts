@@ -50,7 +50,7 @@ export async function npmInstall(pkgSpec: string, registry: string, inDir?: stri
 
 export async function npmPack(inDir?: string): Promise<string> {
     const cmdOutput = await exec.getExecOutput("npm", ["pack"], { cwd: inDir });
-    return cmdOutput.stdout.trim();
+    return cmdOutput.stdout.trim().split(" ").pop() as string;
 }
 
 export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
