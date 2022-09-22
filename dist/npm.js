@@ -19787,7 +19787,7 @@ function npmInstall(pkgSpec, registry, inDir) {
 function npmPack(inDir) {
   return __async(this, null, function* () {
     const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
-    return cmdOutput.stdout.trim().split(" ").pop();
+    return cmdOutput.stdout.trim().split(/\s+/).pop();
   });
 }
 function npmPublish(context, tag, registry, inDir) {
