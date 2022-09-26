@@ -29,6 +29,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
 
+    if (config.pruneShrinkwrap && !fs.existsSync("npm-shrinkwrap.json")) {
+        throw new Error("Could not find npm-shrinkwrap.json but the pruneShrinkwrap option was specified");
+    }
+
     context.branch.channel = context.branch.channel || "latest";
     if (config.npmPublish === false) {
         return;

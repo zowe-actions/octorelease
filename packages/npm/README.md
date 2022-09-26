@@ -50,6 +50,7 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 | ------- | ----------- | ------- |
 | `aliasTags` | Key-value pairs of package tags that should be mirrored (see example below). | `{}` |
 | `npmPublish` | Specify false to skip publishing to the NPM registry. | `true` |
+| `pruneShrinkwrap` | Specify true to prune dev and extraneous dependencies from npm-shrinkwrap.json. | `false` |
 | `smokeTest` | Specify true to test installing the package from the NPM registry after it is published. | `false` |
 | `tarballDir` | Path to directory where package tarball (TGZ) should be generated, or `false` to skip creating a tarball. | `false` |
 

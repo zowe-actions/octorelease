@@ -291,7 +291,7 @@ var require_io = __commonJS({
     var path5 = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec3 = util_1.promisify(childProcess.exec);
+    var exec5 = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -350,11 +350,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec5(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath }
               });
             } else {
-              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec5(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath }
               });
             }
@@ -1050,7 +1050,7 @@ var require_exec = __commonJS({
     exports.getExecOutput = exports.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec3(commandLine, args, options) {
+    function exec5(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -1062,7 +1062,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec3;
+    exports.exec = exec5;
     function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -1085,7 +1085,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec5(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -19171,7 +19171,7 @@ var require_utils5 = __commonJS({
     exports.getLastCommitMessage = exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
     var fs5 = __importStar(require("fs"));
     var path5 = __importStar(require("path"));
-    var exec3 = __importStar(require_exec());
+    var exec5 = __importStar(require_exec());
     var cosmiconfig_1 = require_dist4();
     var inputs_1 = require_inputs();
     var logger_1 = require_logger();
@@ -19260,7 +19260,7 @@ var require_utils5 = __commonJS({
     exports.verifyConditions = verifyConditions2;
     function buildVersionInfo(branch, tagPrefix) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec3.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
+        const cmdOutput = yield exec5.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
         const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         let prerelease = void 0;
         if (branch.prerelease) {
@@ -19273,7 +19273,7 @@ var require_utils5 = __commonJS({
     }
     function getLastCommitMessage(context) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec3.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
+        const cmdOutput = yield exec5.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
         return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
       });
     }
@@ -19285,15 +19285,15 @@ var require_utils5 = __commonJS({
           throw new Error(`Unsupported CI service detected: ${envCi.service}`);
         }
         if (envCi.branch == null) {
-          const cmdOutput = yield exec3.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+          const cmdOutput = yield exec5.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
           envCi.branch = cmdOutput.stdout.trim();
         }
         if (envCi.commit == null) {
-          const cmdOutput = yield exec3.getExecOutput("git", ["rev-parse", "HEAD"]);
+          const cmdOutput = yield exec5.getExecOutput("git", ["rev-parse", "HEAD"]);
           envCi.commit = cmdOutput.stdout.trim();
         }
         if (envCi.slug == null) {
-          const cmdOutput = yield exec3.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+          const cmdOutput = yield exec5.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
           envCi.slug = cmdOutput.stdout.trim().replace(/\.git$/, "").split("/").slice(-2).join("/");
         }
         const [owner, repo] = envCi.slug.split("/");
@@ -19844,6 +19844,9 @@ function init_default(context, config) {
     } catch (e) {
       context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
+    if (config.pruneShrinkwrap && !fs2.existsSync("npm-shrinkwrap.json")) {
+      throw new Error("Could not find npm-shrinkwrap.json but the pruneShrinkwrap option was specified");
+    }
     context.branch.channel = context.branch.channel || "latest";
     if (config.npmPublish === false) {
       return;
@@ -19856,10 +19859,18 @@ function init_default(context, config) {
 // src/publish.ts
 var fs3 = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
+var exec3 = __toESM(require_exec());
 function publish_default(context, config, inDir) {
   return __async(this, null, function* () {
     var _a, _b;
     const cwd = inDir || process.cwd();
+    const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+    if (config.pruneShrinkwrap) {
+      if (packageJson.scripts.preshrinkwrap != null) {
+        yield exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
+      }
+      pruneShrinkwrap(inDir);
+    }
     if (config.tarballDir != null) {
       const tgzFile = yield npmPack(inDir);
       fs3.mkdirSync(config.tarballDir, { recursive: true });
@@ -19870,12 +19881,11 @@ function publish_default(context, config, inDir) {
     } else if (fs3.existsSync(".npmrc")) {
       fs3.renameSync(".npmrc", ".npmrc.bak");
     }
+    if (packageJson.private) {
+      context.logger.info(`Skipping publish of private package ${packageJson.name}`);
+      return;
+    }
     try {
-      const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
-      if (packageJson.private) {
-        context.logger.info(`Skipping publish of private package ${packageJson.name}`);
-        return;
-      }
       const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
       const packageTag = context.branch.channel;
       const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
@@ -19906,6 +19916,20 @@ function publish_default(context, config, inDir) {
       }
     }
   });
+}
+function pruneShrinkwrap(inDir) {
+  const shrinkwrapPath = inDir != null ? path2.join(inDir, "npm-shrinkwrap.json") : "npm-shrinkwrap.json";
+  const lockfile = JSON.parse(fs3.readFileSync(shrinkwrapPath, "utf-8"));
+  const filterPkgs = (obj, key) => {
+    for (const [pkgName, pkgData] of Object.entries(obj[key])) {
+      if (["dev", "extraneous"].some((prop) => pkgData[prop])) {
+        delete obj[key][pkgName];
+      }
+    }
+  };
+  filterPkgs(lockfile, "packages");
+  filterPkgs(lockfile, "dependencies");
+  fs3.writeFileSync(shrinkwrapPath, JSON.stringify(lockfile, null, 2) + "\n");
 }
 
 // src/success.ts
