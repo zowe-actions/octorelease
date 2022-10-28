@@ -27,8 +27,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     if (config.checkPrLabels && Inputs.newVersion == null) {
         const releaseType = await getPrReleaseType(context, config);
-        context.version.new = releaseType != null ?
-            require("semver").inc(context.version.old.split("-")[0], releaseType) : context.version.old.split("-")[0];
+        const oldVersion = (context.version.new || context.version.old).split("-")[0];
+        context.version.new = releaseType != null ? require("semver").inc(oldVersion, releaseType) : oldVersion;
     }
 }
 
@@ -57,7 +57,8 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
 
     const events = await octokit.issues.listEvents({
         ...context.ci.repo,
-        issue_number: prNumber
+        issue_number: prNumber,
+        per_page: 100
     });
     const collaborators = await octokit.repos.listCollaborators(context.ci.repo);
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
@@ -76,7 +77,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         }
 
         // Comment on PR to request version approval
-        const oldVersion = context.version.old.split("-")[0];
+        const oldVersion = (context.version.new || context.version.old).split("-")[0];
         const prereleaseSuffix = (context.version.prerelease != null) ? `-${context.version.prerelease}` : "";
         const semverInc = require("semver/functions/inc");
         let commentBody = `Version info from a repo admin is required to publish a new version. ` +
@@ -107,6 +108,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
                 const response = await octokit.issues.listEvents({
                     ...context.ci.repo,
                     issue_number: prNumber,
+                    per_page: 100,
                     headers: { "if-none-match": lastEtag }
                 });
                 approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);

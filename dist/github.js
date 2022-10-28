@@ -42580,7 +42580,8 @@ function init_default(context, config) {
     }
     if (config.checkPrLabels && import_core.Inputs.newVersion == null) {
       const releaseType = yield getPrReleaseType(context, config);
-      context.version.new = releaseType != null ? require_semver2().inc(context.version.old.split("-")[0], releaseType) : context.version.old.split("-")[0];
+      const oldVersion = (context.version.new || context.version.old).split("-")[0];
+      context.version.new = releaseType != null ? require_semver2().inc(oldVersion, releaseType) : oldVersion;
     }
   });
 }
@@ -42603,7 +42604,8 @@ function getPrReleaseType(context, config) {
       return null;
     }
     const events = yield octokit.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
-      issue_number: prNumber
+      issue_number: prNumber,
+      per_page: 100
     }));
     const collaborators = yield octokit.repos.listCollaborators(context.ci.repo);
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
@@ -42616,7 +42618,7 @@ function getPrReleaseType(context, config) {
           name
         }));
       }
-      const oldVersion = context.version.old.split("-")[0];
+      const oldVersion = (context.version.new || context.version.old).split("-")[0];
       const prereleaseSuffix = context.version.prerelease != null ? `-${context.version.prerelease}` : "";
       const semverInc = require_inc();
       let commentBody = `Version info from a repo admin is required to publish a new version. Please add one of the following labels within ${timeoutInMinutes} minutes:
@@ -42644,6 +42646,7 @@ function getPrReleaseType(context, config) {
         try {
           const response = yield octokit.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
             issue_number: prNumber,
+            per_page: 100,
             headers: { "if-none-match": lastEtag }
           }));
           approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
