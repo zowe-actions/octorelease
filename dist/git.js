@@ -1207,14 +1207,19 @@ function version_default(context, config) {
     const commitMessage = config.commitMessage || "Bump version to {{version}}";
     let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
     yield gitAdd(...context.changedFiles);
-    if (!(yield gitCommit(commitMessage.replace("{{version}}", context.version.new)))) {
+    let shouldPush = false;
+    if (yield gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
+      shouldPush = true;
+    } else {
       context.logger.warn("Nothing to commit");
     }
     tagMessage = tagMessage == null ? void 0 : tagMessage.replace("{{version}}", context.version.new);
-    if (!(yield gitTag(context.tagPrefix + context.version.new, tagMessage))) {
+    if (yield gitTag(context.tagPrefix + context.version.new, tagMessage)) {
+      shouldPush = true;
+    } else {
       context.logger.warn("Git tag already exists");
     }
-    if (!(yield gitPush(context, context.branch.name, true))) {
+    if (!shouldPush || !(yield gitPush(context, context.branch.name, true))) {
       context.logger.warn("Nothing to push");
     }
   });

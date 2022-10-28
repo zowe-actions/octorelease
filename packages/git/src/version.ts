@@ -24,17 +24,22 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         `Release {{version}} to ${context.branch.channel}`);
 
     await utils.gitAdd(...context.changedFiles);
+    let shouldPush = false;
 
-    if (!(await utils.gitCommit(commitMessage.replace("{{version}}", context.version.new)))) {
+    if (await utils.gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
+        shouldPush = true;
+    } else {
         context.logger.warn("Nothing to commit");
     }
 
     tagMessage = tagMessage?.replace("{{version}}", context.version.new);
-    if (!(await utils.gitTag(context.tagPrefix + context.version.new, tagMessage))) {
+    if (await utils.gitTag(context.tagPrefix + context.version.new, tagMessage)) {
+        shouldPush = true;
+    } else {
         context.logger.warn("Git tag already exists");
     }
 
-    if (!(await utils.gitPush(context, context.branch.name, true))) {
+    if (!shouldPush || !(await utils.gitPush(context, context.branch.name, true))) {
         context.logger.warn("Nothing to push");
     }
 }
