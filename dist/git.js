@@ -1152,6 +1152,7 @@ function gitConfig(context) {
       const gitUrl = new url.URL(cmdOutput.stdout);
       fs.appendFileSync(path.join(os.homedir(), ".git-credentials"), `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
     }
+    yield exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);
   });
 }
 function gitPush(context, branch, tags) {

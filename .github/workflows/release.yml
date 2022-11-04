@@ -28,11 +28,9 @@ jobs:
         fetch-depth: 0
         ref: ${{ github.ref }}
 
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v3
       with:
-        node-version: 'lts/*'
-
-    - run: npm install -g npm@~8.5.0
+        node-version: 16.x
 
     - run: |
         npm ci
