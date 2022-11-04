@@ -27,6 +27,5 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
         throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
     }
 
-    // TODO Check if Git credentials are set
     await utils.gitConfig(context);
 }

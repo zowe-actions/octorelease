@@ -53,6 +53,8 @@ export async function gitConfig(context: IContext): Promise<void> {
         fs.appendFileSync(path.join(os.homedir(), ".git-credentials"),
             `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
     }
+
+    await exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);  // Validate Git credentials
 }
 
 export async function gitPush(context: IContext, branch: string, tags?: boolean): Promise<boolean> {
