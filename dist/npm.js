@@ -19176,6 +19176,7 @@ var require_utils5 = __commonJS({
     var inputs_1 = require_inputs();
     var logger_1 = require_logger();
     function buildContext(opts) {
+      var _a;
       return __awaiter(this, void 0, void 0, function* () {
         const envCi = yield loadCiEnv();
         const config = yield (0, cosmiconfig_1.cosmiconfig)("release").search(inputs_1.Inputs.configDir);
@@ -19187,11 +19188,11 @@ var require_utils5 = __commonJS({
         const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch, branch.name));
         if (branchIndex == -1 && !(opts === null || opts === void 0 ? void 0 : opts.force)) {
           return;
-        } else {
-          branches[branchIndex].name = (opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch;
-          if (branchIndex > 0 && branches[branchIndex].channel == null) {
-            branches[branchIndex].channel = branches[branchIndex].name;
-          }
+        }
+        const branchInfo = (_a = branches[branchIndex]) !== null && _a !== void 0 ? _a : {};
+        branchInfo.name = (opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch;
+        if (branchIndex > 0 && branchInfo.channel == null) {
+          branchInfo.channel = branchInfo.name;
         }
         const pluginConfig = {};
         for (const pc of config.config.plugins || []) {
@@ -19202,9 +19203,9 @@ var require_utils5 = __commonJS({
           }
         }
         const tagPrefix = config.config.tagPrefix || "v";
-        const versionInfo = yield buildVersionInfo(branches[branchIndex], tagPrefix);
+        const versionInfo = yield buildVersionInfo(branchInfo, tagPrefix);
         return {
-          branch: branches[branchIndex],
+          branch: branchInfo,
           changedFiles: [],
           ci: envCi,
           dryRun: inputs_1.Inputs.dryRun,

@@ -41,11 +41,11 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         micromatch.isMatch(opts?.branch || envCi.branch, branch.name));
     if (branchIndex == -1 && !opts?.force) {
         return;
-    } else {
-        branches[branchIndex].name = opts?.branch || envCi.branch;
-        if (branchIndex > 0 && branches[branchIndex].channel == null) {
-            branches[branchIndex].channel = branches[branchIndex].name;
-        }
+    }
+    const branchInfo = branches[branchIndex] ?? {};
+    branchInfo.name = opts?.branch || envCi.branch;
+    if (branchIndex > 0 && branchInfo.channel == null) {
+        branchInfo.channel = branchInfo.name;
     }
 
     const pluginConfig: Record<string, Record<string, any>> = {};
@@ -58,10 +58,10 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
     }
 
     const tagPrefix = config.config.tagPrefix || "v";
-    const versionInfo = await buildVersionInfo(branches[branchIndex], tagPrefix);
+    const versionInfo = await buildVersionInfo(branchInfo, tagPrefix);
 
     return {
-        branch: branches[branchIndex],
+        branch: branchInfo,
         changedFiles: [],
         ci: envCi,
         dryRun: Inputs.dryRun,

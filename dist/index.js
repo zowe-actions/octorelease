@@ -18903,6 +18903,7 @@ var Logger = class {
 // src/utils.ts
 function buildContext(opts) {
   return __async(this, null, function* () {
+    var _a;
     const envCi = yield loadCiEnv();
     const config = yield (0, import_cosmiconfig.cosmiconfig)("release").search(Inputs.configDir);
     if (config == null || config.isEmpty) {
@@ -18913,11 +18914,11 @@ function buildContext(opts) {
     const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts == null ? void 0 : opts.branch) || envCi.branch, branch.name));
     if (branchIndex == -1 && !(opts == null ? void 0 : opts.force)) {
       return;
-    } else {
-      branches[branchIndex].name = (opts == null ? void 0 : opts.branch) || envCi.branch;
-      if (branchIndex > 0 && branches[branchIndex].channel == null) {
-        branches[branchIndex].channel = branches[branchIndex].name;
-      }
+    }
+    const branchInfo = (_a = branches[branchIndex]) != null ? _a : {};
+    branchInfo.name = (opts == null ? void 0 : opts.branch) || envCi.branch;
+    if (branchIndex > 0 && branchInfo.channel == null) {
+      branchInfo.channel = branchInfo.name;
     }
     const pluginConfig = {};
     for (const pc of config.config.plugins || []) {
@@ -18928,9 +18929,9 @@ function buildContext(opts) {
       }
     }
     const tagPrefix = config.config.tagPrefix || "v";
-    const versionInfo = yield buildVersionInfo(branches[branchIndex], tagPrefix);
+    const versionInfo = yield buildVersionInfo(branchInfo, tagPrefix);
     return {
-      branch: branches[branchIndex],
+      branch: branchInfo,
       changedFiles: [],
       ci: envCi,
       dryRun: Inputs.dryRun,
