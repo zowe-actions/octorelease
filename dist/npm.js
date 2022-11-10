@@ -19185,7 +19185,7 @@ var require_utils5 = __commonJS({
         const micromatch = require_micromatch();
         const branches = config.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
         const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch, branch.name));
-        if (branchIndex == -1) {
+        if (branchIndex == -1 && !(opts === null || opts === void 0 ? void 0 : opts.force)) {
           return;
         } else {
           branches[branchIndex].name = (opts === null || opts === void 0 ? void 0 : opts.branch) || envCi.branch;

@@ -18911,7 +18911,7 @@ function buildContext(opts) {
     const micromatch = require_micromatch();
     const branches = config.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
     const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts == null ? void 0 : opts.branch) || envCi.branch, branch.name));
-    if (branchIndex == -1) {
+    if (branchIndex == -1 && !(opts == null ? void 0 : opts.force)) {
       return;
     } else {
       branches[branchIndex].name = (opts == null ? void 0 : opts.branch) || envCi.branch;
