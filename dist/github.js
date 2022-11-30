@@ -42789,6 +42789,9 @@ function uploadAssets(context, octokit, release, assetPaths) {
 var import_core3 = __toESM(require_lib5());
 function success_default(context, config) {
   return __async(this, null, function* () {
+    if (Object.keys(context.releasedPackages).length == 0) {
+      return;
+    }
     const octokit = getOctokit2(context, config);
     const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
       commit_sha: context.ci.commit
@@ -42800,26 +42803,24 @@ function success_default(context, config) {
           labels: ["released"]
         }));
       }));
-      if (Object.keys(context.releasedPackages).length > 0) {
-        const packageList = [];
-        for (const pkgType of Object.keys(context.releasedPackages)) {
-          for (const { name, url } of context.releasedPackages[pkgType]) {
-            const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
-            packageList.push(`**${pkgType}**: ${pkgName}`);
-          }
+      const packageList = [];
+      for (const pkgType of Object.keys(context.releasedPackages)) {
+        for (const { name, url } of context.releasedPackages[pkgType]) {
+          const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
+          packageList.push(`**${pkgType}**: ${pkgName}`);
         }
-        yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
-          yield octokit.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
-            issue_number: prs.data[0].number,
-            body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
+      }
+      yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
+        yield octokit.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
+          issue_number: prs.data[0].number,
+          body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
 
 The following packages have been published:
 ` + packageList.map((line) => `* ${line}`).join("\n") + `
 
 <sub>Powered by Octorelease :rocket:</sub>`
-          }));
         }));
-      }
+      }));
     }
   });
 }

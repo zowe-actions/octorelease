@@ -19,6 +19,10 @@ import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    if (Object.keys(context.releasedPackages).length == 0) {
+        return;
+    }
+
     const octokit = utils.getOctokit(context, config);
     const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
@@ -34,24 +38,22 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             });
         });
 
-        if (Object.keys(context.releasedPackages).length > 0) {
-            const packageList: string[] = [];
-            for (const pkgType of Object.keys(context.releasedPackages)) {
-                for (const { name, url } of context.releasedPackages[pkgType]) {
-                    const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
-                    packageList.push(`**${pkgType}**: ${pkgName}`);
-                }
+        const packageList: string[] = [];
+        for (const pkgType of Object.keys(context.releasedPackages)) {
+            for (const { name, url } of context.releasedPackages[pkgType]) {
+                const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
+                packageList.push(`**${pkgType}**: ${pkgName}`);
             }
-            await coreUtils.dryRunTask(context, "create success comment on pull request", async () => {
-                await octokit.issues.createComment({
-                    ...context.ci.repo,
-                    issue_number: prs.data[0].number,
-                    body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:\n\n` +
-                    `The following packages have been published:\n` +
-                    packageList.map(line => `* ${line}`).join("\n") + `\n\n` +
-                    `<sub>Powered by Octorelease :rocket:</sub>`
-                });
-            });
         }
+        await coreUtils.dryRunTask(context, "create success comment on pull request", async () => {
+            await octokit.issues.createComment({
+                ...context.ci.repo,
+                issue_number: prs.data[0].number,
+                body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:\n\n` +
+                `The following packages have been published:\n` +
+                packageList.map(line => `* ${line}`).join("\n") + `\n\n` +
+                `<sub>Powered by Octorelease :rocket:</sub>`
+            });
+        });
     }
 }
