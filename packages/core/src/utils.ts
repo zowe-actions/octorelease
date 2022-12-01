@@ -186,7 +186,7 @@ async function loadCiEnv(): Promise<any> {
         const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
         envCi.slug = cmdOutput.stdout.trim().replace(/\.git$/, "").split("/").slice(-2).join("/");
     }
-    const [ owner, repo ] = envCi.slug.split("/");
+    const [owner, repo] = envCi.slug.split("/");
 
     return { ...envCi, repo: { owner, repo } };
 }

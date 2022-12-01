@@ -42789,38 +42789,40 @@ function uploadAssets(context, octokit, release, assetPaths) {
 var import_core3 = __toESM(require_lib5());
 function success_default(context, config) {
   return __async(this, null, function* () {
+    if (Object.keys(context.releasedPackages).length === 0) {
+      return;
+    }
     const octokit = getOctokit2(context, config);
     const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
       commit_sha: context.ci.commit
     }));
-    if (prs.data.length > 0) {
-      yield import_core3.utils.dryRunTask(context, "add released label to pull request", () => __async(this, null, function* () {
-        yield octokit.issues.addLabels(__spreadProps(__spreadValues({}, context.ci.repo), {
-          issue_number: prs.data[0].number,
-          labels: ["released"]
-        }));
+    if (prs.data.length === 0) {
+      return;
+    }
+    yield import_core3.utils.dryRunTask(context, "add released label to pull request", () => __async(this, null, function* () {
+      yield octokit.issues.addLabels(__spreadProps(__spreadValues({}, context.ci.repo), {
+        issue_number: prs.data[0].number,
+        labels: ["released"]
       }));
-      if (Object.keys(context.releasedPackages).length > 0) {
-        const packageList = [];
-        for (const pkgType of Object.keys(context.releasedPackages)) {
-          for (const { name, url } of context.releasedPackages[pkgType]) {
-            const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
-            packageList.push(`**${pkgType}**: ${pkgName}`);
-          }
-        }
-        yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
-          yield octokit.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
-            issue_number: prs.data[0].number,
-            body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
+    }));
+    const packageList = [];
+    for (const pkgType of Object.keys(context.releasedPackages)) {
+      for (const { name, url } of context.releasedPackages[pkgType]) {
+        const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
+        packageList.push(`**${pkgType}**: ${pkgName}`);
+      }
+    }
+    yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
+      yield octokit.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
+        issue_number: prs.data[0].number,
+        body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
 
 The following packages have been published:
 ` + packageList.map((line) => `* ${line}`).join("\n") + `
 
 <sub>Powered by Octorelease :rocket:</sub>`
-          }));
-        }));
-      }
-    }
+      }));
+    }));
   });
 }
 
@@ -42828,26 +42830,28 @@ The following packages have been published:
 var import_core4 = __toESM(require_lib5());
 function fail_default(context, config) {
   return __async(this, null, function* () {
-    if (config.checkPrLabels) {
-      const octokit = getOctokit2(context, config);
-      const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-        commit_sha: context.ci.commit
-      }));
-      if (prs.data.length > 0) {
-        const prNumber = prs.data[0].number;
-        const labels = yield octokit.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
-          issue_number: prNumber
+    if (!config.checkPrLabels) {
+      return;
+    }
+    const octokit = getOctokit2(context, config);
+    const prs = yield octokit.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
+      commit_sha: context.ci.commit
+    }));
+    if (prs.data.length === 0) {
+      return;
+    }
+    const prNumber = prs.data[0].number;
+    const labels = yield octokit.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
+      issue_number: prNumber
+    }));
+    const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
+    for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
+      yield import_core4.utils.dryRunTask(context, `remove pull request label "${name}"`, () => __async(this, null, function* () {
+        yield octokit.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
+          issue_number: prNumber,
+          name
         }));
-        const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-        for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
-          yield import_core4.utils.dryRunTask(context, `remove pull request label "${name}"`, () => __async(this, null, function* () {
-            yield octokit.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
-              issue_number: prNumber,
-              name
-            }));
-          }));
-        }
-      }
+      }));
     }
   });
 }
