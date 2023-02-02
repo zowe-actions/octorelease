@@ -24,7 +24,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const octokit = getOctokit(context, config);
-    const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
+    const prs = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
         commit_sha: context.ci.commit
     });
@@ -33,7 +33,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const prNumber = prs.data[0].number;
-    const labels = await octokit.issues.listLabelsOnIssue({
+    const labels = await octokit.rest.issues.listLabelsOnIssue({
         ...context.ci.repo,
         issue_number: prNumber
     });
@@ -41,7 +41,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
         await utils.dryRunTask(context, `remove pull request label "${name}"`, async () => {
-            await octokit.issues.removeLabel({
+            await octokit.rest.issues.removeLabel({
                 ...context.ci.repo,
                 issue_number: prNumber,
                 name

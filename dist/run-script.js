@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -50,7 +51,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve2, reject) => {
     var fulfilled = (value) => {
       try {
         step(generator.next(value));
@@ -65,313 +66,10 @@ var __async = (__this, __arguments, generator) => {
         reject(e);
       }
     };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    var step = (x) => x.done ? resolve2(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-
-// ../../node_modules/deprecation/dist-node/index.js
-var require_dist_node = __commonJS({
-  "../../node_modules/deprecation/dist-node/index.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Deprecation = class extends Error {
-      constructor(message) {
-        super(message);
-        if (Error.captureStackTrace) {
-          Error.captureStackTrace(this, this.constructor);
-        }
-        this.name = "Deprecation";
-      }
-    };
-    exports.Deprecation = Deprecation;
-  }
-});
-
-// ../../node_modules/wrappy/wrappy.js
-var require_wrappy = __commonJS({
-  "../../node_modules/wrappy/wrappy.js"(exports, module2) {
-    module2.exports = wrappy;
-    function wrappy(fn, cb) {
-      if (fn && cb)
-        return wrappy(fn)(cb);
-      if (typeof fn !== "function")
-        throw new TypeError("need wrapper function");
-      Object.keys(fn).forEach(function(k) {
-        wrapper[k] = fn[k];
-      });
-      return wrapper;
-      function wrapper() {
-        var args = new Array(arguments.length);
-        for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i];
-        }
-        var ret = fn.apply(this, args);
-        var cb2 = args[args.length - 1];
-        if (typeof ret === "function" && ret !== cb2) {
-          Object.keys(cb2).forEach(function(k) {
-            ret[k] = cb2[k];
-          });
-        }
-        return ret;
-      }
-    }
-  }
-});
-
-// ../../node_modules/once/once.js
-var require_once = __commonJS({
-  "../../node_modules/once/once.js"(exports, module2) {
-    var wrappy = require_wrappy();
-    module2.exports = wrappy(once);
-    module2.exports.strict = wrappy(onceStrict);
-    once.proto = once(function() {
-      Object.defineProperty(Function.prototype, "once", {
-        value: function() {
-          return once(this);
-        },
-        configurable: true
-      });
-      Object.defineProperty(Function.prototype, "onceStrict", {
-        value: function() {
-          return onceStrict(this);
-        },
-        configurable: true
-      });
-    });
-    function once(fn) {
-      var f = function() {
-        if (f.called)
-          return f.value;
-        f.called = true;
-        return f.value = fn.apply(this, arguments);
-      };
-      f.called = false;
-      return f;
-    }
-    function onceStrict(fn) {
-      var f = function() {
-        if (f.called)
-          throw new Error(f.onceError);
-        f.called = true;
-        return f.value = fn.apply(this, arguments);
-      };
-      var name = fn.name || "Function wrapped with `once`";
-      f.onceError = name + " shouldn't be called more than once";
-      f.called = false;
-      return f;
-    }
-  }
-});
-
-// ../../node_modules/@octokit/request-error/dist-node/index.js
-var require_dist_node2 = __commonJS({
-  "../../node_modules/@octokit/request-error/dist-node/index.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function _interopDefault(ex) {
-      return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
-    }
-    var deprecation = require_dist_node();
-    var once = _interopDefault(require_once());
-    var logOnceCode = once((deprecation2) => console.warn(deprecation2));
-    var logOnceHeaders = once((deprecation2) => console.warn(deprecation2));
-    var RequestError3 = class extends Error {
-      constructor(message, statusCode, options) {
-        super(message);
-        if (Error.captureStackTrace) {
-          Error.captureStackTrace(this, this.constructor);
-        }
-        this.name = "HttpError";
-        this.status = statusCode;
-        let headers;
-        if ("headers" in options && typeof options.headers !== "undefined") {
-          headers = options.headers;
-        }
-        if ("response" in options) {
-          this.response = options.response;
-          headers = options.response.headers;
-        }
-        const requestCopy = Object.assign({}, options.request);
-        if (options.request.headers.authorization) {
-          requestCopy.headers = Object.assign({}, options.request.headers, {
-            authorization: options.request.headers.authorization.replace(/ .*$/, " [REDACTED]")
-          });
-        }
-        requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-        this.request = requestCopy;
-        Object.defineProperty(this, "code", {
-          get() {
-            logOnceCode(new deprecation.Deprecation("[@octokit/request-error] `error.code` is deprecated, use `error.status`."));
-            return statusCode;
-          }
-        });
-        Object.defineProperty(this, "headers", {
-          get() {
-            logOnceHeaders(new deprecation.Deprecation("[@octokit/request-error] `error.headers` is deprecated, use `error.response.headers`."));
-            return headers || {};
-          }
-        });
-      }
-    };
-    exports.RequestError = RequestError3;
-  }
-});
-
-// ../../node_modules/delay/index.js
-var require_delay = __commonJS({
-  "../../node_modules/delay/index.js"(exports, module2) {
-    "use strict";
-    var randomInteger = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
-    var createAbortError = () => {
-      const error = new Error("Delay aborted");
-      error.name = "AbortError";
-      return error;
-    };
-    var createDelay = ({ clearTimeout: defaultClear, setTimeout: set, willResolve }) => (ms, { value, signal } = {}) => {
-      if (signal && signal.aborted) {
-        return Promise.reject(createAbortError());
-      }
-      let timeoutId;
-      let settle;
-      let rejectFn;
-      const clear = defaultClear || clearTimeout;
-      const signalListener = () => {
-        clear(timeoutId);
-        rejectFn(createAbortError());
-      };
-      const cleanup = () => {
-        if (signal) {
-          signal.removeEventListener("abort", signalListener);
-        }
-      };
-      const delayPromise = new Promise((resolve, reject) => {
-        settle = () => {
-          cleanup();
-          if (willResolve) {
-            resolve(value);
-          } else {
-            reject(value);
-          }
-        };
-        rejectFn = reject;
-        timeoutId = (set || setTimeout)(settle, ms);
-      });
-      if (signal) {
-        signal.addEventListener("abort", signalListener, { once: true });
-      }
-      delayPromise.clear = () => {
-        clear(timeoutId);
-        timeoutId = null;
-        settle();
-      };
-      return delayPromise;
-    };
-    var createWithTimers = (clearAndSet) => {
-      const delay3 = createDelay({ ...clearAndSet, willResolve: true });
-      delay3.reject = createDelay({ ...clearAndSet, willResolve: false });
-      delay3.range = (minimum, maximum, options) => delay3(randomInteger(minimum, maximum), options);
-      return delay3;
-    };
-    var delay2 = createWithTimers();
-    delay2.createWithTimers = createWithTimers;
-    module2.exports = delay2;
-    module2.exports.default = delay2;
-  }
-});
-
-// ../core/lib/doc/IConfig.js
-var require_IConfig = __commonJS({
-  "../core/lib/doc/IConfig.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/IContext.js
-var require_IContext = __commonJS({
-  "../core/lib/doc/IContext.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/IPlugin.js
-var require_IPlugin = __commonJS({
-  "../core/lib/doc/IPlugin.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/IPluginsLoaded.js
-var require_IPluginsLoaded = __commonJS({
-  "../core/lib/doc/IPluginsLoaded.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/IProtectedBranch.js
-var require_IProtectedBranch = __commonJS({
-  "../core/lib/doc/IProtectedBranch.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/IReleasedPackage.js
-var require_IReleasedPackage = __commonJS({
-  "../core/lib/doc/IReleasedPackage.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/IVersionInfo.js
-var require_IVersionInfo = __commonJS({
-  "../core/lib/doc/IVersionInfo.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-  }
-});
-
-// ../core/lib/doc/index.js
-var require_doc = __commonJS({
-  "../core/lib/doc/index.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      var desc = Object.getOwnPropertyDescriptor(m, k);
-      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-        desc = { enumerable: true, get: function() {
-          return m[k];
-        } };
-      }
-      Object.defineProperty(o, k2, desc);
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __exportStar = exports && exports.__exportStar || function(m, exports2) {
-      for (var p in m)
-        if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
-          __createBinding(exports2, m, p);
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SYMBOL_PLUGIN_DIR = void 0;
-    __exportStar(require_IConfig(), exports);
-    __exportStar(require_IContext(), exports);
-    __exportStar(require_IPlugin(), exports);
-    __exportStar(require_IPluginsLoaded(), exports);
-    __exportStar(require_IProtectedBranch(), exports);
-    __exportStar(require_IReleasedPackage(), exports);
-    __exportStar(require_IVersionInfo(), exports);
-    exports.SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");
-  }
-});
 
 // ../../node_modules/@actions/core/lib/utils.js
 var require_utils = __commonJS({
@@ -441,8 +139,8 @@ var require_command = __commonJS({
     exports.issue = exports.issueCommand = void 0;
     var os = __importStar(require("os"));
     var utils_1 = require_utils();
-    function issueCommand(command, properties, message) {
-      const cmd = new Command(command, properties, message);
+    function issueCommand(command, properties2, message) {
+      const cmd = new Command(command, properties2, message);
       process.stdout.write(cmd.toString() + os.EOL);
     }
     exports.issueCommand = issueCommand;
@@ -452,12 +150,12 @@ var require_command = __commonJS({
     exports.issue = issue;
     var CMD_STRING = "::";
     var Command = class {
-      constructor(command, properties, message) {
+      constructor(command, properties2, message) {
         if (!command) {
           command = "missing.command";
         }
         this.command = command;
-        this.properties = properties;
+        this.properties = properties2;
         this.message = message;
       }
       toString() {
@@ -859,7 +557,7 @@ var require_file_command = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.prepareKeyValueMessage = exports.issueFileCommand = void 0;
-    var fs2 = __importStar(require("fs"));
+    var fs4 = __importStar(require("fs"));
     var os = __importStar(require("os"));
     var uuid_1 = (init_esm_node(), __toCommonJS(esm_node_exports));
     var utils_1 = require_utils();
@@ -868,10 +566,10 @@ var require_file_command = __commonJS({
       if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
       }
-      if (!fs2.existsSync(filePath)) {
+      if (!fs4.existsSync(filePath)) {
         throw new Error(`Missing file at path: ${filePath}`);
       }
-      fs2.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+      fs4.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
         encoding: "utf8"
       });
     }
@@ -1075,18 +773,18 @@ var require_tunnel = __commonJS({
             res.statusCode
           );
           socket.destroy();
-          var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
-          error.code = "ECONNRESET";
-          options.request.emit("error", error);
+          var error2 = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
+          error2.code = "ECONNRESET";
+          options.request.emit("error", error2);
           self.removeSocket(placeholder);
           return;
         }
         if (head.length > 0) {
           debug("got illegal response body from proxy");
           socket.destroy();
-          var error = new Error("got illegal response body from proxy");
-          error.code = "ECONNRESET";
-          options.request.emit("error", error);
+          var error2 = new Error("got illegal response body from proxy");
+          error2.code = "ECONNRESET";
+          options.request.emit("error", error2);
           self.removeSocket(placeholder);
           return;
         }
@@ -1101,9 +799,9 @@ var require_tunnel = __commonJS({
           cause.message,
           cause.stack
         );
-        var error = new Error("tunneling socket could not be established, cause=" + cause.message);
-        error.code = "ECONNRESET";
-        options.request.emit("error", error);
+        var error2 = new Error("tunneling socket could not be established, cause=" + cause.message);
+        error2.code = "ECONNRESET";
+        options.request.emit("error", error2);
         self.removeSocket(placeholder);
       }
     };
@@ -1218,11 +916,11 @@ var require_lib = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -1238,7 +936,7 @@ var require_lib = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -1323,13 +1021,13 @@ var require_lib = __commonJS({
       }
       readBody() {
         return __awaiter(this, void 0, void 0, function* () {
-          return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve2) => __awaiter(this, void 0, void 0, function* () {
             let output = Buffer.alloc(0);
             this.message.on("data", (chunk) => {
               output = Buffer.concat([output, chunk]);
             });
             this.message.on("end", () => {
-              resolve(output.toString());
+              resolve2(output.toString());
             });
           }));
         });
@@ -1468,12 +1166,12 @@ var require_lib = __commonJS({
             throw new Error("Client has already been disposed.");
           }
           const parsedUrl = new URL(requestUrl);
-          let info = this._prepareRequest(verb, parsedUrl, headers);
+          let info2 = this._prepareRequest(verb, parsedUrl, headers);
           const maxTries = this._allowRetries && RetryableHttpVerbs.includes(verb) ? this._maxRetries + 1 : 1;
           let numTries = 0;
           let response;
           do {
-            response = yield this.requestRaw(info, data);
+            response = yield this.requestRaw(info2, data);
             if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
               let authenticationHandler;
               for (const handler of this.handlers) {
@@ -1483,7 +1181,7 @@ var require_lib = __commonJS({
                 }
               }
               if (authenticationHandler) {
-                return authenticationHandler.handleAuthentication(this, info, data);
+                return authenticationHandler.handleAuthentication(this, info2, data);
               } else {
                 return response;
               }
@@ -1506,8 +1204,8 @@ var require_lib = __commonJS({
                   }
                 }
               }
-              info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-              response = yield this.requestRaw(info, data);
+              info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+              response = yield this.requestRaw(info2, data);
               redirectsRemaining--;
             }
             if (!response.message.statusCode || !HttpResponseRetryCodes.includes(response.message.statusCode)) {
@@ -1536,19 +1234,19 @@ var require_lib = __commonJS({
        * @param info
        * @param data
        */
-      requestRaw(info, data) {
+      requestRaw(info2, data) {
         return __awaiter(this, void 0, void 0, function* () {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve2, reject) => {
             function callbackForResult(err, res) {
               if (err) {
                 reject(err);
               } else if (!res) {
                 reject(new Error("Unknown error"));
               } else {
-                resolve(res);
+                resolve2(res);
               }
             }
-            this.requestRawWithCallback(info, data, callbackForResult);
+            this.requestRawWithCallback(info2, data, callbackForResult);
           });
         });
       }
@@ -1558,12 +1256,12 @@ var require_lib = __commonJS({
        * @param data
        * @param onResult
        */
-      requestRawWithCallback(info, data, onResult) {
+      requestRawWithCallback(info2, data, onResult) {
         if (typeof data === "string") {
-          if (!info.options.headers) {
-            info.options.headers = {};
+          if (!info2.options.headers) {
+            info2.options.headers = {};
           }
-          info.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         function handleResult(err, res) {
@@ -1572,7 +1270,7 @@ var require_lib = __commonJS({
             onResult(err, res);
           }
         }
-        const req = info.httpModule.request(info.options, (msg) => {
+        const req = info2.httpModule.request(info2.options, (msg) => {
           const res = new HttpClientResponse(msg);
           handleResult(void 0, res);
         });
@@ -1584,7 +1282,7 @@ var require_lib = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error(`Request timeout: ${info.options.path}`));
+          handleResult(new Error(`Request timeout: ${info2.options.path}`));
         });
         req.on("error", function(err) {
           handleResult(err);
@@ -1611,27 +1309,27 @@ var require_lib = __commonJS({
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info = {};
-        info.parsedUrl = requestUrl;
-        const usingSsl = info.parsedUrl.protocol === "https:";
-        info.httpModule = usingSsl ? https : http;
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https : http;
         const defaultPort = usingSsl ? 443 : 80;
-        info.options = {};
-        info.options.host = info.parsedUrl.hostname;
-        info.options.port = info.parsedUrl.port ? parseInt(info.parsedUrl.port) : defaultPort;
-        info.options.path = (info.parsedUrl.pathname || "") + (info.parsedUrl.search || "");
-        info.options.method = method;
-        info.options.headers = this._mergeHeaders(headers);
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info.options.headers["user-agent"] = this.userAgent;
+          info2.options.headers["user-agent"] = this.userAgent;
         }
-        info.options.agent = this._getAgent(info.parsedUrl);
+        info2.options.agent = this._getAgent(info2.parsedUrl);
         if (this.handlers) {
           for (const handler of this.handlers) {
-            handler.prepareRequest(info.options);
+            handler.prepareRequest(info2.options);
           }
         }
-        return info;
+        return info2;
       }
       _mergeHeaders(headers) {
         if (this.requestOptions && this.requestOptions.headers) {
@@ -1701,12 +1399,12 @@ var require_lib = __commonJS({
         return __awaiter(this, void 0, void 0, function* () {
           retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
           const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-          return new Promise((resolve) => setTimeout(() => resolve(), ms));
+          return new Promise((resolve2) => setTimeout(() => resolve2(), ms));
         });
       }
       _processResponse(res, options) {
         return __awaiter(this, void 0, void 0, function* () {
-          return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve2, reject) => __awaiter(this, void 0, void 0, function* () {
             const statusCode = res.message.statusCode || 0;
             const response = {
               statusCode,
@@ -1714,7 +1412,7 @@ var require_lib = __commonJS({
               headers: {}
             };
             if (statusCode === HttpCodes.NotFound) {
-              resolve(response);
+              resolve2(response);
             }
             function dateTimeDeserializer(key, value) {
               if (typeof value === "string") {
@@ -1753,7 +1451,7 @@ var require_lib = __commonJS({
               err.result = response.result;
               reject(err);
             } else {
-              resolve(response);
+              resolve2(response);
             }
           }));
         });
@@ -1770,11 +1468,11 @@ var require_auth = __commonJS({
     "use strict";
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -1790,7 +1488,7 @@ var require_auth = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -1874,11 +1572,11 @@ var require_oidc_utils = __commonJS({
     "use strict";
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -1894,7 +1592,7 @@ var require_oidc_utils = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -1930,12 +1628,12 @@ var require_oidc_utils = __commonJS({
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
           const httpclient = OidcClient.createHttpClient();
-          const res = yield httpclient.getJson(id_token_url).catch((error) => {
+          const res = yield httpclient.getJson(id_token_url).catch((error2) => {
             throw new Error(`Failed to get ID Token. 
  
-        Error Code : ${error.statusCode}
+        Error Code : ${error2.statusCode}
  
-        Error Message: ${error.result.message}`);
+        Error Message: ${error2.result.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
           if (!id_token) {
@@ -1956,8 +1654,8 @@ var require_oidc_utils = __commonJS({
             const id_token = yield OidcClient.getCall(id_token_url);
             core_1.setSecret(id_token);
             return id_token;
-          } catch (error) {
-            throw new Error(`Error message: ${error.message}`);
+          } catch (error2) {
+            throw new Error(`Error message: ${error2.message}`);
           }
         });
       }
@@ -1972,11 +1670,11 @@ var require_summary = __commonJS({
     "use strict";
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -1992,7 +1690,7 @@ var require_summary = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -2344,11 +2042,11 @@ var require_core = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -2364,7 +2062,7 @@ var require_core = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -2406,7 +2104,7 @@ var require_core = __commonJS({
       process.env["PATH"] = `${inputPath}${path2.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
-    function getInput(name, options) {
+    function getInput3(name, options) {
       const val = process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
       if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
@@ -2416,9 +2114,9 @@ var require_core = __commonJS({
       }
       return val.trim();
     }
-    exports.getInput = getInput;
+    exports.getInput = getInput3;
     function getMultilineInput(name, options) {
-      const inputs = getInput(name, options).split("\n").filter((x) => x !== "");
+      const inputs = getInput3(name, options).split("\n").filter((x) => x !== "");
       if (options && options.trimWhitespace === false) {
         return inputs;
       }
@@ -2428,7 +2126,7 @@ var require_core = __commonJS({
     function getBooleanInput(name, options) {
       const trueValue = ["true", "True", "TRUE"];
       const falseValue = ["false", "False", "FALSE"];
-      const val = getInput(name, options);
+      const val = getInput3(name, options);
       if (trueValue.includes(val))
         return true;
       if (falseValue.includes(val))
@@ -2437,7 +2135,7 @@ var require_core = __commonJS({
 Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
     }
     exports.getBooleanInput = getBooleanInput;
-    function setOutput(name, value) {
+    function setOutput2(name, value) {
       const filePath = process.env["GITHUB_OUTPUT"] || "";
       if (filePath) {
         return file_command_1.issueFileCommand("OUTPUT", file_command_1.prepareKeyValueMessage(name, value));
@@ -2445,16 +2143,16 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       process.stdout.write(os.EOL);
       command_1.issueCommand("set-output", { name }, utils_1.toCommandValue(value));
     }
-    exports.setOutput = setOutput;
+    exports.setOutput = setOutput2;
     function setCommandEcho(enabled) {
       command_1.issue("echo", enabled ? "on" : "off");
     }
     exports.setCommandEcho = setCommandEcho;
-    function setFailed(message) {
+    function setFailed2(message) {
       process.exitCode = ExitCode.Failure;
-      error(message);
+      error2(message);
     }
-    exports.setFailed = setFailed;
+    exports.setFailed = setFailed2;
     function isDebug() {
       return process.env["RUNNER_DEBUG"] === "1";
     }
@@ -2463,22 +2161,22 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
       command_1.issueCommand("debug", {}, message);
     }
     exports.debug = debug;
-    function error(message, properties = {}) {
-      command_1.issueCommand("error", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+    function error2(message, properties2 = {}) {
+      command_1.issueCommand("error", utils_1.toCommandProperties(properties2), message instanceof Error ? message.toString() : message);
     }
-    exports.error = error;
-    function warning(message, properties = {}) {
-      command_1.issueCommand("warning", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+    exports.error = error2;
+    function warning(message, properties2 = {}) {
+      command_1.issueCommand("warning", utils_1.toCommandProperties(properties2), message instanceof Error ? message.toString() : message);
     }
     exports.warning = warning;
-    function notice(message, properties = {}) {
-      command_1.issueCommand("notice", utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+    function notice(message, properties2 = {}) {
+      command_1.issueCommand("notice", utils_1.toCommandProperties(properties2), message instanceof Error ? message.toString() : message);
     }
     exports.notice = notice;
-    function info(message) {
+    function info2(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info;
+    exports.info = info2;
     function startGroup(name) {
       command_1.issue("group", name);
     }
@@ -2539,6 +2237,99 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
   }
 });
 
+// ../core/lib/doc/IConfig.js
+var require_IConfig = __commonJS({
+  "../core/lib/doc/IConfig.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IContext.js
+var require_IContext = __commonJS({
+  "../core/lib/doc/IContext.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IPlugin.js
+var require_IPlugin = __commonJS({
+  "../core/lib/doc/IPlugin.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IPluginsLoaded.js
+var require_IPluginsLoaded = __commonJS({
+  "../core/lib/doc/IPluginsLoaded.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IProtectedBranch.js
+var require_IProtectedBranch = __commonJS({
+  "../core/lib/doc/IProtectedBranch.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IReleasedPackage.js
+var require_IReleasedPackage = __commonJS({
+  "../core/lib/doc/IReleasedPackage.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/IVersionInfo.js
+var require_IVersionInfo = __commonJS({
+  "../core/lib/doc/IVersionInfo.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../core/lib/doc/index.js
+var require_doc = __commonJS({
+  "../core/lib/doc/index.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __exportStar = exports && exports.__exportStar || function(m, exports2) {
+      for (var p in m)
+        if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
+          __createBinding(exports2, m, p);
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SYMBOL_PLUGIN_DIR = void 0;
+    __exportStar(require_IConfig(), exports);
+    __exportStar(require_IContext(), exports);
+    __exportStar(require_IPlugin(), exports);
+    __exportStar(require_IPluginsLoaded(), exports);
+    __exportStar(require_IProtectedBranch(), exports);
+    __exportStar(require_IReleasedPackage(), exports);
+    __exportStar(require_IVersionInfo(), exports);
+    exports.SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");
+  }
+});
+
 // ../core/lib/inputs.js
 var require_inputs = __commonJS({
   "../core/lib/inputs.js"(exports) {
@@ -2578,26 +2369,26 @@ var require_inputs = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Inputs = void 0;
     var path2 = __importStar(require("path"));
-    var core = __importStar(require_core());
-    var Inputs2 = class {
+    var core4 = __importStar(require_core());
+    var Inputs = class {
       /**
        * Specify whether to detect [ci skip] in last commit message
        */
       static get ciSkip() {
         try {
-          return core.getBooleanInput("ci-skip");
-        } catch (error) {
-          if (error instanceof TypeError) {
+          return core4.getBooleanInput("ci-skip");
+        } catch (error2) {
+          if (error2 instanceof TypeError) {
             return true;
           }
-          throw error;
+          throw error2;
         }
       }
       /**
        * Custom directory to search for release configuration.
        */
       static get configDir() {
-        const input = core.getInput("config-dir");
+        const input = core4.getInput("config-dir");
         return input ? path2.resolve(this.rootDir, input) : void 0;
       }
       /**
@@ -2605,36 +2396,36 @@ var require_inputs = __commonJS({
        */
       static get dryRun() {
         try {
-          return core.getBooleanInput("dry-run");
-        } catch (error) {
-          if (error instanceof TypeError) {
+          return core4.getBooleanInput("dry-run");
+        } catch (error2) {
+          if (error2 instanceof TypeError) {
             return false;
           }
-          throw error;
+          throw error2;
         }
       }
       /**
        * New version number that should be released.
        */
       static get newVersion() {
-        return core.getInput("new-version") || void 0;
+        return core4.getInput("new-version") || void 0;
       }
       /**
        * Comma-separated list of stages that should be skipped.
        */
       static get skipStages() {
-        const input = core.getInput("skip-stages");
+        const input = core4.getInput("skip-stages");
         return input ? input.split(",").map((s) => s.trim()) : [];
       }
       /**
        * Custom working directory to use instead of the project root.
        */
       static get workingDir() {
-        return core.getInput("working-dir") || void 0;
+        return core4.getInput("working-dir") || void 0;
       }
     };
-    exports.Inputs = Inputs2;
-    Inputs2.rootDir = process.cwd();
+    exports.Inputs = Inputs;
+    Inputs.rootDir = process.cwd();
   }
 });
 
@@ -2676,7 +2467,7 @@ var require_logger = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Logger = void 0;
-    var core = __importStar(require_core());
+    var core4 = __importStar(require_core());
     var Logger = class {
       constructor(pluginName) {
         this.pluginName = pluginName;
@@ -2686,28 +2477,28 @@ var require_logger = __commonJS({
        * @param message Text to output
        */
       debug(message) {
-        core.debug(this.prependPluginName(message));
+        core4.debug(this.prependPluginName(message));
       }
       /**
        * Output error level message with plugin name prepended.
        * @param message Text to output
        */
       error(message) {
-        core.error(this.prependPluginName(message));
+        core4.error(this.prependPluginName(message));
       }
       /**
        * Output info level message with plugin name prepended.
        * @param message Text to output
        */
       info(message) {
-        core.info(this.prependPluginName(message));
+        core4.info(this.prependPluginName(message));
       }
       /**
        * Output warning level message with plugin name prepended.
        * @param message Text to output
        */
       warn(message) {
-        core.warning(this.prependPluginName(message));
+        core4.warning(this.prependPluginName(message));
       }
       /**
        * If plugin name is defined for this logger, prepend it to message.
@@ -2760,11 +2551,11 @@ var require_stages = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -2780,7 +2571,7 @@ var require_stages = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -2788,61 +2579,61 @@ var require_stages = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
     var path2 = __importStar(require("path"));
-    var core = __importStar(require_core());
+    var core4 = __importStar(require_core());
     var doc_1 = require_doc();
     var inputs_1 = require_inputs();
-    function fail(context, pluginsLoaded) {
+    function fail(context3, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
-        yield runStage(context, pluginsLoaded, { name: "fail" });
+        yield runStage(context3, pluginsLoaded, { name: "fail" });
       });
     }
     exports.fail = fail;
-    function init(context, pluginsLoaded) {
+    function init(context3, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
-        yield runStage(context, pluginsLoaded, { name: "init", canSkip: false });
+        yield runStage(context3, pluginsLoaded, { name: "init", canSkip: false });
       });
     }
     exports.init = init;
-    function publish(context, pluginsLoaded) {
+    function publish(context3, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
-        yield runStage(context, pluginsLoaded, { name: "publish" });
+        yield runStage(context3, pluginsLoaded, { name: "publish" });
       });
     }
     exports.publish = publish;
-    function success(context, pluginsLoaded) {
+    function success(context3, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
-        yield runStage(context, pluginsLoaded, { name: "success" });
+        yield runStage(context3, pluginsLoaded, { name: "success" });
       });
     }
     exports.success = success;
-    function version2(context, pluginsLoaded) {
+    function version2(context3, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
-        yield runStage(context, pluginsLoaded, { name: "version" });
+        yield runStage(context3, pluginsLoaded, { name: "version" });
       });
     }
     exports.version = version2;
-    function runStage(context, pluginsLoaded, stage) {
+    function runStage(context3, pluginsLoaded, stage) {
       return __awaiter(this, void 0, void 0, function* () {
         if (stage.canSkip !== false && shouldSkipStage(stage.name)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule[stage.name] != null) {
-            const pluginConfig = context.plugins[pluginName] || {};
+            const pluginConfig = context3.plugins[pluginName] || {};
             let oldCwd;
-            context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+            context3.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             if (pluginConfig[doc_1.SYMBOL_PLUGIN_DIR] != null) {
               oldCwd = process.cwd();
               process.chdir(path2.resolve(pluginConfig[doc_1.SYMBOL_PLUGIN_DIR]));
             }
-            context.logger.pluginName = pluginName;
+            context3.logger.pluginName = pluginName;
             try {
-              yield pluginModule[stage.name](context, pluginConfig);
+              yield pluginModule[stage.name](context3, pluginConfig);
             } finally {
               if (oldCwd != null) {
                 process.chdir(oldCwd);
               }
-              context.logger.pluginName = void 0;
+              context3.logger.pluginName = void 0;
             }
           }
         }
@@ -2850,7 +2641,7 @@ var require_stages = __commonJS({
     }
     function shouldSkipStage(name) {
       if (inputs_1.Inputs.skipStages.includes(name)) {
-        core.info(`Skipping "${name}" stage`);
+        core4.info(`Skipping "${name}" stage`);
         return true;
       }
       return false;
@@ -2892,11 +2683,11 @@ var require_io_util = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -2912,7 +2703,7 @@ var require_io_util = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -2920,9 +2711,9 @@ var require_io_util = __commonJS({
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-    var fs2 = __importStar(require("fs"));
+    var fs4 = __importStar(require("fs"));
     var path2 = __importStar(require("path"));
-    _a = fs2.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+    _a = fs4.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
     exports.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -3068,11 +2859,11 @@ var require_io = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -3088,7 +2879,7 @@ var require_io = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -3100,7 +2891,7 @@ var require_io = __commonJS({
     var path2 = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec = util_1.promisify(childProcess.exec);
+    var exec3 = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -3159,11 +2950,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath }
               });
             } else {
-              yield exec(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath }
               });
             }
@@ -3350,11 +3141,11 @@ var require_toolrunner = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -3370,7 +3161,7 @@ var require_toolrunner = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -3598,7 +3389,7 @@ var require_toolrunner = __commonJS({
             this.toolPath = path2.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
           }
           this.toolPath = yield io.which(this.toolPath, true);
-          return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve2, reject) => __awaiter(this, void 0, void 0, function* () {
             this._debug(`exec tool: ${this.toolPath}`);
             this._debug("arguments:");
             for (const arg of this.args) {
@@ -3670,7 +3461,7 @@ var require_toolrunner = __commonJS({
               this._debug(`STDIO streams have closed for tool '${this.toolPath}'`);
               state.CheckComplete();
             });
-            state.on("done", (error, exitCode) => {
+            state.on("done", (error2, exitCode) => {
               if (stdbuffer.length > 0) {
                 this.emit("stdline", stdbuffer);
               }
@@ -3678,10 +3469,10 @@ var require_toolrunner = __commonJS({
                 this.emit("errline", errbuffer);
               }
               cp.removeAllListeners();
-              if (error) {
-                reject(error);
+              if (error2) {
+                reject(error2);
               } else {
-                resolve(exitCode);
+                resolve2(exitCode);
               }
             });
             if (this.options.input) {
@@ -3774,14 +3565,14 @@ var require_toolrunner = __commonJS({
         this.emit("debug", message);
       }
       _setResult() {
-        let error;
+        let error2;
         if (this.processExited) {
           if (this.processError) {
-            error = new Error(`There was an error when attempting to execute the process '${this.toolPath}'. This may indicate the process failed to start. Error: ${this.processError}`);
+            error2 = new Error(`There was an error when attempting to execute the process '${this.toolPath}'. This may indicate the process failed to start. Error: ${this.processError}`);
           } else if (this.processExitCode !== 0 && !this.options.ignoreReturnCode) {
-            error = new Error(`The process '${this.toolPath}' failed with exit code ${this.processExitCode}`);
+            error2 = new Error(`The process '${this.toolPath}' failed with exit code ${this.processExitCode}`);
           } else if (this.processStderr && this.options.failOnStdErr) {
-            error = new Error(`The process '${this.toolPath}' failed because one or more lines were written to the STDERR stream`);
+            error2 = new Error(`The process '${this.toolPath}' failed because one or more lines were written to the STDERR stream`);
           }
         }
         if (this.timeout) {
@@ -3789,7 +3580,7 @@ var require_toolrunner = __commonJS({
           this.timeout = null;
         }
         this.done = true;
-        this.emit("done", error, this.processExitCode);
+        this.emit("done", error2, this.processExitCode);
       }
       static HandleTimeout(state) {
         if (state.done) {
@@ -3839,11 +3630,11 @@ var require_exec = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -3859,7 +3650,7 @@ var require_exec = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -3868,7 +3659,7 @@ var require_exec = __commonJS({
     exports.getExecOutput = exports.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec(commandLine, args, options) {
+    function exec3(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -3880,8 +3671,8 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec;
-    function getExecOutput(commandLine, args, options) {
+    exports.exec = exec3;
+    function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -3903,7 +3694,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -3913,7 +3704,7 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput;
+    exports.getExecOutput = getExecOutput2;
   }
 });
 
@@ -3923,7 +3714,7 @@ var require_resolve_from = __commonJS({
     "use strict";
     var path2 = require("path");
     var Module = require("module");
-    var fs2 = require("fs");
+    var fs4 = require("fs");
     var resolveFrom = (fromDir, moduleId, silent) => {
       if (typeof fromDir !== "string") {
         throw new TypeError(`Expected \`fromDir\` to be of type \`string\`, got \`${typeof fromDir}\``);
@@ -3932,7 +3723,7 @@ var require_resolve_from = __commonJS({
         throw new TypeError(`Expected \`moduleId\` to be of type \`string\`, got \`${typeof moduleId}\``);
       }
       try {
-        fromDir = fs2.realpathSync(fromDir);
+        fromDir = fs4.realpathSync(fromDir);
       } catch (err) {
         if (err.code === "ENOENT") {
           fromDir = path2.resolve(fromDir);
@@ -4059,9 +3850,9 @@ var require_error_ex = __commonJS({
     "use strict";
     var util = require("util");
     var isArrayish = require_is_arrayish();
-    var errorEx = function errorEx2(name, properties) {
+    var errorEx = function errorEx2(name, properties2) {
       if (!name || name.constructor !== String) {
-        properties = name || {};
+        properties2 = name || {};
         name = Error.name;
       }
       var errorExError = function ErrorEXError(message) {
@@ -4077,11 +3868,11 @@ var require_error_ex = __commonJS({
           enumerable: false,
           get: function() {
             var newMessage = message.split(/\r?\n/g);
-            for (var key in properties) {
-              if (!properties.hasOwnProperty(key)) {
+            for (var key in properties2) {
+              if (!properties2.hasOwnProperty(key)) {
                 continue;
               }
-              var modifier = properties[key];
+              var modifier = properties2[key];
               if ("message" in modifier) {
                 newMessage = modifier.message(this[key], newMessage) || newMessage;
                 if (!isArrayish(newMessage)) {
@@ -4110,11 +3901,11 @@ var require_error_ex = __commonJS({
             stack[0] = this.name + ": " + this.message;
           }
           var lineCount = 1;
-          for (var key in properties) {
-            if (!properties.hasOwnProperty(key)) {
+          for (var key in properties2) {
+            if (!properties2.hasOwnProperty(key)) {
               continue;
             }
-            var modifier = properties[key];
+            var modifier = properties2[key];
             if ("line" in modifier) {
               var line = modifier.line(this[key]);
               if (line) {
@@ -4171,7 +3962,7 @@ var require_json_parse_even_better_errors = __commonJS({
       const h = char.charCodeAt(0).toString(16).toUpperCase();
       return "0x" + (h.length % 2 ? "0" : "") + h;
     };
-    var parseError = (e, txt, context) => {
+    var parseError = (e, txt, context3) => {
       if (!txt) {
         return {
           message: e.message + " while parsing empty string",
@@ -4182,8 +3973,8 @@ var require_json_parse_even_better_errors = __commonJS({
       const errIdx = badToken ? +badToken[2] : e.message.match(/^Unexpected end of JSON.*/i) ? txt.length - 1 : null;
       const msg = badToken ? e.message.replace(/^Unexpected token ./, `Unexpected token ${JSON.stringify(badToken[1])} (${hexify(badToken[1])})`) : e.message;
       if (errIdx !== null && errIdx !== void 0) {
-        const start = errIdx <= context ? 0 : errIdx - context;
-        const end = errIdx + context >= txt.length ? txt.length : errIdx + context;
+        const start = errIdx <= context3 ? 0 : errIdx - context3;
+        const end = errIdx + context3 >= txt.length ? txt.length : errIdx + context3;
         const slice = (start === 0 ? "" : "...") + txt.slice(start, end) + (end === txt.length ? "" : "...");
         const near = txt === slice ? "" : "near ";
         return {
@@ -4192,15 +3983,15 @@ var require_json_parse_even_better_errors = __commonJS({
         };
       } else {
         return {
-          message: msg + ` while parsing '${txt.slice(0, context * 2)}'`,
+          message: msg + ` while parsing '${txt.slice(0, context3 * 2)}'`,
           position: 0
         };
       }
     };
     var JSONParseError = class extends SyntaxError {
-      constructor(er, txt, context, caller) {
-        context = context || 20;
-        const metadata = parseError(er, txt, context);
+      constructor(er, txt, context3, caller) {
+        context3 = context3 || 20;
+        const metadata = parseError(er, txt, context3);
         super(metadata.message);
         Object.assign(this, metadata);
         this.code = "EJSONPARSE";
@@ -4220,9 +4011,9 @@ var require_json_parse_even_better_errors = __commonJS({
     var kNewline = Symbol.for("newline");
     var formatRE = /^\s*[{\[]((?:\r?\n)+)([\s\t]*)/;
     var emptyRE = /^(?:\{\}|\[\])((?:\r?\n)+)?$/;
-    var parseJson = (txt, reviver, context) => {
+    var parseJson = (txt, reviver, context3) => {
       const parseText = stripBOM(txt);
-      context = context || 20;
+      context3 = context3 || 20;
       try {
         const [, newline = "\n", indent = "  "] = parseText.match(emptyRE) || parseText.match(formatRE) || [, "", ""];
         const result = JSON.parse(parseText, reviver);
@@ -4241,7 +4032,7 @@ var require_json_parse_even_better_errors = __commonJS({
             systemError: e
           });
         }
-        throw new JSONParseError(e, parseText, context, parseJson);
+        throw new JSONParseError(e, parseText, context3, parseJson);
       }
     };
     var stripBOM = (txt) => String(txt).replace(/^\uFEFF/, "");
@@ -6346,14 +6137,14 @@ var require_parse_json = __commonJS({
       try {
         try {
           return JSON.parse(string, reviver);
-        } catch (error) {
+        } catch (error2) {
           fallback(string, reviver);
-          throw error;
+          throw error2;
         }
-      } catch (error) {
-        error.message = error.message.replace(/\n/g, "");
-        const indexMatch = error.message.match(/in JSON at position (\d+) while parsing/);
-        const jsonError = new JSONError(error);
+      } catch (error2) {
+        error2.message = error2.message.replace(/\n/g, "");
+        const indexMatch = error2.message.match(/in JSON at position (\d+) while parsing/);
+        const jsonError = new JSONError(error2);
         if (filename) {
           jsonError.fileName = filename;
         }
@@ -6674,7 +6465,7 @@ ${offset}${err}${errEnd}`;
       // presumes src[offset] === '\n'
       static foldNewline(src, offset, indent) {
         let inCount = 0;
-        let error = false;
+        let error2 = false;
         let fold = "";
         let ch = src[offset + 1];
         while (ch === " " || ch === "	" || ch === "\n") {
@@ -6686,7 +6477,7 @@ ${offset}${err}${errEnd}`;
               break;
             case "	":
               if (inCount <= indent)
-                error = true;
+                error2 = true;
               offset = Node.endOfWhiteSpace(src, offset + 2) - 1;
               break;
             case " ":
@@ -6699,16 +6490,16 @@ ${offset}${err}${errEnd}`;
         if (!fold)
           fold = " ";
         if (ch && inCount <= indent)
-          error = true;
+          error2 = true;
         return {
           fold,
           offset,
-          error
+          error: error2
         };
       }
-      constructor(type, props, context) {
+      constructor(type, props, context3) {
         Object.defineProperty(this, "context", {
-          value: context || null,
+          value: context3 || null,
           writable: true
         });
         this.error = null;
@@ -7094,12 +6885,12 @@ ${ctx}
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this scalar, may be `\n`
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           inFlow,
           src
-        } = context;
+        } = context3;
         let offset = start;
         const ch = src[offset];
         if (ch && ch !== "#" && ch !== "\n") {
@@ -7150,8 +6941,8 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first \n character
        * @returns {number} - Index of the character after this
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         this.range = new PlainValue.Range(start, start + 1);
         return start + 1;
       }
@@ -7169,19 +6960,19 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           parseNode,
           src
-        } = context;
+        } = context3;
         let {
           atLineStart,
           lineStart
-        } = context;
+        } = context3;
         if (!atLineStart && this.type === PlainValue.Type.SEQ_ITEM)
           this.error = new PlainValue.YAMLSemanticError(this, "Sequence items must not have preceding content on the same line");
-        const indent = atLineStart ? start - lineStart : context.indent;
+        const indent = atLineStart ? start - lineStart : context3.indent;
         let offset = PlainValue.Node.endOfWhiteSpace(src, start + 1);
         let ch = src[offset];
         const inlineComment = ch === "#";
@@ -7219,7 +7010,7 @@ var require_parse_cst = __commonJS({
         }
         if (this.node) {
           if (blankLine) {
-            const items = context.parent.items || context.parent.contents;
+            const items = context3.parent.items || context3.parent.contents;
             if (items)
               items.push(blankLine);
           }
@@ -7269,8 +7060,8 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this scalar
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const offset = this.parseComment(start);
         this.range = new PlainValue.Range(start, offset);
         return offset;
@@ -7350,12 +7141,12 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           parseNode,
           src
-        } = context;
+        } = context3;
         let lineStart = PlainValue.Node.startOfLine(src, start);
         const firstItem = this.items[0];
         firstItem.context.parent = this;
@@ -7530,8 +7321,8 @@ var require_parse_cst = __commonJS({
         this.valueRange = new PlainValue.Range(start, offset);
         return offset;
       }
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         let offset = this.parseName(start + 1);
         offset = this.parseParameters(offset);
         offset = this.parseComment(offset);
@@ -7663,7 +7454,7 @@ var require_parse_cst = __commonJS({
               break;
             default: {
               const iEnd = PlainValue.Node.endOfIndent(src, offset);
-              const context = {
+              const context3 = {
                 atLineStart,
                 indent: -1,
                 inFlow: false,
@@ -7671,7 +7462,7 @@ var require_parse_cst = __commonJS({
                 lineStart,
                 parent: this
               };
-              const node = parseNode(context, iEnd);
+              const node = parseNode(context3, iEnd);
               if (!node)
                 return this.valueRange.end = iEnd;
               this.contents.push(node);
@@ -7715,12 +7506,12 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this
        */
-      parse(context, start) {
-        context.root = this;
-        this.context = context;
+      parse(context3, start) {
+        context3.root = this;
+        this.context = context3;
         const {
           src
-        } = context;
+        } = context3;
         let offset = src.charCodeAt(start) === 65279 ? start + 1 : start;
         offset = this.parseDirectives(offset);
         offset = this.parseContents(offset);
@@ -7767,11 +7558,11 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this scalar
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           src
-        } = context;
+        } = context3;
         let offset = PlainValue.Node.endOfIdentifier(src, start + 1);
         this.valueRange = new PlainValue.Range(start + 1, offset);
         offset = PlainValue.Node.endOfWhiteSpace(src, offset);
@@ -7975,11 +7766,11 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this block
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           src
-        } = context;
+        } = context3;
         let offset = this.parseBlockHeader(start);
         offset = PlainValue.Node.endOfWhiteSpace(src, offset);
         offset = this.parseComment(offset);
@@ -8005,16 +7796,16 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           parseNode,
           src
-        } = context;
+        } = context3;
         let {
           indent,
           lineStart
-        } = context;
+        } = context3;
         let char = src[start];
         this.items = [{
           char,
@@ -8189,11 +7980,11 @@ var require_parse_cst = __commonJS({
             const {
               fold,
               offset,
-              error
+              error: error2
             } = PlainValue.Node.foldNewline(src, i, indent);
             str += fold;
             i = offset;
-            if (error)
+            if (error2)
               errors.push(new PlainValue.YAMLSemanticError(this, "Multi-line double-quoted string needs to be sufficiently indented"));
           } else if (ch === "\\") {
             i += 1;
@@ -8310,11 +8101,11 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this scalar
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           src
-        } = context;
+        } = context3;
         let offset = QuoteDouble.endOfQuote(src, start + 1);
         this.valueRange = new PlainValue.Range(start, offset);
         offset = PlainValue.Node.endOfWhiteSpace(src, offset);
@@ -8362,11 +8153,11 @@ var require_parse_cst = __commonJS({
             const {
               fold,
               offset,
-              error
+              error: error2
             } = PlainValue.Node.foldNewline(src, i, indent);
             str += fold;
             i = offset;
-            if (error)
+            if (error2)
               errors.push(new PlainValue.YAMLSemanticError(this, "Multi-line single-quoted string needs to be sufficiently indented"));
           } else if (ch === "'") {
             str += ch;
@@ -8398,11 +8189,11 @@ var require_parse_cst = __commonJS({
        * @param {number} start - Index of first character
        * @returns {number} - Index of the character after this scalar
        */
-      parse(context, start) {
-        this.context = context;
+      parse(context3, start) {
+        this.context = context3;
         const {
           src
-        } = context;
+        } = context3;
         let offset = QuoteSingle.endOfQuote(src, start + 1);
         this.valueRange = new PlainValue.Range(start, offset);
         offset = PlainValue.Node.endOfWhiteSpace(src, offset);
@@ -8473,14 +8264,14 @@ var require_parse_cst = __commonJS({
         PlainValue._defineProperty(this, "parseNode", (overlay, start) => {
           if (PlainValue.Node.atDocumentBoundary(this.src, start))
             return null;
-          const context = new ParseContext(this, overlay);
+          const context3 = new ParseContext(this, overlay);
           const {
             props,
             type,
             valueStart
-          } = context.parseProps(start);
+          } = context3.parseProps(start);
           const node = createNewNode(type, props);
-          let offset = node.parse(context, valueStart);
+          let offset = node.parse(context3, valueStart);
           node.range = new PlainValue.Range(start, offset);
           if (offset <= start) {
             node.error = new Error(`Node#parse consumed no characters`);
@@ -8488,12 +8279,12 @@ var require_parse_cst = __commonJS({
             node.error.source = node;
             node.range.end = start + 1;
           }
-          if (context.nodeStartsCollection(node)) {
-            if (!node.error && !context.atLineStart && context.parent.type === PlainValue.Type.DOCUMENT) {
+          if (context3.nodeStartsCollection(node)) {
+            if (!node.error && !context3.atLineStart && context3.parent.type === PlainValue.Type.DOCUMENT) {
               node.error = new PlainValue.YAMLSyntaxError(node, "Block collection must not have preceding content here (e.g. directives-end indicator)");
             }
             const collection = new Collection(node);
-            offset = collection.parse(new ParseContext(context), offset);
+            offset = collection.parse(new ParseContext(context3), offset);
             collection.range = new PlainValue.Range(start, offset);
             return collection;
           }
@@ -8596,10 +8387,10 @@ var require_parse_cst = __commonJS({
       let offset = 0;
       do {
         const doc = new Document();
-        const context = new ParseContext({
+        const context3 = new ParseContext({
           src
         });
-        offset = doc.parse(context, offset);
+        offset = doc.parse(context3, offset);
         documents.push(doc);
       } while (offset < src.length);
       documents.setOrigRanges = () => {
@@ -9328,12 +9119,12 @@ ${ctx.indent}`;
       for (const {
         format,
         test,
-        resolve
+        resolve: resolve2
       } of tags) {
         if (test) {
           const match = str.match(test);
           if (match) {
-            let res = resolve.apply(null, match);
+            let res = resolve2.apply(null, match);
             if (!(res instanceof Scalar))
               res = new Scalar(res);
             if (format)
@@ -9846,10 +9637,10 @@ ${indent}`);
         return "";
       if (typeof res === "string")
         return res;
-      res.errors.forEach((error) => {
-        if (!error.source)
-          error.source = node;
-        doc.errors.push(error);
+      res.errors.forEach((error2) => {
+        if (!error2.source)
+          error2.source = node;
+        doc.errors.push(error2);
       });
       return res.str;
     }
@@ -9902,8 +9693,8 @@ ${indent}`);
         } else {
           try {
             return resolveTagHandle(doc, node);
-          } catch (error) {
-            doc.errors.push(error);
+          } catch (error2) {
+            doc.errors.push(error2);
           }
         }
       }
@@ -9967,10 +9758,10 @@ ${indent}`);
             res.tag = tagName;
           return res;
         }
-      } catch (error) {
-        if (!error.source)
-          error.source = node;
-        doc.errors.push(error);
+      } catch (error2) {
+        if (!error2.source)
+          error2.source = node;
+        doc.errors.push(error2);
         return null;
       }
       try {
@@ -9982,9 +9773,9 @@ ${indent}`);
         const res = resolveByTagName(doc, node, fallback);
         res.tag = tagName;
         return res;
-      } catch (error) {
-        const refError = new PlainValue.YAMLReferenceError(node, error.message);
-        refError.stack = error.stack;
+      } catch (error2) {
+        const refError = new PlainValue.YAMLReferenceError(node, error2.message);
+        refError.stack = error2.stack;
         doc.errors.push(refError);
         return null;
       }
@@ -10074,10 +9865,10 @@ ${indent}`);
       try {
         const str = resolveString(doc, node);
         return resolveScalar(str, schema.tags, schema.tags.scalarFallback);
-      } catch (error) {
-        if (!error.source)
-          error.source = node;
-        errors.push(error);
+      } catch (error2) {
+        if (!error2.source)
+          error2.source = node;
+        errors.push(error2);
         return null;
       }
     }
@@ -10147,7 +9938,7 @@ ${ca}` : ca;
         if (doc.schema.merge && iKey && iKey.value === MERGE_KEY) {
           items[i] = new Merge(items[i]);
           const sources = items[i].value.items;
-          let error = null;
+          let error2 = null;
           sources.some((node) => {
             if (node instanceof Alias) {
               const {
@@ -10155,12 +9946,12 @@ ${ca}` : ca;
               } = node.source;
               if (type === PlainValue.Type.MAP || type === PlainValue.Type.FLOW_MAP)
                 return false;
-              return error = "Merge nodes aliases can only point to maps";
+              return error2 = "Merge nodes aliases can only point to maps";
             }
-            return error = "Merge nodes can only have Alias nodes as values";
+            return error2 = "Merge nodes can only have Alias nodes as values";
           });
-          if (error)
-            doc.errors.push(new PlainValue.YAMLSemanticError(cst, error));
+          if (error2)
+            doc.errors.push(new PlainValue.YAMLSemanticError(cst, error2));
         } else {
           for (let j = i + 1; j < items.length; ++j) {
             const {
@@ -11112,7 +10903,7 @@ var require_Schema_88e323a7 = __commonJS({
       },
       stringify: resolveSeq.stringifyNumber
     };
-    var core = failsafe.concat([nullObj, boolObj, octObj, intObj, hexObj, nanObj, expObj, floatObj]);
+    var core4 = failsafe.concat([nullObj, boolObj, octObj, intObj, hexObj, nanObj, expObj, floatObj]);
     var intIdentify$1 = (value) => typeof value === "bigint" || Number.isInteger(value);
     var stringifyJSON = ({
       value
@@ -11282,7 +11073,7 @@ var require_Schema_88e323a7 = __commonJS({
       stringify: resolveSeq.stringifyNumber
     }], warnings.binary, warnings.omap, warnings.pairs, warnings.set, warnings.intTime, warnings.floatTime, warnings.timestamp);
     var schemas = {
-      core,
+      core: core4,
       failsafe,
       json,
       yaml11
@@ -11814,8 +11605,8 @@ ${cbNode.commentBefore}` : cb;
           case "TAG":
             try {
               doc.tagPrefixes.push(resolveTagDirective(doc, directive));
-            } catch (error) {
-              doc.errors.push(error);
+            } catch (error2) {
+              doc.errors.push(error2);
             }
             hasDirectives = true;
             break;
@@ -11827,8 +11618,8 @@ ${cbNode.commentBefore}` : cb;
             }
             try {
               doc.version = resolveYamlDirective(doc, directive);
-            } catch (error) {
-              doc.errors.push(error);
+            } catch (error2) {
+              doc.errors.push(error2);
             }
             hasDirectives = true;
             break;
@@ -11954,13 +11745,13 @@ ${cbNode.commentBefore}` : cb;
           directives = [],
           contents = [],
           directivesEndMarker,
-          error,
+          error: error2,
           valueRange
         } = node;
-        if (error) {
-          if (!error.source)
-            error.source = this;
-          this.errors.push(error);
+        if (error2) {
+          if (!error2.source)
+            error2.source = this;
+          this.errors.push(error2);
         }
         parseDirectives(this, directives, prevDoc);
         if (directivesEndMarker)
@@ -11971,9 +11762,9 @@ ${cbNode.commentBefore}` : cb;
         parseContents(this, contents);
         this.anchors.resolveNodes();
         if (this.options.prettyErrors) {
-          for (const error2 of this.errors)
-            if (error2 instanceof PlainValue.YAMLError)
-              error2.makePretty();
+          for (const error3 of this.errors)
+            if (error3 instanceof PlainValue.YAMLError)
+              error3.makePretty();
           for (const warn of this.warnings)
             if (warn instanceof PlainValue.YAMLError)
               warn.makePretty();
@@ -12212,10 +12003,10 @@ var require_loaders = __commonJS({
       try {
         const result = parseJson(content);
         return result;
-      } catch (error) {
-        error.message = `JSON Error in ${filepath}:
-${error.message}`;
-        throw error;
+      } catch (error2) {
+        error2.message = `JSON Error in ${filepath}:
+${error2.message}`;
+        throw error2;
       }
     };
     var yaml;
@@ -12228,10 +12019,10 @@ ${error.message}`;
           prettyErrors: true
         });
         return result;
-      } catch (error) {
-        error.message = `YAML Error in ${filepath}:
-${error.message}`;
-        throw error;
+      } catch (error2) {
+        error2.message = `YAML Error in ${filepath}:
+${error2.message}`;
+        throw error2;
       }
     };
     var loaders = {
@@ -12392,19 +12183,19 @@ var require_readFile = __commonJS({
       value: true
     });
     exports.readFile = readFile;
-    exports.readFileSync = readFileSync2;
+    exports.readFileSync = readFileSync3;
     var _fs = _interopRequireDefault(require("fs"));
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : { default: obj };
     }
     async function fsReadFileAsync(pathname, encoding) {
-      return new Promise((resolve, reject) => {
-        _fs.default.readFile(pathname, encoding, (error, contents) => {
-          if (error) {
-            reject(error);
+      return new Promise((resolve2, reject) => {
+        _fs.default.readFile(pathname, encoding, (error2, contents) => {
+          if (error2) {
+            reject(error2);
             return;
           }
-          resolve(contents);
+          resolve2(contents);
         });
       });
     }
@@ -12413,23 +12204,23 @@ var require_readFile = __commonJS({
       try {
         const content = await fsReadFileAsync(filepath, "utf8");
         return content;
-      } catch (error) {
-        if (throwNotFound === false && (error.code === "ENOENT" || error.code === "EISDIR")) {
+      } catch (error2) {
+        if (throwNotFound === false && (error2.code === "ENOENT" || error2.code === "EISDIR")) {
           return null;
         }
-        throw error;
+        throw error2;
       }
     }
-    function readFileSync2(filepath, options = {}) {
+    function readFileSync3(filepath, options = {}) {
       const throwNotFound = options.throwNotFound === true;
       try {
         const content = _fs.default.readFileSync(filepath, "utf8");
         return content;
-      } catch (error) {
-        if (throwNotFound === false && (error.code === "ENOENT" || error.code === "EISDIR")) {
+      } catch (error2) {
+        if (throwNotFound === false && (error2.code === "ENOENT" || error2.code === "EISDIR")) {
           return null;
         }
-        throw error;
+        throw error2;
       }
     }
   }
@@ -12469,20 +12260,20 @@ var require_cacheWrapper = __commonJS({
 var require_path_type = __commonJS({
   "../../node_modules/path-type/index.js"(exports) {
     "use strict";
-    var { promisify } = require("util");
-    var fs2 = require("fs");
+    var { promisify: promisify2 } = require("util");
+    var fs4 = require("fs");
     async function isType(fsStatType, statsMethodName, filePath) {
       if (typeof filePath !== "string") {
         throw new TypeError(`Expected a string, got ${typeof filePath}`);
       }
       try {
-        const stats = await promisify(fs2[fsStatType])(filePath);
+        const stats = await promisify2(fs4[fsStatType])(filePath);
         return stats[statsMethodName]();
-      } catch (error) {
-        if (error.code === "ENOENT") {
+      } catch (error2) {
+        if (error2.code === "ENOENT") {
           return false;
         }
-        throw error;
+        throw error2;
       }
     }
     function isTypeSync(fsStatType, statsMethodName, filePath) {
@@ -12490,12 +12281,12 @@ var require_path_type = __commonJS({
         throw new TypeError(`Expected a string, got ${typeof filePath}`);
       }
       try {
-        return fs2[fsStatType](filePath)[statsMethodName]();
-      } catch (error) {
-        if (error.code === "ENOENT") {
+        return fs4[fsStatType](filePath)[statsMethodName]();
+      } catch (error2) {
+        if (error2.code === "ENOENT") {
           return false;
         }
-        throw error;
+        throw error2;
       }
     }
     exports.isFile = isType.bind(null, "stat", "isFile");
@@ -12567,7 +12358,7 @@ var require_Explorer = __commonJS({
       }
       async searchFromDirectory(dir) {
         const absoluteDir = _path.default.resolve(process.cwd(), dir);
-        const run = async () => {
+        const run2 = async () => {
           const result = await this.searchDirectory(absoluteDir);
           const nextDir = this.nextDirectoryToSearch(absoluteDir, result);
           if (nextDir) {
@@ -12577,9 +12368,9 @@ var require_Explorer = __commonJS({
           return transformResult;
         };
         if (this.searchCache) {
-          return (0, _cacheWrapper.cacheWrapper)(this.searchCache, absoluteDir, run);
+          return (0, _cacheWrapper.cacheWrapper)(this.searchCache, absoluteDir, run2);
         }
-        return run();
+        return run2();
       }
       async searchDirectory(dir) {
         for await (const place of this.config.searchPlaces) {
@@ -12660,7 +12451,7 @@ var require_ExplorerSync = __commonJS({
       }
       searchFromDirectorySync(dir) {
         const absoluteDir = _path.default.resolve(process.cwd(), dir);
-        const run = () => {
+        const run2 = () => {
           const result = this.searchDirectorySync(absoluteDir);
           const nextDir = this.nextDirectoryToSearch(absoluteDir, result);
           if (nextDir) {
@@ -12670,9 +12461,9 @@ var require_ExplorerSync = __commonJS({
           return transformResult;
         };
         if (this.searchCache) {
-          return (0, _cacheWrapper.cacheWrapperSync)(this.searchCache, absoluteDir, run);
+          return (0, _cacheWrapper.cacheWrapperSync)(this.searchCache, absoluteDir, run2);
         }
-        return run();
+        return run2();
       }
       searchDirectorySync(dir) {
         for (const place of this.config.searchPlaces) {
@@ -12899,14 +12690,14 @@ var require_utils2 = __commonJS({
 var require_stringify = __commonJS({
   "../../node_modules/braces/lib/stringify.js"(exports, module2) {
     "use strict";
-    var utils2 = require_utils2();
+    var utils = require_utils2();
     module2.exports = (ast, options = {}) => {
       let stringify2 = (node, parent = {}) => {
-        let invalidBlock = options.escapeInvalid && utils2.isInvalidBrace(parent);
+        let invalidBlock = options.escapeInvalid && utils.isInvalidBrace(parent);
         let invalidNode = node.invalid === true && options.escapeInvalid === true;
         let output = "";
         if (node.value) {
-          if ((invalidBlock || invalidNode) && utils2.isOpenOrClose(node)) {
+          if ((invalidBlock || invalidNode) && utils.isOpenOrClose(node)) {
             return "\\" + node.value;
           }
           return node.value;
@@ -13365,10 +13156,10 @@ var require_compile = __commonJS({
   "../../node_modules/braces/lib/compile.js"(exports, module2) {
     "use strict";
     var fill = require_fill_range();
-    var utils2 = require_utils2();
+    var utils = require_utils2();
     var compile = (ast, options = {}) => {
       let walk = (node, parent = {}) => {
-        let invalidBlock = utils2.isInvalidBrace(parent);
+        let invalidBlock = utils.isInvalidBrace(parent);
         let invalidNode = node.invalid === true && options.escapeInvalid === true;
         let invalid = invalidBlock === true || invalidNode === true;
         let prefix = options.escapeInvalid === true ? "\\" : "";
@@ -13392,7 +13183,7 @@ var require_compile = __commonJS({
           return node.value;
         }
         if (node.nodes && node.ranges > 0) {
-          let args = utils2.reduce(node.nodes);
+          let args = utils.reduce(node.nodes);
           let range = fill(...args, { ...options, wrap: false, toRegex: true });
           if (range.length !== 0) {
             return args.length > 1 && range.length > 1 ? `(${range})` : range;
@@ -13417,7 +13208,7 @@ var require_expand = __commonJS({
     "use strict";
     var fill = require_fill_range();
     var stringify2 = require_stringify();
-    var utils2 = require_utils2();
+    var utils = require_utils2();
     var append = (queue = "", stash = "", enclose = false) => {
       let result = [];
       queue = [].concat(queue);
@@ -13425,7 +13216,7 @@ var require_expand = __commonJS({
       if (!stash.length)
         return queue;
       if (!queue.length) {
-        return enclose ? utils2.flatten(stash).map((ele) => `{${ele}}`) : stash;
+        return enclose ? utils.flatten(stash).map((ele) => `{${ele}}`) : stash;
       }
       for (let item of queue) {
         if (Array.isArray(item)) {
@@ -13440,7 +13231,7 @@ var require_expand = __commonJS({
           }
         }
       }
-      return utils2.flatten(result);
+      return utils.flatten(result);
     };
     var expand = (ast, options = {}) => {
       let rangeLimit = options.rangeLimit === void 0 ? 1e3 : options.rangeLimit;
@@ -13461,8 +13252,8 @@ var require_expand = __commonJS({
           return;
         }
         if (node.nodes && node.ranges > 0) {
-          let args = utils2.reduce(node.nodes);
-          if (utils2.exceedsLimit(...args, options.step, rangeLimit)) {
+          let args = utils.reduce(node.nodes);
+          if (utils.exceedsLimit(...args, options.step, rangeLimit)) {
             throw new RangeError("expanded array length exceeds range limit. Use options.rangeLimit to increase or disable the limit.");
           }
           let range = fill(...args, options);
@@ -13473,7 +13264,7 @@ var require_expand = __commonJS({
           node.nodes = [];
           return;
         }
-        let enclose = utils2.encloseBrace(node);
+        let enclose = utils.encloseBrace(node);
         let queue = node.queue;
         let block = node;
         while (block.type !== "brace" && block.type !== "root" && block.parent) {
@@ -13502,7 +13293,7 @@ var require_expand = __commonJS({
         }
         return queue;
       };
-      return utils2.flatten(walk(ast));
+      return utils.flatten(walk(ast));
     };
     module2.exports = expand;
   }
@@ -14180,7 +13971,7 @@ var require_utils3 = __commonJS({
 var require_scan = __commonJS({
   "../../node_modules/picomatch/lib/scan.js"(exports, module2) {
     "use strict";
-    var utils2 = require_utils3();
+    var utils = require_utils3();
     var {
       CHAR_ASTERISK,
       /* * */
@@ -14422,7 +14213,7 @@ var require_scan = __commonJS({
       }
       let base = str;
       let prefix = "";
-      let glob2 = "";
+      let glob = "";
       if (start > 0) {
         prefix = str.slice(0, start);
         str = str.slice(start);
@@ -14430,10 +14221,10 @@ var require_scan = __commonJS({
       }
       if (base && isGlob === true && lastIndex > 0) {
         base = str.slice(0, lastIndex);
-        glob2 = str.slice(lastIndex);
+        glob = str.slice(lastIndex);
       } else if (isGlob === true) {
         base = "";
-        glob2 = str;
+        glob = str;
       } else {
         base = str;
       }
@@ -14443,10 +14234,10 @@ var require_scan = __commonJS({
         }
       }
       if (opts.unescape === true) {
-        if (glob2)
-          glob2 = utils2.removeBackslashes(glob2);
+        if (glob)
+          glob = utils.removeBackslashes(glob);
         if (base && backslashes === true) {
-          base = utils2.removeBackslashes(base);
+          base = utils.removeBackslashes(base);
         }
       }
       const state = {
@@ -14454,7 +14245,7 @@ var require_scan = __commonJS({
         input,
         start,
         base,
-        glob: glob2,
+        glob,
         isBrace,
         isBracket,
         isGlob,
@@ -14514,7 +14305,7 @@ var require_parse2 = __commonJS({
   "../../node_modules/picomatch/lib/parse.js"(exports, module2) {
     "use strict";
     var constants = require_constants2();
-    var utils2 = require_utils3();
+    var utils = require_utils3();
     var {
       MAX_LENGTH,
       POSIX_REGEX_SOURCE,
@@ -14531,7 +14322,7 @@ var require_parse2 = __commonJS({
       try {
         new RegExp(value);
       } catch (ex) {
-        return args.map((v) => utils2.escapeRegex(v)).join("..");
+        return args.map((v) => utils.escapeRegex(v)).join("..");
       }
       return value;
     };
@@ -14552,7 +14343,7 @@ var require_parse2 = __commonJS({
       const bos = { type: "bos", value: "", output: opts.prepend || "" };
       const tokens = [bos];
       const capture = opts.capture ? "" : "?:";
-      const win32 = utils2.isWindows(options);
+      const win32 = utils.isWindows(options);
       const PLATFORM_CHARS = constants.globChars(win32);
       const EXTGLOB_CHARS = constants.extglobChars(PLATFORM_CHARS);
       const {
@@ -14598,7 +14389,7 @@ var require_parse2 = __commonJS({
         globstar: false,
         tokens
       };
-      input = utils2.removePrefix(input, state);
+      input = utils.removePrefix(input, state);
       len = input.length;
       const extglobs = [];
       const braces = [];
@@ -14738,7 +14529,7 @@ var require_parse2 = __commonJS({
           state.output = input;
           return state;
         }
-        state.output = utils2.wrapOutput(output, state, options);
+        state.output = utils.wrapOutput(output, state, options);
         return state;
       }
       while (!eos()) {
@@ -14814,7 +14605,7 @@ var require_parse2 = __commonJS({
           continue;
         }
         if (state.quotes === 1 && value !== '"') {
-          value = utils2.escapeRegex(value);
+          value = utils.escapeRegex(value);
           prev.value += value;
           append({ value });
           continue;
@@ -14875,10 +14666,10 @@ var require_parse2 = __commonJS({
           }
           prev.value += value;
           append({ value });
-          if (opts.literalBrackets === false || utils2.hasRegexChars(prevValue)) {
+          if (opts.literalBrackets === false || utils.hasRegexChars(prevValue)) {
             continue;
           }
-          const escaped = utils2.escapeRegex(prev.value);
+          const escaped = utils.escapeRegex(prev.value);
           state.output = state.output.slice(0, -prev.value.length);
           if (opts.literalBrackets === true) {
             state.output += escaped;
@@ -14995,7 +14786,7 @@ var require_parse2 = __commonJS({
           if (prev && prev.type === "paren") {
             const next = peek();
             let output = value;
-            if (next === "<" && !utils2.supportsLookbehinds()) {
+            if (next === "<" && !utils.supportsLookbehinds()) {
               throw new Error("Node.js v10 or higher is required for regex lookbehinds");
             }
             if (prev.value === "(" && !/[!=<:]/.test(next) || next === "<" && !/<([!=]|\w+>)/.test(remaining())) {
@@ -15188,19 +14979,19 @@ var require_parse2 = __commonJS({
       while (state.brackets > 0) {
         if (opts.strictBrackets === true)
           throw new SyntaxError(syntaxError("closing", "]"));
-        state.output = utils2.escapeLast(state.output, "[");
+        state.output = utils.escapeLast(state.output, "[");
         decrement("brackets");
       }
       while (state.parens > 0) {
         if (opts.strictBrackets === true)
           throw new SyntaxError(syntaxError("closing", ")"));
-        state.output = utils2.escapeLast(state.output, "(");
+        state.output = utils.escapeLast(state.output, "(");
         decrement("parens");
       }
       while (state.braces > 0) {
         if (opts.strictBrackets === true)
           throw new SyntaxError(syntaxError("closing", "}"));
-        state.output = utils2.escapeLast(state.output, "{");
+        state.output = utils.escapeLast(state.output, "{");
         decrement("braces");
       }
       if (opts.strictSlashes !== true && (prev.type === "star" || prev.type === "bracket")) {
@@ -15225,7 +15016,7 @@ var require_parse2 = __commonJS({
         throw new SyntaxError(`Input length: ${len}, exceeds maximum allowed length: ${max}`);
       }
       input = REPLACEMENTS[input] || input;
-      const win32 = utils2.isWindows(options);
+      const win32 = utils.isWindows(options);
       const {
         DOT_LITERAL,
         SLASH_LITERAL,
@@ -15250,7 +15041,7 @@ var require_parse2 = __commonJS({
           return star;
         return `(${capture}(?:(?!${START_ANCHOR}${opts2.dot ? DOTS_SLASH : DOT_LITERAL}).)*?)`;
       };
-      const create2 = (str) => {
+      const create = (str) => {
         switch (str) {
           case "*":
             return `${nodot}${ONE_CHAR}${star}`;
@@ -15272,15 +15063,15 @@ var require_parse2 = __commonJS({
             const match = /^(.*?)\.(\w+)$/.exec(str);
             if (!match)
               return;
-            const source2 = create2(match[1]);
+            const source2 = create(match[1]);
             if (!source2)
               return;
             return source2 + DOT_LITERAL + match[2];
           }
         }
       };
-      const output = utils2.removePrefix(input, state);
-      let source = create2(output);
+      const output = utils.removePrefix(input, state);
+      let source = create(output);
       if (source && opts.strictSlashes !== true) {
         source += `${SLASH_LITERAL}?`;
       }
@@ -15297,12 +15088,12 @@ var require_picomatch = __commonJS({
     var path2 = require("path");
     var scan = require_scan();
     var parse2 = require_parse2();
-    var utils2 = require_utils3();
+    var utils = require_utils3();
     var constants = require_constants2();
     var isObject = (val) => val && typeof val === "object" && !Array.isArray(val);
-    var picomatch = (glob2, options, returnState = false) => {
-      if (Array.isArray(glob2)) {
-        const fns = glob2.map((input) => picomatch(input, options, returnState));
+    var picomatch = (glob, options, returnState = false) => {
+      if (Array.isArray(glob)) {
+        const fns = glob.map((input) => picomatch(input, options, returnState));
         const arrayMatcher = (str) => {
           for (const isMatch of fns) {
             const state2 = isMatch(str);
@@ -15313,13 +15104,13 @@ var require_picomatch = __commonJS({
         };
         return arrayMatcher;
       }
-      const isState = isObject(glob2) && glob2.tokens && glob2.input;
-      if (glob2 === "" || typeof glob2 !== "string" && !isState) {
+      const isState = isObject(glob) && glob.tokens && glob.input;
+      if (glob === "" || typeof glob !== "string" && !isState) {
         throw new TypeError("Expected pattern to be a non-empty string");
       }
       const opts = options || {};
-      const posix = utils2.isWindows(options);
-      const regex = isState ? picomatch.compileRe(glob2, options) : picomatch.makeRe(glob2, options, false, true);
+      const posix = utils.isWindows(options);
+      const regex = isState ? picomatch.compileRe(glob, options) : picomatch.makeRe(glob, options, false, true);
       const state = regex.state;
       delete regex.state;
       let isIgnored = () => false;
@@ -15328,8 +15119,8 @@ var require_picomatch = __commonJS({
         isIgnored = picomatch(opts.ignore, ignoreOpts, returnState);
       }
       const matcher = (input, returnObject = false) => {
-        const { isMatch, match, output } = picomatch.test(input, regex, options, { glob: glob2, posix });
-        const result = { glob: glob2, state, regex, posix, input, output, match, isMatch };
+        const { isMatch, match, output } = picomatch.test(input, regex, options, { glob, posix });
+        const result = { glob, state, regex, posix, input, output, match, isMatch };
         if (typeof opts.onResult === "function") {
           opts.onResult(result);
         }
@@ -15354,7 +15145,7 @@ var require_picomatch = __commonJS({
       }
       return matcher;
     };
-    picomatch.test = (input, regex, options, { glob: glob2, posix } = {}) => {
+    picomatch.test = (input, regex, options, { glob, posix } = {}) => {
       if (typeof input !== "string") {
         throw new TypeError("Expected input to be a string");
       }
@@ -15362,12 +15153,12 @@ var require_picomatch = __commonJS({
         return { isMatch: false, output: "" };
       }
       const opts = options || {};
-      const format = opts.format || (posix ? utils2.toPosixSlashes : null);
-      let match = input === glob2;
+      const format = opts.format || (posix ? utils.toPosixSlashes : null);
+      let match = input === glob;
       let output = match && format ? format(input) : input;
       if (match === false) {
         output = format ? format(input) : input;
-        match = output === glob2;
+        match = output === glob;
       }
       if (match === false || opts.capture === true) {
         if (opts.matchBase === true || opts.basename === true) {
@@ -15378,8 +15169,8 @@ var require_picomatch = __commonJS({
       }
       return { isMatch: Boolean(match), match, output };
     };
-    picomatch.matchBase = (input, glob2, options, posix = utils2.isWindows(options)) => {
-      const regex = glob2 instanceof RegExp ? glob2 : picomatch.makeRe(glob2, options);
+    picomatch.matchBase = (input, glob, options, posix = utils.isWindows(options)) => {
+      const regex = glob instanceof RegExp ? glob : picomatch.makeRe(glob, options);
       return regex.test(path2.basename(input));
     };
     picomatch.isMatch = (str, patterns, options) => picomatch(patterns, options)(str);
@@ -15449,7 +15240,7 @@ var require_micromatch = __commonJS({
     var util = require("util");
     var braces = require_braces();
     var picomatch = require_picomatch2();
-    var utils2 = require_utils3();
+    var utils = require_utils3();
     var isEmptyString = (val) => val === "" || val === "./";
     var micromatch = (list, patterns, options) => {
       patterns = [].concat(patterns);
@@ -15533,7 +15324,7 @@ var require_micromatch = __commonJS({
       return micromatch.isMatch(str, pattern, { ...options, contains: true });
     };
     micromatch.matchKeys = (obj, patterns, options) => {
-      if (!utils2.isObject(obj)) {
+      if (!utils.isObject(obj)) {
         throw new TypeError("Expected the first argument to be an object");
       }
       let keys = micromatch(Object.keys(obj), patterns, options);
@@ -15568,10 +15359,10 @@ var require_micromatch = __commonJS({
       }
       return [].concat(patterns).every((p) => picomatch(p, options)(str));
     };
-    micromatch.capture = (glob2, input, options) => {
-      let posix = utils2.isWindows(options);
-      let regex = picomatch.makeRe(String(glob2), { ...options, capture: true });
-      let match = regex.exec(posix ? utils2.toPosixSlashes(input) : input);
+    micromatch.capture = (glob, input, options) => {
+      let posix = utils.isWindows(options);
+      let regex = picomatch.makeRe(String(glob), { ...options, capture: true });
+      let match = regex.exec(posix ? utils.toPosixSlashes(input) : input);
       if (match) {
         return match.slice(1).map((v) => v === void 0 ? "" : v);
       }
@@ -16738,7 +16529,7 @@ var require_windows = __commonJS({
   "../../node_modules/isexe/windows.js"(exports, module2) {
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs2 = require("fs");
+    var fs4 = require("fs");
     function checkPathExt(path2, options) {
       var pathext = options.pathExt !== void 0 ? options.pathExt : process.env.PATHEXT;
       if (!pathext) {
@@ -16763,12 +16554,12 @@ var require_windows = __commonJS({
       return checkPathExt(path2, options);
     }
     function isexe(path2, options, cb) {
-      fs2.stat(path2, function(er, stat) {
+      fs4.stat(path2, function(er, stat) {
         cb(er, er ? false : checkStat(stat, path2, options));
       });
     }
     function sync(path2, options) {
-      return checkStat(fs2.statSync(path2), path2, options);
+      return checkStat(fs4.statSync(path2), path2, options);
     }
   }
 });
@@ -16778,14 +16569,14 @@ var require_mode = __commonJS({
   "../../node_modules/isexe/mode.js"(exports, module2) {
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs2 = require("fs");
+    var fs4 = require("fs");
     function isexe(path2, options, cb) {
-      fs2.stat(path2, function(er, stat) {
+      fs4.stat(path2, function(er, stat) {
         cb(er, er ? false : checkStat(stat, options));
       });
     }
     function sync(path2, options) {
-      return checkStat(fs2.statSync(path2), options);
+      return checkStat(fs4.statSync(path2), options);
     }
     function checkStat(stat, options) {
       return stat.isFile() && checkMode(stat, options);
@@ -16809,12 +16600,12 @@ var require_mode = __commonJS({
 // ../../node_modules/isexe/index.js
 var require_isexe = __commonJS({
   "../../node_modules/isexe/index.js"(exports, module2) {
-    var fs2 = require("fs");
-    var core;
+    var fs4 = require("fs");
+    var core4;
     if (process.platform === "win32" || global.TESTING_WINDOWS) {
-      core = require_windows();
+      core4 = require_windows();
     } else {
-      core = require_mode();
+      core4 = require_mode();
     }
     module2.exports = isexe;
     isexe.sync = sync;
@@ -16827,17 +16618,17 @@ var require_isexe = __commonJS({
         if (typeof Promise !== "function") {
           throw new TypeError("callback not provided");
         }
-        return new Promise(function(resolve, reject) {
+        return new Promise(function(resolve2, reject) {
           isexe(path2, options || {}, function(er, is) {
             if (er) {
               reject(er);
             } else {
-              resolve(is);
+              resolve2(is);
             }
           });
         });
       }
-      core(path2, options || {}, function(er, is) {
+      core4(path2, options || {}, function(er, is) {
         if (er) {
           if (er.code === "EACCES" || options && options.ignoreErrors) {
             er = null;
@@ -16849,7 +16640,7 @@ var require_isexe = __commonJS({
     }
     function sync(path2, options) {
       try {
-        return core.sync(path2, options || {});
+        return core4.sync(path2, options || {});
       } catch (er) {
         if (options && options.ignoreErrors || er.code === "EACCES") {
           return false;
@@ -16898,27 +16689,27 @@ var require_which = __commonJS({
         opt = {};
       const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt);
       const found = [];
-      const step = (i) => new Promise((resolve, reject) => {
+      const step = (i) => new Promise((resolve2, reject) => {
         if (i === pathEnv.length)
-          return opt.all && found.length ? resolve(found) : reject(getNotFoundError(cmd));
+          return opt.all && found.length ? resolve2(found) : reject(getNotFoundError(cmd));
         const ppRaw = pathEnv[i];
         const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
         const pCmd = path2.join(pathPart, cmd);
         const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd : pCmd;
-        resolve(subStep(p, i, 0));
+        resolve2(subStep(p, i, 0));
       });
-      const subStep = (p, i, ii) => new Promise((resolve, reject) => {
+      const subStep = (p, i, ii) => new Promise((resolve2, reject) => {
         if (ii === pathExt.length)
-          return resolve(step(i + 1));
+          return resolve2(step(i + 1));
         const ext = pathExt[ii];
         isexe(p + ext, { pathExt: pathExtExe }, (er, is) => {
           if (!er && is) {
             if (opt.all)
               found.push(p + ext);
             else
-              return resolve(p + ext);
+              return resolve2(p + ext);
           }
-          return resolve(subStep(p, i, ii + 1));
+          return resolve2(subStep(p, i, ii + 1));
         });
       });
       return cb ? step(0).then((res) => cb(null, res), cb) : step(0);
@@ -17073,16 +16864,16 @@ var require_shebang_command = __commonJS({
 var require_readShebang = __commonJS({
   "../../node_modules/cross-spawn/lib/util/readShebang.js"(exports, module2) {
     "use strict";
-    var fs2 = require("fs");
+    var fs4 = require("fs");
     var shebangCommand = require_shebang_command();
     function readShebang(command) {
       const size = 150;
       const buffer = Buffer.alloc(size);
       let fd;
       try {
-        fd = fs2.openSync(command, "r");
-        fs2.readSync(fd, buffer, 0, size, 0);
-        fs2.closeSync(fd);
+        fd = fs4.openSync(command, "r");
+        fs4.readSync(fd, buffer, 0, size, 0);
+        fs4.closeSync(fd);
       } catch (e) {
       }
       return shebangCommand(buffer.toString());
@@ -17766,7 +17557,7 @@ var require_error = __commonJS({
       stdout,
       stderr,
       all,
-      error,
+      error: error2,
       signal,
       exitCode,
       command,
@@ -17779,38 +17570,38 @@ var require_error = __commonJS({
       exitCode = exitCode === null ? void 0 : exitCode;
       signal = signal === null ? void 0 : signal;
       const signalDescription = signal === void 0 ? void 0 : signalsByName[signal].description;
-      const errorCode = error && error.code;
+      const errorCode = error2 && error2.code;
       const prefix = getErrorPrefix({ timedOut, timeout, errorCode, signal, signalDescription, exitCode, isCanceled });
       const execaMessage = `Command ${prefix}: ${command}`;
-      const isError = Object.prototype.toString.call(error) === "[object Error]";
+      const isError = Object.prototype.toString.call(error2) === "[object Error]";
       const shortMessage = isError ? `${execaMessage}
-${error.message}` : execaMessage;
+${error2.message}` : execaMessage;
       const message = [shortMessage, stderr, stdout].filter(Boolean).join("\n");
       if (isError) {
-        error.originalMessage = error.message;
-        error.message = message;
+        error2.originalMessage = error2.message;
+        error2.message = message;
       } else {
-        error = new Error(message);
+        error2 = new Error(message);
       }
-      error.shortMessage = shortMessage;
-      error.command = command;
-      error.escapedCommand = escapedCommand;
-      error.exitCode = exitCode;
-      error.signal = signal;
-      error.signalDescription = signalDescription;
-      error.stdout = stdout;
-      error.stderr = stderr;
+      error2.shortMessage = shortMessage;
+      error2.command = command;
+      error2.escapedCommand = escapedCommand;
+      error2.exitCode = exitCode;
+      error2.signal = signal;
+      error2.signalDescription = signalDescription;
+      error2.stdout = stdout;
+      error2.stderr = stderr;
       if (all !== void 0) {
-        error.all = all;
+        error2.all = all;
       }
-      if ("bufferedData" in error) {
-        delete error.bufferedData;
+      if ("bufferedData" in error2) {
+        delete error2.bufferedData;
       }
-      error.failed = true;
-      error.timedOut = Boolean(timedOut);
-      error.isCanceled = isCanceled;
-      error.killed = killed && !timedOut;
-      return error;
+      error2.failed = true;
+      error2.timedOut = Boolean(timedOut);
+      error2.isCanceled = isCanceled;
+      error2.killed = killed && !timedOut;
+      return error2;
     };
     module2.exports = makeError;
   }
@@ -18094,10 +17885,10 @@ var require_kill = __commonJS({
       }
       return forceKillAfterTimeout;
     };
-    var spawnedCancel = (spawned, context) => {
+    var spawnedCancel = (spawned, context3) => {
       const killResult = spawned.kill();
       if (killResult) {
-        context.isCanceled = true;
+        context3.isCanceled = true;
       }
     };
     var timeoutKill = (spawned, signal, reject) => {
@@ -18109,7 +17900,7 @@ var require_kill = __commonJS({
         return spawnedPromise;
       }
       let timeoutId;
-      const timeoutPromise = new Promise((resolve, reject) => {
+      const timeoutPromise = new Promise((resolve2, reject) => {
         timeoutId = setTimeout(() => {
           timeoutKill(spawned, killSignal, reject);
         }, timeout);
@@ -18209,9 +18000,9 @@ var require_get_stream = __commonJS({
     "use strict";
     var { constants: BufferConstants } = require("buffer");
     var stream = require("stream");
-    var { promisify } = require("util");
+    var { promisify: promisify2 } = require("util");
     var bufferStream = require_buffer_stream();
-    var streamPipelinePromisified = promisify(stream.pipeline);
+    var streamPipelinePromisified = promisify2(stream.pipeline);
     var MaxBufferError = class extends Error {
       constructor() {
         super("maxBuffer exceeded");
@@ -18228,19 +18019,19 @@ var require_get_stream = __commonJS({
       };
       const { maxBuffer } = options;
       const stream2 = bufferStream(options);
-      await new Promise((resolve, reject) => {
-        const rejectPromise = (error) => {
-          if (error && stream2.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
-            error.bufferedData = stream2.getBufferedValue();
+      await new Promise((resolve2, reject) => {
+        const rejectPromise = (error2) => {
+          if (error2 && stream2.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
+            error2.bufferedData = stream2.getBufferedValue();
           }
-          reject(error);
+          reject(error2);
         };
         (async () => {
           try {
             await streamPipelinePromisified(inputStream, stream2);
-            resolve();
-          } catch (error) {
-            rejectPromise(error);
+            resolve2();
+          } catch (error2) {
+            rejectPromise(error2);
           }
         })();
         stream2.on("data", () => {
@@ -18335,8 +18126,8 @@ var require_stream = __commonJS({
       stream.destroy();
       try {
         return await streamPromise;
-      } catch (error) {
-        return error.bufferedData;
+      } catch (error2) {
+        return error2.bufferedData;
       }
     };
     var getStreamPromise = (stream, { encoding, buffer, maxBuffer }) => {
@@ -18354,9 +18145,9 @@ var require_stream = __commonJS({
       const allPromise = getStreamPromise(all, { encoding, buffer, maxBuffer: maxBuffer * 2 });
       try {
         return await Promise.all([processDone, stdoutPromise, stderrPromise, allPromise]);
-      } catch (error) {
+      } catch (error2) {
         return Promise.all([
-          { error, signal: error.signal, timedOut: error.timedOut },
+          { error: error2, signal: error2.signal, timedOut: error2.timedOut },
           getBufferedData(stdout, stdoutPromise),
           getBufferedData(stderr, stderrPromise),
           getBufferedData(all, allPromise)
@@ -18395,16 +18186,16 @@ var require_promise = __commonJS({
       return spawned;
     };
     var getSpawnedPromise = (spawned) => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve2, reject) => {
         spawned.on("exit", (exitCode, signal) => {
-          resolve({ exitCode, signal });
+          resolve2({ exitCode, signal });
         });
-        spawned.on("error", (error) => {
-          reject(error);
+        spawned.on("error", (error2) => {
+          reject(error2);
         });
         if (spawned.stdin) {
-          spawned.stdin.on("error", (error) => {
-            reject(error);
+          spawned.stdin.on("error", (error2) => {
+            reject(error2);
           });
         }
       });
@@ -18512,9 +18303,9 @@ var require_execa = __commonJS({
       }
       return { file, args, options, parsed };
     };
-    var handleOutput = (options, value, error) => {
+    var handleOutput = (options, value, error2) => {
       if (typeof value !== "string" && !Buffer.isBuffer(value)) {
-        return error === void 0 ? void 0 : "";
+        return error2 === void 0 ? void 0 : "";
       }
       if (options.stripFinalNewline) {
         return stripFinalNewline(value);
@@ -18529,10 +18320,10 @@ var require_execa = __commonJS({
       let spawned;
       try {
         spawned = childProcess.spawn(parsed.file, parsed.args, parsed.options);
-      } catch (error) {
+      } catch (error2) {
         const dummySpawned = new childProcess.ChildProcess();
         const errorPromise = Promise.reject(makeError({
-          error,
+          error: error2,
           stdout: "",
           stderr: "",
           all: "",
@@ -18548,17 +18339,17 @@ var require_execa = __commonJS({
       const spawnedPromise = getSpawnedPromise(spawned);
       const timedPromise = setupTimeout(spawned, parsed.options, spawnedPromise);
       const processDone = setExitHandler(spawned, parsed.options, timedPromise);
-      const context = { isCanceled: false };
+      const context3 = { isCanceled: false };
       spawned.kill = spawnedKill.bind(null, spawned.kill.bind(spawned));
-      spawned.cancel = spawnedCancel.bind(null, spawned, context);
+      spawned.cancel = spawnedCancel.bind(null, spawned, context3);
       const handlePromise = async () => {
-        const [{ error, exitCode, signal, timedOut }, stdoutResult, stderrResult, allResult] = await getSpawnedResult(spawned, parsed.options, processDone);
+        const [{ error: error2, exitCode, signal, timedOut }, stdoutResult, stderrResult, allResult] = await getSpawnedResult(spawned, parsed.options, processDone);
         const stdout = handleOutput(parsed.options, stdoutResult);
         const stderr = handleOutput(parsed.options, stderrResult);
         const all = handleOutput(parsed.options, allResult);
-        if (error || exitCode !== 0 || signal !== null) {
+        if (error2 || exitCode !== 0 || signal !== null) {
           const returnedError = makeError({
-            error,
+            error: error2,
             exitCode,
             signal,
             stdout,
@@ -18568,7 +18359,7 @@ var require_execa = __commonJS({
             escapedCommand,
             parsed,
             timedOut,
-            isCanceled: context.isCanceled,
+            isCanceled: context3.isCanceled,
             killed: spawned.killed
           });
           if (!parsed.options.reject) {
@@ -18603,9 +18394,9 @@ var require_execa = __commonJS({
       let result;
       try {
         result = childProcess.spawnSync(parsed.file, parsed.args, parsed.options);
-      } catch (error) {
+      } catch (error2) {
         throw makeError({
-          error,
+          error: error2,
           stdout: "",
           stderr: "",
           all: "",
@@ -18620,7 +18411,7 @@ var require_execa = __commonJS({
       const stdout = handleOutput(parsed.options, result.stdout, result.error);
       const stderr = handleOutput(parsed.options, result.stderr, result.error);
       if (result.error || result.status !== 0 || result.signal !== null) {
-        const error = makeError({
+        const error2 = makeError({
           stdout,
           stderr,
           error: result.error,
@@ -18634,9 +18425,9 @@ var require_execa = __commonJS({
           killed: result.signal !== null
         });
         if (!parsed.options.reject) {
-          return error;
+          return error2;
         }
-        throw error;
+        throw error2;
       }
       return {
         command,
@@ -19354,7 +19145,7 @@ var require_shippable = __commonJS({
 });
 
 // ../../node_modules/java-properties/dist-node/index.js
-var require_dist_node3 = __commonJS({
+var require_dist_node = __commonJS({
   "../../node_modules/java-properties/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", {
@@ -19509,12 +19300,12 @@ var require_dist_node3 = __commonJS({
       }
     };
     exports.PropertiesFile = PropertiesFile;
-    var of = function of2(...args) {
+    var of2 = function of3(...args) {
       let globalFile = new PropertiesFile();
       globalFile.of.apply(globalFile, args);
       return globalFile;
     };
-    exports.of = of;
+    exports.of = of2;
   }
 });
 
@@ -19533,7 +19324,7 @@ var require_fromentries = __commonJS({
 // ../../node_modules/env-ci/services/teamcity.js
 var require_teamcity = __commonJS({
   "../../node_modules/env-ci/services/teamcity.js"(exports, module2) {
-    var javaProperties = require_dist_node3();
+    var javaProperties = require_dist_node();
     var fromEntries = require_fromentries();
     var { branch } = require_git();
     var PROPERTIES_MAPPING = { root: "teamcity.build.workingDir", branch: "teamcity.build.branch" };
@@ -19799,11 +19590,11 @@ var require_utils5 = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -19819,16 +19610,16 @@ var require_utils5 = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getLastCommitMessage = exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
-    var fs2 = __importStar(require("fs"));
+    var fs4 = __importStar(require("fs"));
     var path2 = __importStar(require("path"));
-    var exec = __importStar(require_exec());
+    var exec3 = __importStar(require_exec());
     var cosmiconfig_1 = require_dist2();
     var doc_1 = require_doc();
     var inputs_1 = require_inputs();
@@ -19877,25 +19668,25 @@ var require_utils5 = __commonJS({
       });
     }
     exports.buildContext = buildContext;
-    function dryRunTask(context, description, task) {
+    function dryRunTask(context3, description, task) {
       return __awaiter(this, void 0, void 0, function* () {
-        if (context.dryRun) {
-          context.logger.info(`Skipping "${description}"`);
+        if (context3.dryRun) {
+          context3.logger.info(`Skipping "${description}"`);
         } else {
           return task();
         }
       });
     }
     exports.dryRunTask = dryRunTask;
-    function loadPlugins(context) {
+    function loadPlugins(context3) {
       return __awaiter(this, void 0, void 0, function* () {
         const pluginsLoaded = {};
-        for (const pluginName in context.plugins) {
+        for (const pluginName in context3.plugins) {
           let pluginPath = pluginName;
           if (!pluginName.startsWith("./")) {
             pluginPath = `./node_modules/${pluginName}`;
           }
-          if (pluginName.startsWith("@octorelease/") && !fs2.existsSync(pluginPath)) {
+          if (pluginName.startsWith("@octorelease/") && !fs4.existsSync(pluginPath)) {
             pluginPath = pluginName.replace("@octorelease", __dirname);
           }
           pluginsLoaded[pluginName] = require(path2.resolve(pluginPath));
@@ -19904,22 +19695,22 @@ var require_utils5 = __commonJS({
       });
     }
     exports.loadPlugins = loadPlugins;
-    function verifyConditions(context) {
+    function verifyConditions(context3) {
       return __awaiter(this, void 0, void 0, function* () {
-        context.version.new = inputs_1.Inputs.newVersion || context.version.new;
-        if (context.version.prerelease != null) {
-          context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
+        context3.version.new = inputs_1.Inputs.newVersion || context3.version.new;
+        if (context3.version.prerelease != null) {
+          context3.version.new = `${context3.version.new.split("-")[0]}-${context3.version.prerelease}`;
         }
-        const semverDiff = require_semver().diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
-        if (semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch") || semverDiff === "minor" && context.branch.level === "patch") {
-          throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
+        const semverDiff = require_semver().diff(context3.version.old.split("-")[0], context3.version.new.split("-")[0]);
+        if (semverDiff === "major" && (context3.branch.level === "minor" || context3.branch.level === "patch") || semverDiff === "minor" && context3.branch.level === "patch") {
+          throw new Error(`Protected branch ${context3.branch.name} does not allow ${semverDiff} version changes`);
         }
       });
     }
     exports.verifyConditions = verifyConditions;
     function buildVersionInfo(branch, tagPrefix) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
+        const cmdOutput = yield exec3.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`], { ignoreReturnCode: true });
         const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
         let prerelease = void 0;
         if (branch.prerelease) {
@@ -19930,9 +19721,9 @@ var require_utils5 = __commonJS({
         return { old: oldVersion, new: oldVersion, prerelease };
       });
     }
-    function getLastCommitMessage(context) {
+    function getLastCommitMessage(context3) {
       return __awaiter(this, void 0, void 0, function* () {
-        const cmdOutput = yield exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
+        const cmdOutput = yield exec3.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context3.ci.commit], { ignoreReturnCode: true });
         return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
       });
     }
@@ -19944,15 +19735,15 @@ var require_utils5 = __commonJS({
           throw new Error(`Unsupported CI service detected: ${envCi.service}`);
         }
         if (envCi.branch == null) {
-          const cmdOutput = yield exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
           envCi.branch = cmdOutput.stdout.trim();
         }
         if (envCi.commit == null) {
-          const cmdOutput = yield exec.getExecOutput("git", ["rev-parse", "HEAD"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["rev-parse", "HEAD"]);
           envCi.commit = cmdOutput.stdout.trim();
         }
         if (envCi.slug == null) {
-          const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
           envCi.slug = cmdOutput.stdout.trim().replace(/\.git$/, "").split("/").slice(-2).join("/");
         }
         const [owner, repo] = envCi.slug.split("/");
@@ -20010,6 +19801,850 @@ var require_lib5 = __commonJS({
     __exportStar(require_logger(), exports);
     exports.stages = __importStar(require_stages());
     exports.utils = __importStar(require_utils5());
+  }
+});
+
+// ../git/lib/utils.js
+var require_utils6 = __commonJS({
+  "../git/lib/utils.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod)
+          if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+            __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve2, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.gitTag = exports.gitPush = exports.gitConfig = exports.gitCommit = exports.gitAdd = void 0;
+    var fs4 = __importStar(require("fs"));
+    var os = __importStar(require("os"));
+    var path2 = __importStar(require("path"));
+    var url = __importStar(require("url"));
+    var exec3 = __importStar(require_exec());
+    function gitAdd(...files) {
+      return __awaiter(this, void 0, void 0, function* () {
+        yield exec3.exec("git", ["add", ...files]);
+      });
+    }
+    exports.gitAdd = gitAdd;
+    function gitCommit(message, amend) {
+      return __awaiter(this, void 0, void 0, function* () {
+        if (!amend) {
+          const cmdOutput = yield exec3.getExecOutput("git", ["diff", "--name-only", "--cached"]);
+          if (cmdOutput.stdout.trim().length == 0) {
+            return false;
+          }
+        }
+        const cmdArgs = ["commit", "-s", "-m", `${message} [ci skip]`];
+        if (amend) {
+          cmdArgs.push("--amend");
+        }
+        yield exec3.exec("git", cmdArgs);
+        return true;
+      });
+    }
+    exports.gitCommit = gitCommit;
+    function gitConfig(context3) {
+      return __awaiter(this, void 0, void 0, function* () {
+        yield exec3.exec("git", ["config", "--global", "user.name", context3.env.GIT_COMMITTER_NAME]);
+        yield exec3.exec("git", ["config", "--global", "user.email", context3.env.GIT_COMMITTER_EMAIL]);
+        if (context3.env.GIT_CREDENTIALS != null) {
+          yield exec3.exec("git", ["config", "--global", "credential.helper", "store"]);
+          const cmdOutput = yield exec3.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+          const gitUrl = new url.URL(cmdOutput.stdout);
+          fs4.appendFileSync(path2.join(os.homedir(), ".git-credentials"), `${gitUrl.protocol}//${context3.env.GIT_CREDENTIALS}@${gitUrl.host}`);
+        }
+        yield exec3.exec("git", ["ls-remote", "--heads", "origin", context3.branch.name]);
+      });
+    }
+    exports.gitConfig = gitConfig;
+    function gitPush(context3, branch, tags) {
+      return __awaiter(this, void 0, void 0, function* () {
+        if (!tags) {
+          const cmdOutput = yield exec3.getExecOutput("git", ["cherry"]);
+          if (cmdOutput.stdout.trim().length == 0) {
+            return false;
+          }
+        }
+        const cmdArgs = ["push", "-u", "origin", branch];
+        if (tags) {
+          cmdArgs.push("--follow-tags");
+        }
+        if (context3.dryRun) {
+          cmdArgs.push("--dry-run");
+        }
+        yield exec3.exec("git", cmdArgs);
+        return true;
+      });
+    }
+    exports.gitPush = gitPush;
+    function gitTag(tagName, message) {
+      return __awaiter(this, void 0, void 0, function* () {
+        const cmdOutput = yield exec3.getExecOutput("git", ["tag", "-l", tagName]);
+        if (cmdOutput.stdout.trim().length > 0) {
+          return false;
+        }
+        const cmdArgs = ["tag", tagName];
+        if (message != null) {
+          cmdArgs.push("-a", "-m", message);
+        }
+        yield exec3.exec("git", cmdArgs);
+        return true;
+      });
+    }
+    exports.gitTag = gitTag;
+  }
+});
+
+// ../git/lib/init.js
+var require_init = __commonJS({
+  "../git/lib/init.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod)
+          if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+            __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve2, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var utils = __importStar(require_utils6());
+    function default_1(context3, _config) {
+      return __awaiter(this, void 0, void 0, function* () {
+        if (context3.env.GIT_COMMITTER_NAME == null) {
+          throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
+        }
+        if (context3.env.GIT_COMMITTER_EMAIL == null) {
+          throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
+        }
+        yield utils.gitConfig(context3);
+      });
+    }
+    exports.default = default_1;
+  }
+});
+
+// ../git/lib/version.js
+var require_version = __commonJS({
+  "../git/lib/version.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod)
+          if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+            __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve2, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var utils = __importStar(require_utils6());
+    function default_1(context3, config) {
+      return __awaiter(this, void 0, void 0, function* () {
+        const commitMessage = config.commitMessage || "Bump version to {{version}}";
+        let tagMessage = config.tagMessage || context3.branch.channel && `Release {{version}} to ${context3.branch.channel}`;
+        yield utils.gitAdd(...context3.changedFiles);
+        let shouldPush = false;
+        if (yield utils.gitCommit(commitMessage.replace("{{version}}", context3.version.new))) {
+          shouldPush = true;
+        } else {
+          context3.logger.warn("Nothing to commit");
+        }
+        tagMessage = tagMessage === null || tagMessage === void 0 ? void 0 : tagMessage.replace("{{version}}", context3.version.new);
+        if (yield utils.gitTag(context3.tagPrefix + context3.version.new, tagMessage)) {
+          shouldPush = true;
+        } else {
+          context3.logger.warn("Git tag already exists");
+        }
+        if (!shouldPush || !(yield utils.gitPush(context3, context3.branch.name, true))) {
+          context3.logger.warn("Nothing to push");
+        }
+      });
+    }
+    exports.default = default_1;
+  }
+});
+
+// ../git/lib/config.js
+var require_config = __commonJS({
+  "../git/lib/config.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+  }
+});
+
+// ../git/lib/index.js
+var require_lib6 = __commonJS({
+  "../git/lib/index.js"(exports) {
+    "use strict";
+    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      var desc = Object.getOwnPropertyDescriptor(m, k);
+      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() {
+          return m[k];
+        } };
+      }
+      Object.defineProperty(o, k2, desc);
+    } : function(o, m, k, k2) {
+      if (k2 === void 0)
+        k2 = k;
+      o[k2] = m[k];
+    });
+    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    } : function(o, v) {
+      o["default"] = v;
+    });
+    var __exportStar = exports && exports.__exportStar || function(m, exports2) {
+      for (var p in m)
+        if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
+          __createBinding(exports2, m, p);
+    };
+    var __importStar = exports && exports.__importStar || function(mod) {
+      if (mod && mod.__esModule)
+        return mod;
+      var result = {};
+      if (mod != null) {
+        for (var k in mod)
+          if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+            __createBinding(result, mod, k);
+      }
+      __setModuleDefault(result, mod);
+      return result;
+    };
+    var __importDefault = exports && exports.__importDefault || function(mod) {
+      return mod && mod.__esModule ? mod : { "default": mod };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.utils = exports.version = exports.init = void 0;
+    var init_1 = require_init();
+    Object.defineProperty(exports, "init", { enumerable: true, get: function() {
+      return __importDefault(init_1).default;
+    } });
+    var version_1 = require_version();
+    Object.defineProperty(exports, "version", { enumerable: true, get: function() {
+      return __importDefault(version_1).default;
+    } });
+    __exportStar(require_config(), exports);
+    exports.utils = __importStar(require_utils6());
+  }
+});
+
+// ../../node_modules/pluralize/pluralize.js
+var require_pluralize = __commonJS({
+  "../../node_modules/pluralize/pluralize.js"(exports, module2) {
+    (function(root, pluralize) {
+      if (typeof require === "function" && typeof exports === "object" && typeof module2 === "object") {
+        module2.exports = pluralize();
+      } else if (typeof define === "function" && define.amd) {
+        define(function() {
+          return pluralize();
+        });
+      } else {
+        root.pluralize = pluralize();
+      }
+    })(exports, function() {
+      var pluralRules = [];
+      var singularRules = [];
+      var uncountables = {};
+      var irregularPlurals = {};
+      var irregularSingles = {};
+      function sanitizeRule(rule) {
+        if (typeof rule === "string") {
+          return new RegExp("^" + rule + "$", "i");
+        }
+        return rule;
+      }
+      function restoreCase(word, token) {
+        if (word === token)
+          return token;
+        if (word === word.toLowerCase())
+          return token.toLowerCase();
+        if (word === word.toUpperCase())
+          return token.toUpperCase();
+        if (word[0] === word[0].toUpperCase()) {
+          return token.charAt(0).toUpperCase() + token.substr(1).toLowerCase();
+        }
+        return token.toLowerCase();
+      }
+      function interpolate(str, args) {
+        return str.replace(/\$(\d{1,2})/g, function(match, index) {
+          return args[index] || "";
+        });
+      }
+      function replace(word, rule) {
+        return word.replace(rule[0], function(match, index) {
+          var result = interpolate(rule[1], arguments);
+          if (match === "") {
+            return restoreCase(word[index - 1], result);
+          }
+          return restoreCase(match, result);
+        });
+      }
+      function sanitizeWord(token, word, rules) {
+        if (!token.length || uncountables.hasOwnProperty(token)) {
+          return word;
+        }
+        var len = rules.length;
+        while (len--) {
+          var rule = rules[len];
+          if (rule[0].test(word))
+            return replace(word, rule);
+        }
+        return word;
+      }
+      function replaceWord(replaceMap, keepMap, rules) {
+        return function(word) {
+          var token = word.toLowerCase();
+          if (keepMap.hasOwnProperty(token)) {
+            return restoreCase(word, token);
+          }
+          if (replaceMap.hasOwnProperty(token)) {
+            return restoreCase(word, replaceMap[token]);
+          }
+          return sanitizeWord(token, word, rules);
+        };
+      }
+      function checkWord(replaceMap, keepMap, rules, bool) {
+        return function(word) {
+          var token = word.toLowerCase();
+          if (keepMap.hasOwnProperty(token))
+            return true;
+          if (replaceMap.hasOwnProperty(token))
+            return false;
+          return sanitizeWord(token, token, rules) === token;
+        };
+      }
+      function pluralize(word, count, inclusive) {
+        var pluralized = count === 1 ? pluralize.singular(word) : pluralize.plural(word);
+        return (inclusive ? count + " " : "") + pluralized;
+      }
+      pluralize.plural = replaceWord(
+        irregularSingles,
+        irregularPlurals,
+        pluralRules
+      );
+      pluralize.isPlural = checkWord(
+        irregularSingles,
+        irregularPlurals,
+        pluralRules
+      );
+      pluralize.singular = replaceWord(
+        irregularPlurals,
+        irregularSingles,
+        singularRules
+      );
+      pluralize.isSingular = checkWord(
+        irregularPlurals,
+        irregularSingles,
+        singularRules
+      );
+      pluralize.addPluralRule = function(rule, replacement) {
+        pluralRules.push([sanitizeRule(rule), replacement]);
+      };
+      pluralize.addSingularRule = function(rule, replacement) {
+        singularRules.push([sanitizeRule(rule), replacement]);
+      };
+      pluralize.addUncountableRule = function(word) {
+        if (typeof word === "string") {
+          uncountables[word.toLowerCase()] = true;
+          return;
+        }
+        pluralize.addPluralRule(word, "$0");
+        pluralize.addSingularRule(word, "$0");
+      };
+      pluralize.addIrregularRule = function(single, plural) {
+        plural = plural.toLowerCase();
+        single = single.toLowerCase();
+        irregularSingles[single] = plural;
+        irregularPlurals[plural] = single;
+      };
+      [
+        // Pronouns.
+        ["I", "we"],
+        ["me", "us"],
+        ["he", "they"],
+        ["she", "they"],
+        ["them", "them"],
+        ["myself", "ourselves"],
+        ["yourself", "yourselves"],
+        ["itself", "themselves"],
+        ["herself", "themselves"],
+        ["himself", "themselves"],
+        ["themself", "themselves"],
+        ["is", "are"],
+        ["was", "were"],
+        ["has", "have"],
+        ["this", "these"],
+        ["that", "those"],
+        // Words ending in with a consonant and `o`.
+        ["echo", "echoes"],
+        ["dingo", "dingoes"],
+        ["volcano", "volcanoes"],
+        ["tornado", "tornadoes"],
+        ["torpedo", "torpedoes"],
+        // Ends with `us`.
+        ["genus", "genera"],
+        ["viscus", "viscera"],
+        // Ends with `ma`.
+        ["stigma", "stigmata"],
+        ["stoma", "stomata"],
+        ["dogma", "dogmata"],
+        ["lemma", "lemmata"],
+        ["schema", "schemata"],
+        ["anathema", "anathemata"],
+        // Other irregular rules.
+        ["ox", "oxen"],
+        ["axe", "axes"],
+        ["die", "dice"],
+        ["yes", "yeses"],
+        ["foot", "feet"],
+        ["eave", "eaves"],
+        ["goose", "geese"],
+        ["tooth", "teeth"],
+        ["quiz", "quizzes"],
+        ["human", "humans"],
+        ["proof", "proofs"],
+        ["carve", "carves"],
+        ["valve", "valves"],
+        ["looey", "looies"],
+        ["thief", "thieves"],
+        ["groove", "grooves"],
+        ["pickaxe", "pickaxes"],
+        ["passerby", "passersby"]
+      ].forEach(function(rule) {
+        return pluralize.addIrregularRule(rule[0], rule[1]);
+      });
+      [
+        [/s?$/i, "s"],
+        [/[^\u0000-\u007F]$/i, "$0"],
+        [/([^aeiou]ese)$/i, "$1"],
+        [/(ax|test)is$/i, "$1es"],
+        [/(alias|[^aou]us|t[lm]as|gas|ris)$/i, "$1es"],
+        [/(e[mn]u)s?$/i, "$1s"],
+        [/([^l]ias|[aeiou]las|[ejzr]as|[iu]am)$/i, "$1"],
+        [/(alumn|syllab|vir|radi|nucle|fung|cact|stimul|termin|bacill|foc|uter|loc|strat)(?:us|i)$/i, "$1i"],
+        [/(alumn|alg|vertebr)(?:a|ae)$/i, "$1ae"],
+        [/(seraph|cherub)(?:im)?$/i, "$1im"],
+        [/(her|at|gr)o$/i, "$1oes"],
+        [/(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|automat|quor)(?:a|um)$/i, "$1a"],
+        [/(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)(?:a|on)$/i, "$1a"],
+        [/sis$/i, "ses"],
+        [/(?:(kni|wi|li)fe|(ar|l|ea|eo|oa|hoo)f)$/i, "$1$2ves"],
+        [/([^aeiouy]|qu)y$/i, "$1ies"],
+        [/([^ch][ieo][ln])ey$/i, "$1ies"],
+        [/(x|ch|ss|sh|zz)$/i, "$1es"],
+        [/(matr|cod|mur|sil|vert|ind|append)(?:ix|ex)$/i, "$1ices"],
+        [/\b((?:tit)?m|l)(?:ice|ouse)$/i, "$1ice"],
+        [/(pe)(?:rson|ople)$/i, "$1ople"],
+        [/(child)(?:ren)?$/i, "$1ren"],
+        [/eaux$/i, "$0"],
+        [/m[ae]n$/i, "men"],
+        ["thou", "you"]
+      ].forEach(function(rule) {
+        return pluralize.addPluralRule(rule[0], rule[1]);
+      });
+      [
+        [/s$/i, ""],
+        [/(ss)$/i, "$1"],
+        [/(wi|kni|(?:after|half|high|low|mid|non|night|[^\w]|^)li)ves$/i, "$1fe"],
+        [/(ar|(?:wo|[ae])l|[eo][ao])ves$/i, "$1f"],
+        [/ies$/i, "y"],
+        [/\b([pl]|zomb|(?:neck|cross)?t|coll|faer|food|gen|goon|group|lass|talk|goal|cut)ies$/i, "$1ie"],
+        [/\b(mon|smil)ies$/i, "$1ey"],
+        [/\b((?:tit)?m|l)ice$/i, "$1ouse"],
+        [/(seraph|cherub)im$/i, "$1"],
+        [/(x|ch|ss|sh|zz|tto|go|cho|alias|[^aou]us|t[lm]as|gas|(?:her|at|gr)o|[aeiou]ris)(?:es)?$/i, "$1"],
+        [/(analy|diagno|parenthe|progno|synop|the|empha|cri|ne)(?:sis|ses)$/i, "$1sis"],
+        [/(movie|twelve|abuse|e[mn]u)s$/i, "$1"],
+        [/(test)(?:is|es)$/i, "$1is"],
+        [/(alumn|syllab|vir|radi|nucle|fung|cact|stimul|termin|bacill|foc|uter|loc|strat)(?:us|i)$/i, "$1us"],
+        [/(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|quor)a$/i, "$1um"],
+        [/(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)a$/i, "$1on"],
+        [/(alumn|alg|vertebr)ae$/i, "$1a"],
+        [/(cod|mur|sil|vert|ind)ices$/i, "$1ex"],
+        [/(matr|append)ices$/i, "$1ix"],
+        [/(pe)(rson|ople)$/i, "$1rson"],
+        [/(child)ren$/i, "$1"],
+        [/(eau)x?$/i, "$1"],
+        [/men$/i, "man"]
+      ].forEach(function(rule) {
+        return pluralize.addSingularRule(rule[0], rule[1]);
+      });
+      [
+        // Singular words with no plurals.
+        "adulthood",
+        "advice",
+        "agenda",
+        "aid",
+        "aircraft",
+        "alcohol",
+        "ammo",
+        "analytics",
+        "anime",
+        "athletics",
+        "audio",
+        "bison",
+        "blood",
+        "bream",
+        "buffalo",
+        "butter",
+        "carp",
+        "cash",
+        "chassis",
+        "chess",
+        "clothing",
+        "cod",
+        "commerce",
+        "cooperation",
+        "corps",
+        "debris",
+        "diabetes",
+        "digestion",
+        "elk",
+        "energy",
+        "equipment",
+        "excretion",
+        "expertise",
+        "firmware",
+        "flounder",
+        "fun",
+        "gallows",
+        "garbage",
+        "graffiti",
+        "hardware",
+        "headquarters",
+        "health",
+        "herpes",
+        "highjinks",
+        "homework",
+        "housework",
+        "information",
+        "jeans",
+        "justice",
+        "kudos",
+        "labour",
+        "literature",
+        "machinery",
+        "mackerel",
+        "mail",
+        "media",
+        "mews",
+        "moose",
+        "music",
+        "mud",
+        "manga",
+        "news",
+        "only",
+        "personnel",
+        "pike",
+        "plankton",
+        "pliers",
+        "police",
+        "pollution",
+        "premises",
+        "rain",
+        "research",
+        "rice",
+        "salmon",
+        "scissors",
+        "series",
+        "sewage",
+        "shambles",
+        "shrimp",
+        "software",
+        "species",
+        "staff",
+        "swine",
+        "tennis",
+        "traffic",
+        "transportation",
+        "trout",
+        "tuna",
+        "wealth",
+        "welfare",
+        "whiting",
+        "wildebeest",
+        "wildlife",
+        "you",
+        /pok[eé]mon$/i,
+        // Regexes.
+        /[^aeiou]ese$/i,
+        // "chinese", "japanese"
+        /deer$/i,
+        // "deer", "reindeer"
+        /fish$/i,
+        // "fish", "blowfish", "angelfish"
+        /measles$/i,
+        /o[iu]s$/i,
+        // "carnivorous"
+        /pox$/i,
+        // "chickpox", "smallpox"
+        /sheep$/i
+      ].forEach(pluralize.addUncountableRule);
+      return pluralize;
+    });
+  }
+});
+
+// scripts/npmUpdate.ts
+var npmUpdate_exports = {};
+__export(npmUpdate_exports, {
+  default: () => npmUpdate_default
+});
+function getDependencies(branch, dev) {
+  const dependencies = dev ? branch.devDependencies : branch.dependencies;
+  if (!Array.isArray(dependencies)) {
+    return dependencies || {};
+  }
+  const dependencyMap = {};
+  for (const pkgName of dependencies) {
+    dependencyMap[pkgName] = branch.channel || "latest";
+  }
+  return dependencyMap;
+}
+function updateDependency(pkgName, pkgTag, dev) {
+  return __async(this, null, function* () {
+    const lockfile = JSON.parse(fs.readFileSync(lockfilePath, "utf-8"));
+    const currentVersion = lockfile.dependencies[pkgName].version;
+    if (resolutions[pkgName] == null) {
+      resolutions[pkgName] = (yield exec.getExecOutput(
+        "npm",
+        ["view", `${pkgName}@${pkgTag}`, "version"]
+      )).stdout.trim();
+    }
+    const latestVersion = resolutions[pkgName];
+    if (currentVersion !== latestVersion) {
+      const npmArgs = dev ? ["--save-dev"] : ["--save-prod", "--save-exact"];
+      yield exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs]);
+      updateDetails.push(`${pkgName}: ${currentVersion} -> ${latestVersion}`);
+    }
+  });
+}
+function npmUpdate_default(context3) {
+  return __async(this, null, function* () {
+    const branchConfig = context3.branch;
+    if (branchConfig.dependencies == null && branchConfig.devDependencies == null) {
+      return;
+    }
+    const pluralize = require_pluralize();
+    const dependencies = getDependencies(branchConfig, false);
+    const devDependencies = getDependencies(branchConfig, true);
+    const changedFiles = ["package.json", lockfilePath];
+    context3.logger.info(`Checking for updates to ${pluralize("dependency", Object.keys(dependencies).length, true)} and ${pluralize("dev dependency", Object.keys(devDependencies).length, true)}`);
+    if (context3.env.NPM_RESOLUTIONS) {
+      resolutions = JSON.parse(context3.env.NPM_RESOLUTIONS);
+      if (Object.keys(resolutions).length === 0) {
+        return;
+      }
+    }
+    if (branchConfig.dependencies != null) {
+      for (const [pkgName, pkgTag] of Object.entries(dependencies)) {
+        yield updateDependency(pkgName, pkgTag, false);
+      }
+    }
+    if (branchConfig.devDependencies) {
+      for (const [pkgName, pkgTag] of Object.entries(devDependencies)) {
+        yield updateDependency(pkgName, pkgTag, true);
+      }
+    }
+    if (!context3.env.NPM_RESOLUTIONS) {
+      core.setOutput("result", JSON.stringify(resolutions));
+    }
+    if (updateDetails.length > 0) {
+      const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+      if (packageJson.workspaces != null) {
+        changedFiles.push("**/package.json");
+        const dependencyList = [...Object.keys(dependencies), ...Object.keys(devDependencies)];
+        yield exec.exec("npx", [
+          "-y",
+          "--",
+          "syncpack",
+          "fix-mismatches",
+          "--dev",
+          "--prod",
+          "--filter",
+          dependencyList.join("|")
+        ]);
+        yield exec.exec("git", ["checkout", lockfilePath]);
+        yield exec.exec("npm", ["install"]);
+      }
+      if (context3.env.GIT_COMMITTER_NAME !== null && context3.env.GIT_COMMITTER_EMAIL !== null) {
+        yield import_git.utils.gitConfig(context3);
+        yield import_git.utils.gitAdd(...changedFiles);
+        yield import_git.utils.gitCommit("Update dependencies [ci skip]\n\n" + updateDetails.join("\n"));
+      }
+    }
+  });
+}
+var fs, core, exec, import_git, lockfilePath, updateDetails, resolutions;
+var init_npmUpdate = __esm({
+  "scripts/npmUpdate.ts"() {
+    "use strict";
+    fs = __toESM(require("fs"));
+    core = __toESM(require_core());
+    exec = __toESM(require_exec());
+    import_git = __toESM(require_lib6());
+    lockfilePath = fs.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
+    updateDetails = [];
+    resolutions = {};
   }
 });
 
@@ -20072,7 +20707,7 @@ var require_context = __commonJS({
 });
 
 // ../../node_modules/@actions/github/lib/internal/utils.js
-var require_utils6 = __commonJS({
+var require_utils7 = __commonJS({
   "../../node_modules/@actions/github/lib/internal/utils.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
@@ -20128,7 +20763,7 @@ var require_utils6 = __commonJS({
 });
 
 // ../../node_modules/universal-user-agent/dist-node/index.js
-var require_dist_node4 = __commonJS({
+var require_dist_node2 = __commonJS({
   "../../node_modules/universal-user-agent/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -20200,8 +20835,8 @@ var require_add = __commonJS({
       }
       if (kind === "error") {
         hook = function(method, options) {
-          return Promise.resolve().then(method.bind(null, options)).catch(function(error) {
-            return orig(error, options);
+          return Promise.resolve().then(method.bind(null, options)).catch(function(error2) {
+            return orig(error2, options);
           });
         };
       }
@@ -20316,12 +20951,12 @@ var require_is_plain_object = __commonJS({
 });
 
 // ../../node_modules/@actions/github/node_modules/@octokit/endpoint/dist-node/index.js
-var require_dist_node5 = __commonJS({
+var require_dist_node3 = __commonJS({
   "../../node_modules/@actions/github/node_modules/@octokit/endpoint/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var isPlainObject = require_is_plain_object();
-    var universalUserAgent = require_dist_node4();
+    var universalUserAgent = require_dist_node2();
     function lowercaseKeys(object) {
       if (!object) {
         return {};
@@ -20436,8 +21071,8 @@ var require_dist_node5 = __commonJS({
     function isKeyOperator(operator) {
       return operator === ";" || operator === "&" || operator === "?";
     }
-    function getValues(context, operator, key, modifier) {
-      var value = context[key], result = [];
+    function getValues(context3, operator, key, modifier) {
+      var value = context3[key], result = [];
       if (isDefined(value) && value !== "") {
         if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
           value = value.toString();
@@ -20497,7 +21132,7 @@ var require_dist_node5 = __commonJS({
         expand: expand.bind(null, template)
       };
     }
-    function expand(template, context) {
+    function expand(template, context3) {
       var operators = ["+", "#", ".", "/", ";", "?", "&"];
       return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function(_, expression, literal) {
         if (expression) {
@@ -20509,7 +21144,7 @@ var require_dist_node5 = __commonJS({
           }
           expression.split(/,/g).forEach(function(variable) {
             var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-            values.push(getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+            values.push(getValues(context3, operator, tmp[1], tmp[2] || tmp[3]));
           });
           if (operator && operator !== "+") {
             var separator = ",";
@@ -20615,7 +21250,7 @@ var require_dist_node5 = __commonJS({
 });
 
 // ../../node_modules/webidl-conversions/lib/index.js
-var require_lib6 = __commonJS({
+var require_lib7 = __commonJS({
   "../../node_modules/webidl-conversions/lib/index.js"(exports, module2) {
     "use strict";
     var conversions = {};
@@ -20772,7 +21407,7 @@ var require_lib6 = __commonJS({
 });
 
 // ../../node_modules/whatwg-url/lib/utils.js
-var require_utils7 = __commonJS({
+var require_utils8 = __commonJS({
   "../../node_modules/whatwg-url/lib/utils.js"(exports, module2) {
     "use strict";
     module2.exports.mixin = function mixin(target, source) {
@@ -20888,21 +21523,21 @@ var require_tr46 = __commonJS({
         label = punycode.toUnicode(label);
         processing_option = PROCESSING_OPTIONS.NONTRANSITIONAL;
       }
-      var error = false;
+      var error2 = false;
       if (normalize(label) !== label || label[3] === "-" && label[4] === "-" || label[0] === "-" || label[label.length - 1] === "-" || label.indexOf(".") !== -1 || label.search(combiningMarksRegex) === 0) {
-        error = true;
+        error2 = true;
       }
       var len = countSymbols(label);
       for (var i = 0; i < len; ++i) {
         var status = findStatus(label.codePointAt(i));
         if (processing === PROCESSING_OPTIONS.TRANSITIONAL && status[1] !== "valid" || processing === PROCESSING_OPTIONS.NONTRANSITIONAL && status[1] !== "valid" && status[1] !== "deviation") {
-          error = true;
+          error2 = true;
           break;
         }
       }
       return {
         label,
-        error
+        error: error2
       };
     }
     function processing(domain_name, useSTD3, processing_option) {
@@ -22194,10 +22829,10 @@ var require_URL_impl = __commonJS({
 var require_URL = __commonJS({
   "../../node_modules/whatwg-url/lib/URL.js"(exports, module2) {
     "use strict";
-    var conversions = require_lib6();
-    var utils2 = require_utils7();
+    var conversions = require_lib7();
+    var utils = require_utils8();
     var Impl = require_URL_impl();
-    var impl = utils2.implSymbol;
+    var impl = utils.implSymbol;
     function URL3(url) {
       if (!this || this[impl] || !(this instanceof URL3)) {
         throw new TypeError("Failed to construct 'URL': Please use the 'new' operator, this DOM object constructor cannot be called as a function.");
@@ -22362,7 +22997,7 @@ var require_URL = __commonJS({
           privateData = {};
         privateData.wrapper = obj;
         obj[impl] = new Impl.implementation(constructorArgs, privateData);
-        obj[impl][utils2.wrapperSymbol] = obj;
+        obj[impl][utils.wrapperSymbol] = obj;
       },
       interface: URL3,
       expose: {
@@ -22390,7 +23025,7 @@ var require_public_api = __commonJS({
 });
 
 // ../../node_modules/node-fetch/lib/index.js
-var require_lib7 = __commonJS({
+var require_lib8 = __commonJS({
   "../../node_modules/node-fetch/lib/index.js"(exports, module2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -22403,7 +23038,7 @@ var require_lib7 = __commonJS({
     var whatwgUrl = _interopDefault(require_public_api());
     var https = _interopDefault(require("https"));
     var zlib = _interopDefault(require("zlib"));
-    var Readable = Stream.Readable;
+    var Readable2 = Stream.Readable;
     var BUFFER = Symbol("buffer");
     var TYPE = Symbol("type");
     var Blob = class {
@@ -22455,7 +23090,7 @@ var require_lib7 = __commonJS({
         return Promise.resolve(ab);
       }
       stream() {
-        const readable = new Readable();
+        const readable = new Readable2();
         readable._read = function() {
         };
         readable.push(this[BUFFER]);
@@ -22554,8 +23189,8 @@ var require_lib7 = __commonJS({
       this.timeout = timeout;
       if (body instanceof Stream) {
         body.on("error", function(err) {
-          const error = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
-          _this[INTERNALS].error = error;
+          const error2 = err.name === "AbortError" ? err : new FetchError(`Invalid response body while trying to fetch ${_this.url}: ${err.message}`, "system", err);
+          _this[INTERNALS].error = error2;
         });
       }
     }
@@ -22682,7 +23317,7 @@ var require_lib7 = __commonJS({
       let accum = [];
       let accumBytes = 0;
       let abort = false;
-      return new Body.Promise(function(resolve, reject) {
+      return new Body.Promise(function(resolve2, reject) {
         let resTimeout;
         if (_this4.timeout) {
           resTimeout = setTimeout(function() {
@@ -22716,7 +23351,7 @@ var require_lib7 = __commonJS({
           }
           clearTimeout(resTimeout);
           try {
-            resolve(Buffer.concat(accum, accumBytes));
+            resolve2(Buffer.concat(accum, accumBytes));
           } catch (err) {
             reject(new FetchError(`Could not create Buffer from response body for ${_this4.url}: ${err.message}`, "system", err));
           }
@@ -23396,21 +24031,21 @@ var require_lib7 = __commonJS({
         throw new Error("native promise missing, set fetch.Promise to your favorite alternative");
       }
       Body.Promise = fetch.Promise;
-      return new fetch.Promise(function(resolve, reject) {
+      return new fetch.Promise(function(resolve2, reject) {
         const request = new Request(url, opts);
         const options = getNodeRequestOptions(request);
         const send = (options.protocol === "https:" ? https : http).request;
         const signal = request.signal;
         let response = null;
         const abort = function abort2() {
-          let error = new AbortError("The user aborted a request.");
-          reject(error);
+          let error2 = new AbortError("The user aborted a request.");
+          reject(error2);
           if (request.body && request.body instanceof Stream.Readable) {
-            destroyStream(request.body, error);
+            destroyStream(request.body, error2);
           }
           if (!response || !response.body)
             return;
-          response.body.emit("error", error);
+          response.body.emit("error", error2);
         };
         if (signal && signal.aborted) {
           abort();
@@ -23531,7 +24166,7 @@ var require_lib7 = __commonJS({
                   requestOpts.body = void 0;
                   requestOpts.headers.delete("content-length");
                 }
-                resolve(fetch(new Request(locationURL, requestOpts)));
+                resolve2(fetch(new Request(locationURL, requestOpts)));
                 finalize();
                 return;
             }
@@ -23553,7 +24188,7 @@ var require_lib7 = __commonJS({
           const codings = headers.get("Content-Encoding");
           if (!request.compress || request.method === "HEAD" || codings === null || res.statusCode === 204 || res.statusCode === 304) {
             response = new Response(body, response_options);
-            resolve(response);
+            resolve2(response);
             return;
           }
           const zlibOptions = {
@@ -23563,7 +24198,7 @@ var require_lib7 = __commonJS({
           if (codings == "gzip" || codings == "x-gzip") {
             body = body.pipe(zlib.createGunzip(zlibOptions));
             response = new Response(body, response_options);
-            resolve(response);
+            resolve2(response);
             return;
           }
           if (codings == "deflate" || codings == "x-deflate") {
@@ -23575,12 +24210,12 @@ var require_lib7 = __commonJS({
                 body = body.pipe(zlib.createInflateRaw());
               }
               response = new Response(body, response_options);
-              resolve(response);
+              resolve2(response);
             });
             raw.on("end", function() {
               if (!response) {
                 response = new Response(body, response_options);
-                resolve(response);
+                resolve2(response);
               }
             });
             return;
@@ -23588,11 +24223,11 @@ var require_lib7 = __commonJS({
           if (codings == "br" && typeof zlib.createBrotliDecompress === "function") {
             body = body.pipe(zlib.createBrotliDecompress());
             response = new Response(body, response_options);
-            resolve(response);
+            resolve2(response);
             return;
           }
           response = new Response(body, response_options);
-          resolve(response);
+          resolve2(response);
         });
         writeToStream(req, request);
       });
@@ -23638,19 +24273,113 @@ var require_lib7 = __commonJS({
   }
 });
 
+// ../../node_modules/deprecation/dist-node/index.js
+var require_dist_node4 = __commonJS({
+  "../../node_modules/deprecation/dist-node/index.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Deprecation = class extends Error {
+      constructor(message) {
+        super(message);
+        if (Error.captureStackTrace) {
+          Error.captureStackTrace(this, this.constructor);
+        }
+        this.name = "Deprecation";
+      }
+    };
+    exports.Deprecation = Deprecation;
+  }
+});
+
+// ../../node_modules/wrappy/wrappy.js
+var require_wrappy = __commonJS({
+  "../../node_modules/wrappy/wrappy.js"(exports, module2) {
+    module2.exports = wrappy;
+    function wrappy(fn, cb) {
+      if (fn && cb)
+        return wrappy(fn)(cb);
+      if (typeof fn !== "function")
+        throw new TypeError("need wrapper function");
+      Object.keys(fn).forEach(function(k) {
+        wrapper[k] = fn[k];
+      });
+      return wrapper;
+      function wrapper() {
+        var args = new Array(arguments.length);
+        for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i];
+        }
+        var ret = fn.apply(this, args);
+        var cb2 = args[args.length - 1];
+        if (typeof ret === "function" && ret !== cb2) {
+          Object.keys(cb2).forEach(function(k) {
+            ret[k] = cb2[k];
+          });
+        }
+        return ret;
+      }
+    }
+  }
+});
+
+// ../../node_modules/once/once.js
+var require_once = __commonJS({
+  "../../node_modules/once/once.js"(exports, module2) {
+    var wrappy = require_wrappy();
+    module2.exports = wrappy(once);
+    module2.exports.strict = wrappy(onceStrict);
+    once.proto = once(function() {
+      Object.defineProperty(Function.prototype, "once", {
+        value: function() {
+          return once(this);
+        },
+        configurable: true
+      });
+      Object.defineProperty(Function.prototype, "onceStrict", {
+        value: function() {
+          return onceStrict(this);
+        },
+        configurable: true
+      });
+    });
+    function once(fn) {
+      var f = function() {
+        if (f.called)
+          return f.value;
+        f.called = true;
+        return f.value = fn.apply(this, arguments);
+      };
+      f.called = false;
+      return f;
+    }
+    function onceStrict(fn) {
+      var f = function() {
+        if (f.called)
+          throw new Error(f.onceError);
+        f.called = true;
+        return f.value = fn.apply(this, arguments);
+      };
+      var name = fn.name || "Function wrapped with `once`";
+      f.onceError = name + " shouldn't be called more than once";
+      f.called = false;
+      return f;
+    }
+  }
+});
+
 // ../../node_modules/@actions/github/node_modules/@octokit/request-error/dist-node/index.js
-var require_dist_node6 = __commonJS({
+var require_dist_node5 = __commonJS({
   "../../node_modules/@actions/github/node_modules/@octokit/request-error/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function _interopDefault(ex) {
       return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
     }
-    var deprecation = require_dist_node();
+    var deprecation = require_dist_node4();
     var once = _interopDefault(require_once());
     var logOnceCode = once((deprecation2) => console.warn(deprecation2));
     var logOnceHeaders = once((deprecation2) => console.warn(deprecation2));
-    var RequestError3 = class extends Error {
+    var RequestError = class extends Error {
       constructor(message, statusCode, options) {
         super(message);
         if (Error.captureStackTrace) {
@@ -23688,23 +24417,23 @@ var require_dist_node6 = __commonJS({
         });
       }
     };
-    exports.RequestError = RequestError3;
+    exports.RequestError = RequestError;
   }
 });
 
 // ../../node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js
-var require_dist_node7 = __commonJS({
+var require_dist_node6 = __commonJS({
   "../../node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function _interopDefault(ex) {
       return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
     }
-    var endpoint = require_dist_node5();
-    var universalUserAgent = require_dist_node4();
+    var endpoint = require_dist_node3();
+    var universalUserAgent = require_dist_node2();
     var isPlainObject = require_is_plain_object();
-    var nodeFetch = _interopDefault(require_lib7());
-    var requestError = require_dist_node6();
+    var nodeFetch = _interopDefault(require_lib8());
+    var requestError = require_dist_node5();
     var VERSION = "5.6.3";
     function getBufferResponse(response) {
       return response.arrayBuffer();
@@ -23769,7 +24498,7 @@ var require_dist_node7 = __commonJS({
         }
         if (status >= 400) {
           const data = await getResponseData(response);
-          const error = new requestError.RequestError(toErrorMessage(data), status, {
+          const error2 = new requestError.RequestError(toErrorMessage(data), status, {
             response: {
               url,
               status,
@@ -23778,7 +24507,7 @@ var require_dist_node7 = __commonJS({
             },
             request: requestOptions
           });
-          throw error;
+          throw error2;
         }
         return getResponseData(response);
       }).then((data) => {
@@ -23788,10 +24517,10 @@ var require_dist_node7 = __commonJS({
           headers,
           data
         };
-      }).catch((error) => {
-        if (error instanceof requestError.RequestError)
-          throw error;
-        throw new requestError.RequestError(error.message, 500, {
+      }).catch((error2) => {
+        if (error2 instanceof requestError.RequestError)
+          throw error2;
+        throw new requestError.RequestError(error2.message, 500, {
           request: requestOptions
         });
       });
@@ -23848,12 +24577,12 @@ var require_dist_node7 = __commonJS({
 });
 
 // ../../node_modules/@actions/github/node_modules/@octokit/graphql/dist-node/index.js
-var require_dist_node8 = __commonJS({
+var require_dist_node7 = __commonJS({
   "../../node_modules/@actions/github/node_modules/@octokit/graphql/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var request = require_dist_node7();
-    var universalUserAgent = require_dist_node4();
+    var request = require_dist_node6();
+    var universalUserAgent = require_dist_node2();
     var VERSION = "4.8.0";
     function _buildMessageForResponseErrors(data) {
       return `Request failed due to following response errors:
@@ -23946,7 +24675,7 @@ var require_dist_node8 = __commonJS({
 });
 
 // ../../node_modules/@actions/github/node_modules/@octokit/auth-token/dist-node/index.js
-var require_dist_node9 = __commonJS({
+var require_dist_node8 = __commonJS({
   "../../node_modules/@actions/github/node_modules/@octokit/auth-token/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -23992,15 +24721,15 @@ var require_dist_node9 = __commonJS({
 });
 
 // ../../node_modules/@actions/github/node_modules/@octokit/core/dist-node/index.js
-var require_dist_node10 = __commonJS({
+var require_dist_node9 = __commonJS({
   "../../node_modules/@actions/github/node_modules/@octokit/core/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var universalUserAgent = require_dist_node4();
+    var universalUserAgent = require_dist_node2();
     var beforeAfterHook = require_before_after_hook();
-    var request = require_dist_node7();
-    var graphql = require_dist_node8();
-    var authToken = require_dist_node9();
+    var request = require_dist_node6();
+    var graphql = require_dist_node7();
+    var authToken = require_dist_node8();
     function _objectWithoutPropertiesLoose(source, excluded) {
       if (source == null)
         return {};
@@ -24140,7 +24869,7 @@ var require_dist_node10 = __commonJS({
 });
 
 // ../../node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js
-var require_dist_node11 = __commonJS({
+var require_dist_node10 = __commonJS({
   "../../node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -25214,7 +25943,7 @@ var require_dist_node11 = __commonJS({
 });
 
 // ../../node_modules/@octokit/plugin-paginate-rest/dist-node/index.js
-var require_dist_node12 = __commonJS({
+var require_dist_node11 = __commonJS({
   "../../node_modules/@octokit/plugin-paginate-rest/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -25304,9 +26033,9 @@ var require_dist_node12 = __commonJS({
               return {
                 value: normalizedResponse
               };
-            } catch (error) {
-              if (error.status !== 409)
-                throw error;
+            } catch (error2) {
+              if (error2.status !== 409)
+                throw error2;
               url = "";
               return {
                 value: {
@@ -25370,7 +26099,7 @@ var require_dist_node12 = __commonJS({
 });
 
 // ../../node_modules/@actions/github/lib/utils.js
-var require_utils8 = __commonJS({
+var require_utils9 = __commonJS({
   "../../node_modules/@actions/github/lib/utils.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
@@ -25404,10 +26133,10 @@ var require_utils8 = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getOctokitOptions = exports.GitHub = exports.defaults = exports.context = void 0;
     var Context = __importStar(require_context());
-    var Utils = __importStar(require_utils6());
-    var core_1 = require_dist_node10();
-    var plugin_rest_endpoint_methods_1 = require_dist_node11();
-    var plugin_paginate_rest_1 = require_dist_node12();
+    var Utils = __importStar(require_utils7());
+    var core_1 = require_dist_node9();
+    var plugin_rest_endpoint_methods_1 = require_dist_node10();
+    var plugin_paginate_rest_1 = require_dist_node11();
     exports.context = new Context.Context();
     var baseUrl = Utils.getApiBaseUrl();
     exports.defaults = {
@@ -25417,7 +26146,7 @@ var require_utils8 = __commonJS({
       }
     };
     exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(exports.defaults);
-    function getOctokitOptions2(token, options) {
+    function getOctokitOptions(token, options) {
       const opts = Object.assign({}, options || {});
       const auth = Utils.getAuthString(token, opts);
       if (auth) {
@@ -25425,7 +26154,7 @@ var require_utils8 = __commonJS({
       }
       return opts;
     }
-    exports.getOctokitOptions = getOctokitOptions2;
+    exports.getOctokitOptions = getOctokitOptions;
   }
 });
 
@@ -25464,16568 +26193,2110 @@ var require_github2 = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getOctokit = exports.context = void 0;
     var Context = __importStar(require_context());
-    var utils_1 = require_utils8();
+    var utils_1 = require_utils9();
     exports.context = new Context.Context();
-    function getOctokit3(token, options, ...additionalPlugins) {
+    function getOctokit2(token, options, ...additionalPlugins) {
       const GitHubWithPlugins = utils_1.GitHub.plugin(...additionalPlugins);
       return new GitHubWithPlugins(utils_1.getOctokitOptions(token, options));
     }
-    exports.getOctokit = getOctokit3;
+    exports.getOctokit = getOctokit2;
   }
 });
 
-// ../../node_modules/@octokit/plugin-enterprise-server/dist-node/index.js
-var require_dist_node13 = __commonJS({
-  "../../node_modules/@octokit/plugin-enterprise-server/dist-node/index.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var VERSION = "12.1.0";
-    function endpointsToMethods(octokit, endpointsMap) {
-      const newMethods = {};
-      for (const [scope, endpoints] of Object.entries(endpointsMap)) {
-        for (const [methodName, endpoint] of Object.entries(endpoints)) {
-          const [route, defaults, decorations = {}] = endpoint;
-          const [method, url] = route.split(/ /);
-          const endpointDefaults = Object.assign({
-            method,
-            url
-          }, defaults);
-          if (!newMethods[scope]) {
-            newMethods[scope] = {};
-          }
-          const scopeMethods = newMethods[scope];
-          if (decorations.renamed) {
-            const [newScope, newMethodName] = decorations.renamed;
-            scopeMethods[methodName] = deprecate(octokit, `octokit.${scope}.${methodName}() has been renamed to octokit.${newScope}.${newMethodName}()`, endpointDefaults);
-            continue;
-          }
-          if (decorations.deprecated) {
-            scopeMethods[methodName] = deprecate(octokit, decorations.deprecated, endpointDefaults);
-            continue;
-          }
-          scopeMethods[methodName] = octokit.request.defaults(endpointDefaults);
+// ../../node_modules/traverse/index.js
+var require_traverse = __commonJS({
+  "../../node_modules/traverse/index.js"(exports, module2) {
+    module2.exports = Traverse;
+    function Traverse(obj) {
+      if (!(this instanceof Traverse))
+        return new Traverse(obj);
+      this.value = obj;
+    }
+    Traverse.prototype.get = function(ps) {
+      var node = this.value;
+      for (var i = 0; i < ps.length; i++) {
+        var key = ps[i];
+        if (!Object.hasOwnProperty.call(node, key)) {
+          node = void 0;
+          break;
         }
+        node = node[key];
       }
-      return newMethods;
-    }
-    function deprecate(octokit, deprecation, defaults) {
-      const requestWithDefaults = octokit.request.defaults(defaults);
-      function deprecated(...args) {
-        octokit.log.warn(deprecation);
-        return requestWithDefaults(...args);
-      }
-      return Object.assign(deprecated, requestWithDefaults);
-    }
-    var Endpoints = {
-      actions: {
-        addCustomLabelsToSelfHostedRunnerForOrg: ["POST /orgs/{org}/actions/runners/{runner_id}/labels"],
-        addCustomLabelsToSelfHostedRunnerForRepo: ["POST /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        cancelWorkflowRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel"],
-        createOrUpdateEnvironmentSecret: ["PUT /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        createRegistrationTokenForOrg: ["POST /orgs/{org}/actions/runners/registration-token"],
-        createRegistrationTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/registration-token"],
-        createRemoveTokenForOrg: ["POST /orgs/{org}/actions/runners/remove-token"],
-        createRemoveTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/remove-token"],
-        createWorkflowDispatch: ["POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches"],
-        deleteArtifact: ["DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        deleteEnvironmentSecret: ["DELETE /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        deleteSelfHostedRunnerFromOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}"],
-        deleteSelfHostedRunnerFromRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        deleteWorkflowRun: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        deleteWorkflowRunLogs: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        disableSelectedRepositoryGithubActionsOrganization: ["DELETE /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        disableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable"],
-        downloadArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}"],
-        downloadJobLogsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs"],
-        downloadWorkflowRunLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        enableSelectedRepositoryGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        enableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable"],
-        getAllowedActionsOrganization: ["GET /orgs/{org}/actions/permissions/selected-actions"],
-        getAllowedActionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        getArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        getEnvironmentPublicKey: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/public-key"],
-        getEnvironmentSecret: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        getGithubActionsPermissionsOrganization: ["GET /orgs/{org}/actions/permissions"],
-        getGithubActionsPermissionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions"],
-        getJobForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}"],
-        getOrgPublicKey: ["GET /orgs/{org}/actions/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}"],
-        getPendingDeploymentsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/actions/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        getReviewsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/approvals"],
-        getSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}"],
-        getSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        getWorkflow: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}"],
-        getWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        listArtifactsForRepo: ["GET /repos/{owner}/{repo}/actions/artifacts"],
-        listEnvironmentSecrets: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets"],
-        listJobsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs"],
-        listLabelsForSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}/labels"],
-        listLabelsForSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        listOrgSecrets: ["GET /orgs/{org}/actions/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/actions/secrets"],
-        listRepoWorkflows: ["GET /repos/{owner}/{repo}/actions/workflows"],
-        listRunnerApplicationsForOrg: ["GET /orgs/{org}/actions/runners/downloads"],
-        listRunnerApplicationsForRepo: ["GET /repos/{owner}/{repo}/actions/runners/downloads"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        listSelectedRepositoriesEnabledGithubActionsOrganization: ["GET /orgs/{org}/actions/permissions/repositories"],
-        listSelfHostedRunnersForOrg: ["GET /orgs/{org}/actions/runners"],
-        listSelfHostedRunnersForRepo: ["GET /repos/{owner}/{repo}/actions/runners"],
-        listWorkflowRunArtifacts: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"],
-        listWorkflowRuns: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs"],
-        listWorkflowRunsForRepo: ["GET /repos/{owner}/{repo}/actions/runs"],
-        reRunWorkflow: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun"],
-        removeAllCustomLabelsFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels"],
-        removeAllCustomLabelsFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        removeCustomLabelFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels/{name}"],
-        removeCustomLabelFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels/{name}"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        reviewPendingDeploymentsForRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        setAllowedActionsOrganization: ["PUT /orgs/{org}/actions/permissions/selected-actions"],
-        setAllowedActionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        setCustomLabelsForSelfHostedRunnerForOrg: ["PUT /orgs/{org}/actions/runners/{runner_id}/labels"],
-        setCustomLabelsForSelfHostedRunnerForRepo: ["PUT /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions"],
-        setGithubActionsPermissionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        setSelectedRepositoriesEnabledGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories"]
-      },
-      activity: {
-        checkRepoIsStarredByAuthenticatedUser: ["GET /user/starred/{owner}/{repo}"],
-        deleteRepoSubscription: ["DELETE /repos/{owner}/{repo}/subscription"],
-        deleteThreadSubscription: ["DELETE /notifications/threads/{thread_id}/subscription"],
-        getFeeds: ["GET /feeds"],
-        getRepoSubscription: ["GET /repos/{owner}/{repo}/subscription"],
-        getThread: ["GET /notifications/threads/{thread_id}"],
-        getThreadSubscriptionForAuthenticatedUser: ["GET /notifications/threads/{thread_id}/subscription"],
-        listEventsForAuthenticatedUser: ["GET /users/{username}/events"],
-        listNotificationsForAuthenticatedUser: ["GET /notifications"],
-        listOrgEventsForAuthenticatedUser: ["GET /users/{username}/events/orgs/{org}"],
-        listPublicEvents: ["GET /events"],
-        listPublicEventsForRepoNetwork: ["GET /networks/{owner}/{repo}/events"],
-        listPublicEventsForUser: ["GET /users/{username}/events/public"],
-        listPublicOrgEvents: ["GET /orgs/{org}/events"],
-        listReceivedEventsForUser: ["GET /users/{username}/received_events"],
-        listReceivedPublicEventsForUser: ["GET /users/{username}/received_events/public"],
-        listRepoEvents: ["GET /repos/{owner}/{repo}/events"],
-        listRepoNotificationsForAuthenticatedUser: ["GET /repos/{owner}/{repo}/notifications"],
-        listReposStarredByAuthenticatedUser: ["GET /user/starred"],
-        listReposStarredByUser: ["GET /users/{username}/starred"],
-        listReposWatchedByUser: ["GET /users/{username}/subscriptions"],
-        listStargazersForRepo: ["GET /repos/{owner}/{repo}/stargazers"],
-        listWatchedReposForAuthenticatedUser: ["GET /user/subscriptions"],
-        listWatchersForRepo: ["GET /repos/{owner}/{repo}/subscribers"],
-        markNotificationsAsRead: ["PUT /notifications"],
-        markRepoNotificationsAsRead: ["PUT /repos/{owner}/{repo}/notifications"],
-        markThreadAsRead: ["PATCH /notifications/threads/{thread_id}"],
-        setRepoSubscription: ["PUT /repos/{owner}/{repo}/subscription"],
-        setThreadSubscription: ["PUT /notifications/threads/{thread_id}/subscription"],
-        starRepoForAuthenticatedUser: ["PUT /user/starred/{owner}/{repo}"],
-        unstarRepoForAuthenticatedUser: ["DELETE /user/starred/{owner}/{repo}"]
-      },
-      apps: {
-        addRepoToInstallation: ["PUT /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "addRepoToInstallationForAuthenticatedUser"]
-        }],
-        addRepoToInstallationForAuthenticatedUser: ["PUT /user/installations/{installation_id}/repositories/{repository_id}"],
-        checkToken: ["POST /applications/{client_id}/token"],
-        createFromManifest: ["POST /app-manifests/{code}/conversions"],
-        createInstallationAccessToken: ["POST /app/installations/{installation_id}/access_tokens"],
-        deleteAuthorization: ["DELETE /applications/{client_id}/grant"],
-        deleteInstallation: ["DELETE /app/installations/{installation_id}"],
-        deleteToken: ["DELETE /applications/{client_id}/token"],
-        getAuthenticated: ["GET /app"],
-        getBySlug: ["GET /apps/{app_slug}"],
-        getInstallation: ["GET /app/installations/{installation_id}"],
-        getOrgInstallation: ["GET /orgs/{org}/installation"],
-        getRepoInstallation: ["GET /repos/{owner}/{repo}/installation"],
-        getUserInstallation: ["GET /users/{username}/installation"],
-        getWebhookConfigForApp: ["GET /app/hook/config"],
-        getWebhookDelivery: ["GET /app/hook/deliveries/{delivery_id}"],
-        listInstallationReposForAuthenticatedUser: ["GET /user/installations/{installation_id}/repositories"],
-        listInstallations: ["GET /app/installations"],
-        listInstallationsForAuthenticatedUser: ["GET /user/installations"],
-        listReposAccessibleToInstallation: ["GET /installation/repositories"],
-        listWebhookDeliveries: ["GET /app/hook/deliveries"],
-        redeliverWebhookDelivery: ["POST /app/hook/deliveries/{delivery_id}/attempts"],
-        removeRepoFromInstallation: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "removeRepoFromInstallationForAuthenticatedUser"]
-        }],
-        removeRepoFromInstallationForAuthenticatedUser: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}"],
-        resetToken: ["PATCH /applications/{client_id}/token"],
-        revokeInstallationAccessToken: ["DELETE /installation/token"],
-        scopeToken: ["POST /applications/{client_id}/token/scoped"],
-        suspendInstallation: ["PUT /app/installations/{installation_id}/suspended"],
-        unsuspendInstallation: ["DELETE /app/installations/{installation_id}/suspended"],
-        updateWebhookConfigForApp: ["PATCH /app/hook/config"]
-      },
-      billing: {
-        getGithubAdvancedSecurityBillingGhe: ["GET /enterprises/{enterprise}/settings/billing/advanced-security"],
-        getGithubAdvancedSecurityBillingOrg: ["GET /orgs/{org}/settings/billing/advanced-security"]
-      },
-      checks: {
-        create: ["POST /repos/{owner}/{repo}/check-runs"],
-        createSuite: ["POST /repos/{owner}/{repo}/check-suites"],
-        get: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}"],
-        getSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}"],
-        listAnnotations: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}/annotations"],
-        listForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-runs"],
-        listForSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"],
-        listSuitesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-suites"],
-        rerequestRun: ["POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest"],
-        rerequestSuite: ["POST /repos/{owner}/{repo}/check-suites/{check_suite_id}/rerequest"],
-        setSuitesPreferences: ["PATCH /repos/{owner}/{repo}/check-suites/preferences"],
-        update: ["PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}"]
-      },
-      codeScanning: {
-        deleteAnalysis: ["DELETE /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}{?confirm_delete}"],
-        getAlert: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        getAnalysis: ["GET /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}"],
-        getSarif: ["GET /repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}"],
-        listAlertInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/code-scanning/alerts"],
-        listAlertsInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances", {}, {
-          renamed: ["codeScanning", "listAlertInstances"]
-        }],
-        listRecentAnalyses: ["GET /repos/{owner}/{repo}/code-scanning/analyses"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        uploadSarif: ["POST /repos/{owner}/{repo}/code-scanning/sarifs"]
-      },
-      codesOfConduct: {
-        getAllCodesOfConduct: ["GET /codes_of_conduct"],
-        getConductCode: ["GET /codes_of_conduct/{key}"]
-      },
-      dependabot: {
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        getOrgPublicKey: ["GET /orgs/{org}/dependabot/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/dependabot/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        listOrgSecrets: ["GET /orgs/{org}/dependabot/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/dependabot/secrets"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}/repositories"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories"]
-      },
-      emojis: {
-        get: ["GET /emojis"]
-      },
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      },
-      gists: {
-        checkIsStarred: ["GET /gists/{gist_id}/star"],
-        create: ["POST /gists"],
-        createComment: ["POST /gists/{gist_id}/comments"],
-        delete: ["DELETE /gists/{gist_id}"],
-        deleteComment: ["DELETE /gists/{gist_id}/comments/{comment_id}"],
-        fork: ["POST /gists/{gist_id}/forks"],
-        get: ["GET /gists/{gist_id}"],
-        getComment: ["GET /gists/{gist_id}/comments/{comment_id}"],
-        getRevision: ["GET /gists/{gist_id}/{sha}"],
-        list: ["GET /gists"],
-        listComments: ["GET /gists/{gist_id}/comments"],
-        listCommits: ["GET /gists/{gist_id}/commits"],
-        listForUser: ["GET /users/{username}/gists"],
-        listForks: ["GET /gists/{gist_id}/forks"],
-        listPublic: ["GET /gists/public"],
-        listStarred: ["GET /gists/starred"],
-        star: ["PUT /gists/{gist_id}/star"],
-        unstar: ["DELETE /gists/{gist_id}/star"],
-        update: ["PATCH /gists/{gist_id}"],
-        updateComment: ["PATCH /gists/{gist_id}/comments/{comment_id}"]
-      },
-      git: {
-        createBlob: ["POST /repos/{owner}/{repo}/git/blobs"],
-        createCommit: ["POST /repos/{owner}/{repo}/git/commits"],
-        createRef: ["POST /repos/{owner}/{repo}/git/refs"],
-        createTag: ["POST /repos/{owner}/{repo}/git/tags"],
-        createTree: ["POST /repos/{owner}/{repo}/git/trees"],
-        deleteRef: ["DELETE /repos/{owner}/{repo}/git/refs/{ref}"],
-        getBlob: ["GET /repos/{owner}/{repo}/git/blobs/{file_sha}"],
-        getCommit: ["GET /repos/{owner}/{repo}/git/commits/{commit_sha}"],
-        getRef: ["GET /repos/{owner}/{repo}/git/ref/{ref}"],
-        getTag: ["GET /repos/{owner}/{repo}/git/tags/{tag_sha}"],
-        getTree: ["GET /repos/{owner}/{repo}/git/trees/{tree_sha}"],
-        listMatchingRefs: ["GET /repos/{owner}/{repo}/git/matching-refs/{ref}"],
-        updateRef: ["PATCH /repos/{owner}/{repo}/git/refs/{ref}"]
-      },
-      gitignore: {
-        getAllTemplates: ["GET /gitignore/templates"],
-        getTemplate: ["GET /gitignore/templates/{name}"]
-      },
-      issues: {
-        addAssignees: ["POST /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        addLabels: ["POST /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        checkUserCanBeAssigned: ["GET /repos/{owner}/{repo}/assignees/{assignee}"],
-        checkUserCanBeAssignedToIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/assignees/{assignee}"],
-        create: ["POST /repos/{owner}/{repo}/issues"],
-        createComment: ["POST /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        createLabel: ["POST /repos/{owner}/{repo}/labels"],
-        createMilestone: ["POST /repos/{owner}/{repo}/milestones"],
-        deleteComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        deleteLabel: ["DELETE /repos/{owner}/{repo}/labels/{name}"],
-        deleteMilestone: ["DELETE /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        get: ["GET /repos/{owner}/{repo}/issues/{issue_number}"],
-        getComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        getEvent: ["GET /repos/{owner}/{repo}/issues/events/{event_id}"],
-        getLabel: ["GET /repos/{owner}/{repo}/labels/{name}"],
-        getMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        list: ["GET /issues"],
-        listAssignees: ["GET /repos/{owner}/{repo}/assignees"],
-        listComments: ["GET /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        listCommentsForRepo: ["GET /repos/{owner}/{repo}/issues/comments"],
-        listEvents: ["GET /repos/{owner}/{repo}/issues/{issue_number}/events"],
-        listEventsForRepo: ["GET /repos/{owner}/{repo}/issues/events"],
-        listEventsForTimeline: ["GET /repos/{owner}/{repo}/issues/{issue_number}/timeline"],
-        listForAuthenticatedUser: ["GET /user/issues"],
-        listForOrg: ["GET /orgs/{org}/issues"],
-        listForRepo: ["GET /repos/{owner}/{repo}/issues"],
-        listLabelsForMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}/labels"],
-        listLabelsForRepo: ["GET /repos/{owner}/{repo}/labels"],
-        listLabelsOnIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        listMilestones: ["GET /repos/{owner}/{repo}/milestones"],
-        lock: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        removeAllLabels: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        removeAssignees: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        removeLabel: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels/{name}"],
-        setLabels: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        unlock: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        update: ["PATCH /repos/{owner}/{repo}/issues/{issue_number}"],
-        updateComment: ["PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        updateLabel: ["PATCH /repos/{owner}/{repo}/labels/{name}"],
-        updateMilestone: ["PATCH /repos/{owner}/{repo}/milestones/{milestone_number}"]
-      },
-      licenses: {
-        get: ["GET /licenses/{license}"],
-        getAllCommonlyUsed: ["GET /licenses"],
-        getForRepo: ["GET /repos/{owner}/{repo}/license"]
-      },
-      markdown: {
-        render: ["POST /markdown"],
-        renderRaw: ["POST /markdown/raw", {
-          headers: {
-            "content-type": "text/plain; charset=utf-8"
-          }
-        }]
-      },
-      meta: {
-        get: ["GET /meta"],
-        getOctocat: ["GET /octocat"],
-        getZen: ["GET /zen"],
-        root: ["GET /"]
-      },
-      migrations: {
-        getArchiveForAuthenticatedUser: ["GET /user/migrations/{migration_id}/archive"],
-        getStatusForOrg: ["GET /orgs/{org}/migrations/{migration_id}"],
-        listForAuthenticatedUser: ["GET /user/migrations"],
-        listForOrg: ["GET /orgs/{org}/migrations"],
-        listReposForAuthenticatedUser: ["GET /user/migrations/{migration_id}/repositories"],
-        listReposForUser: ["GET /user/migrations/{migration_id}/repositories", {}, {
-          renamed: ["migrations", "listReposForAuthenticatedUser"]
-        }],
-        startForAuthenticatedUser: ["POST /user/migrations"],
-        startForOrg: ["POST /orgs/{org}/migrations"]
-      },
-      orgs: {
-        checkMembershipForUser: ["GET /orgs/{org}/members/{username}"],
-        checkPublicMembershipForUser: ["GET /orgs/{org}/public_members/{username}"],
-        convertMemberToOutsideCollaborator: ["PUT /orgs/{org}/outside_collaborators/{username}"],
-        createWebhook: ["POST /orgs/{org}/hooks"],
-        deleteWebhook: ["DELETE /orgs/{org}/hooks/{hook_id}"],
-        get: ["GET /orgs/{org}"],
-        getMembershipForAuthenticatedUser: ["GET /user/memberships/orgs/{org}"],
-        getMembershipForUser: ["GET /orgs/{org}/memberships/{username}"],
-        getWebhook: ["GET /orgs/{org}/hooks/{hook_id}"],
-        getWebhookConfigForOrg: ["GET /orgs/{org}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        list: ["GET /organizations"],
-        listAppInstallations: ["GET /orgs/{org}/installations"],
-        listCustomRoles: ["GET /organizations/{organization_id}/custom_roles"],
-        listForAuthenticatedUser: ["GET /user/orgs"],
-        listForUser: ["GET /users/{username}/orgs"],
-        listMembers: ["GET /orgs/{org}/members"],
-        listMembershipsForAuthenticatedUser: ["GET /user/memberships/orgs"],
-        listOutsideCollaborators: ["GET /orgs/{org}/outside_collaborators"],
-        listPublicMembers: ["GET /orgs/{org}/public_members"],
-        listWebhookDeliveries: ["GET /orgs/{org}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /orgs/{org}/hooks"],
-        pingWebhook: ["POST /orgs/{org}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeMember: ["DELETE /orgs/{org}/members/{username}"],
-        removeMembershipForUser: ["DELETE /orgs/{org}/memberships/{username}"],
-        removeOutsideCollaborator: ["DELETE /orgs/{org}/outside_collaborators/{username}"],
-        removePublicMembershipForAuthenticatedUser: ["DELETE /orgs/{org}/public_members/{username}"],
-        setMembershipForUser: ["PUT /orgs/{org}/memberships/{username}"],
-        setPublicMembershipForAuthenticatedUser: ["PUT /orgs/{org}/public_members/{username}"],
-        update: ["PATCH /orgs/{org}"],
-        updateMembershipForAuthenticatedUser: ["PATCH /user/memberships/orgs/{org}"],
-        updateWebhook: ["PATCH /orgs/{org}/hooks/{hook_id}"],
-        updateWebhookConfigForOrg: ["PATCH /orgs/{org}/hooks/{hook_id}/config"]
-      },
-      projects: {
-        addCollaborator: ["PUT /projects/{project_id}/collaborators/{username}"],
-        createCard: ["POST /projects/columns/{column_id}/cards"],
-        createColumn: ["POST /projects/{project_id}/columns"],
-        createForAuthenticatedUser: ["POST /user/projects"],
-        createForOrg: ["POST /orgs/{org}/projects"],
-        createForRepo: ["POST /repos/{owner}/{repo}/projects"],
-        delete: ["DELETE /projects/{project_id}"],
-        deleteCard: ["DELETE /projects/columns/cards/{card_id}"],
-        deleteColumn: ["DELETE /projects/columns/{column_id}"],
-        get: ["GET /projects/{project_id}"],
-        getCard: ["GET /projects/columns/cards/{card_id}"],
-        getColumn: ["GET /projects/columns/{column_id}"],
-        getPermissionForUser: ["GET /projects/{project_id}/collaborators/{username}/permission"],
-        listCards: ["GET /projects/columns/{column_id}/cards"],
-        listCollaborators: ["GET /projects/{project_id}/collaborators"],
-        listColumns: ["GET /projects/{project_id}/columns"],
-        listForOrg: ["GET /orgs/{org}/projects"],
-        listForRepo: ["GET /repos/{owner}/{repo}/projects"],
-        listForUser: ["GET /users/{username}/projects"],
-        moveCard: ["POST /projects/columns/cards/{card_id}/moves"],
-        moveColumn: ["POST /projects/columns/{column_id}/moves"],
-        removeCollaborator: ["DELETE /projects/{project_id}/collaborators/{username}"],
-        update: ["PATCH /projects/{project_id}"],
-        updateCard: ["PATCH /projects/columns/cards/{card_id}"],
-        updateColumn: ["PATCH /projects/columns/{column_id}"]
-      },
-      pulls: {
-        checkIfMerged: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        create: ["POST /repos/{owner}/{repo}/pulls"],
-        createReplyForReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies"],
-        createReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        createReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        deletePendingReview: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        deleteReviewComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        dismissReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/dismissals"],
-        get: ["GET /repos/{owner}/{repo}/pulls/{pull_number}"],
-        getReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        getReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        list: ["GET /repos/{owner}/{repo}/pulls"],
-        listCommentsForReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/comments"],
-        listCommits: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/commits"],
-        listFiles: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/files"],
-        listRequestedReviewers: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        listReviewComments: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        listReviewCommentsForRepo: ["GET /repos/{owner}/{repo}/pulls/comments"],
-        listReviews: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        merge: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        removeRequestedReviewers: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        requestReviewers: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        submitReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/events"],
-        update: ["PATCH /repos/{owner}/{repo}/pulls/{pull_number}"],
-        updateBranch: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch"],
-        updateReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        updateReviewComment: ["PATCH /repos/{owner}/{repo}/pulls/comments/{comment_id}"]
-      },
-      rateLimit: {
-        get: ["GET /rate_limit"]
-      },
-      reactions: {
-        createForCommitComment: ["POST /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        createForIssue: ["POST /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        createForIssueComment: ["POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        createForPullRequestReviewComment: ["POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        createForRelease: ["POST /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        createForTeamDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        createForTeamDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#create-reaction-for-a-team-discussion-comment-legacy"
-        }],
-        createForTeamDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        createForTeamDiscussionLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#create-reaction-for-a-team-discussion-legacy"
-        }],
-        deleteForCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForIssue: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/reactions/{reaction_id}"],
-        deleteForIssueComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForPullRequestComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}/reactions/{reaction_id}"],
-        deleteForTeamDiscussion: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions/{reaction_id}"],
-        deleteForTeamDiscussionComment: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions/{reaction_id}"],
-        deleteLegacy: ["DELETE /reactions/{reaction_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#delete-a-reaction-legacy"
-        }],
-        listForCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        listForIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        listForIssueComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        listForPullRequestReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        listForRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        listForTeamDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        listForTeamDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#list-reactions-for-a-team-discussion-comment-legacy"
-        }],
-        listForTeamDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        listForTeamDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#list-reactions-for-a-team-discussion-legacy"
-        }]
-      },
-      repos: {
-        acceptInvitation: ["PATCH /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "acceptInvitationForAuthenticatedUser"]
-        }],
-        acceptInvitationForAuthenticatedUser: ["PATCH /user/repository_invitations/{invitation_id}"],
-        addAppAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        addCollaborator: ["PUT /repos/{owner}/{repo}/collaborators/{username}"],
-        addStatusCheckContexts: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        addTeamAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        addUserAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        checkCollaborator: ["GET /repos/{owner}/{repo}/collaborators/{username}"],
-        compareCommits: ["GET /repos/{owner}/{repo}/compare/{base}...{head}"],
-        compareCommitsWithBasehead: ["GET /repos/{owner}/{repo}/compare/{basehead}"],
-        createAutolink: ["POST /repos/{owner}/{repo}/autolinks"],
-        createCommitComment: ["POST /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        createCommitSignatureProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        createCommitStatus: ["POST /repos/{owner}/{repo}/statuses/{sha}"],
-        createDeployKey: ["POST /repos/{owner}/{repo}/keys"],
-        createDeployment: ["POST /repos/{owner}/{repo}/deployments"],
-        createDeploymentBranchPolicy: ["POST /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        createDeploymentStatus: ["POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        createDispatchEvent: ["POST /repos/{owner}/{repo}/dispatches"],
-        createForAuthenticatedUser: ["POST /user/repos"],
-        createFork: ["POST /repos/{owner}/{repo}/forks"],
-        createInOrg: ["POST /orgs/{org}/repos"],
-        createOrUpdateEnvironment: ["PUT /repos/{owner}/{repo}/environments/{environment_name}"],
-        createOrUpdateFileContents: ["PUT /repos/{owner}/{repo}/contents/{path}"],
-        createPagesSite: ["POST /repos/{owner}/{repo}/pages"],
-        createRelease: ["POST /repos/{owner}/{repo}/releases"],
-        createUsingTemplate: ["POST /repos/{template_owner}/{template_repo}/generate"],
-        createWebhook: ["POST /repos/{owner}/{repo}/hooks"],
-        declineInvitation: ["DELETE /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "declineInvitationForAuthenticatedUser"]
-        }],
-        declineInvitationForAuthenticatedUser: ["DELETE /user/repository_invitations/{invitation_id}"],
-        delete: ["DELETE /repos/{owner}/{repo}"],
-        deleteAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        deleteAdminBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        deleteAnEnvironment: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}"],
-        deleteAutolink: ["DELETE /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        deleteBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection"],
-        deleteCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}"],
-        deleteCommitSignatureProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        deleteDeployKey: ["DELETE /repos/{owner}/{repo}/keys/{key_id}"],
-        deleteDeployment: ["DELETE /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        deleteDeploymentBranchPolicy: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        deleteFile: ["DELETE /repos/{owner}/{repo}/contents/{path}"],
-        deleteInvitation: ["DELETE /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        deletePagesSite: ["DELETE /repos/{owner}/{repo}/pages"],
-        deletePullRequestReviewProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        deleteRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}"],
-        deleteReleaseAsset: ["DELETE /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        deleteWebhook: ["DELETE /repos/{owner}/{repo}/hooks/{hook_id}"],
-        disableLfsForRepo: ["DELETE /repos/{owner}/{repo}/lfs"],
-        downloadTarballArchive: ["GET /repos/{owner}/{repo}/tarball/{ref}"],
-        downloadZipballArchive: ["GET /repos/{owner}/{repo}/zipball/{ref}"],
-        enableLfsForRepo: ["PUT /repos/{owner}/{repo}/lfs"],
-        generateReleaseNotes: ["POST /repos/{owner}/{repo}/releases/generate-notes"],
-        get: ["GET /repos/{owner}/{repo}"],
-        getAccessRestrictions: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        getAdminBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        getAllEnvironments: ["GET /repos/{owner}/{repo}/environments"],
-        getAllStatusCheckContexts: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        getAllTopics: ["GET /repos/{owner}/{repo}/topics"],
-        getAppsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        getAutolink: ["GET /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        getBranch: ["GET /repos/{owner}/{repo}/branches/{branch}"],
-        getBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection"],
-        getCodeFrequencyStats: ["GET /repos/{owner}/{repo}/stats/code_frequency"],
-        getCollaboratorPermissionLevel: ["GET /repos/{owner}/{repo}/collaborators/{username}/permission"],
-        getCombinedStatusForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/status"],
-        getCommit: ["GET /repos/{owner}/{repo}/commits/{ref}"],
-        getCommitActivityStats: ["GET /repos/{owner}/{repo}/stats/commit_activity"],
-        getCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}"],
-        getCommitSignatureProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        getContent: ["GET /repos/{owner}/{repo}/contents/{path}"],
-        getContributorsStats: ["GET /repos/{owner}/{repo}/stats/contributors"],
-        getDeployKey: ["GET /repos/{owner}/{repo}/keys/{key_id}"],
-        getDeployment: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        getDeploymentBranchPolicy: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        getDeploymentStatus: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses/{status_id}"],
-        getEnvironment: ["GET /repos/{owner}/{repo}/environments/{environment_name}"],
-        getLatestPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/latest"],
-        getLatestRelease: ["GET /repos/{owner}/{repo}/releases/latest"],
-        getPages: ["GET /repos/{owner}/{repo}/pages"],
-        getPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/{build_id}"],
-        getParticipationStats: ["GET /repos/{owner}/{repo}/stats/participation"],
-        getPullRequestReviewProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        getPunchCardStats: ["GET /repos/{owner}/{repo}/stats/punch_card"],
-        getReadme: ["GET /repos/{owner}/{repo}/readme"],
-        getReadmeInDirectory: ["GET /repos/{owner}/{repo}/readme/{dir}"],
-        getRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}"],
-        getReleaseAsset: ["GET /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        getReleaseByTag: ["GET /repos/{owner}/{repo}/releases/tags/{tag}"],
-        getStatusChecksProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        getTeamsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        getUsersWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        getWebhook: ["GET /repos/{owner}/{repo}/hooks/{hook_id}"],
-        getWebhookConfigForRepo: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        listAutolinks: ["GET /repos/{owner}/{repo}/autolinks"],
-        listBranches: ["GET /repos/{owner}/{repo}/branches"],
-        listBranchesForHeadCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/branches-where-head"],
-        listCacheInfo: ["GET /repos/{owner}/{repo}/replicas/caches"],
-        listCollaborators: ["GET /repos/{owner}/{repo}/collaborators"],
-        listCommentsForCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        listCommitCommentsForRepo: ["GET /repos/{owner}/{repo}/comments"],
-        listCommitStatusesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/statuses"],
-        listCommits: ["GET /repos/{owner}/{repo}/commits"],
-        listContributors: ["GET /repos/{owner}/{repo}/contributors"],
-        listDeployKeys: ["GET /repos/{owner}/{repo}/keys"],
-        listDeploymentBranchPolicies: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        listDeploymentStatuses: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        listDeployments: ["GET /repos/{owner}/{repo}/deployments"],
-        listForAuthenticatedUser: ["GET /user/repos"],
-        listForOrg: ["GET /orgs/{org}/repos"],
-        listForUser: ["GET /users/{username}/repos"],
-        listForks: ["GET /repos/{owner}/{repo}/forks"],
-        listInvitations: ["GET /repos/{owner}/{repo}/invitations"],
-        listInvitationsForAuthenticatedUser: ["GET /user/repository_invitations"],
-        listLanguages: ["GET /repos/{owner}/{repo}/languages"],
-        listPagesBuilds: ["GET /repos/{owner}/{repo}/pages/builds"],
-        listPublic: ["GET /repositories"],
-        listPullRequestsAssociatedWithCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls"],
-        listReleaseAssets: ["GET /repos/{owner}/{repo}/releases/{release_id}/assets"],
-        listReleases: ["GET /repos/{owner}/{repo}/releases"],
-        listTags: ["GET /repos/{owner}/{repo}/tags"],
-        listTeams: ["GET /repos/{owner}/{repo}/teams"],
-        listWebhookDeliveries: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /repos/{owner}/{repo}/hooks"],
-        merge: ["POST /repos/{owner}/{repo}/merges"],
-        mergeUpstream: ["POST /repos/{owner}/{repo}/merge-upstream"],
-        pingWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeAppAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        removeCollaborator: ["DELETE /repos/{owner}/{repo}/collaborators/{username}"],
-        removeStatusCheckContexts: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        removeStatusCheckProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        removeTeamAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        removeUserAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        renameBranch: ["POST /repos/{owner}/{repo}/branches/{branch}/rename"],
-        replaceAllTopics: ["PUT /repos/{owner}/{repo}/topics"],
-        requestPagesBuild: ["POST /repos/{owner}/{repo}/pages/builds"],
-        setAdminBranchProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        setAppAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        setStatusCheckContexts: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        setTeamAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        setUserAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        testPushWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/tests"],
-        transfer: ["POST /repos/{owner}/{repo}/transfer"],
-        update: ["PATCH /repos/{owner}/{repo}"],
-        updateBranchProtection: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection"],
-        updateCommitComment: ["PATCH /repos/{owner}/{repo}/comments/{comment_id}"],
-        updateDeploymentBranchPolicy: ["PUT /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        updateInformationAboutPagesSite: ["PUT /repos/{owner}/{repo}/pages"],
-        updateInvitation: ["PATCH /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        updatePullRequestReviewProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        updateRelease: ["PATCH /repos/{owner}/{repo}/releases/{release_id}"],
-        updateReleaseAsset: ["PATCH /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        updateStatusCheckProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        updateWebhook: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}"],
-        updateWebhookConfigForRepo: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        uploadReleaseAsset: ["POST {origin}/repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}"]
-      },
-      search: {
-        code: ["GET /search/code"],
-        commits: ["GET /search/commits"],
-        issuesAndPullRequests: ["GET /search/issues"],
-        labels: ["GET /search/labels"],
-        repos: ["GET /search/repositories"],
-        topics: ["GET /search/topics"],
-        users: ["GET /search/users"]
-      },
-      secretScanning: {
-        getAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"],
-        listAlertsForEnterprise: ["GET /enterprises/{enterprise}/secret-scanning/alerts"],
-        listAlertsForOrg: ["GET /orgs/{org}/secret-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/secret-scanning/alerts"],
-        listLocationsForAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"]
-      },
-      teams: {
-        addMemberLegacy: ["PUT /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.addMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#add-team-member-legacy"
-        }],
-        addOrUpdateMembershipForUserInOrg: ["PUT /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        addOrUpdateMembershipForUserLegacy: ["PUT /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.addOrUpdateMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#add-or-update-team-membership-for-a-user-legacy"
-        }],
-        addOrUpdateProjectPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        addOrUpdateProjectPermissionsLegacy: ["PUT /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.addOrUpdateProjectPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#add-or-update-team-project-permissions-legacy"
-        }],
-        addOrUpdateRepoPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        addOrUpdateRepoPermissionsLegacy: ["PUT /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.addOrUpdateRepoPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#add-or-update-team-repository-permissions-legacy"
-        }],
-        checkPermissionsForProjectInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        checkPermissionsForProjectLegacy: ["GET /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#check-team-permissions-for-a-project-legacy"
-        }],
-        checkPermissionsForRepoInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        checkPermissionsForRepoLegacy: ["GET /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#check-team-permissions-for-a-repository-legacy"
-        }],
-        create: ["POST /orgs/{org}/teams"],
-        createDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        createDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.createDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#create-a-discussion-comment-legacy"
-        }],
-        createDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions"],
-        createDiscussionLegacy: ["POST /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.createDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#create-a-discussion-legacy"
-        }],
-        deleteDiscussionCommentInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        deleteDiscussionCommentLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#delete-a-discussion-comment-legacy"
-        }],
-        deleteDiscussionInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        deleteDiscussionLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#delete-a-discussion-legacy"
-        }],
-        deleteInOrg: ["DELETE /orgs/{org}/teams/{team_slug}"],
-        deleteLegacy: ["DELETE /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#delete-a-team-legacy"
-        }],
-        getByName: ["GET /orgs/{org}/teams/{team_slug}"],
-        getDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        getDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#get-a-discussion-comment-legacy"
-        }],
-        getDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        getDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#get-a-discussion-legacy"
-        }],
-        getLegacy: ["GET /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.getLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#get-a-team-legacy"
-        }],
-        getMemberLegacy: ["GET /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.getMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#get-team-member-legacy"
-        }],
-        getMembershipForUserInOrg: ["GET /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        getMembershipForUserLegacy: ["GET /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.getMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#get-team-membership-for-a-user-legacy"
-        }],
-        list: ["GET /orgs/{org}/teams"],
-        listChildInOrg: ["GET /orgs/{org}/teams/{team_slug}/teams"],
-        listChildLegacy: ["GET /teams/{team_id}/teams", {}, {
-          deprecated: "octokit.scim.listChildLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#list-child-teams-legacy"
-        }],
-        listDiscussionCommentsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        listDiscussionCommentsLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.listDiscussionCommentsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#list-discussion-comments-legacy"
-        }],
-        listDiscussionsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions"],
-        listDiscussionsLegacy: ["GET /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.listDiscussionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#list-discussions-legacy"
-        }],
-        listForAuthenticatedUser: ["GET /user/teams"],
-        listMembersInOrg: ["GET /orgs/{org}/teams/{team_slug}/members"],
-        listMembersLegacy: ["GET /teams/{team_id}/members", {}, {
-          deprecated: "octokit.scim.listMembersLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#list-team-members-legacy"
-        }],
-        listProjectsInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects"],
-        listProjectsLegacy: ["GET /teams/{team_id}/projects", {}, {
-          deprecated: "octokit.scim.listProjectsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#list-team-projects-legacy"
-        }],
-        listReposInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos"],
-        listReposLegacy: ["GET /teams/{team_id}/repos", {}, {
-          deprecated: "octokit.scim.listReposLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#list-team-repositories-legacy"
-        }],
-        removeMemberLegacy: ["DELETE /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.removeMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#remove-team-member-legacy"
-        }],
-        removeMembershipForUserInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        removeMembershipForUserLegacy: ["DELETE /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.removeMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#remove-team-membership-for-a-user-legacy"
-        }],
-        removeProjectInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        removeProjectLegacy: ["DELETE /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.removeProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#remove-a-project-from-a-team-legacy"
-        }],
-        removeRepoInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        removeRepoLegacy: ["DELETE /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.removeRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#remove-a-repository-from-a-team-legacy"
-        }],
-        updateDiscussionCommentInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        updateDiscussionCommentLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#update-a-discussion-comment-legacy"
-        }],
-        updateDiscussionInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        updateDiscussionLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams#update-a-discussion-legacy"
-        }],
-        updateInOrg: ["PATCH /orgs/{org}/teams/{team_slug}"],
-        updateLegacy: ["PATCH /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.updateLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/teams/#update-a-team-legacy"
-        }]
-      },
-      users: {
-        addEmailForAuthenticated: ["POST /user/emails", {}, {
-          renamed: ["users", "addEmailForAuthenticatedUser"]
-        }],
-        addEmailForAuthenticatedUser: ["POST /user/emails"],
-        checkFollowingForUser: ["GET /users/{username}/following/{target_user}"],
-        checkPersonIsFollowedByAuthenticated: ["GET /user/following/{username}"],
-        createGpgKeyForAuthenticated: ["POST /user/gpg_keys", {}, {
-          renamed: ["users", "createGpgKeyForAuthenticatedUser"]
-        }],
-        createGpgKeyForAuthenticatedUser: ["POST /user/gpg_keys"],
-        createPublicSshKeyForAuthenticated: ["POST /user/keys", {}, {
-          renamed: ["users", "createPublicSshKeyForAuthenticatedUser"]
-        }],
-        createPublicSshKeyForAuthenticatedUser: ["POST /user/keys"],
-        deleteEmailForAuthenticated: ["DELETE /user/emails", {}, {
-          renamed: ["users", "deleteEmailForAuthenticatedUser"]
-        }],
-        deleteEmailForAuthenticatedUser: ["DELETE /user/emails"],
-        deleteGpgKeyForAuthenticated: ["DELETE /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "deleteGpgKeyForAuthenticatedUser"]
-        }],
-        deleteGpgKeyForAuthenticatedUser: ["DELETE /user/gpg_keys/{gpg_key_id}"],
-        deletePublicSshKeyForAuthenticated: ["DELETE /user/keys/{key_id}", {}, {
-          renamed: ["users", "deletePublicSshKeyForAuthenticatedUser"]
-        }],
-        deletePublicSshKeyForAuthenticatedUser: ["DELETE /user/keys/{key_id}"],
-        follow: ["PUT /user/following/{username}"],
-        getAuthenticated: ["GET /user"],
-        getByUsername: ["GET /users/{username}"],
-        getContextForUser: ["GET /users/{username}/hovercard"],
-        getGpgKeyForAuthenticated: ["GET /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "getGpgKeyForAuthenticatedUser"]
-        }],
-        getGpgKeyForAuthenticatedUser: ["GET /user/gpg_keys/{gpg_key_id}"],
-        getPublicSshKeyForAuthenticated: ["GET /user/keys/{key_id}", {}, {
-          renamed: ["users", "getPublicSshKeyForAuthenticatedUser"]
-        }],
-        getPublicSshKeyForAuthenticatedUser: ["GET /user/keys/{key_id}"],
-        list: ["GET /users"],
-        listEmailsForAuthenticated: ["GET /user/emails", {}, {
-          renamed: ["users", "listEmailsForAuthenticatedUser"]
-        }],
-        listEmailsForAuthenticatedUser: ["GET /user/emails"],
-        listFollowedByAuthenticated: ["GET /user/following", {}, {
-          renamed: ["users", "listFollowedByAuthenticatedUser"]
-        }],
-        listFollowedByAuthenticatedUser: ["GET /user/following"],
-        listFollowersForAuthenticatedUser: ["GET /user/followers"],
-        listFollowersForUser: ["GET /users/{username}/followers"],
-        listFollowingForUser: ["GET /users/{username}/following"],
-        listGpgKeysForAuthenticated: ["GET /user/gpg_keys", {}, {
-          renamed: ["users", "listGpgKeysForAuthenticatedUser"]
-        }],
-        listGpgKeysForAuthenticatedUser: ["GET /user/gpg_keys"],
-        listGpgKeysForUser: ["GET /users/{username}/gpg_keys"],
-        listPublicEmailsForAuthenticated: ["GET /user/public_emails", {}, {
-          renamed: ["users", "listPublicEmailsForAuthenticatedUser"]
-        }],
-        listPublicEmailsForAuthenticatedUser: ["GET /user/public_emails"],
-        listPublicKeysForUser: ["GET /users/{username}/keys"],
-        listPublicSshKeysForAuthenticated: ["GET /user/keys", {}, {
-          renamed: ["users", "listPublicSshKeysForAuthenticatedUser"]
-        }],
-        listPublicSshKeysForAuthenticatedUser: ["GET /user/keys"],
-        unfollow: ["DELETE /user/following/{username}"],
-        updateAuthenticated: ["PATCH /user"]
-      }
+      return node;
     };
-    var Endpoints$1 = {
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
+    Traverse.prototype.set = function(ps, value) {
+      var node = this.value;
+      for (var i = 0; i < ps.length - 1; i++) {
+        var key = ps[i];
+        if (!Object.hasOwnProperty.call(node, key))
+          node[key] = {};
+        node = node[key];
       }
+      node[ps[i]] = value;
+      return value;
     };
-    var Endpoints$2 = {
-      actions: {
-        addCustomLabelsToSelfHostedRunnerForOrg: ["POST /orgs/{org}/actions/runners/{runner_id}/labels"],
-        addCustomLabelsToSelfHostedRunnerForRepo: ["POST /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        cancelWorkflowRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel"],
-        createOrUpdateEnvironmentSecret: ["PUT /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        createRegistrationTokenForOrg: ["POST /orgs/{org}/actions/runners/registration-token"],
-        createRegistrationTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/registration-token"],
-        createRemoveTokenForOrg: ["POST /orgs/{org}/actions/runners/remove-token"],
-        createRemoveTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/remove-token"],
-        createWorkflowDispatch: ["POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches"],
-        deleteArtifact: ["DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        deleteEnvironmentSecret: ["DELETE /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        deleteSelfHostedRunnerFromOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}"],
-        deleteSelfHostedRunnerFromRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        deleteWorkflowRun: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        deleteWorkflowRunLogs: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        disableSelectedRepositoryGithubActionsOrganization: ["DELETE /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        disableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable"],
-        downloadArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}"],
-        downloadJobLogsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs"],
-        downloadWorkflowRunAttemptLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/logs"],
-        downloadWorkflowRunLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        enableSelectedRepositoryGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        enableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable"],
-        getActionsCacheUsage: ["GET /repos/{owner}/{repo}/actions/cache/usage"],
-        getActionsCacheUsageByRepoForOrg: ["GET /orgs/{org}/actions/cache/usage-by-repository"],
-        getActionsCacheUsageForEnterprise: ["GET /enterprises/{enterprise}/actions/cache/usage"],
-        getActionsCacheUsageForOrg: ["GET /orgs/{org}/actions/cache/usage"],
-        getActionsCacheUsagePolicy: ["GET /repos/{owner}/{repo}/actions/cache/usage-policy"],
-        getActionsCacheUsagePolicyForEnterprise: ["GET /enterprises/{enterprise}/actions/cache/usage-policy"],
-        getAllowedActionsOrganization: ["GET /orgs/{org}/actions/permissions/selected-actions"],
-        getAllowedActionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        getArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        getEnvironmentPublicKey: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/public-key"],
-        getEnvironmentSecret: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        getGithubActionsDefaultWorkflowPermissionsOrganization: ["GET /orgs/{org}/actions/permissions/workflow"],
-        getGithubActionsPermissionsOrganization: ["GET /orgs/{org}/actions/permissions"],
-        getGithubActionsPermissionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions"],
-        getJobForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}"],
-        getOrgPublicKey: ["GET /orgs/{org}/actions/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}"],
-        getPendingDeploymentsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/actions/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        getReviewsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/approvals"],
-        getSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}"],
-        getSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        getWorkflow: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}"],
-        getWorkflowAccessToRepository: ["GET /repos/{owner}/{repo}/actions/permissions/access"],
-        getWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        getWorkflowRunAttempt: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}"],
-        listArtifactsForRepo: ["GET /repos/{owner}/{repo}/actions/artifacts"],
-        listEnvironmentSecrets: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets"],
-        listJobsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs"],
-        listJobsForWorkflowRunAttempt: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs"],
-        listLabelsForSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}/labels"],
-        listLabelsForSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        listOrgSecrets: ["GET /orgs/{org}/actions/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/actions/secrets"],
-        listRepoWorkflows: ["GET /repos/{owner}/{repo}/actions/workflows"],
-        listRunnerApplicationsForOrg: ["GET /orgs/{org}/actions/runners/downloads"],
-        listRunnerApplicationsForRepo: ["GET /repos/{owner}/{repo}/actions/runners/downloads"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        listSelectedRepositoriesEnabledGithubActionsOrganization: ["GET /orgs/{org}/actions/permissions/repositories"],
-        listSelfHostedRunnersForOrg: ["GET /orgs/{org}/actions/runners"],
-        listSelfHostedRunnersForRepo: ["GET /repos/{owner}/{repo}/actions/runners"],
-        listWorkflowRunArtifacts: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"],
-        listWorkflowRuns: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs"],
-        listWorkflowRunsForRepo: ["GET /repos/{owner}/{repo}/actions/runs"],
-        reRunJobForWorkflowRun: ["POST /repos/{owner}/{repo}/actions/jobs/{job_id}/rerun"],
-        reRunWorkflow: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun"],
-        reRunWorkflowFailedJobs: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs"],
-        removeAllCustomLabelsFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels"],
-        removeAllCustomLabelsFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        removeCustomLabelFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels/{name}"],
-        removeCustomLabelFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels/{name}"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        reviewPendingDeploymentsForRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        setActionsCacheUsagePolicy: ["PATCH /repos/{owner}/{repo}/actions/cache/usage-policy"],
-        setActionsCacheUsagePolicyForEnterprise: ["PATCH /enterprises/{enterprise}/actions/cache/usage-policy"],
-        setAllowedActionsOrganization: ["PUT /orgs/{org}/actions/permissions/selected-actions"],
-        setAllowedActionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        setCustomLabelsForSelfHostedRunnerForOrg: ["PUT /orgs/{org}/actions/runners/{runner_id}/labels"],
-        setCustomLabelsForSelfHostedRunnerForRepo: ["PUT /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        setGithubActionsDefaultWorkflowPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions/workflow"],
-        setGithubActionsPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions"],
-        setGithubActionsPermissionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        setSelectedRepositoriesEnabledGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories"],
-        setWorkflowAccessToRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/access"]
-      },
-      activity: {
-        checkRepoIsStarredByAuthenticatedUser: ["GET /user/starred/{owner}/{repo}"],
-        deleteRepoSubscription: ["DELETE /repos/{owner}/{repo}/subscription"],
-        deleteThreadSubscription: ["DELETE /notifications/threads/{thread_id}/subscription"],
-        getFeeds: ["GET /feeds"],
-        getRepoSubscription: ["GET /repos/{owner}/{repo}/subscription"],
-        getThread: ["GET /notifications/threads/{thread_id}"],
-        getThreadSubscriptionForAuthenticatedUser: ["GET /notifications/threads/{thread_id}/subscription"],
-        listEventsForAuthenticatedUser: ["GET /users/{username}/events"],
-        listNotificationsForAuthenticatedUser: ["GET /notifications"],
-        listOrgEventsForAuthenticatedUser: ["GET /users/{username}/events/orgs/{org}"],
-        listPublicEvents: ["GET /events"],
-        listPublicEventsForRepoNetwork: ["GET /networks/{owner}/{repo}/events"],
-        listPublicEventsForUser: ["GET /users/{username}/events/public"],
-        listPublicOrgEvents: ["GET /orgs/{org}/events"],
-        listReceivedEventsForUser: ["GET /users/{username}/received_events"],
-        listReceivedPublicEventsForUser: ["GET /users/{username}/received_events/public"],
-        listRepoEvents: ["GET /repos/{owner}/{repo}/events"],
-        listRepoNotificationsForAuthenticatedUser: ["GET /repos/{owner}/{repo}/notifications"],
-        listReposStarredByAuthenticatedUser: ["GET /user/starred"],
-        listReposStarredByUser: ["GET /users/{username}/starred"],
-        listReposWatchedByUser: ["GET /users/{username}/subscriptions"],
-        listStargazersForRepo: ["GET /repos/{owner}/{repo}/stargazers"],
-        listWatchedReposForAuthenticatedUser: ["GET /user/subscriptions"],
-        listWatchersForRepo: ["GET /repos/{owner}/{repo}/subscribers"],
-        markNotificationsAsRead: ["PUT /notifications"],
-        markRepoNotificationsAsRead: ["PUT /repos/{owner}/{repo}/notifications"],
-        markThreadAsRead: ["PATCH /notifications/threads/{thread_id}"],
-        setRepoSubscription: ["PUT /repos/{owner}/{repo}/subscription"],
-        setThreadSubscription: ["PUT /notifications/threads/{thread_id}/subscription"],
-        starRepoForAuthenticatedUser: ["PUT /user/starred/{owner}/{repo}"],
-        unstarRepoForAuthenticatedUser: ["DELETE /user/starred/{owner}/{repo}"]
-      },
-      apps: {
-        addRepoToInstallation: ["PUT /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "addRepoToInstallationForAuthenticatedUser"]
-        }],
-        addRepoToInstallationForAuthenticatedUser: ["PUT /user/installations/{installation_id}/repositories/{repository_id}"],
-        checkToken: ["POST /applications/{client_id}/token"],
-        createFromManifest: ["POST /app-manifests/{code}/conversions"],
-        createInstallationAccessToken: ["POST /app/installations/{installation_id}/access_tokens"],
-        deleteAuthorization: ["DELETE /applications/{client_id}/grant"],
-        deleteInstallation: ["DELETE /app/installations/{installation_id}"],
-        deleteToken: ["DELETE /applications/{client_id}/token"],
-        getAuthenticated: ["GET /app"],
-        getBySlug: ["GET /apps/{app_slug}"],
-        getInstallation: ["GET /app/installations/{installation_id}"],
-        getOrgInstallation: ["GET /orgs/{org}/installation"],
-        getRepoInstallation: ["GET /repos/{owner}/{repo}/installation"],
-        getUserInstallation: ["GET /users/{username}/installation"],
-        getWebhookConfigForApp: ["GET /app/hook/config"],
-        getWebhookDelivery: ["GET /app/hook/deliveries/{delivery_id}"],
-        listInstallationReposForAuthenticatedUser: ["GET /user/installations/{installation_id}/repositories"],
-        listInstallations: ["GET /app/installations"],
-        listInstallationsForAuthenticatedUser: ["GET /user/installations"],
-        listReposAccessibleToInstallation: ["GET /installation/repositories"],
-        listWebhookDeliveries: ["GET /app/hook/deliveries"],
-        redeliverWebhookDelivery: ["POST /app/hook/deliveries/{delivery_id}/attempts"],
-        removeRepoFromInstallation: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "removeRepoFromInstallationForAuthenticatedUser"]
-        }],
-        removeRepoFromInstallationForAuthenticatedUser: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}"],
-        resetToken: ["PATCH /applications/{client_id}/token"],
-        revokeInstallationAccessToken: ["DELETE /installation/token"],
-        scopeToken: ["POST /applications/{client_id}/token/scoped"],
-        suspendInstallation: ["PUT /app/installations/{installation_id}/suspended"],
-        unsuspendInstallation: ["DELETE /app/installations/{installation_id}/suspended"],
-        updateWebhookConfigForApp: ["PATCH /app/hook/config"]
-      },
-      billing: {
-        getGithubAdvancedSecurityBillingGhe: ["GET /enterprises/{enterprise}/settings/billing/advanced-security"],
-        getGithubAdvancedSecurityBillingOrg: ["GET /orgs/{org}/settings/billing/advanced-security"]
-      },
-      checks: {
-        create: ["POST /repos/{owner}/{repo}/check-runs"],
-        createSuite: ["POST /repos/{owner}/{repo}/check-suites"],
-        get: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}"],
-        getSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}"],
-        listAnnotations: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}/annotations"],
-        listForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-runs"],
-        listForSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"],
-        listSuitesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-suites"],
-        rerequestRun: ["POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest"],
-        rerequestSuite: ["POST /repos/{owner}/{repo}/check-suites/{check_suite_id}/rerequest"],
-        setSuitesPreferences: ["PATCH /repos/{owner}/{repo}/check-suites/preferences"],
-        update: ["PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}"]
-      },
-      codeScanning: {
-        deleteAnalysis: ["DELETE /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}{?confirm_delete}"],
-        getAlert: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        getAnalysis: ["GET /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}"],
-        getSarif: ["GET /repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}"],
-        listAlertInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances"],
-        listAlertsForOrg: ["GET /orgs/{org}/code-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/code-scanning/alerts"],
-        listAlertsInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances", {}, {
-          renamed: ["codeScanning", "listAlertInstances"]
-        }],
-        listRecentAnalyses: ["GET /repos/{owner}/{repo}/code-scanning/analyses"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        uploadSarif: ["POST /repos/{owner}/{repo}/code-scanning/sarifs"]
-      },
-      codesOfConduct: {
-        getAllCodesOfConduct: ["GET /codes_of_conduct"],
-        getConductCode: ["GET /codes_of_conduct/{key}"]
-      },
-      dependabot: {
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        getOrgPublicKey: ["GET /orgs/{org}/dependabot/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/dependabot/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        listOrgSecrets: ["GET /orgs/{org}/dependabot/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/dependabot/secrets"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}/repositories"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories"]
-      },
-      emojis: {
-        get: ["GET /emojis"]
-      },
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      },
-      gists: {
-        checkIsStarred: ["GET /gists/{gist_id}/star"],
-        create: ["POST /gists"],
-        createComment: ["POST /gists/{gist_id}/comments"],
-        delete: ["DELETE /gists/{gist_id}"],
-        deleteComment: ["DELETE /gists/{gist_id}/comments/{comment_id}"],
-        fork: ["POST /gists/{gist_id}/forks"],
-        get: ["GET /gists/{gist_id}"],
-        getComment: ["GET /gists/{gist_id}/comments/{comment_id}"],
-        getRevision: ["GET /gists/{gist_id}/{sha}"],
-        list: ["GET /gists"],
-        listComments: ["GET /gists/{gist_id}/comments"],
-        listCommits: ["GET /gists/{gist_id}/commits"],
-        listForUser: ["GET /users/{username}/gists"],
-        listForks: ["GET /gists/{gist_id}/forks"],
-        listPublic: ["GET /gists/public"],
-        listStarred: ["GET /gists/starred"],
-        star: ["PUT /gists/{gist_id}/star"],
-        unstar: ["DELETE /gists/{gist_id}/star"],
-        update: ["PATCH /gists/{gist_id}"],
-        updateComment: ["PATCH /gists/{gist_id}/comments/{comment_id}"]
-      },
-      git: {
-        createBlob: ["POST /repos/{owner}/{repo}/git/blobs"],
-        createCommit: ["POST /repos/{owner}/{repo}/git/commits"],
-        createRef: ["POST /repos/{owner}/{repo}/git/refs"],
-        createTag: ["POST /repos/{owner}/{repo}/git/tags"],
-        createTree: ["POST /repos/{owner}/{repo}/git/trees"],
-        deleteRef: ["DELETE /repos/{owner}/{repo}/git/refs/{ref}"],
-        getBlob: ["GET /repos/{owner}/{repo}/git/blobs/{file_sha}"],
-        getCommit: ["GET /repos/{owner}/{repo}/git/commits/{commit_sha}"],
-        getRef: ["GET /repos/{owner}/{repo}/git/ref/{ref}"],
-        getTag: ["GET /repos/{owner}/{repo}/git/tags/{tag_sha}"],
-        getTree: ["GET /repos/{owner}/{repo}/git/trees/{tree_sha}"],
-        listMatchingRefs: ["GET /repos/{owner}/{repo}/git/matching-refs/{ref}"],
-        updateRef: ["PATCH /repos/{owner}/{repo}/git/refs/{ref}"]
-      },
-      gitignore: {
-        getAllTemplates: ["GET /gitignore/templates"],
-        getTemplate: ["GET /gitignore/templates/{name}"]
-      },
-      issues: {
-        addAssignees: ["POST /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        addLabels: ["POST /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        checkUserCanBeAssigned: ["GET /repos/{owner}/{repo}/assignees/{assignee}"],
-        checkUserCanBeAssignedToIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/assignees/{assignee}"],
-        create: ["POST /repos/{owner}/{repo}/issues"],
-        createComment: ["POST /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        createLabel: ["POST /repos/{owner}/{repo}/labels"],
-        createMilestone: ["POST /repos/{owner}/{repo}/milestones"],
-        deleteComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        deleteLabel: ["DELETE /repos/{owner}/{repo}/labels/{name}"],
-        deleteMilestone: ["DELETE /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        get: ["GET /repos/{owner}/{repo}/issues/{issue_number}"],
-        getComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        getEvent: ["GET /repos/{owner}/{repo}/issues/events/{event_id}"],
-        getLabel: ["GET /repos/{owner}/{repo}/labels/{name}"],
-        getMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        list: ["GET /issues"],
-        listAssignees: ["GET /repos/{owner}/{repo}/assignees"],
-        listComments: ["GET /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        listCommentsForRepo: ["GET /repos/{owner}/{repo}/issues/comments"],
-        listEvents: ["GET /repos/{owner}/{repo}/issues/{issue_number}/events"],
-        listEventsForRepo: ["GET /repos/{owner}/{repo}/issues/events"],
-        listEventsForTimeline: ["GET /repos/{owner}/{repo}/issues/{issue_number}/timeline"],
-        listForAuthenticatedUser: ["GET /user/issues"],
-        listForOrg: ["GET /orgs/{org}/issues"],
-        listForRepo: ["GET /repos/{owner}/{repo}/issues"],
-        listLabelsForMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}/labels"],
-        listLabelsForRepo: ["GET /repos/{owner}/{repo}/labels"],
-        listLabelsOnIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        listMilestones: ["GET /repos/{owner}/{repo}/milestones"],
-        lock: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        removeAllLabels: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        removeAssignees: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        removeLabel: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels/{name}"],
-        setLabels: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        unlock: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        update: ["PATCH /repos/{owner}/{repo}/issues/{issue_number}"],
-        updateComment: ["PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        updateLabel: ["PATCH /repos/{owner}/{repo}/labels/{name}"],
-        updateMilestone: ["PATCH /repos/{owner}/{repo}/milestones/{milestone_number}"]
-      },
-      licenses: {
-        get: ["GET /licenses/{license}"],
-        getAllCommonlyUsed: ["GET /licenses"],
-        getForRepo: ["GET /repos/{owner}/{repo}/license"]
-      },
-      markdown: {
-        render: ["POST /markdown"],
-        renderRaw: ["POST /markdown/raw", {
-          headers: {
-            "content-type": "text/plain; charset=utf-8"
-          }
-        }]
-      },
-      meta: {
-        get: ["GET /meta"],
-        getOctocat: ["GET /octocat"],
-        getZen: ["GET /zen"],
-        root: ["GET /"]
-      },
-      migrations: {
-        getArchiveForAuthenticatedUser: ["GET /user/migrations/{migration_id}/archive"],
-        getStatusForOrg: ["GET /orgs/{org}/migrations/{migration_id}"],
-        listForAuthenticatedUser: ["GET /user/migrations"],
-        listForOrg: ["GET /orgs/{org}/migrations"],
-        listReposForAuthenticatedUser: ["GET /user/migrations/{migration_id}/repositories"],
-        listReposForUser: ["GET /user/migrations/{migration_id}/repositories", {}, {
-          renamed: ["migrations", "listReposForAuthenticatedUser"]
-        }],
-        startForAuthenticatedUser: ["POST /user/migrations"],
-        startForOrg: ["POST /orgs/{org}/migrations"]
-      },
-      orgs: {
-        checkMembershipForUser: ["GET /orgs/{org}/members/{username}"],
-        checkPublicMembershipForUser: ["GET /orgs/{org}/public_members/{username}"],
-        convertMemberToOutsideCollaborator: ["PUT /orgs/{org}/outside_collaborators/{username}"],
-        createWebhook: ["POST /orgs/{org}/hooks"],
-        deleteWebhook: ["DELETE /orgs/{org}/hooks/{hook_id}"],
-        get: ["GET /orgs/{org}"],
-        getMembershipForAuthenticatedUser: ["GET /user/memberships/orgs/{org}"],
-        getMembershipForUser: ["GET /orgs/{org}/memberships/{username}"],
-        getWebhook: ["GET /orgs/{org}/hooks/{hook_id}"],
-        getWebhookConfigForOrg: ["GET /orgs/{org}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        list: ["GET /organizations"],
-        listAppInstallations: ["GET /orgs/{org}/installations"],
-        listCustomRoles: ["GET /organizations/{organization_id}/custom_roles"],
-        listForAuthenticatedUser: ["GET /user/orgs"],
-        listForUser: ["GET /users/{username}/orgs"],
-        listMembers: ["GET /orgs/{org}/members"],
-        listMembershipsForAuthenticatedUser: ["GET /user/memberships/orgs"],
-        listOutsideCollaborators: ["GET /orgs/{org}/outside_collaborators"],
-        listPublicMembers: ["GET /orgs/{org}/public_members"],
-        listWebhookDeliveries: ["GET /orgs/{org}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /orgs/{org}/hooks"],
-        pingWebhook: ["POST /orgs/{org}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeMember: ["DELETE /orgs/{org}/members/{username}"],
-        removeMembershipForUser: ["DELETE /orgs/{org}/memberships/{username}"],
-        removeOutsideCollaborator: ["DELETE /orgs/{org}/outside_collaborators/{username}"],
-        removePublicMembershipForAuthenticatedUser: ["DELETE /orgs/{org}/public_members/{username}"],
-        setMembershipForUser: ["PUT /orgs/{org}/memberships/{username}"],
-        setPublicMembershipForAuthenticatedUser: ["PUT /orgs/{org}/public_members/{username}"],
-        update: ["PATCH /orgs/{org}"],
-        updateMembershipForAuthenticatedUser: ["PATCH /user/memberships/orgs/{org}"],
-        updateWebhook: ["PATCH /orgs/{org}/hooks/{hook_id}"],
-        updateWebhookConfigForOrg: ["PATCH /orgs/{org}/hooks/{hook_id}/config"]
-      },
-      projects: {
-        addCollaborator: ["PUT /projects/{project_id}/collaborators/{username}"],
-        createCard: ["POST /projects/columns/{column_id}/cards"],
-        createColumn: ["POST /projects/{project_id}/columns"],
-        createForAuthenticatedUser: ["POST /user/projects"],
-        createForOrg: ["POST /orgs/{org}/projects"],
-        createForRepo: ["POST /repos/{owner}/{repo}/projects"],
-        delete: ["DELETE /projects/{project_id}"],
-        deleteCard: ["DELETE /projects/columns/cards/{card_id}"],
-        deleteColumn: ["DELETE /projects/columns/{column_id}"],
-        get: ["GET /projects/{project_id}"],
-        getCard: ["GET /projects/columns/cards/{card_id}"],
-        getColumn: ["GET /projects/columns/{column_id}"],
-        getPermissionForUser: ["GET /projects/{project_id}/collaborators/{username}/permission"],
-        listCards: ["GET /projects/columns/{column_id}/cards"],
-        listCollaborators: ["GET /projects/{project_id}/collaborators"],
-        listColumns: ["GET /projects/{project_id}/columns"],
-        listForOrg: ["GET /orgs/{org}/projects"],
-        listForRepo: ["GET /repos/{owner}/{repo}/projects"],
-        listForUser: ["GET /users/{username}/projects"],
-        moveCard: ["POST /projects/columns/cards/{card_id}/moves"],
-        moveColumn: ["POST /projects/columns/{column_id}/moves"],
-        removeCollaborator: ["DELETE /projects/{project_id}/collaborators/{username}"],
-        update: ["PATCH /projects/{project_id}"],
-        updateCard: ["PATCH /projects/columns/cards/{card_id}"],
-        updateColumn: ["PATCH /projects/columns/{column_id}"]
-      },
-      pulls: {
-        checkIfMerged: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        create: ["POST /repos/{owner}/{repo}/pulls"],
-        createReplyForReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies"],
-        createReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        createReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        deletePendingReview: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        deleteReviewComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        dismissReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/dismissals"],
-        get: ["GET /repos/{owner}/{repo}/pulls/{pull_number}"],
-        getReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        getReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        list: ["GET /repos/{owner}/{repo}/pulls"],
-        listCommentsForReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/comments"],
-        listCommits: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/commits"],
-        listFiles: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/files"],
-        listRequestedReviewers: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        listReviewComments: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        listReviewCommentsForRepo: ["GET /repos/{owner}/{repo}/pulls/comments"],
-        listReviews: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        merge: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        removeRequestedReviewers: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        requestReviewers: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        submitReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/events"],
-        update: ["PATCH /repos/{owner}/{repo}/pulls/{pull_number}"],
-        updateBranch: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch"],
-        updateReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        updateReviewComment: ["PATCH /repos/{owner}/{repo}/pulls/comments/{comment_id}"]
-      },
-      rateLimit: {
-        get: ["GET /rate_limit"]
-      },
-      reactions: {
-        createForCommitComment: ["POST /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        createForIssue: ["POST /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        createForIssueComment: ["POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        createForPullRequestReviewComment: ["POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        createForRelease: ["POST /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        createForTeamDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        createForTeamDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/reactions/#create-reaction-for-a-team-discussion-comment-legacy"
-        }],
-        createForTeamDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        createForTeamDiscussionLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/reactions/#create-reaction-for-a-team-discussion-legacy"
-        }],
-        deleteForCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForIssue: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/reactions/{reaction_id}"],
-        deleteForIssueComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForPullRequestComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}/reactions/{reaction_id}"],
-        deleteForTeamDiscussion: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions/{reaction_id}"],
-        deleteForTeamDiscussionComment: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions/{reaction_id}"],
-        deleteLegacy: ["DELETE /reactions/{reaction_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#delete-a-reaction-legacy"
-        }],
-        listForCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        listForIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        listForIssueComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        listForPullRequestReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        listForRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        listForTeamDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        listForTeamDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/reactions/#list-reactions-for-a-team-discussion-comment-legacy"
-        }],
-        listForTeamDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        listForTeamDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/reactions/#list-reactions-for-a-team-discussion-legacy"
-        }]
-      },
-      repos: {
-        acceptInvitation: ["PATCH /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "acceptInvitationForAuthenticatedUser"]
-        }],
-        acceptInvitationForAuthenticatedUser: ["PATCH /user/repository_invitations/{invitation_id}"],
-        addAppAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        addCollaborator: ["PUT /repos/{owner}/{repo}/collaborators/{username}"],
-        addStatusCheckContexts: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        addTeamAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        addUserAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        checkCollaborator: ["GET /repos/{owner}/{repo}/collaborators/{username}"],
-        codeownersErrors: ["GET /repos/{owner}/{repo}/codeowners/errors"],
-        compareCommits: ["GET /repos/{owner}/{repo}/compare/{base}...{head}"],
-        compareCommitsWithBasehead: ["GET /repos/{owner}/{repo}/compare/{basehead}"],
-        createAutolink: ["POST /repos/{owner}/{repo}/autolinks"],
-        createCommitComment: ["POST /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        createCommitSignatureProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        createCommitStatus: ["POST /repos/{owner}/{repo}/statuses/{sha}"],
-        createDeployKey: ["POST /repos/{owner}/{repo}/keys"],
-        createDeployment: ["POST /repos/{owner}/{repo}/deployments"],
-        createDeploymentBranchPolicy: ["POST /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        createDeploymentStatus: ["POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        createDispatchEvent: ["POST /repos/{owner}/{repo}/dispatches"],
-        createForAuthenticatedUser: ["POST /user/repos"],
-        createFork: ["POST /repos/{owner}/{repo}/forks"],
-        createInOrg: ["POST /orgs/{org}/repos"],
-        createOrUpdateEnvironment: ["PUT /repos/{owner}/{repo}/environments/{environment_name}"],
-        createOrUpdateFileContents: ["PUT /repos/{owner}/{repo}/contents/{path}"],
-        createPagesSite: ["POST /repos/{owner}/{repo}/pages"],
-        createRelease: ["POST /repos/{owner}/{repo}/releases"],
-        createTagProtection: ["POST /repos/{owner}/{repo}/tags/protection"],
-        createUsingTemplate: ["POST /repos/{template_owner}/{template_repo}/generate"],
-        createWebhook: ["POST /repos/{owner}/{repo}/hooks"],
-        declineInvitation: ["DELETE /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "declineInvitationForAuthenticatedUser"]
-        }],
-        declineInvitationForAuthenticatedUser: ["DELETE /user/repository_invitations/{invitation_id}"],
-        delete: ["DELETE /repos/{owner}/{repo}"],
-        deleteAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        deleteAdminBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        deleteAnEnvironment: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}"],
-        deleteAutolink: ["DELETE /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        deleteBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection"],
-        deleteCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}"],
-        deleteCommitSignatureProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        deleteDeployKey: ["DELETE /repos/{owner}/{repo}/keys/{key_id}"],
-        deleteDeployment: ["DELETE /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        deleteDeploymentBranchPolicy: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        deleteFile: ["DELETE /repos/{owner}/{repo}/contents/{path}"],
-        deleteInvitation: ["DELETE /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        deletePagesSite: ["DELETE /repos/{owner}/{repo}/pages"],
-        deletePullRequestReviewProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        deleteRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}"],
-        deleteReleaseAsset: ["DELETE /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        deleteTagProtection: ["DELETE /repos/{owner}/{repo}/tags/protection/{tag_protection_id}"],
-        deleteWebhook: ["DELETE /repos/{owner}/{repo}/hooks/{hook_id}"],
-        disableLfsForRepo: ["DELETE /repos/{owner}/{repo}/lfs"],
-        downloadTarballArchive: ["GET /repos/{owner}/{repo}/tarball/{ref}"],
-        downloadZipballArchive: ["GET /repos/{owner}/{repo}/zipball/{ref}"],
-        enableLfsForRepo: ["PUT /repos/{owner}/{repo}/lfs"],
-        generateReleaseNotes: ["POST /repos/{owner}/{repo}/releases/generate-notes"],
-        get: ["GET /repos/{owner}/{repo}"],
-        getAccessRestrictions: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        getAdminBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        getAllEnvironments: ["GET /repos/{owner}/{repo}/environments"],
-        getAllStatusCheckContexts: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        getAllTopics: ["GET /repos/{owner}/{repo}/topics"],
-        getAppsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        getAutolink: ["GET /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        getBranch: ["GET /repos/{owner}/{repo}/branches/{branch}"],
-        getBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection"],
-        getCodeFrequencyStats: ["GET /repos/{owner}/{repo}/stats/code_frequency"],
-        getCollaboratorPermissionLevel: ["GET /repos/{owner}/{repo}/collaborators/{username}/permission"],
-        getCombinedStatusForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/status"],
-        getCommit: ["GET /repos/{owner}/{repo}/commits/{ref}"],
-        getCommitActivityStats: ["GET /repos/{owner}/{repo}/stats/commit_activity"],
-        getCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}"],
-        getCommitSignatureProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        getContent: ["GET /repos/{owner}/{repo}/contents/{path}"],
-        getContributorsStats: ["GET /repos/{owner}/{repo}/stats/contributors"],
-        getDeployKey: ["GET /repos/{owner}/{repo}/keys/{key_id}"],
-        getDeployment: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        getDeploymentBranchPolicy: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        getDeploymentStatus: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses/{status_id}"],
-        getEnvironment: ["GET /repos/{owner}/{repo}/environments/{environment_name}"],
-        getLatestPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/latest"],
-        getLatestRelease: ["GET /repos/{owner}/{repo}/releases/latest"],
-        getPages: ["GET /repos/{owner}/{repo}/pages"],
-        getPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/{build_id}"],
-        getParticipationStats: ["GET /repos/{owner}/{repo}/stats/participation"],
-        getPullRequestReviewProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        getPunchCardStats: ["GET /repos/{owner}/{repo}/stats/punch_card"],
-        getReadme: ["GET /repos/{owner}/{repo}/readme"],
-        getReadmeInDirectory: ["GET /repos/{owner}/{repo}/readme/{dir}"],
-        getRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}"],
-        getReleaseAsset: ["GET /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        getReleaseByTag: ["GET /repos/{owner}/{repo}/releases/tags/{tag}"],
-        getStatusChecksProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        getTeamsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        getUsersWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        getWebhook: ["GET /repos/{owner}/{repo}/hooks/{hook_id}"],
-        getWebhookConfigForRepo: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        listAutolinks: ["GET /repos/{owner}/{repo}/autolinks"],
-        listBranches: ["GET /repos/{owner}/{repo}/branches"],
-        listBranchesForHeadCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/branches-where-head"],
-        listCacheInfo: ["GET /repos/{owner}/{repo}/replicas/caches"],
-        listCollaborators: ["GET /repos/{owner}/{repo}/collaborators"],
-        listCommentsForCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        listCommitCommentsForRepo: ["GET /repos/{owner}/{repo}/comments"],
-        listCommitStatusesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/statuses"],
-        listCommits: ["GET /repos/{owner}/{repo}/commits"],
-        listContributors: ["GET /repos/{owner}/{repo}/contributors"],
-        listDeployKeys: ["GET /repos/{owner}/{repo}/keys"],
-        listDeploymentBranchPolicies: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        listDeploymentStatuses: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        listDeployments: ["GET /repos/{owner}/{repo}/deployments"],
-        listForAuthenticatedUser: ["GET /user/repos"],
-        listForOrg: ["GET /orgs/{org}/repos"],
-        listForUser: ["GET /users/{username}/repos"],
-        listForks: ["GET /repos/{owner}/{repo}/forks"],
-        listInvitations: ["GET /repos/{owner}/{repo}/invitations"],
-        listInvitationsForAuthenticatedUser: ["GET /user/repository_invitations"],
-        listLanguages: ["GET /repos/{owner}/{repo}/languages"],
-        listPagesBuilds: ["GET /repos/{owner}/{repo}/pages/builds"],
-        listPublic: ["GET /repositories"],
-        listPullRequestsAssociatedWithCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls"],
-        listReleaseAssets: ["GET /repos/{owner}/{repo}/releases/{release_id}/assets"],
-        listReleases: ["GET /repos/{owner}/{repo}/releases"],
-        listTagProtection: ["GET /repos/{owner}/{repo}/tags/protection"],
-        listTags: ["GET /repos/{owner}/{repo}/tags"],
-        listTeams: ["GET /repos/{owner}/{repo}/teams"],
-        listWebhookDeliveries: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /repos/{owner}/{repo}/hooks"],
-        merge: ["POST /repos/{owner}/{repo}/merges"],
-        mergeUpstream: ["POST /repos/{owner}/{repo}/merge-upstream"],
-        pingWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeAppAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        removeCollaborator: ["DELETE /repos/{owner}/{repo}/collaborators/{username}"],
-        removeStatusCheckContexts: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        removeStatusCheckProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        removeTeamAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        removeUserAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        renameBranch: ["POST /repos/{owner}/{repo}/branches/{branch}/rename"],
-        replaceAllTopics: ["PUT /repos/{owner}/{repo}/topics"],
-        requestPagesBuild: ["POST /repos/{owner}/{repo}/pages/builds"],
-        setAdminBranchProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        setAppAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        setStatusCheckContexts: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        setTeamAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        setUserAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        testPushWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/tests"],
-        transfer: ["POST /repos/{owner}/{repo}/transfer"],
-        update: ["PATCH /repos/{owner}/{repo}"],
-        updateBranchProtection: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection"],
-        updateCommitComment: ["PATCH /repos/{owner}/{repo}/comments/{comment_id}"],
-        updateDeploymentBranchPolicy: ["PUT /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        updateInformationAboutPagesSite: ["PUT /repos/{owner}/{repo}/pages"],
-        updateInvitation: ["PATCH /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        updatePullRequestReviewProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        updateRelease: ["PATCH /repos/{owner}/{repo}/releases/{release_id}"],
-        updateReleaseAsset: ["PATCH /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        updateStatusCheckProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        updateWebhook: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}"],
-        updateWebhookConfigForRepo: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        uploadReleaseAsset: ["POST {origin}/repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}"]
-      },
-      search: {
-        code: ["GET /search/code"],
-        commits: ["GET /search/commits"],
-        issuesAndPullRequests: ["GET /search/issues"],
-        labels: ["GET /search/labels"],
-        repos: ["GET /search/repositories"],
-        topics: ["GET /search/topics"],
-        users: ["GET /search/users"]
-      },
-      secretScanning: {
-        getAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"],
-        listAlertsForEnterprise: ["GET /enterprises/{enterprise}/secret-scanning/alerts"],
-        listAlertsForOrg: ["GET /orgs/{org}/secret-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/secret-scanning/alerts"],
-        listLocationsForAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"]
-      },
-      teams: {
-        addMemberLegacy: ["PUT /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.addMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#add-team-member-legacy"
-        }],
-        addOrUpdateMembershipForUserInOrg: ["PUT /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        addOrUpdateMembershipForUserLegacy: ["PUT /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.addOrUpdateMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#add-or-update-team-membership-for-a-user-legacy"
-        }],
-        addOrUpdateProjectPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        addOrUpdateProjectPermissionsLegacy: ["PUT /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.addOrUpdateProjectPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#add-or-update-team-project-permissions-legacy"
-        }],
-        addOrUpdateRepoPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        addOrUpdateRepoPermissionsLegacy: ["PUT /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.addOrUpdateRepoPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#add-or-update-team-repository-permissions-legacy"
-        }],
-        checkPermissionsForProjectInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        checkPermissionsForProjectLegacy: ["GET /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#check-team-permissions-for-a-project-legacy"
-        }],
-        checkPermissionsForRepoInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        checkPermissionsForRepoLegacy: ["GET /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#check-team-permissions-for-a-repository-legacy"
-        }],
-        create: ["POST /orgs/{org}/teams"],
-        createDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        createDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.createDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#create-a-discussion-comment-legacy"
-        }],
-        createDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions"],
-        createDiscussionLegacy: ["POST /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.createDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#create-a-discussion-legacy"
-        }],
-        deleteDiscussionCommentInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        deleteDiscussionCommentLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#delete-a-discussion-comment-legacy"
-        }],
-        deleteDiscussionInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        deleteDiscussionLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#delete-a-discussion-legacy"
-        }],
-        deleteInOrg: ["DELETE /orgs/{org}/teams/{team_slug}"],
-        deleteLegacy: ["DELETE /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#delete-a-team-legacy"
-        }],
-        getByName: ["GET /orgs/{org}/teams/{team_slug}"],
-        getDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        getDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#get-a-discussion-comment-legacy"
-        }],
-        getDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        getDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#get-a-discussion-legacy"
-        }],
-        getLegacy: ["GET /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.getLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#get-a-team-legacy"
-        }],
-        getMemberLegacy: ["GET /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.getMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#get-team-member-legacy"
-        }],
-        getMembershipForUserInOrg: ["GET /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        getMembershipForUserLegacy: ["GET /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.getMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#get-team-membership-for-a-user-legacy"
-        }],
-        list: ["GET /orgs/{org}/teams"],
-        listChildInOrg: ["GET /orgs/{org}/teams/{team_slug}/teams"],
-        listChildLegacy: ["GET /teams/{team_id}/teams", {}, {
-          deprecated: "octokit.scim.listChildLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#list-child-teams-legacy"
-        }],
-        listDiscussionCommentsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        listDiscussionCommentsLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.listDiscussionCommentsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#list-discussion-comments-legacy"
-        }],
-        listDiscussionsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions"],
-        listDiscussionsLegacy: ["GET /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.listDiscussionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#list-discussions-legacy"
-        }],
-        listForAuthenticatedUser: ["GET /user/teams"],
-        listMembersInOrg: ["GET /orgs/{org}/teams/{team_slug}/members"],
-        listMembersLegacy: ["GET /teams/{team_id}/members", {}, {
-          deprecated: "octokit.scim.listMembersLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#list-team-members-legacy"
-        }],
-        listProjectsInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects"],
-        listProjectsLegacy: ["GET /teams/{team_id}/projects", {}, {
-          deprecated: "octokit.scim.listProjectsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#list-team-projects-legacy"
-        }],
-        listReposInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos"],
-        listReposLegacy: ["GET /teams/{team_id}/repos", {}, {
-          deprecated: "octokit.scim.listReposLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#list-team-repositories-legacy"
-        }],
-        removeMemberLegacy: ["DELETE /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.removeMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#remove-team-member-legacy"
-        }],
-        removeMembershipForUserInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        removeMembershipForUserLegacy: ["DELETE /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.removeMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#remove-team-membership-for-a-user-legacy"
-        }],
-        removeProjectInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        removeProjectLegacy: ["DELETE /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.removeProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#remove-a-project-from-a-team-legacy"
-        }],
-        removeRepoInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        removeRepoLegacy: ["DELETE /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.removeRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#remove-a-repository-from-a-team-legacy"
-        }],
-        updateDiscussionCommentInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        updateDiscussionCommentLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#update-a-discussion-comment-legacy"
-        }],
-        updateDiscussionInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        updateDiscussionLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams#update-a-discussion-legacy"
-        }],
-        updateInOrg: ["PATCH /orgs/{org}/teams/{team_slug}"],
-        updateLegacy: ["PATCH /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.updateLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.5/rest/reference/teams/#update-a-team-legacy"
-        }]
-      },
-      users: {
-        addEmailForAuthenticated: ["POST /user/emails", {}, {
-          renamed: ["users", "addEmailForAuthenticatedUser"]
-        }],
-        addEmailForAuthenticatedUser: ["POST /user/emails"],
-        checkFollowingForUser: ["GET /users/{username}/following/{target_user}"],
-        checkPersonIsFollowedByAuthenticated: ["GET /user/following/{username}"],
-        createGpgKeyForAuthenticated: ["POST /user/gpg_keys", {}, {
-          renamed: ["users", "createGpgKeyForAuthenticatedUser"]
-        }],
-        createGpgKeyForAuthenticatedUser: ["POST /user/gpg_keys"],
-        createPublicSshKeyForAuthenticated: ["POST /user/keys", {}, {
-          renamed: ["users", "createPublicSshKeyForAuthenticatedUser"]
-        }],
-        createPublicSshKeyForAuthenticatedUser: ["POST /user/keys"],
-        deleteEmailForAuthenticated: ["DELETE /user/emails", {}, {
-          renamed: ["users", "deleteEmailForAuthenticatedUser"]
-        }],
-        deleteEmailForAuthenticatedUser: ["DELETE /user/emails"],
-        deleteGpgKeyForAuthenticated: ["DELETE /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "deleteGpgKeyForAuthenticatedUser"]
-        }],
-        deleteGpgKeyForAuthenticatedUser: ["DELETE /user/gpg_keys/{gpg_key_id}"],
-        deletePublicSshKeyForAuthenticated: ["DELETE /user/keys/{key_id}", {}, {
-          renamed: ["users", "deletePublicSshKeyForAuthenticatedUser"]
-        }],
-        deletePublicSshKeyForAuthenticatedUser: ["DELETE /user/keys/{key_id}"],
-        follow: ["PUT /user/following/{username}"],
-        getAuthenticated: ["GET /user"],
-        getByUsername: ["GET /users/{username}"],
-        getContextForUser: ["GET /users/{username}/hovercard"],
-        getGpgKeyForAuthenticated: ["GET /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "getGpgKeyForAuthenticatedUser"]
-        }],
-        getGpgKeyForAuthenticatedUser: ["GET /user/gpg_keys/{gpg_key_id}"],
-        getPublicSshKeyForAuthenticated: ["GET /user/keys/{key_id}", {}, {
-          renamed: ["users", "getPublicSshKeyForAuthenticatedUser"]
-        }],
-        getPublicSshKeyForAuthenticatedUser: ["GET /user/keys/{key_id}"],
-        list: ["GET /users"],
-        listEmailsForAuthenticated: ["GET /user/emails", {}, {
-          renamed: ["users", "listEmailsForAuthenticatedUser"]
-        }],
-        listEmailsForAuthenticatedUser: ["GET /user/emails"],
-        listFollowedByAuthenticated: ["GET /user/following", {}, {
-          renamed: ["users", "listFollowedByAuthenticatedUser"]
-        }],
-        listFollowedByAuthenticatedUser: ["GET /user/following"],
-        listFollowersForAuthenticatedUser: ["GET /user/followers"],
-        listFollowersForUser: ["GET /users/{username}/followers"],
-        listFollowingForUser: ["GET /users/{username}/following"],
-        listGpgKeysForAuthenticated: ["GET /user/gpg_keys", {}, {
-          renamed: ["users", "listGpgKeysForAuthenticatedUser"]
-        }],
-        listGpgKeysForAuthenticatedUser: ["GET /user/gpg_keys"],
-        listGpgKeysForUser: ["GET /users/{username}/gpg_keys"],
-        listPublicEmailsForAuthenticated: ["GET /user/public_emails", {}, {
-          renamed: ["users", "listPublicEmailsForAuthenticatedUser"]
-        }],
-        listPublicEmailsForAuthenticatedUser: ["GET /user/public_emails"],
-        listPublicKeysForUser: ["GET /users/{username}/keys"],
-        listPublicSshKeysForAuthenticated: ["GET /user/keys", {}, {
-          renamed: ["users", "listPublicSshKeysForAuthenticatedUser"]
-        }],
-        listPublicSshKeysForAuthenticatedUser: ["GET /user/keys"],
-        unfollow: ["DELETE /user/following/{username}"],
-        updateAuthenticated: ["PATCH /user"]
-      }
+    Traverse.prototype.map = function(cb) {
+      return walk(this.value, cb, true);
     };
-    var Endpoints$3 = {
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      }
-    };
-    var Endpoints$4 = {
-      actions: {
-        addCustomLabelsToSelfHostedRunnerForOrg: ["POST /orgs/{org}/actions/runners/{runner_id}/labels"],
-        addCustomLabelsToSelfHostedRunnerForRepo: ["POST /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        cancelWorkflowRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel"],
-        createOrUpdateEnvironmentSecret: ["PUT /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        createRegistrationTokenForOrg: ["POST /orgs/{org}/actions/runners/registration-token"],
-        createRegistrationTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/registration-token"],
-        createRemoveTokenForOrg: ["POST /orgs/{org}/actions/runners/remove-token"],
-        createRemoveTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/remove-token"],
-        createWorkflowDispatch: ["POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches"],
-        deleteArtifact: ["DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        deleteEnvironmentSecret: ["DELETE /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        deleteSelfHostedRunnerFromOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}"],
-        deleteSelfHostedRunnerFromRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        deleteWorkflowRun: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        deleteWorkflowRunLogs: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        disableSelectedRepositoryGithubActionsOrganization: ["DELETE /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        disableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable"],
-        downloadArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}"],
-        downloadJobLogsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs"],
-        downloadWorkflowRunAttemptLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/logs"],
-        downloadWorkflowRunLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        enableSelectedRepositoryGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        enableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable"],
-        getActionsCacheUsage: ["GET /repos/{owner}/{repo}/actions/cache/usage"],
-        getActionsCacheUsageByRepoForOrg: ["GET /orgs/{org}/actions/cache/usage-by-repository"],
-        getActionsCacheUsageForEnterprise: ["GET /enterprises/{enterprise}/actions/cache/usage"],
-        getActionsCacheUsageForOrg: ["GET /orgs/{org}/actions/cache/usage"],
-        getActionsCacheUsagePolicy: ["GET /repos/{owner}/{repo}/actions/cache/usage-policy"],
-        getActionsCacheUsagePolicyForEnterprise: ["GET /enterprises/{enterprise}/actions/cache/usage-policy"],
-        getAllowedActionsOrganization: ["GET /orgs/{org}/actions/permissions/selected-actions"],
-        getAllowedActionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        getArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        getEnvironmentPublicKey: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/public-key"],
-        getEnvironmentSecret: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        getGithubActionsDefaultWorkflowPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/workflow"],
-        getGithubActionsDefaultWorkflowPermissionsOrganization: ["GET /orgs/{org}/actions/permissions/workflow"],
-        getGithubActionsDefaultWorkflowPermissionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions/workflow"],
-        getGithubActionsPermissionsOrganization: ["GET /orgs/{org}/actions/permissions"],
-        getGithubActionsPermissionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions"],
-        getJobForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}"],
-        getOrgPublicKey: ["GET /orgs/{org}/actions/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}"],
-        getPendingDeploymentsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/actions/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        getReviewsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/approvals"],
-        getSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}"],
-        getSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        getWorkflow: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}"],
-        getWorkflowAccessToRepository: ["GET /repos/{owner}/{repo}/actions/permissions/access"],
-        getWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        getWorkflowRunAttempt: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}"],
-        listArtifactsForRepo: ["GET /repos/{owner}/{repo}/actions/artifacts"],
-        listEnvironmentSecrets: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets"],
-        listJobsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs"],
-        listJobsForWorkflowRunAttempt: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs"],
-        listLabelsForSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}/labels"],
-        listLabelsForSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        listOrgSecrets: ["GET /orgs/{org}/actions/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/actions/secrets"],
-        listRepoWorkflows: ["GET /repos/{owner}/{repo}/actions/workflows"],
-        listRunnerApplicationsForOrg: ["GET /orgs/{org}/actions/runners/downloads"],
-        listRunnerApplicationsForRepo: ["GET /repos/{owner}/{repo}/actions/runners/downloads"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        listSelectedRepositoriesEnabledGithubActionsOrganization: ["GET /orgs/{org}/actions/permissions/repositories"],
-        listSelfHostedRunnersForOrg: ["GET /orgs/{org}/actions/runners"],
-        listSelfHostedRunnersForRepo: ["GET /repos/{owner}/{repo}/actions/runners"],
-        listWorkflowRunArtifacts: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"],
-        listWorkflowRuns: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs"],
-        listWorkflowRunsForRepo: ["GET /repos/{owner}/{repo}/actions/runs"],
-        reRunJobForWorkflowRun: ["POST /repos/{owner}/{repo}/actions/jobs/{job_id}/rerun"],
-        reRunWorkflow: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun"],
-        reRunWorkflowFailedJobs: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs"],
-        removeAllCustomLabelsFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels"],
-        removeAllCustomLabelsFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        removeCustomLabelFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels/{name}"],
-        removeCustomLabelFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels/{name}"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        reviewPendingDeploymentsForRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        setActionsCacheUsagePolicy: ["PATCH /repos/{owner}/{repo}/actions/cache/usage-policy"],
-        setActionsCacheUsagePolicyForEnterprise: ["PATCH /enterprises/{enterprise}/actions/cache/usage-policy"],
-        setAllowedActionsOrganization: ["PUT /orgs/{org}/actions/permissions/selected-actions"],
-        setAllowedActionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        setCustomLabelsForSelfHostedRunnerForOrg: ["PUT /orgs/{org}/actions/runners/{runner_id}/labels"],
-        setCustomLabelsForSelfHostedRunnerForRepo: ["PUT /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        setGithubActionsDefaultWorkflowPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/workflow"],
-        setGithubActionsDefaultWorkflowPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions/workflow"],
-        setGithubActionsDefaultWorkflowPermissionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/workflow"],
-        setGithubActionsPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions"],
-        setGithubActionsPermissionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        setSelectedRepositoriesEnabledGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories"],
-        setWorkflowAccessToRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/access"]
-      },
-      activity: {
-        checkRepoIsStarredByAuthenticatedUser: ["GET /user/starred/{owner}/{repo}"],
-        deleteRepoSubscription: ["DELETE /repos/{owner}/{repo}/subscription"],
-        deleteThreadSubscription: ["DELETE /notifications/threads/{thread_id}/subscription"],
-        getFeeds: ["GET /feeds"],
-        getRepoSubscription: ["GET /repos/{owner}/{repo}/subscription"],
-        getThread: ["GET /notifications/threads/{thread_id}"],
-        getThreadSubscriptionForAuthenticatedUser: ["GET /notifications/threads/{thread_id}/subscription"],
-        listEventsForAuthenticatedUser: ["GET /users/{username}/events"],
-        listNotificationsForAuthenticatedUser: ["GET /notifications"],
-        listOrgEventsForAuthenticatedUser: ["GET /users/{username}/events/orgs/{org}"],
-        listPublicEvents: ["GET /events"],
-        listPublicEventsForRepoNetwork: ["GET /networks/{owner}/{repo}/events"],
-        listPublicEventsForUser: ["GET /users/{username}/events/public"],
-        listPublicOrgEvents: ["GET /orgs/{org}/events"],
-        listReceivedEventsForUser: ["GET /users/{username}/received_events"],
-        listReceivedPublicEventsForUser: ["GET /users/{username}/received_events/public"],
-        listRepoEvents: ["GET /repos/{owner}/{repo}/events"],
-        listRepoNotificationsForAuthenticatedUser: ["GET /repos/{owner}/{repo}/notifications"],
-        listReposStarredByAuthenticatedUser: ["GET /user/starred"],
-        listReposStarredByUser: ["GET /users/{username}/starred"],
-        listReposWatchedByUser: ["GET /users/{username}/subscriptions"],
-        listStargazersForRepo: ["GET /repos/{owner}/{repo}/stargazers"],
-        listWatchedReposForAuthenticatedUser: ["GET /user/subscriptions"],
-        listWatchersForRepo: ["GET /repos/{owner}/{repo}/subscribers"],
-        markNotificationsAsRead: ["PUT /notifications"],
-        markRepoNotificationsAsRead: ["PUT /repos/{owner}/{repo}/notifications"],
-        markThreadAsRead: ["PATCH /notifications/threads/{thread_id}"],
-        setRepoSubscription: ["PUT /repos/{owner}/{repo}/subscription"],
-        setThreadSubscription: ["PUT /notifications/threads/{thread_id}/subscription"],
-        starRepoForAuthenticatedUser: ["PUT /user/starred/{owner}/{repo}"],
-        unstarRepoForAuthenticatedUser: ["DELETE /user/starred/{owner}/{repo}"]
-      },
-      apps: {
-        addRepoToInstallation: ["PUT /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "addRepoToInstallationForAuthenticatedUser"]
-        }],
-        addRepoToInstallationForAuthenticatedUser: ["PUT /user/installations/{installation_id}/repositories/{repository_id}"],
-        checkToken: ["POST /applications/{client_id}/token"],
-        createFromManifest: ["POST /app-manifests/{code}/conversions"],
-        createInstallationAccessToken: ["POST /app/installations/{installation_id}/access_tokens"],
-        deleteAuthorization: ["DELETE /applications/{client_id}/grant"],
-        deleteInstallation: ["DELETE /app/installations/{installation_id}"],
-        deleteToken: ["DELETE /applications/{client_id}/token"],
-        getAuthenticated: ["GET /app"],
-        getBySlug: ["GET /apps/{app_slug}"],
-        getInstallation: ["GET /app/installations/{installation_id}"],
-        getOrgInstallation: ["GET /orgs/{org}/installation"],
-        getRepoInstallation: ["GET /repos/{owner}/{repo}/installation"],
-        getUserInstallation: ["GET /users/{username}/installation"],
-        getWebhookConfigForApp: ["GET /app/hook/config"],
-        getWebhookDelivery: ["GET /app/hook/deliveries/{delivery_id}"],
-        listInstallationReposForAuthenticatedUser: ["GET /user/installations/{installation_id}/repositories"],
-        listInstallations: ["GET /app/installations"],
-        listInstallationsForAuthenticatedUser: ["GET /user/installations"],
-        listReposAccessibleToInstallation: ["GET /installation/repositories"],
-        listWebhookDeliveries: ["GET /app/hook/deliveries"],
-        redeliverWebhookDelivery: ["POST /app/hook/deliveries/{delivery_id}/attempts"],
-        removeRepoFromInstallation: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "removeRepoFromInstallationForAuthenticatedUser"]
-        }],
-        removeRepoFromInstallationForAuthenticatedUser: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}"],
-        resetToken: ["PATCH /applications/{client_id}/token"],
-        revokeInstallationAccessToken: ["DELETE /installation/token"],
-        scopeToken: ["POST /applications/{client_id}/token/scoped"],
-        suspendInstallation: ["PUT /app/installations/{installation_id}/suspended"],
-        unsuspendInstallation: ["DELETE /app/installations/{installation_id}/suspended"],
-        updateWebhookConfigForApp: ["PATCH /app/hook/config"]
-      },
-      billing: {
-        getGithubAdvancedSecurityBillingGhe: ["GET /enterprises/{enterprise}/settings/billing/advanced-security"],
-        getGithubAdvancedSecurityBillingOrg: ["GET /orgs/{org}/settings/billing/advanced-security"]
-      },
-      checks: {
-        create: ["POST /repos/{owner}/{repo}/check-runs"],
-        createSuite: ["POST /repos/{owner}/{repo}/check-suites"],
-        get: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}"],
-        getSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}"],
-        listAnnotations: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}/annotations"],
-        listForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-runs"],
-        listForSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"],
-        listSuitesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-suites"],
-        rerequestRun: ["POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest"],
-        rerequestSuite: ["POST /repos/{owner}/{repo}/check-suites/{check_suite_id}/rerequest"],
-        setSuitesPreferences: ["PATCH /repos/{owner}/{repo}/check-suites/preferences"],
-        update: ["PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}"]
-      },
-      codeScanning: {
-        deleteAnalysis: ["DELETE /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}{?confirm_delete}"],
-        getAlert: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        getAnalysis: ["GET /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}"],
-        getSarif: ["GET /repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}"],
-        listAlertInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances"],
-        listAlertsForOrg: ["GET /orgs/{org}/code-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/code-scanning/alerts"],
-        listAlertsInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances", {}, {
-          renamed: ["codeScanning", "listAlertInstances"]
-        }],
-        listRecentAnalyses: ["GET /repos/{owner}/{repo}/code-scanning/analyses"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        uploadSarif: ["POST /repos/{owner}/{repo}/code-scanning/sarifs"]
-      },
-      codesOfConduct: {
-        getAllCodesOfConduct: ["GET /codes_of_conduct"],
-        getConductCode: ["GET /codes_of_conduct/{key}"]
-      },
-      dependabot: {
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        getOrgPublicKey: ["GET /orgs/{org}/dependabot/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/dependabot/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        listOrgSecrets: ["GET /orgs/{org}/dependabot/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/dependabot/secrets"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}/repositories"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories"]
-      },
-      dependencyGraph: {
-        diffRange: ["GET /repos/{owner}/{repo}/dependency-graph/compare/{basehead}"]
-      },
-      emojis: {
-        get: ["GET /emojis"]
-      },
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteScimGroupFromEnterprise: ["DELETE /scim/v2/Groups/{scim_group_id}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        deleteUserFromEnterprise: ["DELETE /scim/v2/Users/{scim_user_id}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getProvisioningInformationForEnterpriseGroup: ["GET /scim/v2/Groups/{scim_group_id}"],
-        getProvisioningInformationForEnterpriseUser: ["GET /scim/v2/Users/{scim_user_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listProvisionedGroupsEnterprise: ["GET /scim/v2/Groups"],
-        listProvisionedIdentitiesEnterprise: ["GET /scim/v2/Users"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        provisionEnterpriseGroup: ["POST /scim/v2/Groups"],
-        provisionEnterpriseUser: ["POST /scim/v2/Users"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setInformationForProvisionedEnterpriseGroup: ["PUT /scim/v2/Groups/{scim_group_id}"],
-        setInformationForProvisionedEnterpriseUser: ["PUT /scim/v2/Users/{scim_user_id}"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateAttributeForEnterpriseGroup: ["PATCH /scim/v2/Groups/{scim_group_id}"],
-        updateAttributeForEnterpriseUser: ["PATCH /scim/v2/Users/{scim_user_id}"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      },
-      gists: {
-        checkIsStarred: ["GET /gists/{gist_id}/star"],
-        create: ["POST /gists"],
-        createComment: ["POST /gists/{gist_id}/comments"],
-        delete: ["DELETE /gists/{gist_id}"],
-        deleteComment: ["DELETE /gists/{gist_id}/comments/{comment_id}"],
-        fork: ["POST /gists/{gist_id}/forks"],
-        get: ["GET /gists/{gist_id}"],
-        getComment: ["GET /gists/{gist_id}/comments/{comment_id}"],
-        getRevision: ["GET /gists/{gist_id}/{sha}"],
-        list: ["GET /gists"],
-        listComments: ["GET /gists/{gist_id}/comments"],
-        listCommits: ["GET /gists/{gist_id}/commits"],
-        listForUser: ["GET /users/{username}/gists"],
-        listForks: ["GET /gists/{gist_id}/forks"],
-        listPublic: ["GET /gists/public"],
-        listStarred: ["GET /gists/starred"],
-        star: ["PUT /gists/{gist_id}/star"],
-        unstar: ["DELETE /gists/{gist_id}/star"],
-        update: ["PATCH /gists/{gist_id}"],
-        updateComment: ["PATCH /gists/{gist_id}/comments/{comment_id}"]
-      },
-      git: {
-        createBlob: ["POST /repos/{owner}/{repo}/git/blobs"],
-        createCommit: ["POST /repos/{owner}/{repo}/git/commits"],
-        createRef: ["POST /repos/{owner}/{repo}/git/refs"],
-        createTag: ["POST /repos/{owner}/{repo}/git/tags"],
-        createTree: ["POST /repos/{owner}/{repo}/git/trees"],
-        deleteRef: ["DELETE /repos/{owner}/{repo}/git/refs/{ref}"],
-        getBlob: ["GET /repos/{owner}/{repo}/git/blobs/{file_sha}"],
-        getCommit: ["GET /repos/{owner}/{repo}/git/commits/{commit_sha}"],
-        getRef: ["GET /repos/{owner}/{repo}/git/ref/{ref}"],
-        getTag: ["GET /repos/{owner}/{repo}/git/tags/{tag_sha}"],
-        getTree: ["GET /repos/{owner}/{repo}/git/trees/{tree_sha}"],
-        listMatchingRefs: ["GET /repos/{owner}/{repo}/git/matching-refs/{ref}"],
-        updateRef: ["PATCH /repos/{owner}/{repo}/git/refs/{ref}"]
-      },
-      gitignore: {
-        getAllTemplates: ["GET /gitignore/templates"],
-        getTemplate: ["GET /gitignore/templates/{name}"]
-      },
-      issues: {
-        addAssignees: ["POST /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        addLabels: ["POST /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        checkUserCanBeAssigned: ["GET /repos/{owner}/{repo}/assignees/{assignee}"],
-        checkUserCanBeAssignedToIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/assignees/{assignee}"],
-        create: ["POST /repos/{owner}/{repo}/issues"],
-        createComment: ["POST /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        createLabel: ["POST /repos/{owner}/{repo}/labels"],
-        createMilestone: ["POST /repos/{owner}/{repo}/milestones"],
-        deleteComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        deleteLabel: ["DELETE /repos/{owner}/{repo}/labels/{name}"],
-        deleteMilestone: ["DELETE /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        get: ["GET /repos/{owner}/{repo}/issues/{issue_number}"],
-        getComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        getEvent: ["GET /repos/{owner}/{repo}/issues/events/{event_id}"],
-        getLabel: ["GET /repos/{owner}/{repo}/labels/{name}"],
-        getMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        list: ["GET /issues"],
-        listAssignees: ["GET /repos/{owner}/{repo}/assignees"],
-        listComments: ["GET /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        listCommentsForRepo: ["GET /repos/{owner}/{repo}/issues/comments"],
-        listEvents: ["GET /repos/{owner}/{repo}/issues/{issue_number}/events"],
-        listEventsForRepo: ["GET /repos/{owner}/{repo}/issues/events"],
-        listEventsForTimeline: ["GET /repos/{owner}/{repo}/issues/{issue_number}/timeline"],
-        listForAuthenticatedUser: ["GET /user/issues"],
-        listForOrg: ["GET /orgs/{org}/issues"],
-        listForRepo: ["GET /repos/{owner}/{repo}/issues"],
-        listLabelsForMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}/labels"],
-        listLabelsForRepo: ["GET /repos/{owner}/{repo}/labels"],
-        listLabelsOnIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        listMilestones: ["GET /repos/{owner}/{repo}/milestones"],
-        lock: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        removeAllLabels: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        removeAssignees: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        removeLabel: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels/{name}"],
-        setLabels: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        unlock: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        update: ["PATCH /repos/{owner}/{repo}/issues/{issue_number}"],
-        updateComment: ["PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        updateLabel: ["PATCH /repos/{owner}/{repo}/labels/{name}"],
-        updateMilestone: ["PATCH /repos/{owner}/{repo}/milestones/{milestone_number}"]
-      },
-      licenses: {
-        get: ["GET /licenses/{license}"],
-        getAllCommonlyUsed: ["GET /licenses"],
-        getForRepo: ["GET /repos/{owner}/{repo}/license"]
-      },
-      markdown: {
-        render: ["POST /markdown"],
-        renderRaw: ["POST /markdown/raw", {
-          headers: {
-            "content-type": "text/plain; charset=utf-8"
-          }
-        }]
-      },
-      meta: {
-        get: ["GET /meta"],
-        getOctocat: ["GET /octocat"],
-        getZen: ["GET /zen"],
-        root: ["GET /"]
-      },
-      migrations: {
-        getArchiveForAuthenticatedUser: ["GET /user/migrations/{migration_id}/archive"],
-        getStatusForOrg: ["GET /orgs/{org}/migrations/{migration_id}"],
-        listForAuthenticatedUser: ["GET /user/migrations"],
-        listForOrg: ["GET /orgs/{org}/migrations"],
-        listReposForAuthenticatedUser: ["GET /user/migrations/{migration_id}/repositories"],
-        listReposForUser: ["GET /user/migrations/{migration_id}/repositories", {}, {
-          renamed: ["migrations", "listReposForAuthenticatedUser"]
-        }],
-        startForAuthenticatedUser: ["POST /user/migrations"],
-        startForOrg: ["POST /orgs/{org}/migrations"]
-      },
-      orgs: {
-        checkMembershipForUser: ["GET /orgs/{org}/members/{username}"],
-        checkPublicMembershipForUser: ["GET /orgs/{org}/public_members/{username}"],
-        convertMemberToOutsideCollaborator: ["PUT /orgs/{org}/outside_collaborators/{username}"],
-        createWebhook: ["POST /orgs/{org}/hooks"],
-        deleteWebhook: ["DELETE /orgs/{org}/hooks/{hook_id}"],
-        get: ["GET /orgs/{org}"],
-        getMembershipForAuthenticatedUser: ["GET /user/memberships/orgs/{org}"],
-        getMembershipForUser: ["GET /orgs/{org}/memberships/{username}"],
-        getWebhook: ["GET /orgs/{org}/hooks/{hook_id}"],
-        getWebhookConfigForOrg: ["GET /orgs/{org}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        list: ["GET /organizations"],
-        listAppInstallations: ["GET /orgs/{org}/installations"],
-        listCustomRoles: ["GET /organizations/{organization_id}/custom_roles"],
-        listForAuthenticatedUser: ["GET /user/orgs"],
-        listForUser: ["GET /users/{username}/orgs"],
-        listMembers: ["GET /orgs/{org}/members"],
-        listMembershipsForAuthenticatedUser: ["GET /user/memberships/orgs"],
-        listOutsideCollaborators: ["GET /orgs/{org}/outside_collaborators"],
-        listPublicMembers: ["GET /orgs/{org}/public_members"],
-        listWebhookDeliveries: ["GET /orgs/{org}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /orgs/{org}/hooks"],
-        pingWebhook: ["POST /orgs/{org}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeMember: ["DELETE /orgs/{org}/members/{username}"],
-        removeMembershipForUser: ["DELETE /orgs/{org}/memberships/{username}"],
-        removeOutsideCollaborator: ["DELETE /orgs/{org}/outside_collaborators/{username}"],
-        removePublicMembershipForAuthenticatedUser: ["DELETE /orgs/{org}/public_members/{username}"],
-        setMembershipForUser: ["PUT /orgs/{org}/memberships/{username}"],
-        setPublicMembershipForAuthenticatedUser: ["PUT /orgs/{org}/public_members/{username}"],
-        update: ["PATCH /orgs/{org}"],
-        updateMembershipForAuthenticatedUser: ["PATCH /user/memberships/orgs/{org}"],
-        updateWebhook: ["PATCH /orgs/{org}/hooks/{hook_id}"],
-        updateWebhookConfigForOrg: ["PATCH /orgs/{org}/hooks/{hook_id}/config"]
-      },
-      projects: {
-        addCollaborator: ["PUT /projects/{project_id}/collaborators/{username}"],
-        createCard: ["POST /projects/columns/{column_id}/cards"],
-        createColumn: ["POST /projects/{project_id}/columns"],
-        createForAuthenticatedUser: ["POST /user/projects"],
-        createForOrg: ["POST /orgs/{org}/projects"],
-        createForRepo: ["POST /repos/{owner}/{repo}/projects"],
-        delete: ["DELETE /projects/{project_id}"],
-        deleteCard: ["DELETE /projects/columns/cards/{card_id}"],
-        deleteColumn: ["DELETE /projects/columns/{column_id}"],
-        get: ["GET /projects/{project_id}"],
-        getCard: ["GET /projects/columns/cards/{card_id}"],
-        getColumn: ["GET /projects/columns/{column_id}"],
-        getPermissionForUser: ["GET /projects/{project_id}/collaborators/{username}/permission"],
-        listCards: ["GET /projects/columns/{column_id}/cards"],
-        listCollaborators: ["GET /projects/{project_id}/collaborators"],
-        listColumns: ["GET /projects/{project_id}/columns"],
-        listForOrg: ["GET /orgs/{org}/projects"],
-        listForRepo: ["GET /repos/{owner}/{repo}/projects"],
-        listForUser: ["GET /users/{username}/projects"],
-        moveCard: ["POST /projects/columns/cards/{card_id}/moves"],
-        moveColumn: ["POST /projects/columns/{column_id}/moves"],
-        removeCollaborator: ["DELETE /projects/{project_id}/collaborators/{username}"],
-        update: ["PATCH /projects/{project_id}"],
-        updateCard: ["PATCH /projects/columns/cards/{card_id}"],
-        updateColumn: ["PATCH /projects/columns/{column_id}"]
-      },
-      pulls: {
-        checkIfMerged: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        create: ["POST /repos/{owner}/{repo}/pulls"],
-        createReplyForReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies"],
-        createReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        createReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        deletePendingReview: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        deleteReviewComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        dismissReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/dismissals"],
-        get: ["GET /repos/{owner}/{repo}/pulls/{pull_number}"],
-        getReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        getReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        list: ["GET /repos/{owner}/{repo}/pulls"],
-        listCommentsForReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/comments"],
-        listCommits: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/commits"],
-        listFiles: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/files"],
-        listRequestedReviewers: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        listReviewComments: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        listReviewCommentsForRepo: ["GET /repos/{owner}/{repo}/pulls/comments"],
-        listReviews: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        merge: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        removeRequestedReviewers: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        requestReviewers: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        submitReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/events"],
-        update: ["PATCH /repos/{owner}/{repo}/pulls/{pull_number}"],
-        updateBranch: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch"],
-        updateReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        updateReviewComment: ["PATCH /repos/{owner}/{repo}/pulls/comments/{comment_id}"]
-      },
-      rateLimit: {
-        get: ["GET /rate_limit"]
-      },
-      reactions: {
-        createForCommitComment: ["POST /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        createForIssue: ["POST /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        createForIssueComment: ["POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        createForPullRequestReviewComment: ["POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        createForRelease: ["POST /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        createForTeamDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        createForTeamDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/reactions/#create-reaction-for-a-team-discussion-comment-legacy"
-        }],
-        createForTeamDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        createForTeamDiscussionLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/reactions/#create-reaction-for-a-team-discussion-legacy"
-        }],
-        deleteForCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForIssue: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/reactions/{reaction_id}"],
-        deleteForIssueComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForPullRequestComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}/reactions/{reaction_id}"],
-        deleteForTeamDiscussion: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions/{reaction_id}"],
-        deleteForTeamDiscussionComment: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions/{reaction_id}"],
-        deleteLegacy: ["DELETE /reactions/{reaction_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#delete-a-reaction-legacy"
-        }],
-        listForCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        listForIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        listForIssueComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        listForPullRequestReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        listForRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        listForTeamDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        listForTeamDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/reactions/#list-reactions-for-a-team-discussion-comment-legacy"
-        }],
-        listForTeamDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        listForTeamDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/reactions/#list-reactions-for-a-team-discussion-legacy"
-        }]
-      },
-      repos: {
-        acceptInvitation: ["PATCH /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "acceptInvitationForAuthenticatedUser"]
-        }],
-        acceptInvitationForAuthenticatedUser: ["PATCH /user/repository_invitations/{invitation_id}"],
-        addAppAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        addCollaborator: ["PUT /repos/{owner}/{repo}/collaborators/{username}"],
-        addStatusCheckContexts: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        addTeamAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        addUserAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        checkCollaborator: ["GET /repos/{owner}/{repo}/collaborators/{username}"],
-        codeownersErrors: ["GET /repos/{owner}/{repo}/codeowners/errors"],
-        compareCommits: ["GET /repos/{owner}/{repo}/compare/{base}...{head}"],
-        compareCommitsWithBasehead: ["GET /repos/{owner}/{repo}/compare/{basehead}"],
-        createAutolink: ["POST /repos/{owner}/{repo}/autolinks"],
-        createCommitComment: ["POST /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        createCommitSignatureProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        createCommitStatus: ["POST /repos/{owner}/{repo}/statuses/{sha}"],
-        createDeployKey: ["POST /repos/{owner}/{repo}/keys"],
-        createDeployment: ["POST /repos/{owner}/{repo}/deployments"],
-        createDeploymentBranchPolicy: ["POST /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        createDeploymentStatus: ["POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        createDispatchEvent: ["POST /repos/{owner}/{repo}/dispatches"],
-        createForAuthenticatedUser: ["POST /user/repos"],
-        createFork: ["POST /repos/{owner}/{repo}/forks"],
-        createInOrg: ["POST /orgs/{org}/repos"],
-        createOrUpdateEnvironment: ["PUT /repos/{owner}/{repo}/environments/{environment_name}"],
-        createOrUpdateFileContents: ["PUT /repos/{owner}/{repo}/contents/{path}"],
-        createPagesSite: ["POST /repos/{owner}/{repo}/pages"],
-        createRelease: ["POST /repos/{owner}/{repo}/releases"],
-        createTagProtection: ["POST /repos/{owner}/{repo}/tags/protection"],
-        createUsingTemplate: ["POST /repos/{template_owner}/{template_repo}/generate"],
-        createWebhook: ["POST /repos/{owner}/{repo}/hooks"],
-        declineInvitation: ["DELETE /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "declineInvitationForAuthenticatedUser"]
-        }],
-        declineInvitationForAuthenticatedUser: ["DELETE /user/repository_invitations/{invitation_id}"],
-        delete: ["DELETE /repos/{owner}/{repo}"],
-        deleteAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        deleteAdminBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        deleteAnEnvironment: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}"],
-        deleteAutolink: ["DELETE /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        deleteBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection"],
-        deleteCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}"],
-        deleteCommitSignatureProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        deleteDeployKey: ["DELETE /repos/{owner}/{repo}/keys/{key_id}"],
-        deleteDeployment: ["DELETE /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        deleteDeploymentBranchPolicy: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        deleteFile: ["DELETE /repos/{owner}/{repo}/contents/{path}"],
-        deleteInvitation: ["DELETE /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        deletePagesSite: ["DELETE /repos/{owner}/{repo}/pages"],
-        deletePullRequestReviewProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        deleteRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}"],
-        deleteReleaseAsset: ["DELETE /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        deleteTagProtection: ["DELETE /repos/{owner}/{repo}/tags/protection/{tag_protection_id}"],
-        deleteWebhook: ["DELETE /repos/{owner}/{repo}/hooks/{hook_id}"],
-        disableLfsForRepo: ["DELETE /repos/{owner}/{repo}/lfs"],
-        downloadTarballArchive: ["GET /repos/{owner}/{repo}/tarball/{ref}"],
-        downloadZipballArchive: ["GET /repos/{owner}/{repo}/zipball/{ref}"],
-        enableLfsForRepo: ["PUT /repos/{owner}/{repo}/lfs"],
-        generateReleaseNotes: ["POST /repos/{owner}/{repo}/releases/generate-notes"],
-        get: ["GET /repos/{owner}/{repo}"],
-        getAccessRestrictions: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        getAdminBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        getAllEnvironments: ["GET /repos/{owner}/{repo}/environments"],
-        getAllStatusCheckContexts: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        getAllTopics: ["GET /repos/{owner}/{repo}/topics"],
-        getAppsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        getAutolink: ["GET /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        getBranch: ["GET /repos/{owner}/{repo}/branches/{branch}"],
-        getBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection"],
-        getCodeFrequencyStats: ["GET /repos/{owner}/{repo}/stats/code_frequency"],
-        getCollaboratorPermissionLevel: ["GET /repos/{owner}/{repo}/collaborators/{username}/permission"],
-        getCombinedStatusForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/status"],
-        getCommit: ["GET /repos/{owner}/{repo}/commits/{ref}"],
-        getCommitActivityStats: ["GET /repos/{owner}/{repo}/stats/commit_activity"],
-        getCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}"],
-        getCommitSignatureProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        getContent: ["GET /repos/{owner}/{repo}/contents/{path}"],
-        getContributorsStats: ["GET /repos/{owner}/{repo}/stats/contributors"],
-        getDeployKey: ["GET /repos/{owner}/{repo}/keys/{key_id}"],
-        getDeployment: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        getDeploymentBranchPolicy: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        getDeploymentStatus: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses/{status_id}"],
-        getEnvironment: ["GET /repos/{owner}/{repo}/environments/{environment_name}"],
-        getLatestPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/latest"],
-        getLatestRelease: ["GET /repos/{owner}/{repo}/releases/latest"],
-        getPages: ["GET /repos/{owner}/{repo}/pages"],
-        getPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/{build_id}"],
-        getParticipationStats: ["GET /repos/{owner}/{repo}/stats/participation"],
-        getPullRequestReviewProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        getPunchCardStats: ["GET /repos/{owner}/{repo}/stats/punch_card"],
-        getReadme: ["GET /repos/{owner}/{repo}/readme"],
-        getReadmeInDirectory: ["GET /repos/{owner}/{repo}/readme/{dir}"],
-        getRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}"],
-        getReleaseAsset: ["GET /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        getReleaseByTag: ["GET /repos/{owner}/{repo}/releases/tags/{tag}"],
-        getStatusChecksProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        getTeamsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        getUsersWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        getWebhook: ["GET /repos/{owner}/{repo}/hooks/{hook_id}"],
-        getWebhookConfigForRepo: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        listAutolinks: ["GET /repos/{owner}/{repo}/autolinks"],
-        listBranches: ["GET /repos/{owner}/{repo}/branches"],
-        listBranchesForHeadCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/branches-where-head"],
-        listCacheInfo: ["GET /repos/{owner}/{repo}/replicas/caches"],
-        listCollaborators: ["GET /repos/{owner}/{repo}/collaborators"],
-        listCommentsForCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        listCommitCommentsForRepo: ["GET /repos/{owner}/{repo}/comments"],
-        listCommitStatusesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/statuses"],
-        listCommits: ["GET /repos/{owner}/{repo}/commits"],
-        listContributors: ["GET /repos/{owner}/{repo}/contributors"],
-        listDeployKeys: ["GET /repos/{owner}/{repo}/keys"],
-        listDeploymentBranchPolicies: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        listDeploymentStatuses: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        listDeployments: ["GET /repos/{owner}/{repo}/deployments"],
-        listForAuthenticatedUser: ["GET /user/repos"],
-        listForOrg: ["GET /orgs/{org}/repos"],
-        listForUser: ["GET /users/{username}/repos"],
-        listForks: ["GET /repos/{owner}/{repo}/forks"],
-        listInvitations: ["GET /repos/{owner}/{repo}/invitations"],
-        listInvitationsForAuthenticatedUser: ["GET /user/repository_invitations"],
-        listLanguages: ["GET /repos/{owner}/{repo}/languages"],
-        listPagesBuilds: ["GET /repos/{owner}/{repo}/pages/builds"],
-        listPublic: ["GET /repositories"],
-        listPullRequestsAssociatedWithCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls"],
-        listReleaseAssets: ["GET /repos/{owner}/{repo}/releases/{release_id}/assets"],
-        listReleases: ["GET /repos/{owner}/{repo}/releases"],
-        listTagProtection: ["GET /repos/{owner}/{repo}/tags/protection"],
-        listTags: ["GET /repos/{owner}/{repo}/tags"],
-        listTeams: ["GET /repos/{owner}/{repo}/teams"],
-        listWebhookDeliveries: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /repos/{owner}/{repo}/hooks"],
-        merge: ["POST /repos/{owner}/{repo}/merges"],
-        mergeUpstream: ["POST /repos/{owner}/{repo}/merge-upstream"],
-        pingWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeAppAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        removeCollaborator: ["DELETE /repos/{owner}/{repo}/collaborators/{username}"],
-        removeStatusCheckContexts: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        removeStatusCheckProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        removeTeamAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        removeUserAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        renameBranch: ["POST /repos/{owner}/{repo}/branches/{branch}/rename"],
-        replaceAllTopics: ["PUT /repos/{owner}/{repo}/topics"],
-        requestPagesBuild: ["POST /repos/{owner}/{repo}/pages/builds"],
-        setAdminBranchProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        setAppAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        setStatusCheckContexts: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        setTeamAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        setUserAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        testPushWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/tests"],
-        transfer: ["POST /repos/{owner}/{repo}/transfer"],
-        update: ["PATCH /repos/{owner}/{repo}"],
-        updateBranchProtection: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection"],
-        updateCommitComment: ["PATCH /repos/{owner}/{repo}/comments/{comment_id}"],
-        updateDeploymentBranchPolicy: ["PUT /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        updateInformationAboutPagesSite: ["PUT /repos/{owner}/{repo}/pages"],
-        updateInvitation: ["PATCH /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        updatePullRequestReviewProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        updateRelease: ["PATCH /repos/{owner}/{repo}/releases/{release_id}"],
-        updateReleaseAsset: ["PATCH /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        updateStatusCheckProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        updateWebhook: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}"],
-        updateWebhookConfigForRepo: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        uploadReleaseAsset: ["POST {origin}/repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}"]
-      },
-      search: {
-        code: ["GET /search/code"],
-        commits: ["GET /search/commits"],
-        issuesAndPullRequests: ["GET /search/issues"],
-        labels: ["GET /search/labels"],
-        repos: ["GET /search/repositories"],
-        topics: ["GET /search/topics"],
-        users: ["GET /search/users"]
-      },
-      secretScanning: {
-        getAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"],
-        listAlertsForEnterprise: ["GET /enterprises/{enterprise}/secret-scanning/alerts"],
-        listAlertsForOrg: ["GET /orgs/{org}/secret-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/secret-scanning/alerts"],
-        listLocationsForAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"]
-      },
-      teams: {
-        addMemberLegacy: ["PUT /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.addMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#add-team-member-legacy"
-        }],
-        addOrUpdateMembershipForUserInOrg: ["PUT /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        addOrUpdateMembershipForUserLegacy: ["PUT /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.addOrUpdateMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#add-or-update-team-membership-for-a-user-legacy"
-        }],
-        addOrUpdateProjectPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        addOrUpdateProjectPermissionsLegacy: ["PUT /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.addOrUpdateProjectPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#add-or-update-team-project-permissions-legacy"
-        }],
-        addOrUpdateRepoPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        addOrUpdateRepoPermissionsLegacy: ["PUT /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.addOrUpdateRepoPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#add-or-update-team-repository-permissions-legacy"
-        }],
-        checkPermissionsForProjectInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        checkPermissionsForProjectLegacy: ["GET /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#check-team-permissions-for-a-project-legacy"
-        }],
-        checkPermissionsForRepoInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        checkPermissionsForRepoLegacy: ["GET /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#check-team-permissions-for-a-repository-legacy"
-        }],
-        create: ["POST /orgs/{org}/teams"],
-        createDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        createDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.createDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#create-a-discussion-comment-legacy"
-        }],
-        createDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions"],
-        createDiscussionLegacy: ["POST /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.createDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#create-a-discussion-legacy"
-        }],
-        deleteDiscussionCommentInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        deleteDiscussionCommentLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#delete-a-discussion-comment-legacy"
-        }],
-        deleteDiscussionInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        deleteDiscussionLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#delete-a-discussion-legacy"
-        }],
-        deleteInOrg: ["DELETE /orgs/{org}/teams/{team_slug}"],
-        deleteLegacy: ["DELETE /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#delete-a-team-legacy"
-        }],
-        getByName: ["GET /orgs/{org}/teams/{team_slug}"],
-        getDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        getDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#get-a-discussion-comment-legacy"
-        }],
-        getDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        getDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#get-a-discussion-legacy"
-        }],
-        getLegacy: ["GET /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.getLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#get-a-team-legacy"
-        }],
-        getMemberLegacy: ["GET /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.getMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#get-team-member-legacy"
-        }],
-        getMembershipForUserInOrg: ["GET /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        getMembershipForUserLegacy: ["GET /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.getMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#get-team-membership-for-a-user-legacy"
-        }],
-        list: ["GET /orgs/{org}/teams"],
-        listChildInOrg: ["GET /orgs/{org}/teams/{team_slug}/teams"],
-        listChildLegacy: ["GET /teams/{team_id}/teams", {}, {
-          deprecated: "octokit.scim.listChildLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#list-child-teams-legacy"
-        }],
-        listDiscussionCommentsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        listDiscussionCommentsLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.listDiscussionCommentsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#list-discussion-comments-legacy"
-        }],
-        listDiscussionsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions"],
-        listDiscussionsLegacy: ["GET /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.listDiscussionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#list-discussions-legacy"
-        }],
-        listForAuthenticatedUser: ["GET /user/teams"],
-        listMembersInOrg: ["GET /orgs/{org}/teams/{team_slug}/members"],
-        listMembersLegacy: ["GET /teams/{team_id}/members", {}, {
-          deprecated: "octokit.scim.listMembersLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#list-team-members-legacy"
-        }],
-        listProjectsInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects"],
-        listProjectsLegacy: ["GET /teams/{team_id}/projects", {}, {
-          deprecated: "octokit.scim.listProjectsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#list-team-projects-legacy"
-        }],
-        listReposInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos"],
-        listReposLegacy: ["GET /teams/{team_id}/repos", {}, {
-          deprecated: "octokit.scim.listReposLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#list-team-repositories-legacy"
-        }],
-        removeMemberLegacy: ["DELETE /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.removeMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#remove-team-member-legacy"
-        }],
-        removeMembershipForUserInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        removeMembershipForUserLegacy: ["DELETE /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.removeMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#remove-team-membership-for-a-user-legacy"
-        }],
-        removeProjectInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        removeProjectLegacy: ["DELETE /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.removeProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#remove-a-project-from-a-team-legacy"
-        }],
-        removeRepoInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        removeRepoLegacy: ["DELETE /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.removeRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#remove-a-repository-from-a-team-legacy"
-        }],
-        updateDiscussionCommentInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        updateDiscussionCommentLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#update-a-discussion-comment-legacy"
-        }],
-        updateDiscussionInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        updateDiscussionLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams#update-a-discussion-legacy"
-        }],
-        updateInOrg: ["PATCH /orgs/{org}/teams/{team_slug}"],
-        updateLegacy: ["PATCH /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.updateLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.6/rest/reference/teams/#update-a-team-legacy"
-        }]
-      },
-      users: {
-        addEmailForAuthenticated: ["POST /user/emails", {}, {
-          renamed: ["users", "addEmailForAuthenticatedUser"]
-        }],
-        addEmailForAuthenticatedUser: ["POST /user/emails"],
-        checkFollowingForUser: ["GET /users/{username}/following/{target_user}"],
-        checkPersonIsFollowedByAuthenticated: ["GET /user/following/{username}"],
-        createGpgKeyForAuthenticated: ["POST /user/gpg_keys", {}, {
-          renamed: ["users", "createGpgKeyForAuthenticatedUser"]
-        }],
-        createGpgKeyForAuthenticatedUser: ["POST /user/gpg_keys"],
-        createPublicSshKeyForAuthenticated: ["POST /user/keys", {}, {
-          renamed: ["users", "createPublicSshKeyForAuthenticatedUser"]
-        }],
-        createPublicSshKeyForAuthenticatedUser: ["POST /user/keys"],
-        deleteEmailForAuthenticated: ["DELETE /user/emails", {}, {
-          renamed: ["users", "deleteEmailForAuthenticatedUser"]
-        }],
-        deleteEmailForAuthenticatedUser: ["DELETE /user/emails"],
-        deleteGpgKeyForAuthenticated: ["DELETE /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "deleteGpgKeyForAuthenticatedUser"]
-        }],
-        deleteGpgKeyForAuthenticatedUser: ["DELETE /user/gpg_keys/{gpg_key_id}"],
-        deletePublicSshKeyForAuthenticated: ["DELETE /user/keys/{key_id}", {}, {
-          renamed: ["users", "deletePublicSshKeyForAuthenticatedUser"]
-        }],
-        deletePublicSshKeyForAuthenticatedUser: ["DELETE /user/keys/{key_id}"],
-        follow: ["PUT /user/following/{username}"],
-        getAuthenticated: ["GET /user"],
-        getByUsername: ["GET /users/{username}"],
-        getContextForUser: ["GET /users/{username}/hovercard"],
-        getGpgKeyForAuthenticated: ["GET /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "getGpgKeyForAuthenticatedUser"]
-        }],
-        getGpgKeyForAuthenticatedUser: ["GET /user/gpg_keys/{gpg_key_id}"],
-        getPublicSshKeyForAuthenticated: ["GET /user/keys/{key_id}", {}, {
-          renamed: ["users", "getPublicSshKeyForAuthenticatedUser"]
-        }],
-        getPublicSshKeyForAuthenticatedUser: ["GET /user/keys/{key_id}"],
-        list: ["GET /users"],
-        listEmailsForAuthenticated: ["GET /user/emails", {}, {
-          renamed: ["users", "listEmailsForAuthenticatedUser"]
-        }],
-        listEmailsForAuthenticatedUser: ["GET /user/emails"],
-        listFollowedByAuthenticated: ["GET /user/following", {}, {
-          renamed: ["users", "listFollowedByAuthenticatedUser"]
-        }],
-        listFollowedByAuthenticatedUser: ["GET /user/following"],
-        listFollowersForAuthenticatedUser: ["GET /user/followers"],
-        listFollowersForUser: ["GET /users/{username}/followers"],
-        listFollowingForUser: ["GET /users/{username}/following"],
-        listGpgKeysForAuthenticated: ["GET /user/gpg_keys", {}, {
-          renamed: ["users", "listGpgKeysForAuthenticatedUser"]
-        }],
-        listGpgKeysForAuthenticatedUser: ["GET /user/gpg_keys"],
-        listGpgKeysForUser: ["GET /users/{username}/gpg_keys"],
-        listPublicEmailsForAuthenticated: ["GET /user/public_emails", {}, {
-          renamed: ["users", "listPublicEmailsForAuthenticatedUser"]
-        }],
-        listPublicEmailsForAuthenticatedUser: ["GET /user/public_emails"],
-        listPublicKeysForUser: ["GET /users/{username}/keys"],
-        listPublicSshKeysForAuthenticated: ["GET /user/keys", {}, {
-          renamed: ["users", "listPublicSshKeysForAuthenticatedUser"]
-        }],
-        listPublicSshKeysForAuthenticatedUser: ["GET /user/keys"],
-        unfollow: ["DELETE /user/following/{username}"],
-        updateAuthenticated: ["PATCH /user"]
-      }
-    };
-    var Endpoints$5 = {
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteScimGroupFromEnterprise: ["DELETE /scim/v2/Groups/{scim_group_id}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        deleteUserFromEnterprise: ["DELETE /scim/v2/Users/{scim_user_id}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getProvisioningInformationForEnterpriseGroup: ["GET /scim/v2/Groups/{scim_group_id}"],
-        getProvisioningInformationForEnterpriseUser: ["GET /scim/v2/Users/{scim_user_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listProvisionedGroupsEnterprise: ["GET /scim/v2/Groups"],
-        listProvisionedIdentitiesEnterprise: ["GET /scim/v2/Users"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        provisionEnterpriseGroup: ["POST /scim/v2/Groups"],
-        provisionEnterpriseUser: ["POST /scim/v2/Users"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setInformationForProvisionedEnterpriseGroup: ["PUT /scim/v2/Groups/{scim_group_id}"],
-        setInformationForProvisionedEnterpriseUser: ["PUT /scim/v2/Users/{scim_user_id}"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateAttributeForEnterpriseGroup: ["PATCH /scim/v2/Groups/{scim_group_id}"],
-        updateAttributeForEnterpriseUser: ["PATCH /scim/v2/Users/{scim_user_id}"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      }
-    };
-    var Endpoints$6 = {
-      actions: {
-        addCustomLabelsToSelfHostedRunnerForOrg: ["POST /orgs/{org}/actions/runners/{runner_id}/labels"],
-        addCustomLabelsToSelfHostedRunnerForRepo: ["POST /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        cancelWorkflowRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel"],
-        createOrUpdateEnvironmentSecret: ["PUT /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        createRegistrationTokenForOrg: ["POST /orgs/{org}/actions/runners/registration-token"],
-        createRegistrationTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/registration-token"],
-        createRemoveTokenForOrg: ["POST /orgs/{org}/actions/runners/remove-token"],
-        createRemoveTokenForRepo: ["POST /repos/{owner}/{repo}/actions/runners/remove-token"],
-        createWorkflowDispatch: ["POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches"],
-        deleteActionsCacheById: ["DELETE /repos/{owner}/{repo}/actions/caches/{cache_id}"],
-        deleteActionsCacheByKey: ["DELETE /repos/{owner}/{repo}/actions/caches{?key,ref}"],
-        deleteArtifact: ["DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        deleteEnvironmentSecret: ["DELETE /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        deleteSelfHostedRunnerFromOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}"],
-        deleteSelfHostedRunnerFromRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        deleteWorkflowRun: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        deleteWorkflowRunLogs: ["DELETE /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        disableSelectedRepositoryGithubActionsOrganization: ["DELETE /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        disableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable"],
-        downloadArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}"],
-        downloadJobLogsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs"],
-        downloadWorkflowRunAttemptLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/logs"],
-        downloadWorkflowRunLogs: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/logs"],
-        enableSelectedRepositoryGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories/{repository_id}"],
-        enableWorkflow: ["PUT /repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable"],
-        getActionsCacheList: ["GET /repos/{owner}/{repo}/actions/caches"],
-        getActionsCacheUsage: ["GET /repos/{owner}/{repo}/actions/cache/usage"],
-        getActionsCacheUsageByRepoForOrg: ["GET /orgs/{org}/actions/cache/usage-by-repository"],
-        getActionsCacheUsageForEnterprise: ["GET /enterprises/{enterprise}/actions/cache/usage"],
-        getActionsCacheUsageForOrg: ["GET /orgs/{org}/actions/cache/usage"],
-        getActionsCacheUsagePolicy: ["GET /repos/{owner}/{repo}/actions/cache/usage-policy"],
-        getActionsCacheUsagePolicyForEnterprise: ["GET /enterprises/{enterprise}/actions/cache/usage-policy"],
-        getAllowedActionsOrganization: ["GET /orgs/{org}/actions/permissions/selected-actions"],
-        getAllowedActionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        getArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
-        getEnvironmentPublicKey: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/public-key"],
-        getEnvironmentSecret: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets/{secret_name}"],
-        getGithubActionsDefaultWorkflowPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/workflow"],
-        getGithubActionsDefaultWorkflowPermissionsOrganization: ["GET /orgs/{org}/actions/permissions/workflow"],
-        getGithubActionsDefaultWorkflowPermissionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions/workflow"],
-        getGithubActionsPermissionsOrganization: ["GET /orgs/{org}/actions/permissions"],
-        getGithubActionsPermissionsRepository: ["GET /repos/{owner}/{repo}/actions/permissions"],
-        getJobForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/jobs/{job_id}"],
-        getOrgPublicKey: ["GET /orgs/{org}/actions/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}"],
-        getPendingDeploymentsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/actions/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/actions/secrets/{secret_name}"],
-        getReviewsForRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/approvals"],
-        getSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}"],
-        getSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}"],
-        getWorkflow: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}"],
-        getWorkflowAccessToRepository: ["GET /repos/{owner}/{repo}/actions/permissions/access"],
-        getWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}"],
-        getWorkflowRunAttempt: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}"],
-        listArtifactsForRepo: ["GET /repos/{owner}/{repo}/actions/artifacts"],
-        listEnvironmentSecrets: ["GET /repositories/{repository_id}/environments/{environment_name}/secrets"],
-        listJobsForWorkflowRun: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs"],
-        listJobsForWorkflowRunAttempt: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs"],
-        listLabelsForSelfHostedRunnerForOrg: ["GET /orgs/{org}/actions/runners/{runner_id}/labels"],
-        listLabelsForSelfHostedRunnerForRepo: ["GET /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        listOrgSecrets: ["GET /orgs/{org}/actions/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/actions/secrets"],
-        listRepoWorkflows: ["GET /repos/{owner}/{repo}/actions/workflows"],
-        listRunnerApplicationsForOrg: ["GET /orgs/{org}/actions/runners/downloads"],
-        listRunnerApplicationsForRepo: ["GET /repos/{owner}/{repo}/actions/runners/downloads"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        listSelectedRepositoriesEnabledGithubActionsOrganization: ["GET /orgs/{org}/actions/permissions/repositories"],
-        listSelfHostedRunnersForOrg: ["GET /orgs/{org}/actions/runners"],
-        listSelfHostedRunnersForRepo: ["GET /repos/{owner}/{repo}/actions/runners"],
-        listWorkflowRunArtifacts: ["GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"],
-        listWorkflowRuns: ["GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs"],
-        listWorkflowRunsForRepo: ["GET /repos/{owner}/{repo}/actions/runs"],
-        reRunJobForWorkflowRun: ["POST /repos/{owner}/{repo}/actions/jobs/{job_id}/rerun"],
-        reRunWorkflow: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun"],
-        reRunWorkflowFailedJobs: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs"],
-        removeAllCustomLabelsFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels"],
-        removeAllCustomLabelsFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        removeCustomLabelFromSelfHostedRunnerForOrg: ["DELETE /orgs/{org}/actions/runners/{runner_id}/labels/{name}"],
-        removeCustomLabelFromSelfHostedRunnerForRepo: ["DELETE /repos/{owner}/{repo}/actions/runners/{runner_id}/labels/{name}"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}"],
-        reviewPendingDeploymentsForRun: ["POST /repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments"],
-        setActionsCacheUsagePolicy: ["PATCH /repos/{owner}/{repo}/actions/cache/usage-policy"],
-        setActionsCacheUsagePolicyForEnterprise: ["PATCH /enterprises/{enterprise}/actions/cache/usage-policy"],
-        setAllowedActionsOrganization: ["PUT /orgs/{org}/actions/permissions/selected-actions"],
-        setAllowedActionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/selected-actions"],
-        setCustomLabelsForSelfHostedRunnerForOrg: ["PUT /orgs/{org}/actions/runners/{runner_id}/labels"],
-        setCustomLabelsForSelfHostedRunnerForRepo: ["PUT /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"],
-        setGithubActionsDefaultWorkflowPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/workflow"],
-        setGithubActionsDefaultWorkflowPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions/workflow"],
-        setGithubActionsDefaultWorkflowPermissionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/workflow"],
-        setGithubActionsPermissionsOrganization: ["PUT /orgs/{org}/actions/permissions"],
-        setGithubActionsPermissionsRepository: ["PUT /repos/{owner}/{repo}/actions/permissions"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/actions/secrets/{secret_name}/repositories"],
-        setSelectedRepositoriesEnabledGithubActionsOrganization: ["PUT /orgs/{org}/actions/permissions/repositories"],
-        setWorkflowAccessToRepository: ["PUT /repos/{owner}/{repo}/actions/permissions/access"]
-      },
-      activity: {
-        checkRepoIsStarredByAuthenticatedUser: ["GET /user/starred/{owner}/{repo}"],
-        deleteRepoSubscription: ["DELETE /repos/{owner}/{repo}/subscription"],
-        deleteThreadSubscription: ["DELETE /notifications/threads/{thread_id}/subscription"],
-        getFeeds: ["GET /feeds"],
-        getRepoSubscription: ["GET /repos/{owner}/{repo}/subscription"],
-        getThread: ["GET /notifications/threads/{thread_id}"],
-        getThreadSubscriptionForAuthenticatedUser: ["GET /notifications/threads/{thread_id}/subscription"],
-        listEventsForAuthenticatedUser: ["GET /users/{username}/events"],
-        listNotificationsForAuthenticatedUser: ["GET /notifications"],
-        listOrgEventsForAuthenticatedUser: ["GET /users/{username}/events/orgs/{org}"],
-        listPublicEvents: ["GET /events"],
-        listPublicEventsForRepoNetwork: ["GET /networks/{owner}/{repo}/events"],
-        listPublicEventsForUser: ["GET /users/{username}/events/public"],
-        listPublicOrgEvents: ["GET /orgs/{org}/events"],
-        listReceivedEventsForUser: ["GET /users/{username}/received_events"],
-        listReceivedPublicEventsForUser: ["GET /users/{username}/received_events/public"],
-        listRepoEvents: ["GET /repos/{owner}/{repo}/events"],
-        listRepoNotificationsForAuthenticatedUser: ["GET /repos/{owner}/{repo}/notifications"],
-        listReposStarredByAuthenticatedUser: ["GET /user/starred"],
-        listReposStarredByUser: ["GET /users/{username}/starred"],
-        listReposWatchedByUser: ["GET /users/{username}/subscriptions"],
-        listStargazersForRepo: ["GET /repos/{owner}/{repo}/stargazers"],
-        listWatchedReposForAuthenticatedUser: ["GET /user/subscriptions"],
-        listWatchersForRepo: ["GET /repos/{owner}/{repo}/subscribers"],
-        markNotificationsAsRead: ["PUT /notifications"],
-        markRepoNotificationsAsRead: ["PUT /repos/{owner}/{repo}/notifications"],
-        markThreadAsRead: ["PATCH /notifications/threads/{thread_id}"],
-        setRepoSubscription: ["PUT /repos/{owner}/{repo}/subscription"],
-        setThreadSubscription: ["PUT /notifications/threads/{thread_id}/subscription"],
-        starRepoForAuthenticatedUser: ["PUT /user/starred/{owner}/{repo}"],
-        unstarRepoForAuthenticatedUser: ["DELETE /user/starred/{owner}/{repo}"]
-      },
-      apps: {
-        addRepoToInstallation: ["PUT /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "addRepoToInstallationForAuthenticatedUser"]
-        }],
-        addRepoToInstallationForAuthenticatedUser: ["PUT /user/installations/{installation_id}/repositories/{repository_id}"],
-        checkToken: ["POST /applications/{client_id}/token"],
-        createFromManifest: ["POST /app-manifests/{code}/conversions"],
-        createInstallationAccessToken: ["POST /app/installations/{installation_id}/access_tokens"],
-        deleteAuthorization: ["DELETE /applications/{client_id}/grant"],
-        deleteInstallation: ["DELETE /app/installations/{installation_id}"],
-        deleteToken: ["DELETE /applications/{client_id}/token"],
-        getAuthenticated: ["GET /app"],
-        getBySlug: ["GET /apps/{app_slug}"],
-        getInstallation: ["GET /app/installations/{installation_id}"],
-        getOrgInstallation: ["GET /orgs/{org}/installation"],
-        getRepoInstallation: ["GET /repos/{owner}/{repo}/installation"],
-        getUserInstallation: ["GET /users/{username}/installation"],
-        getWebhookConfigForApp: ["GET /app/hook/config"],
-        getWebhookDelivery: ["GET /app/hook/deliveries/{delivery_id}"],
-        listInstallationReposForAuthenticatedUser: ["GET /user/installations/{installation_id}/repositories"],
-        listInstallations: ["GET /app/installations"],
-        listInstallationsForAuthenticatedUser: ["GET /user/installations"],
-        listReposAccessibleToInstallation: ["GET /installation/repositories"],
-        listWebhookDeliveries: ["GET /app/hook/deliveries"],
-        redeliverWebhookDelivery: ["POST /app/hook/deliveries/{delivery_id}/attempts"],
-        removeRepoFromInstallation: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}", {}, {
-          renamed: ["apps", "removeRepoFromInstallationForAuthenticatedUser"]
-        }],
-        removeRepoFromInstallationForAuthenticatedUser: ["DELETE /user/installations/{installation_id}/repositories/{repository_id}"],
-        resetToken: ["PATCH /applications/{client_id}/token"],
-        revokeInstallationAccessToken: ["DELETE /installation/token"],
-        scopeToken: ["POST /applications/{client_id}/token/scoped"],
-        suspendInstallation: ["PUT /app/installations/{installation_id}/suspended"],
-        unsuspendInstallation: ["DELETE /app/installations/{installation_id}/suspended"],
-        updateWebhookConfigForApp: ["PATCH /app/hook/config"]
-      },
-      billing: {
-        getGithubAdvancedSecurityBillingGhe: ["GET /enterprises/{enterprise}/settings/billing/advanced-security"],
-        getGithubAdvancedSecurityBillingOrg: ["GET /orgs/{org}/settings/billing/advanced-security"]
-      },
-      checks: {
-        create: ["POST /repos/{owner}/{repo}/check-runs"],
-        createSuite: ["POST /repos/{owner}/{repo}/check-suites"],
-        get: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}"],
-        getSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}"],
-        listAnnotations: ["GET /repos/{owner}/{repo}/check-runs/{check_run_id}/annotations"],
-        listForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-runs"],
-        listForSuite: ["GET /repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"],
-        listSuitesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/check-suites"],
-        rerequestRun: ["POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest"],
-        rerequestSuite: ["POST /repos/{owner}/{repo}/check-suites/{check_suite_id}/rerequest"],
-        setSuitesPreferences: ["PATCH /repos/{owner}/{repo}/check-suites/preferences"],
-        update: ["PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}"]
-      },
-      codeScanning: {
-        deleteAnalysis: ["DELETE /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}{?confirm_delete}"],
-        getAlert: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        getAnalysis: ["GET /repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}"],
-        getSarif: ["GET /repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}"],
-        listAlertInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances"],
-        listAlertsForEnterprise: ["GET /enterprises/{enterprise}/code-scanning/alerts"],
-        listAlertsForOrg: ["GET /orgs/{org}/code-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/code-scanning/alerts"],
-        listAlertsInstances: ["GET /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances", {}, {
-          renamed: ["codeScanning", "listAlertInstances"]
-        }],
-        listRecentAnalyses: ["GET /repos/{owner}/{repo}/code-scanning/analyses"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/code-scanning/alerts/{alert_number}"],
-        uploadSarif: ["POST /repos/{owner}/{repo}/code-scanning/sarifs"]
-      },
-      codesOfConduct: {
-        getAllCodesOfConduct: ["GET /codes_of_conduct"],
-        getConductCode: ["GET /codes_of_conduct/{key}"]
-      },
-      dependabot: {
-        addSelectedRepoToOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        createOrUpdateOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}"],
-        createOrUpdateRepoSecret: ["PUT /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        deleteOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}"],
-        deleteRepoSecret: ["DELETE /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        getOrgPublicKey: ["GET /orgs/{org}/dependabot/secrets/public-key"],
-        getOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}"],
-        getRepoPublicKey: ["GET /repos/{owner}/{repo}/dependabot/secrets/public-key"],
-        getRepoSecret: ["GET /repos/{owner}/{repo}/dependabot/secrets/{secret_name}"],
-        listOrgSecrets: ["GET /orgs/{org}/dependabot/secrets"],
-        listRepoSecrets: ["GET /repos/{owner}/{repo}/dependabot/secrets"],
-        listSelectedReposForOrgSecret: ["GET /orgs/{org}/dependabot/secrets/{secret_name}/repositories"],
-        removeSelectedRepoFromOrgSecret: ["DELETE /orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}"],
-        setSelectedReposForOrgSecret: ["PUT /orgs/{org}/dependabot/secrets/{secret_name}/repositories"]
-      },
-      dependencyGraph: {
-        createRepositorySnapshot: ["POST /repos/{owner}/{repo}/dependency-graph/snapshots"],
-        diffRange: ["GET /repos/{owner}/{repo}/dependency-graph/compare/{basehead}"]
-      },
-      emojis: {
-        get: ["GET /emojis"]
-      },
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteScimGroupFromEnterprise: ["DELETE /scim/v2/Groups/{scim_group_id}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        deleteUserFromEnterprise: ["DELETE /scim/v2/Users/{scim_user_id}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getProvisioningInformationForEnterpriseGroup: ["GET /scim/v2/Groups/{scim_group_id}"],
-        getProvisioningInformationForEnterpriseUser: ["GET /scim/v2/Users/{scim_user_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listProvisionedGroupsEnterprise: ["GET /scim/v2/Groups"],
-        listProvisionedIdentitiesEnterprise: ["GET /scim/v2/Users"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        provisionEnterpriseGroup: ["POST /scim/v2/Groups"],
-        provisionEnterpriseUser: ["POST /scim/v2/Users"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setInformationForProvisionedEnterpriseGroup: ["PUT /scim/v2/Groups/{scim_group_id}"],
-        setInformationForProvisionedEnterpriseUser: ["PUT /scim/v2/Users/{scim_user_id}"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateAttributeForEnterpriseGroup: ["PATCH /scim/v2/Groups/{scim_group_id}"],
-        updateAttributeForEnterpriseUser: ["PATCH /scim/v2/Users/{scim_user_id}"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      },
-      gists: {
-        checkIsStarred: ["GET /gists/{gist_id}/star"],
-        create: ["POST /gists"],
-        createComment: ["POST /gists/{gist_id}/comments"],
-        delete: ["DELETE /gists/{gist_id}"],
-        deleteComment: ["DELETE /gists/{gist_id}/comments/{comment_id}"],
-        fork: ["POST /gists/{gist_id}/forks"],
-        get: ["GET /gists/{gist_id}"],
-        getComment: ["GET /gists/{gist_id}/comments/{comment_id}"],
-        getRevision: ["GET /gists/{gist_id}/{sha}"],
-        list: ["GET /gists"],
-        listComments: ["GET /gists/{gist_id}/comments"],
-        listCommits: ["GET /gists/{gist_id}/commits"],
-        listForUser: ["GET /users/{username}/gists"],
-        listForks: ["GET /gists/{gist_id}/forks"],
-        listPublic: ["GET /gists/public"],
-        listStarred: ["GET /gists/starred"],
-        star: ["PUT /gists/{gist_id}/star"],
-        unstar: ["DELETE /gists/{gist_id}/star"],
-        update: ["PATCH /gists/{gist_id}"],
-        updateComment: ["PATCH /gists/{gist_id}/comments/{comment_id}"]
-      },
-      git: {
-        createBlob: ["POST /repos/{owner}/{repo}/git/blobs"],
-        createCommit: ["POST /repos/{owner}/{repo}/git/commits"],
-        createRef: ["POST /repos/{owner}/{repo}/git/refs"],
-        createTag: ["POST /repos/{owner}/{repo}/git/tags"],
-        createTree: ["POST /repos/{owner}/{repo}/git/trees"],
-        deleteRef: ["DELETE /repos/{owner}/{repo}/git/refs/{ref}"],
-        getBlob: ["GET /repos/{owner}/{repo}/git/blobs/{file_sha}"],
-        getCommit: ["GET /repos/{owner}/{repo}/git/commits/{commit_sha}"],
-        getRef: ["GET /repos/{owner}/{repo}/git/ref/{ref}"],
-        getTag: ["GET /repos/{owner}/{repo}/git/tags/{tag_sha}"],
-        getTree: ["GET /repos/{owner}/{repo}/git/trees/{tree_sha}"],
-        listMatchingRefs: ["GET /repos/{owner}/{repo}/git/matching-refs/{ref}"],
-        updateRef: ["PATCH /repos/{owner}/{repo}/git/refs/{ref}"]
-      },
-      gitignore: {
-        getAllTemplates: ["GET /gitignore/templates"],
-        getTemplate: ["GET /gitignore/templates/{name}"]
-      },
-      issues: {
-        addAssignees: ["POST /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        addLabels: ["POST /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        checkUserCanBeAssigned: ["GET /repos/{owner}/{repo}/assignees/{assignee}"],
-        checkUserCanBeAssignedToIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/assignees/{assignee}"],
-        create: ["POST /repos/{owner}/{repo}/issues"],
-        createComment: ["POST /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        createLabel: ["POST /repos/{owner}/{repo}/labels"],
-        createMilestone: ["POST /repos/{owner}/{repo}/milestones"],
-        deleteComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        deleteLabel: ["DELETE /repos/{owner}/{repo}/labels/{name}"],
-        deleteMilestone: ["DELETE /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        get: ["GET /repos/{owner}/{repo}/issues/{issue_number}"],
-        getComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        getEvent: ["GET /repos/{owner}/{repo}/issues/events/{event_id}"],
-        getLabel: ["GET /repos/{owner}/{repo}/labels/{name}"],
-        getMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}"],
-        list: ["GET /issues"],
-        listAssignees: ["GET /repos/{owner}/{repo}/assignees"],
-        listComments: ["GET /repos/{owner}/{repo}/issues/{issue_number}/comments"],
-        listCommentsForRepo: ["GET /repos/{owner}/{repo}/issues/comments"],
-        listEvents: ["GET /repos/{owner}/{repo}/issues/{issue_number}/events"],
-        listEventsForRepo: ["GET /repos/{owner}/{repo}/issues/events"],
-        listEventsForTimeline: ["GET /repos/{owner}/{repo}/issues/{issue_number}/timeline"],
-        listForAuthenticatedUser: ["GET /user/issues"],
-        listForOrg: ["GET /orgs/{org}/issues"],
-        listForRepo: ["GET /repos/{owner}/{repo}/issues"],
-        listLabelsForMilestone: ["GET /repos/{owner}/{repo}/milestones/{milestone_number}/labels"],
-        listLabelsForRepo: ["GET /repos/{owner}/{repo}/labels"],
-        listLabelsOnIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        listMilestones: ["GET /repos/{owner}/{repo}/milestones"],
-        lock: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        removeAllLabels: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        removeAssignees: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/assignees"],
-        removeLabel: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels/{name}"],
-        setLabels: ["PUT /repos/{owner}/{repo}/issues/{issue_number}/labels"],
-        unlock: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/lock"],
-        update: ["PATCH /repos/{owner}/{repo}/issues/{issue_number}"],
-        updateComment: ["PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}"],
-        updateLabel: ["PATCH /repos/{owner}/{repo}/labels/{name}"],
-        updateMilestone: ["PATCH /repos/{owner}/{repo}/milestones/{milestone_number}"]
-      },
-      licenses: {
-        get: ["GET /licenses/{license}"],
-        getAllCommonlyUsed: ["GET /licenses"],
-        getForRepo: ["GET /repos/{owner}/{repo}/license"]
-      },
-      markdown: {
-        render: ["POST /markdown"],
-        renderRaw: ["POST /markdown/raw", {
-          headers: {
-            "content-type": "text/plain; charset=utf-8"
-          }
-        }]
-      },
-      meta: {
-        get: ["GET /meta"],
-        getOctocat: ["GET /octocat"],
-        getZen: ["GET /zen"],
-        root: ["GET /"]
-      },
-      migrations: {
-        getArchiveForAuthenticatedUser: ["GET /user/migrations/{migration_id}/archive"],
-        getStatusForOrg: ["GET /orgs/{org}/migrations/{migration_id}"],
-        listForAuthenticatedUser: ["GET /user/migrations"],
-        listForOrg: ["GET /orgs/{org}/migrations"],
-        listReposForAuthenticatedUser: ["GET /user/migrations/{migration_id}/repositories"],
-        listReposForUser: ["GET /user/migrations/{migration_id}/repositories", {}, {
-          renamed: ["migrations", "listReposForAuthenticatedUser"]
-        }],
-        startForAuthenticatedUser: ["POST /user/migrations"],
-        startForOrg: ["POST /orgs/{org}/migrations"]
-      },
-      orgs: {
-        addSecurityManagerTeam: ["PUT /orgs/{org}/security-managers/teams/{team_slug}"],
-        checkMembershipForUser: ["GET /orgs/{org}/members/{username}"],
-        checkPublicMembershipForUser: ["GET /orgs/{org}/public_members/{username}"],
-        convertMemberToOutsideCollaborator: ["PUT /orgs/{org}/outside_collaborators/{username}"],
-        createWebhook: ["POST /orgs/{org}/hooks"],
-        deleteWebhook: ["DELETE /orgs/{org}/hooks/{hook_id}"],
-        enableOrDisableSecurityProductOnAllOrgRepos: ["POST /orgs/{org}/{security_product}/{enablement}"],
-        get: ["GET /orgs/{org}"],
-        getMembershipForAuthenticatedUser: ["GET /user/memberships/orgs/{org}"],
-        getMembershipForUser: ["GET /orgs/{org}/memberships/{username}"],
-        getWebhook: ["GET /orgs/{org}/hooks/{hook_id}"],
-        getWebhookConfigForOrg: ["GET /orgs/{org}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        list: ["GET /organizations"],
-        listAppInstallations: ["GET /orgs/{org}/installations"],
-        listCustomRoles: ["GET /organizations/{organization_id}/custom_roles"],
-        listForAuthenticatedUser: ["GET /user/orgs"],
-        listForUser: ["GET /users/{username}/orgs"],
-        listMembers: ["GET /orgs/{org}/members"],
-        listMembershipsForAuthenticatedUser: ["GET /user/memberships/orgs"],
-        listOutsideCollaborators: ["GET /orgs/{org}/outside_collaborators"],
-        listPublicMembers: ["GET /orgs/{org}/public_members"],
-        listSecurityManagerTeams: ["GET /orgs/{org}/security-managers"],
-        listWebhookDeliveries: ["GET /orgs/{org}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /orgs/{org}/hooks"],
-        pingWebhook: ["POST /orgs/{org}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeMember: ["DELETE /orgs/{org}/members/{username}"],
-        removeMembershipForUser: ["DELETE /orgs/{org}/memberships/{username}"],
-        removeOutsideCollaborator: ["DELETE /orgs/{org}/outside_collaborators/{username}"],
-        removePublicMembershipForAuthenticatedUser: ["DELETE /orgs/{org}/public_members/{username}"],
-        removeSecurityManagerTeam: ["DELETE /orgs/{org}/security-managers/teams/{team_slug}"],
-        setMembershipForUser: ["PUT /orgs/{org}/memberships/{username}"],
-        setPublicMembershipForAuthenticatedUser: ["PUT /orgs/{org}/public_members/{username}"],
-        update: ["PATCH /orgs/{org}"],
-        updateMembershipForAuthenticatedUser: ["PATCH /user/memberships/orgs/{org}"],
-        updateWebhook: ["PATCH /orgs/{org}/hooks/{hook_id}"],
-        updateWebhookConfigForOrg: ["PATCH /orgs/{org}/hooks/{hook_id}/config"]
-      },
-      projects: {
-        addCollaborator: ["PUT /projects/{project_id}/collaborators/{username}"],
-        createCard: ["POST /projects/columns/{column_id}/cards"],
-        createColumn: ["POST /projects/{project_id}/columns"],
-        createForAuthenticatedUser: ["POST /user/projects"],
-        createForOrg: ["POST /orgs/{org}/projects"],
-        createForRepo: ["POST /repos/{owner}/{repo}/projects"],
-        delete: ["DELETE /projects/{project_id}"],
-        deleteCard: ["DELETE /projects/columns/cards/{card_id}"],
-        deleteColumn: ["DELETE /projects/columns/{column_id}"],
-        get: ["GET /projects/{project_id}"],
-        getCard: ["GET /projects/columns/cards/{card_id}"],
-        getColumn: ["GET /projects/columns/{column_id}"],
-        getPermissionForUser: ["GET /projects/{project_id}/collaborators/{username}/permission"],
-        listCards: ["GET /projects/columns/{column_id}/cards"],
-        listCollaborators: ["GET /projects/{project_id}/collaborators"],
-        listColumns: ["GET /projects/{project_id}/columns"],
-        listForOrg: ["GET /orgs/{org}/projects"],
-        listForRepo: ["GET /repos/{owner}/{repo}/projects"],
-        listForUser: ["GET /users/{username}/projects"],
-        moveCard: ["POST /projects/columns/cards/{card_id}/moves"],
-        moveColumn: ["POST /projects/columns/{column_id}/moves"],
-        removeCollaborator: ["DELETE /projects/{project_id}/collaborators/{username}"],
-        update: ["PATCH /projects/{project_id}"],
-        updateCard: ["PATCH /projects/columns/cards/{card_id}"],
-        updateColumn: ["PATCH /projects/columns/{column_id}"]
-      },
-      pulls: {
-        checkIfMerged: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        create: ["POST /repos/{owner}/{repo}/pulls"],
-        createReplyForReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies"],
-        createReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        createReviewComment: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        deletePendingReview: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        deleteReviewComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        dismissReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/dismissals"],
-        get: ["GET /repos/{owner}/{repo}/pulls/{pull_number}"],
-        getReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        getReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}"],
-        list: ["GET /repos/{owner}/{repo}/pulls"],
-        listCommentsForReview: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/comments"],
-        listCommits: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/commits"],
-        listFiles: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/files"],
-        listRequestedReviewers: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        listReviewComments: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/comments"],
-        listReviewCommentsForRepo: ["GET /repos/{owner}/{repo}/pulls/comments"],
-        listReviews: ["GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews"],
-        merge: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge"],
-        removeRequestedReviewers: ["DELETE /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        requestReviewers: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers"],
-        submitReview: ["POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/events"],
-        update: ["PATCH /repos/{owner}/{repo}/pulls/{pull_number}"],
-        updateBranch: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/update-branch"],
-        updateReview: ["PUT /repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}"],
-        updateReviewComment: ["PATCH /repos/{owner}/{repo}/pulls/comments/{comment_id}"]
-      },
-      rateLimit: {
-        get: ["GET /rate_limit"]
-      },
-      reactions: {
-        createForCommitComment: ["POST /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        createForIssue: ["POST /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        createForIssueComment: ["POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        createForPullRequestReviewComment: ["POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        createForRelease: ["POST /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        createForTeamDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        createForTeamDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/reactions/#create-reaction-for-a-team-discussion-comment-legacy"
-        }],
-        createForTeamDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        createForTeamDiscussionLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.createForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/reactions/#create-reaction-for-a-team-discussion-legacy"
-        }],
-        deleteForCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForIssue: ["DELETE /repos/{owner}/{repo}/issues/{issue_number}/reactions/{reaction_id}"],
-        deleteForIssueComment: ["DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForPullRequestComment: ["DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}"],
-        deleteForRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}/reactions/{reaction_id}"],
-        deleteForTeamDiscussion: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions/{reaction_id}"],
-        deleteForTeamDiscussionComment: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions/{reaction_id}"],
-        deleteLegacy: ["DELETE /reactions/{reaction_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.4/rest/reference/reactions/#delete-a-reaction-legacy"
-        }],
-        listForCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}/reactions"],
-        listForIssue: ["GET /repos/{owner}/{repo}/issues/{issue_number}/reactions"],
-        listForIssueComment: ["GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions"],
-        listForPullRequestReviewComment: ["GET /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions"],
-        listForRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}/reactions"],
-        listForTeamDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}/reactions"],
-        listForTeamDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/reactions/#list-reactions-for-a-team-discussion-comment-legacy"
-        }],
-        listForTeamDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/reactions"],
-        listForTeamDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/reactions", {}, {
-          deprecated: "octokit.scim.listForTeamDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/reactions/#list-reactions-for-a-team-discussion-legacy"
-        }]
-      },
-      repos: {
-        acceptInvitation: ["PATCH /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "acceptInvitationForAuthenticatedUser"]
-        }],
-        acceptInvitationForAuthenticatedUser: ["PATCH /user/repository_invitations/{invitation_id}"],
-        addAppAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        addCollaborator: ["PUT /repos/{owner}/{repo}/collaborators/{username}"],
-        addStatusCheckContexts: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        addTeamAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        addUserAccessRestrictions: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        checkCollaborator: ["GET /repos/{owner}/{repo}/collaborators/{username}"],
-        codeownersErrors: ["GET /repos/{owner}/{repo}/codeowners/errors"],
-        compareCommits: ["GET /repos/{owner}/{repo}/compare/{base}...{head}"],
-        compareCommitsWithBasehead: ["GET /repos/{owner}/{repo}/compare/{basehead}"],
-        createAutolink: ["POST /repos/{owner}/{repo}/autolinks"],
-        createCommitComment: ["POST /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        createCommitSignatureProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        createCommitStatus: ["POST /repos/{owner}/{repo}/statuses/{sha}"],
-        createDeployKey: ["POST /repos/{owner}/{repo}/keys"],
-        createDeployment: ["POST /repos/{owner}/{repo}/deployments"],
-        createDeploymentBranchPolicy: ["POST /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        createDeploymentStatus: ["POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        createDispatchEvent: ["POST /repos/{owner}/{repo}/dispatches"],
-        createForAuthenticatedUser: ["POST /user/repos"],
-        createFork: ["POST /repos/{owner}/{repo}/forks"],
-        createInOrg: ["POST /orgs/{org}/repos"],
-        createOrUpdateEnvironment: ["PUT /repos/{owner}/{repo}/environments/{environment_name}"],
-        createOrUpdateFileContents: ["PUT /repos/{owner}/{repo}/contents/{path}"],
-        createPagesDeployment: ["POST /repos/{owner}/{repo}/pages/deployment"],
-        createPagesSite: ["POST /repos/{owner}/{repo}/pages"],
-        createRelease: ["POST /repos/{owner}/{repo}/releases"],
-        createTagProtection: ["POST /repos/{owner}/{repo}/tags/protection"],
-        createUsingTemplate: ["POST /repos/{template_owner}/{template_repo}/generate"],
-        createWebhook: ["POST /repos/{owner}/{repo}/hooks"],
-        declineInvitation: ["DELETE /user/repository_invitations/{invitation_id}", {}, {
-          renamed: ["repos", "declineInvitationForAuthenticatedUser"]
-        }],
-        declineInvitationForAuthenticatedUser: ["DELETE /user/repository_invitations/{invitation_id}"],
-        delete: ["DELETE /repos/{owner}/{repo}"],
-        deleteAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        deleteAdminBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        deleteAnEnvironment: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}"],
-        deleteAutolink: ["DELETE /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        deleteBranchProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection"],
-        deleteCommitComment: ["DELETE /repos/{owner}/{repo}/comments/{comment_id}"],
-        deleteCommitSignatureProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        deleteDeployKey: ["DELETE /repos/{owner}/{repo}/keys/{key_id}"],
-        deleteDeployment: ["DELETE /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        deleteDeploymentBranchPolicy: ["DELETE /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        deleteFile: ["DELETE /repos/{owner}/{repo}/contents/{path}"],
-        deleteInvitation: ["DELETE /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        deletePagesSite: ["DELETE /repos/{owner}/{repo}/pages"],
-        deletePullRequestReviewProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        deleteRelease: ["DELETE /repos/{owner}/{repo}/releases/{release_id}"],
-        deleteReleaseAsset: ["DELETE /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        deleteTagProtection: ["DELETE /repos/{owner}/{repo}/tags/protection/{tag_protection_id}"],
-        deleteWebhook: ["DELETE /repos/{owner}/{repo}/hooks/{hook_id}"],
-        disableLfsForRepo: ["DELETE /repos/{owner}/{repo}/lfs"],
-        downloadTarballArchive: ["GET /repos/{owner}/{repo}/tarball/{ref}"],
-        downloadZipballArchive: ["GET /repos/{owner}/{repo}/zipball/{ref}"],
-        enableLfsForRepo: ["PUT /repos/{owner}/{repo}/lfs"],
-        generateReleaseNotes: ["POST /repos/{owner}/{repo}/releases/generate-notes"],
-        get: ["GET /repos/{owner}/{repo}"],
-        getAccessRestrictions: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions"],
-        getAdminBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        getAllEnvironments: ["GET /repos/{owner}/{repo}/environments"],
-        getAllStatusCheckContexts: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        getAllTopics: ["GET /repos/{owner}/{repo}/topics"],
-        getAppsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        getAutolink: ["GET /repos/{owner}/{repo}/autolinks/{autolink_id}"],
-        getBranch: ["GET /repos/{owner}/{repo}/branches/{branch}"],
-        getBranchProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection"],
-        getCodeFrequencyStats: ["GET /repos/{owner}/{repo}/stats/code_frequency"],
-        getCollaboratorPermissionLevel: ["GET /repos/{owner}/{repo}/collaborators/{username}/permission"],
-        getCombinedStatusForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/status"],
-        getCommit: ["GET /repos/{owner}/{repo}/commits/{ref}"],
-        getCommitActivityStats: ["GET /repos/{owner}/{repo}/stats/commit_activity"],
-        getCommitComment: ["GET /repos/{owner}/{repo}/comments/{comment_id}"],
-        getCommitSignatureProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_signatures"],
-        getContent: ["GET /repos/{owner}/{repo}/contents/{path}"],
-        getContributorsStats: ["GET /repos/{owner}/{repo}/stats/contributors"],
-        getDeployKey: ["GET /repos/{owner}/{repo}/keys/{key_id}"],
-        getDeployment: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}"],
-        getDeploymentBranchPolicy: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        getDeploymentStatus: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses/{status_id}"],
-        getEnvironment: ["GET /repos/{owner}/{repo}/environments/{environment_name}"],
-        getLatestPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/latest"],
-        getLatestRelease: ["GET /repos/{owner}/{repo}/releases/latest"],
-        getPages: ["GET /repos/{owner}/{repo}/pages"],
-        getPagesBuild: ["GET /repos/{owner}/{repo}/pages/builds/{build_id}"],
-        getParticipationStats: ["GET /repos/{owner}/{repo}/stats/participation"],
-        getPullRequestReviewProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        getPunchCardStats: ["GET /repos/{owner}/{repo}/stats/punch_card"],
-        getReadme: ["GET /repos/{owner}/{repo}/readme"],
-        getReadmeInDirectory: ["GET /repos/{owner}/{repo}/readme/{dir}"],
-        getRelease: ["GET /repos/{owner}/{repo}/releases/{release_id}"],
-        getReleaseAsset: ["GET /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        getReleaseByTag: ["GET /repos/{owner}/{repo}/releases/tags/{tag}"],
-        getStatusChecksProtection: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        getTeamsWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        getUsersWithAccessToProtectedBranch: ["GET /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        getWebhook: ["GET /repos/{owner}/{repo}/hooks/{hook_id}"],
-        getWebhookConfigForRepo: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        getWebhookDelivery: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}"],
-        listAutolinks: ["GET /repos/{owner}/{repo}/autolinks"],
-        listBranches: ["GET /repos/{owner}/{repo}/branches"],
-        listBranchesForHeadCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/branches-where-head"],
-        listCacheInfo: ["GET /repos/{owner}/{repo}/replicas/caches"],
-        listCollaborators: ["GET /repos/{owner}/{repo}/collaborators"],
-        listCommentsForCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/comments"],
-        listCommitCommentsForRepo: ["GET /repos/{owner}/{repo}/comments"],
-        listCommitStatusesForRef: ["GET /repos/{owner}/{repo}/commits/{ref}/statuses"],
-        listCommits: ["GET /repos/{owner}/{repo}/commits"],
-        listContributors: ["GET /repos/{owner}/{repo}/contributors"],
-        listDeployKeys: ["GET /repos/{owner}/{repo}/keys"],
-        listDeploymentBranchPolicies: ["GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies"],
-        listDeploymentStatuses: ["GET /repos/{owner}/{repo}/deployments/{deployment_id}/statuses"],
-        listDeployments: ["GET /repos/{owner}/{repo}/deployments"],
-        listForAuthenticatedUser: ["GET /user/repos"],
-        listForOrg: ["GET /orgs/{org}/repos"],
-        listForUser: ["GET /users/{username}/repos"],
-        listForks: ["GET /repos/{owner}/{repo}/forks"],
-        listInvitations: ["GET /repos/{owner}/{repo}/invitations"],
-        listInvitationsForAuthenticatedUser: ["GET /user/repository_invitations"],
-        listLanguages: ["GET /repos/{owner}/{repo}/languages"],
-        listPagesBuilds: ["GET /repos/{owner}/{repo}/pages/builds"],
-        listPublic: ["GET /repositories"],
-        listPullRequestsAssociatedWithCommit: ["GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls"],
-        listReleaseAssets: ["GET /repos/{owner}/{repo}/releases/{release_id}/assets"],
-        listReleases: ["GET /repos/{owner}/{repo}/releases"],
-        listTagProtection: ["GET /repos/{owner}/{repo}/tags/protection"],
-        listTags: ["GET /repos/{owner}/{repo}/tags"],
-        listTeams: ["GET /repos/{owner}/{repo}/teams"],
-        listWebhookDeliveries: ["GET /repos/{owner}/{repo}/hooks/{hook_id}/deliveries"],
-        listWebhooks: ["GET /repos/{owner}/{repo}/hooks"],
-        merge: ["POST /repos/{owner}/{repo}/merges"],
-        mergeUpstream: ["POST /repos/{owner}/{repo}/merge-upstream"],
-        pingWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/pings"],
-        redeliverWebhookDelivery: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}/attempts"],
-        removeAppAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        removeCollaborator: ["DELETE /repos/{owner}/{repo}/collaborators/{username}"],
-        removeStatusCheckContexts: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        removeStatusCheckProtection: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        removeTeamAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        removeUserAccessRestrictions: ["DELETE /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        renameBranch: ["POST /repos/{owner}/{repo}/branches/{branch}/rename"],
-        replaceAllTopics: ["PUT /repos/{owner}/{repo}/topics"],
-        requestPagesBuild: ["POST /repos/{owner}/{repo}/pages/builds"],
-        setAdminBranchProtection: ["POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins"],
-        setAppAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps"],
-        setStatusCheckContexts: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts"],
-        setTeamAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams"],
-        setUserAccessRestrictions: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users"],
-        testPushWebhook: ["POST /repos/{owner}/{repo}/hooks/{hook_id}/tests"],
-        transfer: ["POST /repos/{owner}/{repo}/transfer"],
-        update: ["PATCH /repos/{owner}/{repo}"],
-        updateBranchProtection: ["PUT /repos/{owner}/{repo}/branches/{branch}/protection"],
-        updateCommitComment: ["PATCH /repos/{owner}/{repo}/comments/{comment_id}"],
-        updateDeploymentBranchPolicy: ["PUT /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}"],
-        updateInformationAboutPagesSite: ["PUT /repos/{owner}/{repo}/pages"],
-        updateInvitation: ["PATCH /repos/{owner}/{repo}/invitations/{invitation_id}"],
-        updatePullRequestReviewProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews"],
-        updateRelease: ["PATCH /repos/{owner}/{repo}/releases/{release_id}"],
-        updateReleaseAsset: ["PATCH /repos/{owner}/{repo}/releases/assets/{asset_id}"],
-        updateStatusCheckProtection: ["PATCH /repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks"],
-        updateWebhook: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}"],
-        updateWebhookConfigForRepo: ["PATCH /repos/{owner}/{repo}/hooks/{hook_id}/config"],
-        uploadReleaseAsset: ["POST {origin}/repos/{owner}/{repo}/releases/{release_id}/assets{?name,label}"]
-      },
-      search: {
-        code: ["GET /search/code"],
-        commits: ["GET /search/commits"],
-        issuesAndPullRequests: ["GET /search/issues"],
-        labels: ["GET /search/labels"],
-        repos: ["GET /search/repositories"],
-        topics: ["GET /search/topics"],
-        users: ["GET /search/users"]
-      },
-      secretScanning: {
-        getAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"],
-        listAlertsForEnterprise: ["GET /enterprises/{enterprise}/secret-scanning/alerts"],
-        listAlertsForOrg: ["GET /orgs/{org}/secret-scanning/alerts"],
-        listAlertsForRepo: ["GET /repos/{owner}/{repo}/secret-scanning/alerts"],
-        listLocationsForAlert: ["GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations"],
-        updateAlert: ["PATCH /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}"]
-      },
-      teams: {
-        addMemberLegacy: ["PUT /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.addMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#add-team-member-legacy"
-        }],
-        addOrUpdateMembershipForUserInOrg: ["PUT /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        addOrUpdateMembershipForUserLegacy: ["PUT /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.addOrUpdateMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#add-or-update-team-membership-for-a-user-legacy"
-        }],
-        addOrUpdateProjectPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        addOrUpdateProjectPermissionsLegacy: ["PUT /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.addOrUpdateProjectPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#add-or-update-team-project-permissions-legacy"
-        }],
-        addOrUpdateRepoPermissionsInOrg: ["PUT /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        addOrUpdateRepoPermissionsLegacy: ["PUT /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.addOrUpdateRepoPermissionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#add-or-update-team-repository-permissions-legacy"
-        }],
-        checkPermissionsForProjectInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        checkPermissionsForProjectLegacy: ["GET /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#check-team-permissions-for-a-project-legacy"
-        }],
-        checkPermissionsForRepoInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        checkPermissionsForRepoLegacy: ["GET /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.checkPermissionsForRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#check-team-permissions-for-a-repository-legacy"
-        }],
-        create: ["POST /orgs/{org}/teams"],
-        createDiscussionCommentInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        createDiscussionCommentLegacy: ["POST /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.createDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#create-a-discussion-comment-legacy"
-        }],
-        createDiscussionInOrg: ["POST /orgs/{org}/teams/{team_slug}/discussions"],
-        createDiscussionLegacy: ["POST /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.createDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#create-a-discussion-legacy"
-        }],
-        deleteDiscussionCommentInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        deleteDiscussionCommentLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#delete-a-discussion-comment-legacy"
-        }],
-        deleteDiscussionInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        deleteDiscussionLegacy: ["DELETE /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.deleteDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#delete-a-discussion-legacy"
-        }],
-        deleteInOrg: ["DELETE /orgs/{org}/teams/{team_slug}"],
-        deleteLegacy: ["DELETE /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.deleteLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#delete-a-team-legacy"
-        }],
-        getByName: ["GET /orgs/{org}/teams/{team_slug}"],
-        getDiscussionCommentInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        getDiscussionCommentLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#get-a-discussion-comment-legacy"
-        }],
-        getDiscussionInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        getDiscussionLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.getDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#get-a-discussion-legacy"
-        }],
-        getLegacy: ["GET /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.getLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#get-a-team-legacy"
-        }],
-        getMemberLegacy: ["GET /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.getMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#get-team-member-legacy"
-        }],
-        getMembershipForUserInOrg: ["GET /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        getMembershipForUserLegacy: ["GET /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.getMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#get-team-membership-for-a-user-legacy"
-        }],
-        list: ["GET /orgs/{org}/teams"],
-        listChildInOrg: ["GET /orgs/{org}/teams/{team_slug}/teams"],
-        listChildLegacy: ["GET /teams/{team_id}/teams", {}, {
-          deprecated: "octokit.scim.listChildLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#list-child-teams-legacy"
-        }],
-        listDiscussionCommentsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments"],
-        listDiscussionCommentsLegacy: ["GET /teams/{team_id}/discussions/{discussion_number}/comments", {}, {
-          deprecated: "octokit.scim.listDiscussionCommentsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#list-discussion-comments-legacy"
-        }],
-        listDiscussionsInOrg: ["GET /orgs/{org}/teams/{team_slug}/discussions"],
-        listDiscussionsLegacy: ["GET /teams/{team_id}/discussions", {}, {
-          deprecated: "octokit.scim.listDiscussionsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#list-discussions-legacy"
-        }],
-        listForAuthenticatedUser: ["GET /user/teams"],
-        listMembersInOrg: ["GET /orgs/{org}/teams/{team_slug}/members"],
-        listMembersLegacy: ["GET /teams/{team_id}/members", {}, {
-          deprecated: "octokit.scim.listMembersLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#list-team-members-legacy"
-        }],
-        listProjectsInOrg: ["GET /orgs/{org}/teams/{team_slug}/projects"],
-        listProjectsLegacy: ["GET /teams/{team_id}/projects", {}, {
-          deprecated: "octokit.scim.listProjectsLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#list-team-projects-legacy"
-        }],
-        listReposInOrg: ["GET /orgs/{org}/teams/{team_slug}/repos"],
-        listReposLegacy: ["GET /teams/{team_id}/repos", {}, {
-          deprecated: "octokit.scim.listReposLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#list-team-repositories-legacy"
-        }],
-        removeMemberLegacy: ["DELETE /teams/{team_id}/members/{username}", {}, {
-          deprecated: "octokit.scim.removeMemberLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#remove-team-member-legacy"
-        }],
-        removeMembershipForUserInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/memberships/{username}"],
-        removeMembershipForUserLegacy: ["DELETE /teams/{team_id}/memberships/{username}", {}, {
-          deprecated: "octokit.scim.removeMembershipForUserLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#remove-team-membership-for-a-user-legacy"
-        }],
-        removeProjectInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/projects/{project_id}"],
-        removeProjectLegacy: ["DELETE /teams/{team_id}/projects/{project_id}", {}, {
-          deprecated: "octokit.scim.removeProjectLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#remove-a-project-from-a-team-legacy"
-        }],
-        removeRepoInOrg: ["DELETE /orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}"],
-        removeRepoLegacy: ["DELETE /teams/{team_id}/repos/{owner}/{repo}", {}, {
-          deprecated: "octokit.scim.removeRepoLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#remove-a-repository-from-a-team-legacy"
-        }],
-        updateDiscussionCommentInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments/{comment_number}"],
-        updateDiscussionCommentLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}/comments/{comment_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionCommentLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#update-a-discussion-comment-legacy"
-        }],
-        updateDiscussionInOrg: ["PATCH /orgs/{org}/teams/{team_slug}/discussions/{discussion_number}"],
-        updateDiscussionLegacy: ["PATCH /teams/{team_id}/discussions/{discussion_number}", {}, {
-          deprecated: "octokit.scim.updateDiscussionLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams#update-a-discussion-legacy"
-        }],
-        updateInOrg: ["PATCH /orgs/{org}/teams/{team_slug}"],
-        updateLegacy: ["PATCH /teams/{team_id}", {}, {
-          deprecated: "octokit.scim.updateLegacy() is deprecated, see https://docs.github.com/enterprise-server@3.7/rest/reference/teams/#update-a-team-legacy"
-        }]
-      },
-      users: {
-        addEmailForAuthenticated: ["POST /user/emails", {}, {
-          renamed: ["users", "addEmailForAuthenticatedUser"]
-        }],
-        addEmailForAuthenticatedUser: ["POST /user/emails"],
-        checkFollowingForUser: ["GET /users/{username}/following/{target_user}"],
-        checkPersonIsFollowedByAuthenticated: ["GET /user/following/{username}"],
-        createGpgKeyForAuthenticated: ["POST /user/gpg_keys", {}, {
-          renamed: ["users", "createGpgKeyForAuthenticatedUser"]
-        }],
-        createGpgKeyForAuthenticatedUser: ["POST /user/gpg_keys"],
-        createPublicSshKeyForAuthenticated: ["POST /user/keys", {}, {
-          renamed: ["users", "createPublicSshKeyForAuthenticatedUser"]
-        }],
-        createPublicSshKeyForAuthenticatedUser: ["POST /user/keys"],
-        createSshSigningKeyForAuthenticatedUser: ["POST /user/ssh_signing_keys"],
-        deleteEmailForAuthenticated: ["DELETE /user/emails", {}, {
-          renamed: ["users", "deleteEmailForAuthenticatedUser"]
-        }],
-        deleteEmailForAuthenticatedUser: ["DELETE /user/emails"],
-        deleteGpgKeyForAuthenticated: ["DELETE /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "deleteGpgKeyForAuthenticatedUser"]
-        }],
-        deleteGpgKeyForAuthenticatedUser: ["DELETE /user/gpg_keys/{gpg_key_id}"],
-        deletePublicSshKeyForAuthenticated: ["DELETE /user/keys/{key_id}", {}, {
-          renamed: ["users", "deletePublicSshKeyForAuthenticatedUser"]
-        }],
-        deletePublicSshKeyForAuthenticatedUser: ["DELETE /user/keys/{key_id}"],
-        deleteSshSigningKeyForAuthenticatedUser: ["DELETE /user/ssh_signing_keys/{ssh_signing_key_id}"],
-        follow: ["PUT /user/following/{username}"],
-        getAuthenticated: ["GET /user"],
-        getByUsername: ["GET /users/{username}"],
-        getContextForUser: ["GET /users/{username}/hovercard"],
-        getGpgKeyForAuthenticated: ["GET /user/gpg_keys/{gpg_key_id}", {}, {
-          renamed: ["users", "getGpgKeyForAuthenticatedUser"]
-        }],
-        getGpgKeyForAuthenticatedUser: ["GET /user/gpg_keys/{gpg_key_id}"],
-        getPublicSshKeyForAuthenticated: ["GET /user/keys/{key_id}", {}, {
-          renamed: ["users", "getPublicSshKeyForAuthenticatedUser"]
-        }],
-        getPublicSshKeyForAuthenticatedUser: ["GET /user/keys/{key_id}"],
-        getSshSigningKeyForAuthenticatedUser: ["GET /user/ssh_signing_keys/{ssh_signing_key_id}"],
-        list: ["GET /users"],
-        listEmailsForAuthenticated: ["GET /user/emails", {}, {
-          renamed: ["users", "listEmailsForAuthenticatedUser"]
-        }],
-        listEmailsForAuthenticatedUser: ["GET /user/emails"],
-        listFollowedByAuthenticated: ["GET /user/following", {}, {
-          renamed: ["users", "listFollowedByAuthenticatedUser"]
-        }],
-        listFollowedByAuthenticatedUser: ["GET /user/following"],
-        listFollowersForAuthenticatedUser: ["GET /user/followers"],
-        listFollowersForUser: ["GET /users/{username}/followers"],
-        listFollowingForUser: ["GET /users/{username}/following"],
-        listGpgKeysForAuthenticated: ["GET /user/gpg_keys", {}, {
-          renamed: ["users", "listGpgKeysForAuthenticatedUser"]
-        }],
-        listGpgKeysForAuthenticatedUser: ["GET /user/gpg_keys"],
-        listGpgKeysForUser: ["GET /users/{username}/gpg_keys"],
-        listPublicEmailsForAuthenticated: ["GET /user/public_emails", {}, {
-          renamed: ["users", "listPublicEmailsForAuthenticatedUser"]
-        }],
-        listPublicEmailsForAuthenticatedUser: ["GET /user/public_emails"],
-        listPublicKeysForUser: ["GET /users/{username}/keys"],
-        listPublicSshKeysForAuthenticated: ["GET /user/keys", {}, {
-          renamed: ["users", "listPublicSshKeysForAuthenticatedUser"]
-        }],
-        listPublicSshKeysForAuthenticatedUser: ["GET /user/keys"],
-        listSshSigningKeysForAuthenticatedUser: ["GET /user/ssh_signing_keys"],
-        listSshSigningKeysForUser: ["GET /users/{username}/ssh_signing_keys"],
-        unfollow: ["DELETE /user/following/{username}"],
-        updateAuthenticated: ["PATCH /user"]
-      }
-    };
-    var Endpoints$7 = {
-      enterpriseAdmin: {
-        addAuthorizedSshKey: ["POST {origin}/setup/api/settings/authorized-keys"],
-        addCustomLabelsToSelfHostedRunnerForEnterprise: ["POST /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        createEnterpriseServerLicense: ["POST {origin}/setup/api/start"],
-        createGlobalWebhook: ["POST /admin/hooks"],
-        createImpersonationOAuthToken: ["POST /admin/users/{username}/authorizations"],
-        createOrg: ["POST /admin/organizations"],
-        createPreReceiveEnvironment: ["POST /admin/pre-receive-environments"],
-        createPreReceiveHook: ["POST /admin/pre-receive-hooks"],
-        createUser: ["POST /admin/users"],
-        deleteGlobalWebhook: ["DELETE /admin/hooks/{hook_id}"],
-        deleteImpersonationOAuthToken: ["DELETE /admin/users/{username}/authorizations"],
-        deletePersonalAccessToken: ["DELETE /admin/tokens/{token_id}"],
-        deletePreReceiveEnvironment: ["DELETE /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        deletePreReceiveHook: ["DELETE /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        deletePublicKey: ["DELETE /admin/keys/{key_ids}"],
-        deleteScimGroupFromEnterprise: ["DELETE /scim/v2/Groups/{scim_group_id}"],
-        deleteUser: ["DELETE /admin/users/{username}"],
-        deleteUserFromEnterprise: ["DELETE /scim/v2/Users/{scim_user_id}"],
-        demoteSiteAdministrator: ["DELETE /users/{username}/site_admin"],
-        disableSelectedOrganizationGithubActionsEnterprise: ["DELETE /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        enableOrDisableMaintenanceMode: ["POST {origin}/setup/api/maintenance"],
-        enableSelectedOrganizationGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations/{org_id}"],
-        getAllAuthorizedSshKeys: ["GET {origin}/setup/api/settings/authorized-keys"],
-        getAllStats: ["GET /enterprise/stats/all"],
-        getAllowedActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        getAnnouncement: ["GET /enterprise/announcement"],
-        getCommentStats: ["GET /enterprise/stats/comments"],
-        getConfigurationStatus: ["GET {origin}/setup/api/configcheck"],
-        getDownloadStatusForPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}/downloads/latest"],
-        getGistStats: ["GET /enterprise/stats/gists"],
-        getGithubActionsPermissionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions"],
-        getGlobalWebhook: ["GET /admin/hooks/{hook_id}"],
-        getHooksStats: ["GET /enterprise/stats/hooks"],
-        getIssueStats: ["GET /enterprise/stats/issues"],
-        getLicenseInformation: ["GET /enterprise/settings/license"],
-        getMaintenanceStatus: ["GET {origin}/setup/api/maintenance"],
-        getMilestoneStats: ["GET /enterprise/stats/milestones"],
-        getOrgStats: ["GET /enterprise/stats/orgs"],
-        getPagesStats: ["GET /enterprise/stats/pages"],
-        getPreReceiveEnvironment: ["GET /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        getPreReceiveHook: ["GET /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForOrg: ["GET /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getPreReceiveHookForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        getProvisioningInformationForEnterpriseGroup: ["GET /scim/v2/Groups/{scim_group_id}"],
-        getProvisioningInformationForEnterpriseUser: ["GET /scim/v2/Users/{scim_user_id}"],
-        getPullRequestStats: ["GET /enterprise/stats/pulls"],
-        getRepoStats: ["GET /enterprise/stats/repos"],
-        getSettings: ["GET {origin}/setup/api/settings"],
-        getUserStats: ["GET /enterprise/stats/users"],
-        listGlobalWebhooks: ["GET /admin/hooks"],
-        listLabelsForSelfHostedRunnerForEnterprise: ["GET /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        listPersonalAccessTokens: ["GET /admin/tokens"],
-        listPreReceiveEnvironments: ["GET /admin/pre-receive-environments"],
-        listPreReceiveHooks: ["GET /admin/pre-receive-hooks"],
-        listPreReceiveHooksForOrg: ["GET /orgs/{org}/pre-receive-hooks"],
-        listPreReceiveHooksForRepo: ["GET /repos/{owner}/{repo}/pre-receive-hooks"],
-        listProvisionedGroupsEnterprise: ["GET /scim/v2/Groups"],
-        listProvisionedIdentitiesEnterprise: ["GET /scim/v2/Users"],
-        listPublicKeys: ["GET /admin/keys"],
-        listSelectedOrganizationsEnabledGithubActionsEnterprise: ["GET /enterprises/{enterprise}/actions/permissions/organizations"],
-        pingGlobalWebhook: ["POST /admin/hooks/{hook_id}/pings"],
-        promoteUserToBeSiteAdministrator: ["PUT /users/{username}/site_admin"],
-        provisionEnterpriseGroup: ["POST /scim/v2/Groups"],
-        provisionEnterpriseUser: ["POST /scim/v2/Users"],
-        removeAllCustomLabelsFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        removeAnnouncement: ["DELETE /enterprise/announcement"],
-        removeAuthorizedSshKey: ["DELETE {origin}/setup/api/settings/authorized-keys"],
-        removeCustomLabelFromSelfHostedRunnerForEnterprise: ["DELETE /enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}"],
-        removePreReceiveHookEnforcementForOrg: ["DELETE /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        removePreReceiveHookEnforcementForRepo: ["DELETE /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        setAllowedActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/selected-actions"],
-        setAnnouncement: ["PATCH /enterprise/announcement"],
-        setCustomLabelsForSelfHostedRunnerForEnterprise: ["PUT /enterprises/{enterprise}/actions/runners/{runner_id}/labels"],
-        setGithubActionsPermissionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions"],
-        setInformationForProvisionedEnterpriseGroup: ["PUT /scim/v2/Groups/{scim_group_id}"],
-        setInformationForProvisionedEnterpriseUser: ["PUT /scim/v2/Users/{scim_user_id}"],
-        setSelectedOrganizationsEnabledGithubActionsEnterprise: ["PUT /enterprises/{enterprise}/actions/permissions/organizations"],
-        setSettings: ["PUT {origin}/setup/api/settings"],
-        startConfigurationProcess: ["POST {origin}/setup/api/configure"],
-        startPreReceiveEnvironmentDownload: ["POST /admin/pre-receive-environments/{pre_receive_environment_id}/downloads"],
-        suspendUser: ["PUT /users/{username}/suspended"],
-        syncLdapMappingForTeam: ["POST /admin/ldap/teams/{team_id}/sync"],
-        syncLdapMappingForUser: ["POST /admin/ldap/users/{username}/sync"],
-        unsuspendUser: ["DELETE /users/{username}/suspended"],
-        updateAttributeForEnterpriseGroup: ["PATCH /scim/v2/Groups/{scim_group_id}"],
-        updateAttributeForEnterpriseUser: ["PATCH /scim/v2/Users/{scim_user_id}"],
-        updateGlobalWebhook: ["PATCH /admin/hooks/{hook_id}"],
-        updateLdapMappingForTeam: ["PATCH /admin/ldap/teams/{team_id}/mapping"],
-        updateLdapMappingForUser: ["PATCH /admin/ldap/users/{username}/mapping"],
-        updateOrgName: ["PATCH /admin/organizations/{org}"],
-        updatePreReceiveEnvironment: ["PATCH /admin/pre-receive-environments/{pre_receive_environment_id}"],
-        updatePreReceiveHook: ["PATCH /admin/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForOrg: ["PATCH /orgs/{org}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updatePreReceiveHookEnforcementForRepo: ["PATCH /repos/{owner}/{repo}/pre-receive-hooks/{pre_receive_hook_id}"],
-        updateUsernameForUser: ["PATCH /admin/users/{username}"],
-        upgradeLicense: ["POST {origin}/setup/api/upgrade"]
-      }
-    };
-    function enterpriseServer34Admin(octokit) {
-      return endpointsToMethods(octokit, Endpoints$1);
-    }
-    enterpriseServer34Admin.VERSION = VERSION;
-    function enterpriseServer342(octokit) {
-      return endpointsToMethods(octokit, Endpoints);
-    }
-    enterpriseServer342.VERSION = VERSION;
-    function enterpriseServer35Admin(octokit) {
-      return endpointsToMethods(octokit, Endpoints$3);
-    }
-    enterpriseServer35Admin.VERSION = VERSION;
-    function enterpriseServer35(octokit) {
-      return endpointsToMethods(octokit, Endpoints$2);
-    }
-    enterpriseServer35.VERSION = VERSION;
-    function enterpriseServer36Admin(octokit) {
-      return endpointsToMethods(octokit, Endpoints$5);
-    }
-    enterpriseServer36Admin.VERSION = VERSION;
-    function enterpriseServer36(octokit) {
-      return endpointsToMethods(octokit, Endpoints$4);
-    }
-    enterpriseServer36.VERSION = VERSION;
-    function enterpriseServer37Admin(octokit) {
-      return endpointsToMethods(octokit, Endpoints$7);
-    }
-    enterpriseServer37Admin.VERSION = VERSION;
-    function enterpriseServer37(octokit) {
-      return endpointsToMethods(octokit, Endpoints$6);
-    }
-    enterpriseServer37.VERSION = VERSION;
-    exports.enterpriseServer34 = enterpriseServer342;
-    exports.enterpriseServer34Admin = enterpriseServer34Admin;
-    exports.enterpriseServer35 = enterpriseServer35;
-    exports.enterpriseServer35Admin = enterpriseServer35Admin;
-    exports.enterpriseServer36 = enterpriseServer36;
-    exports.enterpriseServer36Admin = enterpriseServer36Admin;
-    exports.enterpriseServer37 = enterpriseServer37;
-    exports.enterpriseServer37Admin = enterpriseServer37Admin;
-  }
-});
-
-// node_modules/semver/semver.js
-var require_semver2 = __commonJS({
-  "node_modules/semver/semver.js"(exports, module2) {
-    exports = module2.exports = SemVer;
-    var debug;
-    if (typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
-      debug = function() {
-        var args = Array.prototype.slice.call(arguments, 0);
-        args.unshift("SEMVER");
-        console.log.apply(console, args);
-      };
-    } else {
-      debug = function() {
-      };
-    }
-    exports.SEMVER_SPEC_VERSION = "2.0.0";
-    var MAX_LENGTH = 256;
-    var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
-    9007199254740991;
-    var MAX_SAFE_COMPONENT_LENGTH = 16;
-    var re = exports.re = [];
-    var src = exports.src = [];
-    var t = exports.tokens = {};
-    var R = 0;
-    function tok(n) {
-      t[n] = R++;
-    }
-    tok("NUMERICIDENTIFIER");
-    src[t.NUMERICIDENTIFIER] = "0|[1-9]\\d*";
-    tok("NUMERICIDENTIFIERLOOSE");
-    src[t.NUMERICIDENTIFIERLOOSE] = "[0-9]+";
-    tok("NONNUMERICIDENTIFIER");
-    src[t.NONNUMERICIDENTIFIER] = "\\d*[a-zA-Z-][a-zA-Z0-9-]*";
-    tok("MAINVERSION");
-    src[t.MAINVERSION] = "(" + src[t.NUMERICIDENTIFIER] + ")\\.(" + src[t.NUMERICIDENTIFIER] + ")\\.(" + src[t.NUMERICIDENTIFIER] + ")";
-    tok("MAINVERSIONLOOSE");
-    src[t.MAINVERSIONLOOSE] = "(" + src[t.NUMERICIDENTIFIERLOOSE] + ")\\.(" + src[t.NUMERICIDENTIFIERLOOSE] + ")\\.(" + src[t.NUMERICIDENTIFIERLOOSE] + ")";
-    tok("PRERELEASEIDENTIFIER");
-    src[t.PRERELEASEIDENTIFIER] = "(?:" + src[t.NUMERICIDENTIFIER] + "|" + src[t.NONNUMERICIDENTIFIER] + ")";
-    tok("PRERELEASEIDENTIFIERLOOSE");
-    src[t.PRERELEASEIDENTIFIERLOOSE] = "(?:" + src[t.NUMERICIDENTIFIERLOOSE] + "|" + src[t.NONNUMERICIDENTIFIER] + ")";
-    tok("PRERELEASE");
-    src[t.PRERELEASE] = "(?:-(" + src[t.PRERELEASEIDENTIFIER] + "(?:\\." + src[t.PRERELEASEIDENTIFIER] + ")*))";
-    tok("PRERELEASELOOSE");
-    src[t.PRERELEASELOOSE] = "(?:-?(" + src[t.PRERELEASEIDENTIFIERLOOSE] + "(?:\\." + src[t.PRERELEASEIDENTIFIERLOOSE] + ")*))";
-    tok("BUILDIDENTIFIER");
-    src[t.BUILDIDENTIFIER] = "[0-9A-Za-z-]+";
-    tok("BUILD");
-    src[t.BUILD] = "(?:\\+(" + src[t.BUILDIDENTIFIER] + "(?:\\." + src[t.BUILDIDENTIFIER] + ")*))";
-    tok("FULL");
-    tok("FULLPLAIN");
-    src[t.FULLPLAIN] = "v?" + src[t.MAINVERSION] + src[t.PRERELEASE] + "?" + src[t.BUILD] + "?";
-    src[t.FULL] = "^" + src[t.FULLPLAIN] + "$";
-    tok("LOOSEPLAIN");
-    src[t.LOOSEPLAIN] = "[v=\\s]*" + src[t.MAINVERSIONLOOSE] + src[t.PRERELEASELOOSE] + "?" + src[t.BUILD] + "?";
-    tok("LOOSE");
-    src[t.LOOSE] = "^" + src[t.LOOSEPLAIN] + "$";
-    tok("GTLT");
-    src[t.GTLT] = "((?:<|>)?=?)";
-    tok("XRANGEIDENTIFIERLOOSE");
-    src[t.XRANGEIDENTIFIERLOOSE] = src[t.NUMERICIDENTIFIERLOOSE] + "|x|X|\\*";
-    tok("XRANGEIDENTIFIER");
-    src[t.XRANGEIDENTIFIER] = src[t.NUMERICIDENTIFIER] + "|x|X|\\*";
-    tok("XRANGEPLAIN");
-    src[t.XRANGEPLAIN] = "[v=\\s]*(" + src[t.XRANGEIDENTIFIER] + ")(?:\\.(" + src[t.XRANGEIDENTIFIER] + ")(?:\\.(" + src[t.XRANGEIDENTIFIER] + ")(?:" + src[t.PRERELEASE] + ")?" + src[t.BUILD] + "?)?)?";
-    tok("XRANGEPLAINLOOSE");
-    src[t.XRANGEPLAINLOOSE] = "[v=\\s]*(" + src[t.XRANGEIDENTIFIERLOOSE] + ")(?:\\.(" + src[t.XRANGEIDENTIFIERLOOSE] + ")(?:\\.(" + src[t.XRANGEIDENTIFIERLOOSE] + ")(?:" + src[t.PRERELEASELOOSE] + ")?" + src[t.BUILD] + "?)?)?";
-    tok("XRANGE");
-    src[t.XRANGE] = "^" + src[t.GTLT] + "\\s*" + src[t.XRANGEPLAIN] + "$";
-    tok("XRANGELOOSE");
-    src[t.XRANGELOOSE] = "^" + src[t.GTLT] + "\\s*" + src[t.XRANGEPLAINLOOSE] + "$";
-    tok("COERCE");
-    src[t.COERCE] = "(^|[^\\d])(\\d{1," + MAX_SAFE_COMPONENT_LENGTH + "})(?:\\.(\\d{1," + MAX_SAFE_COMPONENT_LENGTH + "}))?(?:\\.(\\d{1," + MAX_SAFE_COMPONENT_LENGTH + "}))?(?:$|[^\\d])";
-    tok("COERCERTL");
-    re[t.COERCERTL] = new RegExp(src[t.COERCE], "g");
-    tok("LONETILDE");
-    src[t.LONETILDE] = "(?:~>?)";
-    tok("TILDETRIM");
-    src[t.TILDETRIM] = "(\\s*)" + src[t.LONETILDE] + "\\s+";
-    re[t.TILDETRIM] = new RegExp(src[t.TILDETRIM], "g");
-    var tildeTrimReplace = "$1~";
-    tok("TILDE");
-    src[t.TILDE] = "^" + src[t.LONETILDE] + src[t.XRANGEPLAIN] + "$";
-    tok("TILDELOOSE");
-    src[t.TILDELOOSE] = "^" + src[t.LONETILDE] + src[t.XRANGEPLAINLOOSE] + "$";
-    tok("LONECARET");
-    src[t.LONECARET] = "(?:\\^)";
-    tok("CARETTRIM");
-    src[t.CARETTRIM] = "(\\s*)" + src[t.LONECARET] + "\\s+";
-    re[t.CARETTRIM] = new RegExp(src[t.CARETTRIM], "g");
-    var caretTrimReplace = "$1^";
-    tok("CARET");
-    src[t.CARET] = "^" + src[t.LONECARET] + src[t.XRANGEPLAIN] + "$";
-    tok("CARETLOOSE");
-    src[t.CARETLOOSE] = "^" + src[t.LONECARET] + src[t.XRANGEPLAINLOOSE] + "$";
-    tok("COMPARATORLOOSE");
-    src[t.COMPARATORLOOSE] = "^" + src[t.GTLT] + "\\s*(" + src[t.LOOSEPLAIN] + ")$|^$";
-    tok("COMPARATOR");
-    src[t.COMPARATOR] = "^" + src[t.GTLT] + "\\s*(" + src[t.FULLPLAIN] + ")$|^$";
-    tok("COMPARATORTRIM");
-    src[t.COMPARATORTRIM] = "(\\s*)" + src[t.GTLT] + "\\s*(" + src[t.LOOSEPLAIN] + "|" + src[t.XRANGEPLAIN] + ")";
-    re[t.COMPARATORTRIM] = new RegExp(src[t.COMPARATORTRIM], "g");
-    var comparatorTrimReplace = "$1$2$3";
-    tok("HYPHENRANGE");
-    src[t.HYPHENRANGE] = "^\\s*(" + src[t.XRANGEPLAIN] + ")\\s+-\\s+(" + src[t.XRANGEPLAIN] + ")\\s*$";
-    tok("HYPHENRANGELOOSE");
-    src[t.HYPHENRANGELOOSE] = "^\\s*(" + src[t.XRANGEPLAINLOOSE] + ")\\s+-\\s+(" + src[t.XRANGEPLAINLOOSE] + ")\\s*$";
-    tok("STAR");
-    src[t.STAR] = "(<|>)?=?\\s*\\*";
-    for (i = 0; i < R; i++) {
-      debug(i, src[i]);
-      if (!re[i]) {
-        re[i] = new RegExp(src[i]);
-      }
-    }
-    var i;
-    exports.parse = parse2;
-    function parse2(version2, options) {
-      if (!options || typeof options !== "object") {
-        options = {
-          loose: !!options,
-          includePrerelease: false
-        };
-      }
-      if (version2 instanceof SemVer) {
-        return version2;
-      }
-      if (typeof version2 !== "string") {
-        return null;
-      }
-      if (version2.length > MAX_LENGTH) {
-        return null;
-      }
-      var r = options.loose ? re[t.LOOSE] : re[t.FULL];
-      if (!r.test(version2)) {
-        return null;
-      }
-      try {
-        return new SemVer(version2, options);
-      } catch (er) {
-        return null;
-      }
-    }
-    exports.valid = valid;
-    function valid(version2, options) {
-      var v = parse2(version2, options);
-      return v ? v.version : null;
-    }
-    exports.clean = clean;
-    function clean(version2, options) {
-      var s = parse2(version2.trim().replace(/^[=v]+/, ""), options);
-      return s ? s.version : null;
-    }
-    exports.SemVer = SemVer;
-    function SemVer(version2, options) {
-      if (!options || typeof options !== "object") {
-        options = {
-          loose: !!options,
-          includePrerelease: false
-        };
-      }
-      if (version2 instanceof SemVer) {
-        if (version2.loose === options.loose) {
-          return version2;
-        } else {
-          version2 = version2.version;
-        }
-      } else if (typeof version2 !== "string") {
-        throw new TypeError("Invalid Version: " + version2);
-      }
-      if (version2.length > MAX_LENGTH) {
-        throw new TypeError("version is longer than " + MAX_LENGTH + " characters");
-      }
-      if (!(this instanceof SemVer)) {
-        return new SemVer(version2, options);
-      }
-      debug("SemVer", version2, options);
-      this.options = options;
-      this.loose = !!options.loose;
-      var m = version2.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
-      if (!m) {
-        throw new TypeError("Invalid Version: " + version2);
-      }
-      this.raw = version2;
-      this.major = +m[1];
-      this.minor = +m[2];
-      this.patch = +m[3];
-      if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
-        throw new TypeError("Invalid major version");
-      }
-      if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
-        throw new TypeError("Invalid minor version");
-      }
-      if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
-        throw new TypeError("Invalid patch version");
-      }
-      if (!m[4]) {
-        this.prerelease = [];
-      } else {
-        this.prerelease = m[4].split(".").map(function(id) {
-          if (/^[0-9]+$/.test(id)) {
-            var num = +id;
-            if (num >= 0 && num < MAX_SAFE_INTEGER) {
-              return num;
-            }
-          }
-          return id;
-        });
-      }
-      this.build = m[5] ? m[5].split(".") : [];
-      this.format();
-    }
-    SemVer.prototype.format = function() {
-      this.version = this.major + "." + this.minor + "." + this.patch;
-      if (this.prerelease.length) {
-        this.version += "-" + this.prerelease.join(".");
-      }
-      return this.version;
-    };
-    SemVer.prototype.toString = function() {
-      return this.version;
-    };
-    SemVer.prototype.compare = function(other) {
-      debug("SemVer.compare", this.version, this.options, other);
-      if (!(other instanceof SemVer)) {
-        other = new SemVer(other, this.options);
-      }
-      return this.compareMain(other) || this.comparePre(other);
-    };
-    SemVer.prototype.compareMain = function(other) {
-      if (!(other instanceof SemVer)) {
-        other = new SemVer(other, this.options);
-      }
-      return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
-    };
-    SemVer.prototype.comparePre = function(other) {
-      if (!(other instanceof SemVer)) {
-        other = new SemVer(other, this.options);
-      }
-      if (this.prerelease.length && !other.prerelease.length) {
-        return -1;
-      } else if (!this.prerelease.length && other.prerelease.length) {
-        return 1;
-      } else if (!this.prerelease.length && !other.prerelease.length) {
-        return 0;
-      }
-      var i2 = 0;
-      do {
-        var a = this.prerelease[i2];
-        var b = other.prerelease[i2];
-        debug("prerelease compare", i2, a, b);
-        if (a === void 0 && b === void 0) {
-          return 0;
-        } else if (b === void 0) {
-          return 1;
-        } else if (a === void 0) {
-          return -1;
-        } else if (a === b) {
-          continue;
-        } else {
-          return compareIdentifiers(a, b);
-        }
-      } while (++i2);
-    };
-    SemVer.prototype.compareBuild = function(other) {
-      if (!(other instanceof SemVer)) {
-        other = new SemVer(other, this.options);
-      }
-      var i2 = 0;
-      do {
-        var a = this.build[i2];
-        var b = other.build[i2];
-        debug("prerelease compare", i2, a, b);
-        if (a === void 0 && b === void 0) {
-          return 0;
-        } else if (b === void 0) {
-          return 1;
-        } else if (a === void 0) {
-          return -1;
-        } else if (a === b) {
-          continue;
-        } else {
-          return compareIdentifiers(a, b);
-        }
-      } while (++i2);
-    };
-    SemVer.prototype.inc = function(release, identifier) {
-      switch (release) {
-        case "premajor":
-          this.prerelease.length = 0;
-          this.patch = 0;
-          this.minor = 0;
-          this.major++;
-          this.inc("pre", identifier);
-          break;
-        case "preminor":
-          this.prerelease.length = 0;
-          this.patch = 0;
-          this.minor++;
-          this.inc("pre", identifier);
-          break;
-        case "prepatch":
-          this.prerelease.length = 0;
-          this.inc("patch", identifier);
-          this.inc("pre", identifier);
-          break;
-        case "prerelease":
-          if (this.prerelease.length === 0) {
-            this.inc("patch", identifier);
-          }
-          this.inc("pre", identifier);
-          break;
-        case "major":
-          if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
-            this.major++;
-          }
-          this.minor = 0;
-          this.patch = 0;
-          this.prerelease = [];
-          break;
-        case "minor":
-          if (this.patch !== 0 || this.prerelease.length === 0) {
-            this.minor++;
-          }
-          this.patch = 0;
-          this.prerelease = [];
-          break;
-        case "patch":
-          if (this.prerelease.length === 0) {
-            this.patch++;
-          }
-          this.prerelease = [];
-          break;
-        case "pre":
-          if (this.prerelease.length === 0) {
-            this.prerelease = [0];
-          } else {
-            var i2 = this.prerelease.length;
-            while (--i2 >= 0) {
-              if (typeof this.prerelease[i2] === "number") {
-                this.prerelease[i2]++;
-                i2 = -2;
-              }
-            }
-            if (i2 === -1) {
-              this.prerelease.push(0);
-            }
-          }
-          if (identifier) {
-            if (this.prerelease[0] === identifier) {
-              if (isNaN(this.prerelease[1])) {
-                this.prerelease = [identifier, 0];
-              }
-            } else {
-              this.prerelease = [identifier, 0];
-            }
-          }
-          break;
-        default:
-          throw new Error("invalid increment argument: " + release);
-      }
-      this.format();
-      this.raw = this.version;
-      return this;
-    };
-    exports.inc = inc;
-    function inc(version2, release, loose, identifier) {
-      if (typeof loose === "string") {
-        identifier = loose;
-        loose = void 0;
-      }
-      try {
-        return new SemVer(version2, loose).inc(release, identifier).version;
-      } catch (er) {
-        return null;
-      }
-    }
-    exports.diff = diff;
-    function diff(version1, version2) {
-      if (eq(version1, version2)) {
-        return null;
-      } else {
-        var v12 = parse2(version1);
-        var v2 = parse2(version2);
-        var prefix = "";
-        if (v12.prerelease.length || v2.prerelease.length) {
-          prefix = "pre";
-          var defaultResult = "prerelease";
-        }
-        for (var key in v12) {
-          if (key === "major" || key === "minor" || key === "patch") {
-            if (v12[key] !== v2[key]) {
-              return prefix + key;
-            }
-          }
-        }
-        return defaultResult;
-      }
-    }
-    exports.compareIdentifiers = compareIdentifiers;
-    var numeric = /^[0-9]+$/;
-    function compareIdentifiers(a, b) {
-      var anum = numeric.test(a);
-      var bnum = numeric.test(b);
-      if (anum && bnum) {
-        a = +a;
-        b = +b;
-      }
-      return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
-    }
-    exports.rcompareIdentifiers = rcompareIdentifiers;
-    function rcompareIdentifiers(a, b) {
-      return compareIdentifiers(b, a);
-    }
-    exports.major = major;
-    function major(a, loose) {
-      return new SemVer(a, loose).major;
-    }
-    exports.minor = minor;
-    function minor(a, loose) {
-      return new SemVer(a, loose).minor;
-    }
-    exports.patch = patch;
-    function patch(a, loose) {
-      return new SemVer(a, loose).patch;
-    }
-    exports.compare = compare;
-    function compare(a, b, loose) {
-      return new SemVer(a, loose).compare(new SemVer(b, loose));
-    }
-    exports.compareLoose = compareLoose;
-    function compareLoose(a, b) {
-      return compare(a, b, true);
-    }
-    exports.compareBuild = compareBuild;
-    function compareBuild(a, b, loose) {
-      var versionA = new SemVer(a, loose);
-      var versionB = new SemVer(b, loose);
-      return versionA.compare(versionB) || versionA.compareBuild(versionB);
-    }
-    exports.rcompare = rcompare;
-    function rcompare(a, b, loose) {
-      return compare(b, a, loose);
-    }
-    exports.sort = sort;
-    function sort(list, loose) {
-      return list.sort(function(a, b) {
-        return exports.compareBuild(a, b, loose);
-      });
-    }
-    exports.rsort = rsort;
-    function rsort(list, loose) {
-      return list.sort(function(a, b) {
-        return exports.compareBuild(b, a, loose);
-      });
-    }
-    exports.gt = gt;
-    function gt(a, b, loose) {
-      return compare(a, b, loose) > 0;
-    }
-    exports.lt = lt;
-    function lt(a, b, loose) {
-      return compare(a, b, loose) < 0;
-    }
-    exports.eq = eq;
-    function eq(a, b, loose) {
-      return compare(a, b, loose) === 0;
-    }
-    exports.neq = neq;
-    function neq(a, b, loose) {
-      return compare(a, b, loose) !== 0;
-    }
-    exports.gte = gte;
-    function gte(a, b, loose) {
-      return compare(a, b, loose) >= 0;
-    }
-    exports.lte = lte;
-    function lte(a, b, loose) {
-      return compare(a, b, loose) <= 0;
-    }
-    exports.cmp = cmp;
-    function cmp(a, op, b, loose) {
-      switch (op) {
-        case "===":
-          if (typeof a === "object")
-            a = a.version;
-          if (typeof b === "object")
-            b = b.version;
-          return a === b;
-        case "!==":
-          if (typeof a === "object")
-            a = a.version;
-          if (typeof b === "object")
-            b = b.version;
-          return a !== b;
-        case "":
-        case "=":
-        case "==":
-          return eq(a, b, loose);
-        case "!=":
-          return neq(a, b, loose);
-        case ">":
-          return gt(a, b, loose);
-        case ">=":
-          return gte(a, b, loose);
-        case "<":
-          return lt(a, b, loose);
-        case "<=":
-          return lte(a, b, loose);
-        default:
-          throw new TypeError("Invalid operator: " + op);
-      }
-    }
-    exports.Comparator = Comparator;
-    function Comparator(comp, options) {
-      if (!options || typeof options !== "object") {
-        options = {
-          loose: !!options,
-          includePrerelease: false
-        };
-      }
-      if (comp instanceof Comparator) {
-        if (comp.loose === !!options.loose) {
-          return comp;
-        } else {
-          comp = comp.value;
-        }
-      }
-      if (!(this instanceof Comparator)) {
-        return new Comparator(comp, options);
-      }
-      debug("comparator", comp, options);
-      this.options = options;
-      this.loose = !!options.loose;
-      this.parse(comp);
-      if (this.semver === ANY) {
-        this.value = "";
-      } else {
-        this.value = this.operator + this.semver.version;
-      }
-      debug("comp", this);
-    }
-    var ANY = {};
-    Comparator.prototype.parse = function(comp) {
-      var r = this.options.loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR];
-      var m = comp.match(r);
-      if (!m) {
-        throw new TypeError("Invalid comparator: " + comp);
-      }
-      this.operator = m[1] !== void 0 ? m[1] : "";
-      if (this.operator === "=") {
-        this.operator = "";
-      }
-      if (!m[2]) {
-        this.semver = ANY;
-      } else {
-        this.semver = new SemVer(m[2], this.options.loose);
-      }
-    };
-    Comparator.prototype.toString = function() {
+    Traverse.prototype.forEach = function(cb) {
+      this.value = walk(this.value, cb, false);
       return this.value;
     };
-    Comparator.prototype.test = function(version2) {
-      debug("Comparator.test", version2, this.options.loose);
-      if (this.semver === ANY || version2 === ANY) {
-        return true;
-      }
-      if (typeof version2 === "string") {
-        try {
-          version2 = new SemVer(version2, this.options);
-        } catch (er) {
-          return false;
+    Traverse.prototype.reduce = function(cb, init) {
+      var skip = arguments.length === 1;
+      var acc = skip ? this.value : init;
+      this.forEach(function(x) {
+        if (!this.isRoot || !skip) {
+          acc = cb.call(this, acc, x);
         }
-      }
-      return cmp(version2, this.operator, this.semver, this.options);
+      });
+      return acc;
     };
-    Comparator.prototype.intersects = function(comp, options) {
-      if (!(comp instanceof Comparator)) {
-        throw new TypeError("a Comparator is required");
+    Traverse.prototype.deepEqual = function(obj) {
+      if (arguments.length !== 1) {
+        throw new Error(
+          "deepEqual requires exactly one object to compare against"
+        );
       }
-      if (!options || typeof options !== "object") {
-        options = {
-          loose: !!options,
-          includePrerelease: false
+      var equal = true;
+      var node = obj;
+      this.forEach(function(y) {
+        var notEqual = function() {
+          equal = false;
+          return void 0;
+        }.bind(this);
+        if (!this.isRoot) {
+          if (typeof node !== "object")
+            return notEqual();
+          node = node[this.key];
+        }
+        var x = node;
+        this.post(function() {
+          node = x;
+        });
+        var toS = function(o) {
+          return Object.prototype.toString.call(o);
         };
-      }
-      var rangeTmp;
-      if (this.operator === "") {
-        if (this.value === "") {
-          return true;
+        if (this.circular) {
+          if (Traverse(obj).get(this.circular.path) !== x)
+            notEqual();
+        } else if (typeof x !== typeof y) {
+          notEqual();
+        } else if (x === null || y === null || x === void 0 || y === void 0) {
+          if (x !== y)
+            notEqual();
+        } else if (x.__proto__ !== y.__proto__) {
+          notEqual();
+        } else if (x === y) {
+        } else if (typeof x === "function") {
+          if (x instanceof RegExp) {
+            if (x.toString() != y.toString())
+              notEqual();
+          } else if (x !== y)
+            notEqual();
+        } else if (typeof x === "object") {
+          if (toS(y) === "[object Arguments]" || toS(x) === "[object Arguments]") {
+            if (toS(x) !== toS(y)) {
+              notEqual();
+            }
+          } else if (x instanceof Date || y instanceof Date) {
+            if (!(x instanceof Date) || !(y instanceof Date) || x.getTime() !== y.getTime()) {
+              notEqual();
+            }
+          } else {
+            var kx = Object.keys(x);
+            var ky = Object.keys(y);
+            if (kx.length !== ky.length)
+              return notEqual();
+            for (var i = 0; i < kx.length; i++) {
+              var k = kx[i];
+              if (!Object.hasOwnProperty.call(y, k)) {
+                notEqual();
+              }
+            }
+          }
         }
-        rangeTmp = new Range(comp.value, options);
-        return satisfies(this.value, rangeTmp, options);
-      } else if (comp.operator === "") {
-        if (comp.value === "") {
-          return true;
-        }
-        rangeTmp = new Range(this.value, options);
-        return satisfies(comp.semver, rangeTmp, options);
-      }
-      var sameDirectionIncreasing = (this.operator === ">=" || this.operator === ">") && (comp.operator === ">=" || comp.operator === ">");
-      var sameDirectionDecreasing = (this.operator === "<=" || this.operator === "<") && (comp.operator === "<=" || comp.operator === "<");
-      var sameSemVer = this.semver.version === comp.semver.version;
-      var differentDirectionsInclusive = (this.operator === ">=" || this.operator === "<=") && (comp.operator === ">=" || comp.operator === "<=");
-      var oppositeDirectionsLessThan = cmp(this.semver, "<", comp.semver, options) && ((this.operator === ">=" || this.operator === ">") && (comp.operator === "<=" || comp.operator === "<"));
-      var oppositeDirectionsGreaterThan = cmp(this.semver, ">", comp.semver, options) && ((this.operator === "<=" || this.operator === "<") && (comp.operator === ">=" || comp.operator === ">"));
-      return sameDirectionIncreasing || sameDirectionDecreasing || sameSemVer && differentDirectionsInclusive || oppositeDirectionsLessThan || oppositeDirectionsGreaterThan;
+      });
+      return equal;
     };
-    exports.Range = Range;
-    function Range(range, options) {
-      if (!options || typeof options !== "object") {
-        options = {
-          loose: !!options,
-          includePrerelease: false
+    Traverse.prototype.paths = function() {
+      var acc = [];
+      this.forEach(function(x) {
+        acc.push(this.path);
+      });
+      return acc;
+    };
+    Traverse.prototype.nodes = function() {
+      var acc = [];
+      this.forEach(function(x) {
+        acc.push(this.node);
+      });
+      return acc;
+    };
+    Traverse.prototype.clone = function() {
+      var parents = [], nodes = [];
+      return function clone(src) {
+        for (var i = 0; i < parents.length; i++) {
+          if (parents[i] === src) {
+            return nodes[i];
+          }
+        }
+        if (typeof src === "object" && src !== null) {
+          var dst = copy(src);
+          parents.push(src);
+          nodes.push(dst);
+          Object.keys(src).forEach(function(key) {
+            dst[key] = clone(src[key]);
+          });
+          parents.pop();
+          nodes.pop();
+          return dst;
+        } else {
+          return src;
+        }
+      }(this.value);
+    };
+    function walk(root, cb, immutable) {
+      var path2 = [];
+      var parents = [];
+      var alive = true;
+      return function walker(node_) {
+        var node = immutable ? copy(node_) : node_;
+        var modifiers = {};
+        var state = {
+          node,
+          node_,
+          path: [].concat(path2),
+          parent: parents.slice(-1)[0],
+          key: path2.slice(-1)[0],
+          isRoot: path2.length === 0,
+          level: path2.length,
+          circular: null,
+          update: function(x) {
+            if (!state.isRoot) {
+              state.parent.node[state.key] = x;
+            }
+            state.node = x;
+          },
+          "delete": function() {
+            delete state.parent.node[state.key];
+          },
+          remove: function() {
+            if (Array.isArray(state.parent.node)) {
+              state.parent.node.splice(state.key, 1);
+            } else {
+              delete state.parent.node[state.key];
+            }
+          },
+          before: function(f) {
+            modifiers.before = f;
+          },
+          after: function(f) {
+            modifiers.after = f;
+          },
+          pre: function(f) {
+            modifiers.pre = f;
+          },
+          post: function(f) {
+            modifiers.post = f;
+          },
+          stop: function() {
+            alive = false;
+          }
         };
-      }
-      if (range instanceof Range) {
-        if (range.loose === !!options.loose && range.includePrerelease === !!options.includePrerelease) {
-          return range;
-        } else {
-          return new Range(range.raw, options);
-        }
-      }
-      if (range instanceof Comparator) {
-        return new Range(range.value, options);
-      }
-      if (!(this instanceof Range)) {
-        return new Range(range, options);
-      }
-      this.options = options;
-      this.loose = !!options.loose;
-      this.includePrerelease = !!options.includePrerelease;
-      this.raw = range;
-      this.set = range.split(/\s*\|\|\s*/).map(function(range2) {
-        return this.parseRange(range2.trim());
-      }, this).filter(function(c) {
-        return c.length;
-      });
-      if (!this.set.length) {
-        throw new TypeError("Invalid SemVer Range: " + range);
-      }
-      this.format();
-    }
-    Range.prototype.format = function() {
-      this.range = this.set.map(function(comps) {
-        return comps.join(" ").trim();
-      }).join("||").trim();
-      return this.range;
-    };
-    Range.prototype.toString = function() {
-      return this.range;
-    };
-    Range.prototype.parseRange = function(range) {
-      var loose = this.options.loose;
-      range = range.trim();
-      var hr = loose ? re[t.HYPHENRANGELOOSE] : re[t.HYPHENRANGE];
-      range = range.replace(hr, hyphenReplace);
-      debug("hyphen replace", range);
-      range = range.replace(re[t.COMPARATORTRIM], comparatorTrimReplace);
-      debug("comparator trim", range, re[t.COMPARATORTRIM]);
-      range = range.replace(re[t.TILDETRIM], tildeTrimReplace);
-      range = range.replace(re[t.CARETTRIM], caretTrimReplace);
-      range = range.split(/\s+/).join(" ");
-      var compRe = loose ? re[t.COMPARATORLOOSE] : re[t.COMPARATOR];
-      var set = range.split(" ").map(function(comp) {
-        return parseComparator(comp, this.options);
-      }, this).join(" ").split(/\s+/);
-      if (this.options.loose) {
-        set = set.filter(function(comp) {
-          return !!comp.match(compRe);
-        });
-      }
-      set = set.map(function(comp) {
-        return new Comparator(comp, this.options);
-      }, this);
-      return set;
-    };
-    Range.prototype.intersects = function(range, options) {
-      if (!(range instanceof Range)) {
-        throw new TypeError("a Range is required");
-      }
-      return this.set.some(function(thisComparators) {
-        return isSatisfiable(thisComparators, options) && range.set.some(function(rangeComparators) {
-          return isSatisfiable(rangeComparators, options) && thisComparators.every(function(thisComparator) {
-            return rangeComparators.every(function(rangeComparator) {
-              return thisComparator.intersects(rangeComparator, options);
-            });
-          });
-        });
-      });
-    };
-    function isSatisfiable(comparators, options) {
-      var result = true;
-      var remainingComparators = comparators.slice();
-      var testComparator = remainingComparators.pop();
-      while (result && remainingComparators.length) {
-        result = remainingComparators.every(function(otherComparator) {
-          return testComparator.intersects(otherComparator, options);
-        });
-        testComparator = remainingComparators.pop();
-      }
-      return result;
-    }
-    exports.toComparators = toComparators;
-    function toComparators(range, options) {
-      return new Range(range, options).set.map(function(comp) {
-        return comp.map(function(c) {
-          return c.value;
-        }).join(" ").trim().split(" ");
-      });
-    }
-    function parseComparator(comp, options) {
-      debug("comp", comp, options);
-      comp = replaceCarets(comp, options);
-      debug("caret", comp);
-      comp = replaceTildes(comp, options);
-      debug("tildes", comp);
-      comp = replaceXRanges(comp, options);
-      debug("xrange", comp);
-      comp = replaceStars(comp, options);
-      debug("stars", comp);
-      return comp;
-    }
-    function isX(id) {
-      return !id || id.toLowerCase() === "x" || id === "*";
-    }
-    function replaceTildes(comp, options) {
-      return comp.trim().split(/\s+/).map(function(comp2) {
-        return replaceTilde(comp2, options);
-      }).join(" ");
-    }
-    function replaceTilde(comp, options) {
-      var r = options.loose ? re[t.TILDELOOSE] : re[t.TILDE];
-      return comp.replace(r, function(_, M, m, p, pr) {
-        debug("tilde", comp, _, M, m, p, pr);
-        var ret;
-        if (isX(M)) {
-          ret = "";
-        } else if (isX(m)) {
-          ret = ">=" + M + ".0.0 <" + (+M + 1) + ".0.0";
-        } else if (isX(p)) {
-          ret = ">=" + M + "." + m + ".0 <" + M + "." + (+m + 1) + ".0";
-        } else if (pr) {
-          debug("replaceTilde pr", pr);
-          ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + M + "." + (+m + 1) + ".0";
-        } else {
-          ret = ">=" + M + "." + m + "." + p + " <" + M + "." + (+m + 1) + ".0";
-        }
-        debug("tilde return", ret);
-        return ret;
-      });
-    }
-    function replaceCarets(comp, options) {
-      return comp.trim().split(/\s+/).map(function(comp2) {
-        return replaceCaret(comp2, options);
-      }).join(" ");
-    }
-    function replaceCaret(comp, options) {
-      debug("caret", comp, options);
-      var r = options.loose ? re[t.CARETLOOSE] : re[t.CARET];
-      return comp.replace(r, function(_, M, m, p, pr) {
-        debug("caret", comp, _, M, m, p, pr);
-        var ret;
-        if (isX(M)) {
-          ret = "";
-        } else if (isX(m)) {
-          ret = ">=" + M + ".0.0 <" + (+M + 1) + ".0.0";
-        } else if (isX(p)) {
-          if (M === "0") {
-            ret = ">=" + M + "." + m + ".0 <" + M + "." + (+m + 1) + ".0";
-          } else {
-            ret = ">=" + M + "." + m + ".0 <" + (+M + 1) + ".0.0";
-          }
-        } else if (pr) {
-          debug("replaceCaret pr", pr);
-          if (M === "0") {
-            if (m === "0") {
-              ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + M + "." + m + "." + (+p + 1);
-            } else {
-              ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + M + "." + (+m + 1) + ".0";
-            }
-          } else {
-            ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + (+M + 1) + ".0.0";
-          }
-        } else {
-          debug("no pr");
-          if (M === "0") {
-            if (m === "0") {
-              ret = ">=" + M + "." + m + "." + p + " <" + M + "." + m + "." + (+p + 1);
-            } else {
-              ret = ">=" + M + "." + m + "." + p + " <" + M + "." + (+m + 1) + ".0";
-            }
-          } else {
-            ret = ">=" + M + "." + m + "." + p + " <" + (+M + 1) + ".0.0";
-          }
-        }
-        debug("caret return", ret);
-        return ret;
-      });
-    }
-    function replaceXRanges(comp, options) {
-      debug("replaceXRanges", comp, options);
-      return comp.split(/\s+/).map(function(comp2) {
-        return replaceXRange(comp2, options);
-      }).join(" ");
-    }
-    function replaceXRange(comp, options) {
-      comp = comp.trim();
-      var r = options.loose ? re[t.XRANGELOOSE] : re[t.XRANGE];
-      return comp.replace(r, function(ret, gtlt, M, m, p, pr) {
-        debug("xRange", comp, ret, gtlt, M, m, p, pr);
-        var xM = isX(M);
-        var xm = xM || isX(m);
-        var xp = xm || isX(p);
-        var anyX = xp;
-        if (gtlt === "=" && anyX) {
-          gtlt = "";
-        }
-        pr = options.includePrerelease ? "-0" : "";
-        if (xM) {
-          if (gtlt === ">" || gtlt === "<") {
-            ret = "<0.0.0-0";
-          } else {
-            ret = "*";
-          }
-        } else if (gtlt && anyX) {
-          if (xm) {
-            m = 0;
-          }
-          p = 0;
-          if (gtlt === ">") {
-            gtlt = ">=";
-            if (xm) {
-              M = +M + 1;
-              m = 0;
-              p = 0;
-            } else {
-              m = +m + 1;
-              p = 0;
-            }
-          } else if (gtlt === "<=") {
-            gtlt = "<";
-            if (xm) {
-              M = +M + 1;
-            } else {
-              m = +m + 1;
-            }
-          }
-          ret = gtlt + M + "." + m + "." + p + pr;
-        } else if (xm) {
-          ret = ">=" + M + ".0.0" + pr + " <" + (+M + 1) + ".0.0" + pr;
-        } else if (xp) {
-          ret = ">=" + M + "." + m + ".0" + pr + " <" + M + "." + (+m + 1) + ".0" + pr;
-        }
-        debug("xRange return", ret);
-        return ret;
-      });
-    }
-    function replaceStars(comp, options) {
-      debug("replaceStars", comp, options);
-      return comp.trim().replace(re[t.STAR], "");
-    }
-    function hyphenReplace($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) {
-      if (isX(fM)) {
-        from = "";
-      } else if (isX(fm)) {
-        from = ">=" + fM + ".0.0";
-      } else if (isX(fp)) {
-        from = ">=" + fM + "." + fm + ".0";
-      } else {
-        from = ">=" + from;
-      }
-      if (isX(tM)) {
-        to = "";
-      } else if (isX(tm)) {
-        to = "<" + (+tM + 1) + ".0.0";
-      } else if (isX(tp)) {
-        to = "<" + tM + "." + (+tm + 1) + ".0";
-      } else if (tpr) {
-        to = "<=" + tM + "." + tm + "." + tp + "-" + tpr;
-      } else {
-        to = "<=" + to;
-      }
-      return (from + " " + to).trim();
-    }
-    Range.prototype.test = function(version2) {
-      if (!version2) {
-        return false;
-      }
-      if (typeof version2 === "string") {
-        try {
-          version2 = new SemVer(version2, this.options);
-        } catch (er) {
-          return false;
-        }
-      }
-      for (var i2 = 0; i2 < this.set.length; i2++) {
-        if (testSet(this.set[i2], version2, this.options)) {
-          return true;
-        }
-      }
-      return false;
-    };
-    function testSet(set, version2, options) {
-      for (var i2 = 0; i2 < set.length; i2++) {
-        if (!set[i2].test(version2)) {
-          return false;
-        }
-      }
-      if (version2.prerelease.length && !options.includePrerelease) {
-        for (i2 = 0; i2 < set.length; i2++) {
-          debug(set[i2].semver);
-          if (set[i2].semver === ANY) {
-            continue;
-          }
-          if (set[i2].semver.prerelease.length > 0) {
-            var allowed = set[i2].semver;
-            if (allowed.major === version2.major && allowed.minor === version2.minor && allowed.patch === version2.patch) {
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-      return true;
-    }
-    exports.satisfies = satisfies;
-    function satisfies(version2, range, options) {
-      try {
-        range = new Range(range, options);
-      } catch (er) {
-        return false;
-      }
-      return range.test(version2);
-    }
-    exports.maxSatisfying = maxSatisfying;
-    function maxSatisfying(versions, range, options) {
-      var max = null;
-      var maxSV = null;
-      try {
-        var rangeObj = new Range(range, options);
-      } catch (er) {
-        return null;
-      }
-      versions.forEach(function(v) {
-        if (rangeObj.test(v)) {
-          if (!max || maxSV.compare(v) === -1) {
-            max = v;
-            maxSV = new SemVer(max, options);
-          }
-        }
-      });
-      return max;
-    }
-    exports.minSatisfying = minSatisfying;
-    function minSatisfying(versions, range, options) {
-      var min = null;
-      var minSV = null;
-      try {
-        var rangeObj = new Range(range, options);
-      } catch (er) {
-        return null;
-      }
-      versions.forEach(function(v) {
-        if (rangeObj.test(v)) {
-          if (!min || minSV.compare(v) === 1) {
-            min = v;
-            minSV = new SemVer(min, options);
-          }
-        }
-      });
-      return min;
-    }
-    exports.minVersion = minVersion;
-    function minVersion(range, loose) {
-      range = new Range(range, loose);
-      var minver = new SemVer("0.0.0");
-      if (range.test(minver)) {
-        return minver;
-      }
-      minver = new SemVer("0.0.0-0");
-      if (range.test(minver)) {
-        return minver;
-      }
-      minver = null;
-      for (var i2 = 0; i2 < range.set.length; ++i2) {
-        var comparators = range.set[i2];
-        comparators.forEach(function(comparator) {
-          var compver = new SemVer(comparator.semver.version);
-          switch (comparator.operator) {
-            case ">":
-              if (compver.prerelease.length === 0) {
-                compver.patch++;
-              } else {
-                compver.prerelease.push(0);
-              }
-              compver.raw = compver.format();
-            case "":
-            case ">=":
-              if (!minver || gt(minver, compver)) {
-                minver = compver;
-              }
+        if (!alive)
+          return state;
+        if (typeof node === "object" && node !== null) {
+          state.isLeaf = Object.keys(node).length == 0;
+          for (var i = 0; i < parents.length; i++) {
+            if (parents[i].node_ === node_) {
+              state.circular = parents[i];
               break;
-            case "<":
-            case "<=":
-              break;
-            default:
-              throw new Error("Unexpected operation: " + comparator.operator);
-          }
-        });
-      }
-      if (minver && range.test(minver)) {
-        return minver;
-      }
-      return null;
-    }
-    exports.validRange = validRange;
-    function validRange(range, options) {
-      try {
-        return new Range(range, options).range || "*";
-      } catch (er) {
-        return null;
-      }
-    }
-    exports.ltr = ltr;
-    function ltr(version2, range, options) {
-      return outside(version2, range, "<", options);
-    }
-    exports.gtr = gtr;
-    function gtr(version2, range, options) {
-      return outside(version2, range, ">", options);
-    }
-    exports.outside = outside;
-    function outside(version2, range, hilo, options) {
-      version2 = new SemVer(version2, options);
-      range = new Range(range, options);
-      var gtfn, ltefn, ltfn, comp, ecomp;
-      switch (hilo) {
-        case ">":
-          gtfn = gt;
-          ltefn = lte;
-          ltfn = lt;
-          comp = ">";
-          ecomp = ">=";
-          break;
-        case "<":
-          gtfn = lt;
-          ltefn = gte;
-          ltfn = gt;
-          comp = "<";
-          ecomp = "<=";
-          break;
-        default:
-          throw new TypeError('Must provide a hilo val of "<" or ">"');
-      }
-      if (satisfies(version2, range, options)) {
-        return false;
-      }
-      for (var i2 = 0; i2 < range.set.length; ++i2) {
-        var comparators = range.set[i2];
-        var high = null;
-        var low = null;
-        comparators.forEach(function(comparator) {
-          if (comparator.semver === ANY) {
-            comparator = new Comparator(">=0.0.0");
-          }
-          high = high || comparator;
-          low = low || comparator;
-          if (gtfn(comparator.semver, high.semver, options)) {
-            high = comparator;
-          } else if (ltfn(comparator.semver, low.semver, options)) {
-            low = comparator;
-          }
-        });
-        if (high.operator === comp || high.operator === ecomp) {
-          return false;
-        }
-        if ((!low.operator || low.operator === comp) && ltefn(version2, low.semver)) {
-          return false;
-        } else if (low.operator === ecomp && ltfn(version2, low.semver)) {
-          return false;
-        }
-      }
-      return true;
-    }
-    exports.prerelease = prerelease;
-    function prerelease(version2, options) {
-      var parsed = parse2(version2, options);
-      return parsed && parsed.prerelease.length ? parsed.prerelease : null;
-    }
-    exports.intersects = intersects;
-    function intersects(r1, r2, options) {
-      r1 = new Range(r1, options);
-      r2 = new Range(r2, options);
-      return r1.intersects(r2);
-    }
-    exports.coerce = coerce;
-    function coerce(version2, options) {
-      if (version2 instanceof SemVer) {
-        return version2;
-      }
-      if (typeof version2 === "number") {
-        version2 = String(version2);
-      }
-      if (typeof version2 !== "string") {
-        return null;
-      }
-      options = options || {};
-      var match = null;
-      if (!options.rtl) {
-        match = version2.match(re[t.COERCE]);
-      } else {
-        var next;
-        while ((next = re[t.COERCERTL].exec(version2)) && (!match || match.index + match[0].length !== version2.length)) {
-          if (!match || next.index + next[0].length !== match.index + match[0].length) {
-            match = next;
-          }
-          re[t.COERCERTL].lastIndex = next.index + next[1].length + next[2].length;
-        }
-        re[t.COERCERTL].lastIndex = -1;
-      }
-      if (match === null) {
-        return null;
-      }
-      return parse2(match[2] + "." + (match[3] || "0") + "." + (match[4] || "0"), options);
-    }
-  }
-});
-
-// ../../node_modules/semver/internal/debug.js
-var require_debug = __commonJS({
-  "../../node_modules/semver/internal/debug.js"(exports, module2) {
-    var debug = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
-    };
-    module2.exports = debug;
-  }
-});
-
-// ../../node_modules/semver/internal/constants.js
-var require_constants3 = __commonJS({
-  "../../node_modules/semver/internal/constants.js"(exports, module2) {
-    var SEMVER_SPEC_VERSION = "2.0.0";
-    var MAX_LENGTH = 256;
-    var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
-    9007199254740991;
-    var MAX_SAFE_COMPONENT_LENGTH = 16;
-    module2.exports = {
-      SEMVER_SPEC_VERSION,
-      MAX_LENGTH,
-      MAX_SAFE_INTEGER,
-      MAX_SAFE_COMPONENT_LENGTH
-    };
-  }
-});
-
-// ../../node_modules/semver/internal/re.js
-var require_re = __commonJS({
-  "../../node_modules/semver/internal/re.js"(exports, module2) {
-    var { MAX_SAFE_COMPONENT_LENGTH } = require_constants3();
-    var debug = require_debug();
-    exports = module2.exports = {};
-    var re = exports.re = [];
-    var src = exports.src = [];
-    var t = exports.t = {};
-    var R = 0;
-    var createToken = (name, value, isGlobal) => {
-      const index = R++;
-      debug(name, index, value);
-      t[name] = index;
-      src[index] = value;
-      re[index] = new RegExp(value, isGlobal ? "g" : void 0);
-    };
-    createToken("NUMERICIDENTIFIER", "0|[1-9]\\d*");
-    createToken("NUMERICIDENTIFIERLOOSE", "[0-9]+");
-    createToken("NONNUMERICIDENTIFIER", "\\d*[a-zA-Z-][a-zA-Z0-9-]*");
-    createToken("MAINVERSION", `(${src[t.NUMERICIDENTIFIER]})\\.(${src[t.NUMERICIDENTIFIER]})\\.(${src[t.NUMERICIDENTIFIER]})`);
-    createToken("MAINVERSIONLOOSE", `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.(${src[t.NUMERICIDENTIFIERLOOSE]})\\.(${src[t.NUMERICIDENTIFIERLOOSE]})`);
-    createToken("PRERELEASEIDENTIFIER", `(?:${src[t.NUMERICIDENTIFIER]}|${src[t.NONNUMERICIDENTIFIER]})`);
-    createToken("PRERELEASEIDENTIFIERLOOSE", `(?:${src[t.NUMERICIDENTIFIERLOOSE]}|${src[t.NONNUMERICIDENTIFIER]})`);
-    createToken("PRERELEASE", `(?:-(${src[t.PRERELEASEIDENTIFIER]}(?:\\.${src[t.PRERELEASEIDENTIFIER]})*))`);
-    createToken("PRERELEASELOOSE", `(?:-?(${src[t.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${src[t.PRERELEASEIDENTIFIERLOOSE]})*))`);
-    createToken("BUILDIDENTIFIER", "[0-9A-Za-z-]+");
-    createToken("BUILD", `(?:\\+(${src[t.BUILDIDENTIFIER]}(?:\\.${src[t.BUILDIDENTIFIER]})*))`);
-    createToken("FULLPLAIN", `v?${src[t.MAINVERSION]}${src[t.PRERELEASE]}?${src[t.BUILD]}?`);
-    createToken("FULL", `^${src[t.FULLPLAIN]}$`);
-    createToken("LOOSEPLAIN", `[v=\\s]*${src[t.MAINVERSIONLOOSE]}${src[t.PRERELEASELOOSE]}?${src[t.BUILD]}?`);
-    createToken("LOOSE", `^${src[t.LOOSEPLAIN]}$`);
-    createToken("GTLT", "((?:<|>)?=?)");
-    createToken("XRANGEIDENTIFIERLOOSE", `${src[t.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`);
-    createToken("XRANGEIDENTIFIER", `${src[t.NUMERICIDENTIFIER]}|x|X|\\*`);
-    createToken("XRANGEPLAIN", `[v=\\s]*(${src[t.XRANGEIDENTIFIER]})(?:\\.(${src[t.XRANGEIDENTIFIER]})(?:\\.(${src[t.XRANGEIDENTIFIER]})(?:${src[t.PRERELEASE]})?${src[t.BUILD]}?)?)?`);
-    createToken("XRANGEPLAINLOOSE", `[v=\\s]*(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:${src[t.PRERELEASELOOSE]})?${src[t.BUILD]}?)?)?`);
-    createToken("XRANGE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAIN]}$`);
-    createToken("XRANGELOOSE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAINLOOSE]}$`);
-    createToken("COERCE", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:$|[^\\d])`);
-    createToken("COERCERTL", src[t.COERCE], true);
-    createToken("LONETILDE", "(?:~>?)");
-    createToken("TILDETRIM", `(\\s*)${src[t.LONETILDE]}\\s+`, true);
-    exports.tildeTrimReplace = "$1~";
-    createToken("TILDE", `^${src[t.LONETILDE]}${src[t.XRANGEPLAIN]}$`);
-    createToken("TILDELOOSE", `^${src[t.LONETILDE]}${src[t.XRANGEPLAINLOOSE]}$`);
-    createToken("LONECARET", "(?:\\^)");
-    createToken("CARETTRIM", `(\\s*)${src[t.LONECARET]}\\s+`, true);
-    exports.caretTrimReplace = "$1^";
-    createToken("CARET", `^${src[t.LONECARET]}${src[t.XRANGEPLAIN]}$`);
-    createToken("CARETLOOSE", `^${src[t.LONECARET]}${src[t.XRANGEPLAINLOOSE]}$`);
-    createToken("COMPARATORLOOSE", `^${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]})$|^$`);
-    createToken("COMPARATOR", `^${src[t.GTLT]}\\s*(${src[t.FULLPLAIN]})$|^$`);
-    createToken("COMPARATORTRIM", `(\\s*)${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]}|${src[t.XRANGEPLAIN]})`, true);
-    exports.comparatorTrimReplace = "$1$2$3";
-    createToken("HYPHENRANGE", `^\\s*(${src[t.XRANGEPLAIN]})\\s+-\\s+(${src[t.XRANGEPLAIN]})\\s*$`);
-    createToken("HYPHENRANGELOOSE", `^\\s*(${src[t.XRANGEPLAINLOOSE]})\\s+-\\s+(${src[t.XRANGEPLAINLOOSE]})\\s*$`);
-    createToken("STAR", "(<|>)?=?\\s*\\*");
-    createToken("GTE0", "^\\s*>=\\s*0\\.0\\.0\\s*$");
-    createToken("GTE0PRE", "^\\s*>=\\s*0\\.0\\.0-0\\s*$");
-  }
-});
-
-// ../../node_modules/semver/internal/parse-options.js
-var require_parse_options = __commonJS({
-  "../../node_modules/semver/internal/parse-options.js"(exports, module2) {
-    var opts = ["includePrerelease", "loose", "rtl"];
-    var parseOptions = (options) => !options ? {} : typeof options !== "object" ? { loose: true } : opts.filter((k) => options[k]).reduce((o, k) => {
-      o[k] = true;
-      return o;
-    }, {});
-    module2.exports = parseOptions;
-  }
-});
-
-// ../../node_modules/semver/internal/identifiers.js
-var require_identifiers = __commonJS({
-  "../../node_modules/semver/internal/identifiers.js"(exports, module2) {
-    var numeric = /^[0-9]+$/;
-    var compareIdentifiers = (a, b) => {
-      const anum = numeric.test(a);
-      const bnum = numeric.test(b);
-      if (anum && bnum) {
-        a = +a;
-        b = +b;
-      }
-      return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
-    };
-    var rcompareIdentifiers = (a, b) => compareIdentifiers(b, a);
-    module2.exports = {
-      compareIdentifiers,
-      rcompareIdentifiers
-    };
-  }
-});
-
-// ../../node_modules/semver/classes/semver.js
-var require_semver3 = __commonJS({
-  "../../node_modules/semver/classes/semver.js"(exports, module2) {
-    var debug = require_debug();
-    var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants3();
-    var { re, t } = require_re();
-    var parseOptions = require_parse_options();
-    var { compareIdentifiers } = require_identifiers();
-    var SemVer = class {
-      constructor(version2, options) {
-        options = parseOptions(options);
-        if (version2 instanceof SemVer) {
-          if (version2.loose === !!options.loose && version2.includePrerelease === !!options.includePrerelease) {
-            return version2;
-          } else {
-            version2 = version2.version;
-          }
-        } else if (typeof version2 !== "string") {
-          throw new TypeError(`Invalid Version: ${version2}`);
-        }
-        if (version2.length > MAX_LENGTH) {
-          throw new TypeError(
-            `version is longer than ${MAX_LENGTH} characters`
-          );
-        }
-        debug("SemVer", version2, options);
-        this.options = options;
-        this.loose = !!options.loose;
-        this.includePrerelease = !!options.includePrerelease;
-        const m = version2.trim().match(options.loose ? re[t.LOOSE] : re[t.FULL]);
-        if (!m) {
-          throw new TypeError(`Invalid Version: ${version2}`);
-        }
-        this.raw = version2;
-        this.major = +m[1];
-        this.minor = +m[2];
-        this.patch = +m[3];
-        if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
-          throw new TypeError("Invalid major version");
-        }
-        if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
-          throw new TypeError("Invalid minor version");
-        }
-        if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
-          throw new TypeError("Invalid patch version");
-        }
-        if (!m[4]) {
-          this.prerelease = [];
-        } else {
-          this.prerelease = m[4].split(".").map((id) => {
-            if (/^[0-9]+$/.test(id)) {
-              const num = +id;
-              if (num >= 0 && num < MAX_SAFE_INTEGER) {
-                return num;
-              }
             }
-            return id;
+          }
+        } else {
+          state.isLeaf = true;
+        }
+        state.notLeaf = !state.isLeaf;
+        state.notRoot = !state.isRoot;
+        var ret = cb.call(state, state.node);
+        if (ret !== void 0 && state.update)
+          state.update(ret);
+        if (modifiers.before)
+          modifiers.before.call(state, state.node);
+        if (typeof state.node == "object" && state.node !== null && !state.circular) {
+          parents.push(state);
+          var keys = Object.keys(state.node);
+          keys.forEach(function(key, i2) {
+            path2.push(key);
+            if (modifiers.pre)
+              modifiers.pre.call(state, state.node[key], key);
+            var child = walker(state.node[key]);
+            if (immutable && Object.hasOwnProperty.call(state.node, key)) {
+              state.node[key] = child.node;
+            }
+            child.isLast = i2 == keys.length - 1;
+            child.isFirst = i2 == 0;
+            if (modifiers.post)
+              modifiers.post.call(state, child);
+            path2.pop();
           });
+          parents.pop();
         }
-        this.build = m[5] ? m[5].split(".") : [];
-        this.format();
-      }
-      format() {
-        this.version = `${this.major}.${this.minor}.${this.patch}`;
-        if (this.prerelease.length) {
-          this.version += `-${this.prerelease.join(".")}`;
-        }
-        return this.version;
-      }
-      toString() {
-        return this.version;
-      }
-      compare(other) {
-        debug("SemVer.compare", this.version, this.options, other);
-        if (!(other instanceof SemVer)) {
-          if (typeof other === "string" && other === this.version) {
-            return 0;
-          }
-          other = new SemVer(other, this.options);
-        }
-        if (other.version === this.version) {
-          return 0;
-        }
-        return this.compareMain(other) || this.comparePre(other);
-      }
-      compareMain(other) {
-        if (!(other instanceof SemVer)) {
-          other = new SemVer(other, this.options);
-        }
-        return compareIdentifiers(this.major, other.major) || compareIdentifiers(this.minor, other.minor) || compareIdentifiers(this.patch, other.patch);
-      }
-      comparePre(other) {
-        if (!(other instanceof SemVer)) {
-          other = new SemVer(other, this.options);
-        }
-        if (this.prerelease.length && !other.prerelease.length) {
-          return -1;
-        } else if (!this.prerelease.length && other.prerelease.length) {
-          return 1;
-        } else if (!this.prerelease.length && !other.prerelease.length) {
-          return 0;
-        }
-        let i = 0;
-        do {
-          const a = this.prerelease[i];
-          const b = other.prerelease[i];
-          debug("prerelease compare", i, a, b);
-          if (a === void 0 && b === void 0) {
-            return 0;
-          } else if (b === void 0) {
-            return 1;
-          } else if (a === void 0) {
-            return -1;
-          } else if (a === b) {
-            continue;
-          } else {
-            return compareIdentifiers(a, b);
-          }
-        } while (++i);
-      }
-      compareBuild(other) {
-        if (!(other instanceof SemVer)) {
-          other = new SemVer(other, this.options);
-        }
-        let i = 0;
-        do {
-          const a = this.build[i];
-          const b = other.build[i];
-          debug("prerelease compare", i, a, b);
-          if (a === void 0 && b === void 0) {
-            return 0;
-          } else if (b === void 0) {
-            return 1;
-          } else if (a === void 0) {
-            return -1;
-          } else if (a === b) {
-            continue;
-          } else {
-            return compareIdentifiers(a, b);
-          }
-        } while (++i);
-      }
-      // preminor will bump the version up to the next minor release, and immediately
-      // down to pre-release. premajor and prepatch work the same way.
-      inc(release, identifier) {
-        switch (release) {
-          case "premajor":
-            this.prerelease.length = 0;
-            this.patch = 0;
-            this.minor = 0;
-            this.major++;
-            this.inc("pre", identifier);
-            break;
-          case "preminor":
-            this.prerelease.length = 0;
-            this.patch = 0;
-            this.minor++;
-            this.inc("pre", identifier);
-            break;
-          case "prepatch":
-            this.prerelease.length = 0;
-            this.inc("patch", identifier);
-            this.inc("pre", identifier);
-            break;
-          case "prerelease":
-            if (this.prerelease.length === 0) {
-              this.inc("patch", identifier);
-            }
-            this.inc("pre", identifier);
-            break;
-          case "major":
-            if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
-              this.major++;
-            }
-            this.minor = 0;
-            this.patch = 0;
-            this.prerelease = [];
-            break;
-          case "minor":
-            if (this.patch !== 0 || this.prerelease.length === 0) {
-              this.minor++;
-            }
-            this.patch = 0;
-            this.prerelease = [];
-            break;
-          case "patch":
-            if (this.prerelease.length === 0) {
-              this.patch++;
-            }
-            this.prerelease = [];
-            break;
-          case "pre":
-            if (this.prerelease.length === 0) {
-              this.prerelease = [0];
-            } else {
-              let i = this.prerelease.length;
-              while (--i >= 0) {
-                if (typeof this.prerelease[i] === "number") {
-                  this.prerelease[i]++;
-                  i = -2;
-                }
-              }
-              if (i === -1) {
-                this.prerelease.push(0);
-              }
-            }
-            if (identifier) {
-              if (compareIdentifiers(this.prerelease[0], identifier) === 0) {
-                if (isNaN(this.prerelease[1])) {
-                  this.prerelease = [identifier, 0];
-                }
-              } else {
-                this.prerelease = [identifier, 0];
-              }
-            }
-            break;
-          default:
-            throw new Error(`invalid increment argument: ${release}`);
-        }
-        this.format();
-        this.raw = this.version;
-        return this;
-      }
-    };
-    module2.exports = SemVer;
-  }
-});
-
-// ../../node_modules/semver/functions/inc.js
-var require_inc = __commonJS({
-  "../../node_modules/semver/functions/inc.js"(exports, module2) {
-    var SemVer = require_semver3();
-    var inc = (version2, release, options, identifier) => {
-      if (typeof options === "string") {
-        identifier = options;
-        options = void 0;
-      }
-      try {
-        return new SemVer(
-          version2 instanceof SemVer ? version2.version : version2,
-          options
-        ).inc(release, identifier).version;
-      } catch (er) {
-        return null;
-      }
-    };
-    module2.exports = inc;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-glob-options-helper.js
-var require_internal_glob_options_helper = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-glob-options-helper.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getOptions = void 0;
-    var core = __importStar(require_core());
-    function getOptions(copy) {
-      const result = {
-        followSymbolicLinks: true,
-        implicitDescendants: true,
-        matchDirectories: true,
-        omitBrokenSymbolicLinks: true
+        if (modifiers.after)
+          modifiers.after.call(state, state.node);
+        return state;
+      }(root).node;
+    }
+    Object.keys(Traverse.prototype).forEach(function(key) {
+      Traverse[key] = function(obj) {
+        var args = [].slice.call(arguments, 1);
+        var t = Traverse(obj);
+        return t[key].apply(t, args);
       };
-      if (copy) {
-        if (typeof copy.followSymbolicLinks === "boolean") {
-          result.followSymbolicLinks = copy.followSymbolicLinks;
-          core.debug(`followSymbolicLinks '${result.followSymbolicLinks}'`);
-        }
-        if (typeof copy.implicitDescendants === "boolean") {
-          result.implicitDescendants = copy.implicitDescendants;
-          core.debug(`implicitDescendants '${result.implicitDescendants}'`);
-        }
-        if (typeof copy.matchDirectories === "boolean") {
-          result.matchDirectories = copy.matchDirectories;
-          core.debug(`matchDirectories '${result.matchDirectories}'`);
-        }
-        if (typeof copy.omitBrokenSymbolicLinks === "boolean") {
-          result.omitBrokenSymbolicLinks = copy.omitBrokenSymbolicLinks;
-          core.debug(`omitBrokenSymbolicLinks '${result.omitBrokenSymbolicLinks}'`);
-        }
-      }
-      return result;
-    }
-    exports.getOptions = getOptions;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-path-helper.js
-var require_internal_path_helper = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-path-helper.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    var __importDefault = exports && exports.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.safeTrimTrailingSeparator = exports.normalizeSeparators = exports.hasRoot = exports.hasAbsoluteRoot = exports.ensureAbsoluteRoot = exports.dirname = void 0;
-    var path2 = __importStar(require("path"));
-    var assert_1 = __importDefault(require("assert"));
-    var IS_WINDOWS = process.platform === "win32";
-    function dirname(p) {
-      p = safeTrimTrailingSeparator(p);
-      if (IS_WINDOWS && /^\\\\[^\\]+(\\[^\\]+)?$/.test(p)) {
-        return p;
-      }
-      let result = path2.dirname(p);
-      if (IS_WINDOWS && /^\\\\[^\\]+\\[^\\]+\\$/.test(result)) {
-        result = safeTrimTrailingSeparator(result);
-      }
-      return result;
-    }
-    exports.dirname = dirname;
-    function ensureAbsoluteRoot(root, itemPath) {
-      assert_1.default(root, `ensureAbsoluteRoot parameter 'root' must not be empty`);
-      assert_1.default(itemPath, `ensureAbsoluteRoot parameter 'itemPath' must not be empty`);
-      if (hasAbsoluteRoot(itemPath)) {
-        return itemPath;
-      }
-      if (IS_WINDOWS) {
-        if (itemPath.match(/^[A-Z]:[^\\/]|^[A-Z]:$/i)) {
-          let cwd = process.cwd();
-          assert_1.default(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
-          if (itemPath[0].toUpperCase() === cwd[0].toUpperCase()) {
-            if (itemPath.length === 2) {
-              return `${itemPath[0]}:\\${cwd.substr(3)}`;
-            } else {
-              if (!cwd.endsWith("\\")) {
-                cwd += "\\";
-              }
-              return `${itemPath[0]}:\\${cwd.substr(3)}${itemPath.substr(2)}`;
-            }
-          } else {
-            return `${itemPath[0]}:\\${itemPath.substr(2)}`;
-          }
-        } else if (normalizeSeparators(itemPath).match(/^\\$|^\\[^\\]/)) {
-          const cwd = process.cwd();
-          assert_1.default(cwd.match(/^[A-Z]:\\/i), `Expected current directory to start with an absolute drive root. Actual '${cwd}'`);
-          return `${cwd[0]}:\\${itemPath.substr(1)}`;
-        }
-      }
-      assert_1.default(hasAbsoluteRoot(root), `ensureAbsoluteRoot parameter 'root' must have an absolute root`);
-      if (root.endsWith("/") || IS_WINDOWS && root.endsWith("\\")) {
-      } else {
-        root += path2.sep;
-      }
-      return root + itemPath;
-    }
-    exports.ensureAbsoluteRoot = ensureAbsoluteRoot;
-    function hasAbsoluteRoot(itemPath) {
-      assert_1.default(itemPath, `hasAbsoluteRoot parameter 'itemPath' must not be empty`);
-      itemPath = normalizeSeparators(itemPath);
-      if (IS_WINDOWS) {
-        return itemPath.startsWith("\\\\") || /^[A-Z]:\\/i.test(itemPath);
-      }
-      return itemPath.startsWith("/");
-    }
-    exports.hasAbsoluteRoot = hasAbsoluteRoot;
-    function hasRoot(itemPath) {
-      assert_1.default(itemPath, `isRooted parameter 'itemPath' must not be empty`);
-      itemPath = normalizeSeparators(itemPath);
-      if (IS_WINDOWS) {
-        return itemPath.startsWith("\\") || /^[A-Z]:/i.test(itemPath);
-      }
-      return itemPath.startsWith("/");
-    }
-    exports.hasRoot = hasRoot;
-    function normalizeSeparators(p) {
-      p = p || "";
-      if (IS_WINDOWS) {
-        p = p.replace(/\//g, "\\");
-        const isUnc = /^\\\\+[^\\]/.test(p);
-        return (isUnc ? "\\" : "") + p.replace(/\\\\+/g, "\\");
-      }
-      return p.replace(/\/\/+/g, "/");
-    }
-    exports.normalizeSeparators = normalizeSeparators;
-    function safeTrimTrailingSeparator(p) {
-      if (!p) {
-        return "";
-      }
-      p = normalizeSeparators(p);
-      if (!p.endsWith(path2.sep)) {
-        return p;
-      }
-      if (p === path2.sep) {
-        return p;
-      }
-      if (IS_WINDOWS && /^[A-Z]:\\$/i.test(p)) {
-        return p;
-      }
-      return p.substr(0, p.length - 1);
-    }
-    exports.safeTrimTrailingSeparator = safeTrimTrailingSeparator;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-match-kind.js
-var require_internal_match_kind = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-match-kind.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.MatchKind = void 0;
-    var MatchKind;
-    (function(MatchKind2) {
-      MatchKind2[MatchKind2["None"] = 0] = "None";
-      MatchKind2[MatchKind2["Directory"] = 1] = "Directory";
-      MatchKind2[MatchKind2["File"] = 2] = "File";
-      MatchKind2[MatchKind2["All"] = 3] = "All";
-    })(MatchKind = exports.MatchKind || (exports.MatchKind = {}));
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-pattern-helper.js
-var require_internal_pattern_helper = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-pattern-helper.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.partialMatch = exports.match = exports.getSearchPaths = void 0;
-    var pathHelper = __importStar(require_internal_path_helper());
-    var internal_match_kind_1 = require_internal_match_kind();
-    var IS_WINDOWS = process.platform === "win32";
-    function getSearchPaths(patterns) {
-      patterns = patterns.filter((x) => !x.negate);
-      const searchPathMap = {};
-      for (const pattern of patterns) {
-        const key = IS_WINDOWS ? pattern.searchPath.toUpperCase() : pattern.searchPath;
-        searchPathMap[key] = "candidate";
-      }
-      const result = [];
-      for (const pattern of patterns) {
-        const key = IS_WINDOWS ? pattern.searchPath.toUpperCase() : pattern.searchPath;
-        if (searchPathMap[key] === "included") {
-          continue;
-        }
-        let foundAncestor = false;
-        let tempKey = key;
-        let parent = pathHelper.dirname(tempKey);
-        while (parent !== tempKey) {
-          if (searchPathMap[parent]) {
-            foundAncestor = true;
-            break;
-          }
-          tempKey = parent;
-          parent = pathHelper.dirname(tempKey);
-        }
-        if (!foundAncestor) {
-          result.push(pattern.searchPath);
-          searchPathMap[key] = "included";
-        }
-      }
-      return result;
-    }
-    exports.getSearchPaths = getSearchPaths;
-    function match(patterns, itemPath) {
-      let result = internal_match_kind_1.MatchKind.None;
-      for (const pattern of patterns) {
-        if (pattern.negate) {
-          result &= ~pattern.match(itemPath);
+    function copy(src) {
+      if (typeof src === "object" && src !== null) {
+        var dst;
+        if (Array.isArray(src)) {
+          dst = [];
+        } else if (src instanceof Date) {
+          dst = new Date(src);
+        } else if (src instanceof Boolean) {
+          dst = new Boolean(src);
+        } else if (src instanceof Number) {
+          dst = new Number(src);
+        } else if (src instanceof String) {
+          dst = new String(src);
         } else {
-          result |= pattern.match(itemPath);
+          dst = Object.create(Object.getPrototypeOf(src));
         }
-      }
-      return result;
+        Object.keys(src).forEach(function(key) {
+          dst[key] = src[key];
+        });
+        return dst;
+      } else
+        return src;
     }
-    exports.match = match;
-    function partialMatch(patterns, itemPath) {
-      return patterns.some((x) => !x.negate && x.partialMatch(itemPath));
-    }
-    exports.partialMatch = partialMatch;
   }
 });
 
-// ../../node_modules/concat-map/index.js
-var require_concat_map = __commonJS({
-  "../../node_modules/concat-map/index.js"(exports, module2) {
-    module2.exports = function(xs, fn) {
-      var res = [];
-      for (var i = 0; i < xs.length; i++) {
-        var x = fn(xs[i], i);
-        if (isArray(x))
-          res.push.apply(res, x);
-        else
-          res.push(x);
-      }
-      return res;
+// ../../node_modules/chainsaw/index.js
+var require_chainsaw = __commonJS({
+  "../../node_modules/chainsaw/index.js"(exports, module2) {
+    var Traverse = require_traverse();
+    var EventEmitter = require("events").EventEmitter;
+    module2.exports = Chainsaw;
+    function Chainsaw(builder) {
+      var saw = Chainsaw.saw(builder, {});
+      var r = builder.call(saw.handlers, saw);
+      if (r !== void 0)
+        saw.handlers = r;
+      saw.record();
+      return saw.chain();
+    }
+    Chainsaw.light = function ChainsawLight(builder) {
+      var saw = Chainsaw.saw(builder, {});
+      var r = builder.call(saw.handlers, saw);
+      if (r !== void 0)
+        saw.handlers = r;
+      return saw.chain();
     };
-    var isArray = Array.isArray || function(xs) {
-      return Object.prototype.toString.call(xs) === "[object Array]";
-    };
-  }
-});
-
-// ../../node_modules/balanced-match/index.js
-var require_balanced_match = __commonJS({
-  "../../node_modules/balanced-match/index.js"(exports, module2) {
-    "use strict";
-    module2.exports = balanced;
-    function balanced(a, b, str) {
-      if (a instanceof RegExp)
-        a = maybeMatch(a, str);
-      if (b instanceof RegExp)
-        b = maybeMatch(b, str);
-      var r = range(a, b, str);
-      return r && {
-        start: r[0],
-        end: r[1],
-        pre: str.slice(0, r[0]),
-        body: str.slice(r[0] + a.length, r[1]),
-        post: str.slice(r[1] + b.length)
-      };
-    }
-    function maybeMatch(reg, str) {
-      var m = str.match(reg);
-      return m ? m[0] : null;
-    }
-    balanced.range = range;
-    function range(a, b, str) {
-      var begs, beg, left, right, result;
-      var ai = str.indexOf(a);
-      var bi = str.indexOf(b, ai + 1);
-      var i = ai;
-      if (ai >= 0 && bi > 0) {
-        if (a === b) {
-          return [ai, bi];
-        }
-        begs = [];
-        left = str.length;
-        while (i >= 0 && !result) {
-          if (i == ai) {
-            begs.push(i);
-            ai = str.indexOf(a, i + 1);
-          } else if (begs.length == 1) {
-            result = [begs.pop(), bi];
-          } else {
-            beg = begs.pop();
-            if (beg < left) {
-              left = beg;
-              right = bi;
-            }
-            bi = str.indexOf(b, i + 1);
-          }
-          i = ai < bi && ai >= 0 ? ai : bi;
-        }
-        if (begs.length) {
-          result = [left, right];
-        }
-      }
-      return result;
-    }
-  }
-});
-
-// ../../node_modules/brace-expansion/index.js
-var require_brace_expansion = __commonJS({
-  "../../node_modules/brace-expansion/index.js"(exports, module2) {
-    var concatMap = require_concat_map();
-    var balanced = require_balanced_match();
-    module2.exports = expandTop;
-    var escSlash = "\0SLASH" + Math.random() + "\0";
-    var escOpen = "\0OPEN" + Math.random() + "\0";
-    var escClose = "\0CLOSE" + Math.random() + "\0";
-    var escComma = "\0COMMA" + Math.random() + "\0";
-    var escPeriod = "\0PERIOD" + Math.random() + "\0";
-    function numeric(str) {
-      return parseInt(str, 10) == str ? parseInt(str, 10) : str.charCodeAt(0);
-    }
-    function escapeBraces(str) {
-      return str.split("\\\\").join(escSlash).split("\\{").join(escOpen).split("\\}").join(escClose).split("\\,").join(escComma).split("\\.").join(escPeriod);
-    }
-    function unescapeBraces(str) {
-      return str.split(escSlash).join("\\").split(escOpen).join("{").split(escClose).join("}").split(escComma).join(",").split(escPeriod).join(".");
-    }
-    function parseCommaParts(str) {
-      if (!str)
-        return [""];
-      var parts = [];
-      var m = balanced("{", "}", str);
-      if (!m)
-        return str.split(",");
-      var pre = m.pre;
-      var body = m.body;
-      var post = m.post;
-      var p = pre.split(",");
-      p[p.length - 1] += "{" + body + "}";
-      var postParts = parseCommaParts(post);
-      if (post.length) {
-        p[p.length - 1] += postParts.shift();
-        p.push.apply(p, postParts);
-      }
-      parts.push.apply(parts, p);
-      return parts;
-    }
-    function expandTop(str) {
-      if (!str)
-        return [];
-      if (str.substr(0, 2) === "{}") {
-        str = "\\{\\}" + str.substr(2);
-      }
-      return expand(escapeBraces(str), true).map(unescapeBraces);
-    }
-    function embrace(str) {
-      return "{" + str + "}";
-    }
-    function isPadded(el) {
-      return /^-?0\d/.test(el);
-    }
-    function lte(i, y) {
-      return i <= y;
-    }
-    function gte(i, y) {
-      return i >= y;
-    }
-    function expand(str, isTop) {
-      var expansions = [];
-      var m = balanced("{", "}", str);
-      if (!m || /\$$/.test(m.pre))
-        return [str];
-      var isNumericSequence = /^-?\d+\.\.-?\d+(?:\.\.-?\d+)?$/.test(m.body);
-      var isAlphaSequence = /^[a-zA-Z]\.\.[a-zA-Z](?:\.\.-?\d+)?$/.test(m.body);
-      var isSequence = isNumericSequence || isAlphaSequence;
-      var isOptions = m.body.indexOf(",") >= 0;
-      if (!isSequence && !isOptions) {
-        if (m.post.match(/,.*\}/)) {
-          str = m.pre + "{" + m.body + escClose + m.post;
-          return expand(str);
-        }
-        return [str];
-      }
-      var n;
-      if (isSequence) {
-        n = m.body.split(/\.\./);
-      } else {
-        n = parseCommaParts(m.body);
-        if (n.length === 1) {
-          n = expand(n[0], false).map(embrace);
-          if (n.length === 1) {
-            var post = m.post.length ? expand(m.post, false) : [""];
-            return post.map(function(p) {
-              return m.pre + n[0] + p;
+    Chainsaw.saw = function(builder, handlers) {
+      var saw = new EventEmitter();
+      saw.handlers = handlers;
+      saw.actions = [];
+      saw.chain = function() {
+        var ch = Traverse(saw.handlers).map(function(node) {
+          if (this.isRoot)
+            return node;
+          var ps = this.path;
+          if (typeof node === "function") {
+            this.update(function() {
+              saw.actions.push({
+                path: ps,
+                args: [].slice.call(arguments)
+              });
+              return ch;
             });
           }
-        }
-      }
-      var pre = m.pre;
-      var post = m.post.length ? expand(m.post, false) : [""];
-      var N;
-      if (isSequence) {
-        var x = numeric(n[0]);
-        var y = numeric(n[1]);
-        var width = Math.max(n[0].length, n[1].length);
-        var incr = n.length == 3 ? Math.abs(numeric(n[2])) : 1;
-        var test = lte;
-        var reverse = y < x;
-        if (reverse) {
-          incr *= -1;
-          test = gte;
-        }
-        var pad = n.some(isPadded);
-        N = [];
-        for (var i = x; test(i, y); i += incr) {
-          var c;
-          if (isAlphaSequence) {
-            c = String.fromCharCode(i);
-            if (c === "\\")
-              c = "";
-          } else {
-            c = String(i);
-            if (pad) {
-              var need = width - c.length;
-              if (need > 0) {
-                var z = new Array(need + 1).join("0");
-                if (i < 0)
-                  c = "-" + z + c.slice(1);
-                else
-                  c = z + c;
-              }
-            }
-          }
-          N.push(c);
-        }
-      } else {
-        N = concatMap(n, function(el) {
-          return expand(el, false);
         });
-      }
-      for (var j = 0; j < N.length; j++) {
-        for (var k = 0; k < post.length; k++) {
-          var expansion = pre + N[j] + post[k];
-          if (!isTop || isSequence || expansion)
-            expansions.push(expansion);
+        process.nextTick(function() {
+          saw.emit("begin");
+          saw.next();
+        });
+        return ch;
+      };
+      saw.pop = function() {
+        return saw.actions.shift();
+      };
+      saw.next = function() {
+        var action = saw.pop();
+        if (!action) {
+          saw.emit("end");
+        } else if (!action.trap) {
+          var node = saw.handlers;
+          action.path.forEach(function(key) {
+            node = node[key];
+          });
+          node.apply(saw.handlers, action.args);
         }
-      }
-      return expansions;
-    }
-  }
-});
-
-// ../../node_modules/minimatch/minimatch.js
-var require_minimatch = __commonJS({
-  "../../node_modules/minimatch/minimatch.js"(exports, module2) {
-    module2.exports = minimatch;
-    minimatch.Minimatch = Minimatch;
-    var path2 = function() {
-      try {
-        return require("path");
-      } catch (e) {
-      }
-    }() || {
-      sep: "/"
-    };
-    minimatch.sep = path2.sep;
-    var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {};
-    var expand = require_brace_expansion();
-    var plTypes = {
-      "!": { open: "(?:(?!(?:", close: "))[^/]*?)" },
-      "?": { open: "(?:", close: ")?" },
-      "+": { open: "(?:", close: ")+" },
-      "*": { open: "(?:", close: ")*" },
-      "@": { open: "(?:", close: ")" }
-    };
-    var qmark = "[^/]";
-    var star = qmark + "*?";
-    var twoStarDot = "(?:(?!(?:\\/|^)(?:\\.{1,2})($|\\/)).)*?";
-    var twoStarNoDot = "(?:(?!(?:\\/|^)\\.).)*?";
-    var reSpecials = charSet("().*{}+?[]^$\\!");
-    function charSet(s) {
-      return s.split("").reduce(function(set, c) {
-        set[c] = true;
-        return set;
-      }, {});
-    }
-    var slashSplit = /\/+/;
-    minimatch.filter = filter;
-    function filter(pattern, options) {
-      options = options || {};
-      return function(p, i, list) {
-        return minimatch(p, pattern, options);
       };
-    }
-    function ext(a, b) {
-      b = b || {};
-      var t = {};
-      Object.keys(a).forEach(function(k) {
-        t[k] = a[k];
-      });
-      Object.keys(b).forEach(function(k) {
-        t[k] = b[k];
-      });
-      return t;
-    }
-    minimatch.defaults = function(def) {
-      if (!def || typeof def !== "object" || !Object.keys(def).length) {
-        return minimatch;
-      }
-      var orig = minimatch;
-      var m = function minimatch2(p, pattern, options) {
-        return orig(p, pattern, ext(def, options));
+      saw.nest = function(cb) {
+        var args = [].slice.call(arguments, 1);
+        var autonext = true;
+        if (typeof cb === "boolean") {
+          var autonext = cb;
+          cb = args.shift();
+        }
+        var s = Chainsaw.saw(builder, {});
+        var r = builder.call(s.handlers, s);
+        if (r !== void 0)
+          s.handlers = r;
+        if ("undefined" !== typeof saw.step) {
+          s.record();
+        }
+        cb.apply(s.chain(), args);
+        if (autonext !== false)
+          s.on("end", saw.next);
       };
-      m.Minimatch = function Minimatch2(pattern, options) {
-        return new orig.Minimatch(pattern, ext(def, options));
+      saw.record = function() {
+        upgradeChainsaw(saw);
       };
-      m.Minimatch.defaults = function defaults(options) {
-        return orig.defaults(ext(def, options)).Minimatch;
-      };
-      m.filter = function filter2(pattern, options) {
-        return orig.filter(pattern, ext(def, options));
-      };
-      m.defaults = function defaults(options) {
-        return orig.defaults(ext(def, options));
-      };
-      m.makeRe = function makeRe2(pattern, options) {
-        return orig.makeRe(pattern, ext(def, options));
-      };
-      m.braceExpand = function braceExpand2(pattern, options) {
-        return orig.braceExpand(pattern, ext(def, options));
-      };
-      m.match = function(list, pattern, options) {
-        return orig.match(list, pattern, ext(def, options));
-      };
-      return m;
-    };
-    Minimatch.defaults = function(def) {
-      return minimatch.defaults(def).Minimatch;
-    };
-    function minimatch(p, pattern, options) {
-      assertValidPattern(pattern);
-      if (!options)
-        options = {};
-      if (!options.nocomment && pattern.charAt(0) === "#") {
-        return false;
-      }
-      return new Minimatch(pattern, options).match(p);
-    }
-    function Minimatch(pattern, options) {
-      if (!(this instanceof Minimatch)) {
-        return new Minimatch(pattern, options);
-      }
-      assertValidPattern(pattern);
-      if (!options)
-        options = {};
-      pattern = pattern.trim();
-      if (!options.allowWindowsEscape && path2.sep !== "/") {
-        pattern = pattern.split(path2.sep).join("/");
-      }
-      this.options = options;
-      this.set = [];
-      this.pattern = pattern;
-      this.regexp = null;
-      this.negate = false;
-      this.comment = false;
-      this.empty = false;
-      this.partial = !!options.partial;
-      this.make();
-    }
-    Minimatch.prototype.debug = function() {
-    };
-    Minimatch.prototype.make = make;
-    function make() {
-      var pattern = this.pattern;
-      var options = this.options;
-      if (!options.nocomment && pattern.charAt(0) === "#") {
-        this.comment = true;
-        return;
-      }
-      if (!pattern) {
-        this.empty = true;
-        return;
-      }
-      this.parseNegate();
-      var set = this.globSet = this.braceExpand();
-      if (options.debug)
-        this.debug = function debug() {
-          console.error.apply(console, arguments);
+      ["trap", "down", "jump"].forEach(function(method) {
+        saw[method] = function() {
+          throw new Error("To use the trap, down and jump features, please call record() first to start recording actions.");
         };
-      this.debug(this.pattern, set);
-      set = this.globParts = set.map(function(s) {
-        return s.split(slashSplit);
       });
-      this.debug(this.pattern, set);
-      set = set.map(function(s, si, set2) {
-        return s.map(this.parse, this);
-      }, this);
-      this.debug(this.pattern, set);
-      set = set.filter(function(s) {
-        return s.indexOf(false) === -1;
-      });
-      this.debug(this.pattern, set);
-      this.set = set;
-    }
-    Minimatch.prototype.parseNegate = parseNegate;
-    function parseNegate() {
-      var pattern = this.pattern;
-      var negate = false;
-      var options = this.options;
-      var negateOffset = 0;
-      if (options.nonegate)
-        return;
-      for (var i = 0, l = pattern.length; i < l && pattern.charAt(i) === "!"; i++) {
-        negate = !negate;
-        negateOffset++;
-      }
-      if (negateOffset)
-        this.pattern = pattern.substr(negateOffset);
-      this.negate = negate;
-    }
-    minimatch.braceExpand = function(pattern, options) {
-      return braceExpand(pattern, options);
+      return saw;
     };
-    Minimatch.prototype.braceExpand = braceExpand;
-    function braceExpand(pattern, options) {
-      if (!options) {
-        if (this instanceof Minimatch) {
-          options = this.options;
-        } else {
-          options = {};
-        }
-      }
-      pattern = typeof pattern === "undefined" ? this.pattern : pattern;
-      assertValidPattern(pattern);
-      if (options.nobrace || !/\{(?:(?!\{).)*\}/.test(pattern)) {
-        return [pattern];
-      }
-      return expand(pattern);
-    }
-    var MAX_PATTERN_LENGTH = 1024 * 64;
-    var assertValidPattern = function(pattern) {
-      if (typeof pattern !== "string") {
-        throw new TypeError("invalid pattern");
-      }
-      if (pattern.length > MAX_PATTERN_LENGTH) {
-        throw new TypeError("pattern is too long");
-      }
-    };
-    Minimatch.prototype.parse = parse2;
-    var SUBPARSE = {};
-    function parse2(pattern, isSub) {
-      assertValidPattern(pattern);
-      var options = this.options;
-      if (pattern === "**") {
-        if (!options.noglobstar)
-          return GLOBSTAR;
-        else
-          pattern = "*";
-      }
-      if (pattern === "")
-        return "";
-      var re = "";
-      var hasMagic = !!options.nocase;
-      var escaping = false;
-      var patternListStack = [];
-      var negativeLists = [];
-      var stateChar;
-      var inClass = false;
-      var reClassStart = -1;
-      var classStart = -1;
-      var patternStart = pattern.charAt(0) === "." ? "" : options.dot ? "(?!(?:^|\\/)\\.{1,2}(?:$|\\/))" : "(?!\\.)";
-      var self = this;
-      function clearStateChar() {
-        if (stateChar) {
-          switch (stateChar) {
-            case "*":
-              re += star;
-              hasMagic = true;
-              break;
-            case "?":
-              re += qmark;
-              hasMagic = true;
-              break;
-            default:
-              re += "\\" + stateChar;
-              break;
-          }
-          self.debug("clearStateChar %j %j", stateChar, re);
-          stateChar = false;
-        }
-      }
-      for (var i = 0, len = pattern.length, c; i < len && (c = pattern.charAt(i)); i++) {
-        this.debug("%s	%s %s %j", pattern, i, re, c);
-        if (escaping && reSpecials[c]) {
-          re += "\\" + c;
-          escaping = false;
-          continue;
-        }
-        switch (c) {
-          case "/": {
+    function upgradeChainsaw(saw) {
+      saw.step = 0;
+      saw.pop = function() {
+        return saw.actions[saw.step++];
+      };
+      saw.trap = function(name, cb) {
+        var ps = Array.isArray(name) ? name : [name];
+        saw.actions.push({
+          path: ps,
+          step: saw.step,
+          cb,
+          trap: true
+        });
+      };
+      saw.down = function(name) {
+        var ps = (Array.isArray(name) ? name : [name]).join("/");
+        var i = saw.actions.slice(saw.step).map(function(x) {
+          if (x.trap && x.step <= saw.step)
             return false;
-          }
-          case "\\":
-            clearStateChar();
-            escaping = true;
-            continue;
-          case "?":
-          case "*":
-          case "+":
-          case "@":
-          case "!":
-            this.debug("%s	%s %s %j <-- stateChar", pattern, i, re, c);
-            if (inClass) {
-              this.debug("  in class");
-              if (c === "!" && i === classStart + 1)
-                c = "^";
-              re += c;
-              continue;
-            }
-            self.debug("call clearStateChar %j", stateChar);
-            clearStateChar();
-            stateChar = c;
-            if (options.noext)
-              clearStateChar();
-            continue;
-          case "(":
-            if (inClass) {
-              re += "(";
-              continue;
-            }
-            if (!stateChar) {
-              re += "\\(";
-              continue;
-            }
-            patternListStack.push({
-              type: stateChar,
-              start: i - 1,
-              reStart: re.length,
-              open: plTypes[stateChar].open,
-              close: plTypes[stateChar].close
-            });
-            re += stateChar === "!" ? "(?:(?!(?:" : "(?:";
-            this.debug("plType %j %j", stateChar, re);
-            stateChar = false;
-            continue;
-          case ")":
-            if (inClass || !patternListStack.length) {
-              re += "\\)";
-              continue;
-            }
-            clearStateChar();
-            hasMagic = true;
-            var pl = patternListStack.pop();
-            re += pl.close;
-            if (pl.type === "!") {
-              negativeLists.push(pl);
-            }
-            pl.reEnd = re.length;
-            continue;
-          case "|":
-            if (inClass || !patternListStack.length || escaping) {
-              re += "\\|";
-              escaping = false;
-              continue;
-            }
-            clearStateChar();
-            re += "|";
-            continue;
-          case "[":
-            clearStateChar();
-            if (inClass) {
-              re += "\\" + c;
-              continue;
-            }
-            inClass = true;
-            classStart = i;
-            reClassStart = re.length;
-            re += c;
-            continue;
-          case "]":
-            if (i === classStart + 1 || !inClass) {
-              re += "\\" + c;
-              escaping = false;
-              continue;
-            }
-            var cs = pattern.substring(classStart + 1, i);
-            try {
-              RegExp("[" + cs + "]");
-            } catch (er) {
-              var sp = this.parse(cs, SUBPARSE);
-              re = re.substr(0, reClassStart) + "\\[" + sp[0] + "\\]";
-              hasMagic = hasMagic || sp[1];
-              inClass = false;
-              continue;
-            }
-            hasMagic = true;
-            inClass = false;
-            re += c;
-            continue;
-          default:
-            clearStateChar();
-            if (escaping) {
-              escaping = false;
-            } else if (reSpecials[c] && !(c === "^" && inClass)) {
-              re += "\\";
-            }
-            re += c;
-        }
-      }
-      if (inClass) {
-        cs = pattern.substr(classStart + 1);
-        sp = this.parse(cs, SUBPARSE);
-        re = re.substr(0, reClassStart) + "\\[" + sp[0];
-        hasMagic = hasMagic || sp[1];
-      }
-      for (pl = patternListStack.pop(); pl; pl = patternListStack.pop()) {
-        var tail = re.slice(pl.reStart + pl.open.length);
-        this.debug("setting tail", re, pl);
-        tail = tail.replace(/((?:\\{2}){0,64})(\\?)\|/g, function(_, $1, $2) {
-          if (!$2) {
-            $2 = "\\";
-          }
-          return $1 + $1 + $2 + "|";
-        });
-        this.debug("tail=%j\n   %s", tail, tail, pl, re);
-        var t = pl.type === "*" ? star : pl.type === "?" ? qmark : "\\" + pl.type;
-        hasMagic = true;
-        re = re.slice(0, pl.reStart) + t + "\\(" + tail;
-      }
-      clearStateChar();
-      if (escaping) {
-        re += "\\\\";
-      }
-      var addPatternStart = false;
-      switch (re.charAt(0)) {
-        case "[":
-        case ".":
-        case "(":
-          addPatternStart = true;
-      }
-      for (var n = negativeLists.length - 1; n > -1; n--) {
-        var nl = negativeLists[n];
-        var nlBefore = re.slice(0, nl.reStart);
-        var nlFirst = re.slice(nl.reStart, nl.reEnd - 8);
-        var nlLast = re.slice(nl.reEnd - 8, nl.reEnd);
-        var nlAfter = re.slice(nl.reEnd);
-        nlLast += nlAfter;
-        var openParensBefore = nlBefore.split("(").length - 1;
-        var cleanAfter = nlAfter;
-        for (i = 0; i < openParensBefore; i++) {
-          cleanAfter = cleanAfter.replace(/\)[+*?]?/, "");
-        }
-        nlAfter = cleanAfter;
-        var dollar = "";
-        if (nlAfter === "" && isSub !== SUBPARSE) {
-          dollar = "$";
-        }
-        var newRe = nlBefore + nlFirst + nlAfter + dollar + nlLast;
-        re = newRe;
-      }
-      if (re !== "" && hasMagic) {
-        re = "(?=.)" + re;
-      }
-      if (addPatternStart) {
-        re = patternStart + re;
-      }
-      if (isSub === SUBPARSE) {
-        return [re, hasMagic];
-      }
-      if (!hasMagic) {
-        return globUnescape(pattern);
-      }
-      var flags = options.nocase ? "i" : "";
-      try {
-        var regExp = new RegExp("^" + re + "$", flags);
-      } catch (er) {
-        return new RegExp("$.");
-      }
-      regExp._glob = pattern;
-      regExp._src = re;
-      return regExp;
-    }
-    minimatch.makeRe = function(pattern, options) {
-      return new Minimatch(pattern, options || {}).makeRe();
-    };
-    Minimatch.prototype.makeRe = makeRe;
-    function makeRe() {
-      if (this.regexp || this.regexp === false)
-        return this.regexp;
-      var set = this.set;
-      if (!set.length) {
-        this.regexp = false;
-        return this.regexp;
-      }
-      var options = this.options;
-      var twoStar = options.noglobstar ? star : options.dot ? twoStarDot : twoStarNoDot;
-      var flags = options.nocase ? "i" : "";
-      var re = set.map(function(pattern) {
-        return pattern.map(function(p) {
-          return p === GLOBSTAR ? twoStar : typeof p === "string" ? regExpEscape(p) : p._src;
-        }).join("\\/");
-      }).join("|");
-      re = "^(?:" + re + ")$";
-      if (this.negate)
-        re = "^(?!" + re + ").*$";
-      try {
-        this.regexp = new RegExp(re, flags);
-      } catch (ex) {
-        this.regexp = false;
-      }
-      return this.regexp;
-    }
-    minimatch.match = function(list, pattern, options) {
-      options = options || {};
-      var mm = new Minimatch(pattern, options);
-      list = list.filter(function(f) {
-        return mm.match(f);
-      });
-      if (mm.options.nonull && !list.length) {
-        list.push(pattern);
-      }
-      return list;
-    };
-    Minimatch.prototype.match = function match(f, partial) {
-      if (typeof partial === "undefined")
-        partial = this.partial;
-      this.debug("match", f, this.pattern);
-      if (this.comment)
-        return false;
-      if (this.empty)
-        return f === "";
-      if (f === "/" && partial)
-        return true;
-      var options = this.options;
-      if (path2.sep !== "/") {
-        f = f.split(path2.sep).join("/");
-      }
-      f = f.split(slashSplit);
-      this.debug(this.pattern, "split", f);
-      var set = this.set;
-      this.debug(this.pattern, "set", set);
-      var filename;
-      var i;
-      for (i = f.length - 1; i >= 0; i--) {
-        filename = f[i];
-        if (filename)
-          break;
-      }
-      for (i = 0; i < set.length; i++) {
-        var pattern = set[i];
-        var file = f;
-        if (options.matchBase && pattern.length === 1) {
-          file = [filename];
-        }
-        var hit = this.matchOne(file, pattern, partial);
-        if (hit) {
-          if (options.flipNegate)
-            return true;
-          return !this.negate;
-        }
-      }
-      if (options.flipNegate)
-        return false;
-      return this.negate;
-    };
-    Minimatch.prototype.matchOne = function(file, pattern, partial) {
-      var options = this.options;
-      this.debug(
-        "matchOne",
-        { "this": this, file, pattern }
-      );
-      this.debug("matchOne", file.length, pattern.length);
-      for (var fi = 0, pi = 0, fl = file.length, pl = pattern.length; fi < fl && pi < pl; fi++, pi++) {
-        this.debug("matchOne loop");
-        var p = pattern[pi];
-        var f = file[fi];
-        this.debug(pattern, p, f);
-        if (p === false)
-          return false;
-        if (p === GLOBSTAR) {
-          this.debug("GLOBSTAR", [pattern, p, f]);
-          var fr = fi;
-          var pr = pi + 1;
-          if (pr === pl) {
-            this.debug("** at the end");
-            for (; fi < fl; fi++) {
-              if (file[fi] === "." || file[fi] === ".." || !options.dot && file[fi].charAt(0) === ".")
-                return false;
-            }
-            return true;
-          }
-          while (fr < fl) {
-            var swallowee = file[fr];
-            this.debug("\nglobstar while", file, fr, pattern, pr, swallowee);
-            if (this.matchOne(file.slice(fr), pattern.slice(pr), partial)) {
-              this.debug("globstar found match!", fr, fl, swallowee);
-              return true;
-            } else {
-              if (swallowee === "." || swallowee === ".." || !options.dot && swallowee.charAt(0) === ".") {
-                this.debug("dot detected!", file, fr, pattern, pr);
-                break;
-              }
-              this.debug("globstar swallow a segment, and continue");
-              fr++;
-            }
-          }
-          if (partial) {
-            this.debug("\n>>> no match, partial?", file, fr, pattern, pr);
-            if (fr === fl)
-              return true;
-          }
-          return false;
-        }
-        var hit;
-        if (typeof p === "string") {
-          hit = f === p;
-          this.debug("string match", p, f, hit);
-        } else {
-          hit = f.match(p);
-          this.debug("pattern match", p, f, hit);
-        }
-        if (!hit)
-          return false;
-      }
-      if (fi === fl && pi === pl) {
-        return true;
-      } else if (fi === fl) {
-        return partial;
-      } else if (pi === pl) {
-        return fi === fl - 1 && file[fi] === "";
-      }
-      throw new Error("wtf?");
-    };
-    function globUnescape(s) {
-      return s.replace(/\\(.)/g, "$1");
-    }
-    function regExpEscape(s) {
-      return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+          return x.path.join("/") == ps;
+        }).indexOf(true);
+        if (i >= 0)
+          saw.step += i;
+        else
+          saw.step = saw.actions.length;
+        var act = saw.actions[saw.step - 1];
+        if (act && act.trap) {
+          saw.step = act.step;
+          act.cb();
+        } else
+          saw.next();
+      };
+      saw.jump = function(step) {
+        saw.step = step;
+        saw.next();
+      };
     }
   }
 });
 
-// ../../node_modules/@actions/glob/lib/internal-path.js
-var require_internal_path = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-path.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+// ../../node_modules/buffers/index.js
+var require_buffers = __commonJS({
+  "../../node_modules/buffers/index.js"(exports, module2) {
+    module2.exports = Buffers;
+    function Buffers(bufs) {
+      if (!(this instanceof Buffers))
+        return new Buffers(bufs);
+      this.buffers = bufs || [];
+      this.length = this.buffers.reduce(function(size, buf) {
+        return size + buf.length;
+      }, 0);
+    }
+    Buffers.prototype.push = function() {
+      for (var i = 0; i < arguments.length; i++) {
+        if (!Buffer.isBuffer(arguments[i])) {
+          throw new TypeError("Tried to push a non-buffer");
+        }
       }
-      __setModuleDefault(result, mod);
-      return result;
+      for (var i = 0; i < arguments.length; i++) {
+        var buf = arguments[i];
+        this.buffers.push(buf);
+        this.length += buf.length;
+      }
+      return this.length;
     };
-    var __importDefault = exports && exports.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
+    Buffers.prototype.unshift = function() {
+      for (var i = 0; i < arguments.length; i++) {
+        if (!Buffer.isBuffer(arguments[i])) {
+          throw new TypeError("Tried to unshift a non-buffer");
+        }
+      }
+      for (var i = 0; i < arguments.length; i++) {
+        var buf = arguments[i];
+        this.buffers.unshift(buf);
+        this.length += buf.length;
+      }
+      return this.length;
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Path = void 0;
-    var path2 = __importStar(require("path"));
-    var pathHelper = __importStar(require_internal_path_helper());
-    var assert_1 = __importDefault(require("assert"));
-    var IS_WINDOWS = process.platform === "win32";
-    var Path = class {
-      /**
-       * Constructs a Path
-       * @param itemPath Path or array of segments
-       */
-      constructor(itemPath) {
-        this.segments = [];
-        if (typeof itemPath === "string") {
-          assert_1.default(itemPath, `Parameter 'itemPath' must not be empty`);
-          itemPath = pathHelper.safeTrimTrailingSeparator(itemPath);
-          if (!pathHelper.hasRoot(itemPath)) {
-            this.segments = itemPath.split(path2.sep);
+    Buffers.prototype.copy = function(dst, dStart, start, end) {
+      return this.slice(start, end).copy(dst, dStart, 0, end - start);
+    };
+    Buffers.prototype.splice = function(i, howMany) {
+      var buffers = this.buffers;
+      var index = i >= 0 ? i : this.length - i;
+      var reps = [].slice.call(arguments, 2);
+      if (howMany === void 0) {
+        howMany = this.length - index;
+      } else if (howMany > this.length - index) {
+        howMany = this.length - index;
+      }
+      for (var i = 0; i < reps.length; i++) {
+        this.length += reps[i].length;
+      }
+      var removed = new Buffers();
+      var bytes = 0;
+      var startBytes = 0;
+      for (var ii = 0; ii < buffers.length && startBytes + buffers[ii].length < index; ii++) {
+        startBytes += buffers[ii].length;
+      }
+      if (index - startBytes > 0) {
+        var start = index - startBytes;
+        if (start + howMany < buffers[ii].length) {
+          removed.push(buffers[ii].slice(start, start + howMany));
+          var orig = buffers[ii];
+          var buf0 = new Buffer(start);
+          for (var i = 0; i < start; i++) {
+            buf0[i] = orig[i];
+          }
+          var buf1 = new Buffer(orig.length - start - howMany);
+          for (var i = start + howMany; i < orig.length; i++) {
+            buf1[i - howMany - start] = orig[i];
+          }
+          if (reps.length > 0) {
+            var reps_ = reps.slice();
+            reps_.unshift(buf0);
+            reps_.push(buf1);
+            buffers.splice.apply(buffers, [ii, 1].concat(reps_));
+            ii += reps_.length;
+            reps = [];
           } else {
-            let remaining = itemPath;
-            let dir = pathHelper.dirname(remaining);
-            while (dir !== remaining) {
-              const basename2 = path2.basename(remaining);
-              this.segments.unshift(basename2);
-              remaining = dir;
-              dir = pathHelper.dirname(remaining);
-            }
-            this.segments.unshift(remaining);
+            buffers.splice(ii, 1, buf0, buf1);
+            ii += 2;
           }
         } else {
-          assert_1.default(itemPath.length > 0, `Parameter 'itemPath' must not be an empty array`);
-          for (let i = 0; i < itemPath.length; i++) {
-            let segment = itemPath[i];
-            assert_1.default(segment, `Parameter 'itemPath' must not contain any empty segments`);
-            segment = pathHelper.normalizeSeparators(itemPath[i]);
-            if (i === 0 && pathHelper.hasRoot(segment)) {
-              segment = pathHelper.safeTrimTrailingSeparator(segment);
-              assert_1.default(segment === pathHelper.dirname(segment), `Parameter 'itemPath' root segment contains information for multiple segments`);
-              this.segments.push(segment);
-            } else {
-              assert_1.default(!segment.includes(path2.sep), `Parameter 'itemPath' contains unexpected path separators`);
-              this.segments.push(segment);
-            }
-          }
+          removed.push(buffers[ii].slice(start));
+          buffers[ii] = buffers[ii].slice(0, start);
+          ii++;
         }
       }
-      /**
-       * Converts the path to it's string representation
-       */
-      toString() {
-        let result = this.segments[0];
-        let skipSlash = result.endsWith(path2.sep) || IS_WINDOWS && /^[A-Z]:$/i.test(result);
-        for (let i = 1; i < this.segments.length; i++) {
-          if (skipSlash) {
-            skipSlash = false;
-          } else {
-            result += path2.sep;
-          }
-          result += this.segments[i];
+      if (reps.length > 0) {
+        buffers.splice.apply(buffers, [ii, 0].concat(reps));
+        ii += reps.length;
+      }
+      while (removed.length < howMany) {
+        var buf = buffers[ii];
+        var len = buf.length;
+        var take = Math.min(len, howMany - removed.length);
+        if (take === len) {
+          removed.push(buf);
+          buffers.splice(ii, 1);
+        } else {
+          removed.push(buf.slice(0, take));
+          buffers[ii] = buffers[ii].slice(take);
         }
-        return result;
+      }
+      this.length -= removed.length;
+      return removed;
+    };
+    Buffers.prototype.slice = function(i, j) {
+      var buffers = this.buffers;
+      if (j === void 0)
+        j = this.length;
+      if (i === void 0)
+        i = 0;
+      if (j > this.length)
+        j = this.length;
+      var startBytes = 0;
+      for (var si = 0; si < buffers.length && startBytes + buffers[si].length <= i; si++) {
+        startBytes += buffers[si].length;
+      }
+      var target = new Buffer(j - i);
+      var ti = 0;
+      for (var ii = si; ti < j - i && ii < buffers.length; ii++) {
+        var len = buffers[ii].length;
+        var start = ti === 0 ? i - startBytes : 0;
+        var end = ti + len >= j - i ? Math.min(start + (j - i) - ti, len) : len;
+        buffers[ii].copy(target, ti, start, end);
+        ti += end - start;
+      }
+      return target;
+    };
+    Buffers.prototype.pos = function(i) {
+      if (i < 0 || i >= this.length)
+        throw new Error("oob");
+      var l = i, bi = 0, bu = null;
+      for (; ; ) {
+        bu = this.buffers[bi];
+        if (l < bu.length) {
+          return { buf: bi, offset: l };
+        } else {
+          l -= bu.length;
+        }
+        bi++;
       }
     };
-    exports.Path = Path;
+    Buffers.prototype.get = function get(i) {
+      var pos = this.pos(i);
+      return this.buffers[pos.buf].get(pos.offset);
+    };
+    Buffers.prototype.set = function set(i, b) {
+      var pos = this.pos(i);
+      return this.buffers[pos.buf].set(pos.offset, b);
+    };
+    Buffers.prototype.indexOf = function(needle, offset) {
+      if ("string" === typeof needle) {
+        needle = new Buffer(needle);
+      } else if (needle instanceof Buffer) {
+      } else {
+        throw new Error("Invalid type for a search string");
+      }
+      if (!needle.length) {
+        return 0;
+      }
+      if (!this.length) {
+        return -1;
+      }
+      var i = 0, j = 0, match = 0, mstart, pos = 0;
+      if (offset) {
+        var p = this.pos(offset);
+        i = p.buf;
+        j = p.offset;
+        pos = offset;
+      }
+      for (; ; ) {
+        while (j >= this.buffers[i].length) {
+          j = 0;
+          i++;
+          if (i >= this.buffers.length) {
+            return -1;
+          }
+        }
+        var char = this.buffers[i][j];
+        if (char == needle[match]) {
+          if (match == 0) {
+            mstart = {
+              i,
+              j,
+              pos
+            };
+          }
+          match++;
+          if (match == needle.length) {
+            return mstart.pos;
+          }
+        } else if (match != 0) {
+          i = mstart.i;
+          j = mstart.j;
+          pos = mstart.pos;
+          match = 0;
+        }
+        j++;
+        pos++;
+      }
+    };
+    Buffers.prototype.toBuffer = function() {
+      return this.slice();
+    };
+    Buffers.prototype.toString = function(encoding, start, end) {
+      return this.slice(start, end).toString(encoding);
+    };
   }
 });
 
-// ../../node_modules/@actions/glob/lib/internal-pattern.js
-var require_internal_pattern = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-pattern.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    var __importDefault = exports && exports.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Pattern = void 0;
-    var os = __importStar(require("os"));
-    var path2 = __importStar(require("path"));
-    var pathHelper = __importStar(require_internal_path_helper());
-    var assert_1 = __importDefault(require("assert"));
-    var minimatch_1 = require_minimatch();
-    var internal_match_kind_1 = require_internal_match_kind();
-    var internal_path_1 = require_internal_path();
-    var IS_WINDOWS = process.platform === "win32";
-    var Pattern = class {
-      constructor(patternOrNegate, isImplicitPattern = false, segments, homedir) {
-        this.negate = false;
-        let pattern;
-        if (typeof patternOrNegate === "string") {
-          pattern = patternOrNegate.trim();
+// ../../node_modules/binary/lib/vars.js
+var require_vars = __commonJS({
+  "../../node_modules/binary/lib/vars.js"(exports, module2) {
+    module2.exports = function(store) {
+      function getset(name, value) {
+        var node = vars.store;
+        var keys = name.split(".");
+        keys.slice(0, -1).forEach(function(k) {
+          if (node[k] === void 0)
+            node[k] = {};
+          node = node[k];
+        });
+        var key = keys[keys.length - 1];
+        if (arguments.length == 1) {
+          return node[key];
         } else {
-          segments = segments || [];
-          assert_1.default(segments.length, `Parameter 'segments' must not empty`);
-          const root = Pattern.getLiteral(segments[0]);
-          assert_1.default(root && pathHelper.hasAbsoluteRoot(root), `Parameter 'segments' first element must be a root path`);
-          pattern = new internal_path_1.Path(segments).toString().trim();
-          if (patternOrNegate) {
-            pattern = `!${pattern}`;
+          return node[key] = value;
+        }
+      }
+      var vars = {
+        get: function(name) {
+          return getset(name);
+        },
+        set: function(name, value) {
+          return getset(name, value);
+        },
+        store: store || {}
+      };
+      return vars;
+    };
+  }
+});
+
+// ../../node_modules/binary/index.js
+var require_binary = __commonJS({
+  "../../node_modules/binary/index.js"(exports, module2) {
+    var Chainsaw = require_chainsaw();
+    var EventEmitter = require("events").EventEmitter;
+    var Buffers = require_buffers();
+    var Vars = require_vars();
+    var Stream = require("stream").Stream;
+    exports = module2.exports = function(bufOrEm, eventName) {
+      if (Buffer.isBuffer(bufOrEm)) {
+        return exports.parse(bufOrEm);
+      }
+      var s = exports.stream();
+      if (bufOrEm && bufOrEm.pipe) {
+        bufOrEm.pipe(s);
+      } else if (bufOrEm) {
+        bufOrEm.on(eventName || "data", function(buf) {
+          s.write(buf);
+        });
+        bufOrEm.on("end", function() {
+          s.end();
+        });
+      }
+      return s;
+    };
+    exports.stream = function(input) {
+      if (input)
+        return exports.apply(null, arguments);
+      var pending = null;
+      function getBytes(bytes, cb, skip) {
+        pending = {
+          bytes,
+          skip,
+          cb: function(buf) {
+            pending = null;
+            cb(buf);
           }
-        }
-        while (pattern.startsWith("!")) {
-          this.negate = !this.negate;
-          pattern = pattern.substr(1).trim();
-        }
-        pattern = Pattern.fixupPattern(pattern, homedir);
-        this.segments = new internal_path_1.Path(pattern).segments;
-        this.trailingSeparator = pathHelper.normalizeSeparators(pattern).endsWith(path2.sep);
-        pattern = pathHelper.safeTrimTrailingSeparator(pattern);
-        let foundGlob = false;
-        const searchSegments = this.segments.map((x) => Pattern.getLiteral(x)).filter((x) => !foundGlob && !(foundGlob = x === ""));
-        this.searchPath = new internal_path_1.Path(searchSegments).toString();
-        this.rootRegExp = new RegExp(Pattern.regExpEscape(searchSegments[0]), IS_WINDOWS ? "i" : "");
-        this.isImplicitPattern = isImplicitPattern;
-        const minimatchOptions = {
-          dot: true,
-          nobrace: true,
-          nocase: IS_WINDOWS,
-          nocomment: true,
-          noext: true,
-          nonegate: true
         };
-        pattern = IS_WINDOWS ? pattern.replace(/\\/g, "/") : pattern;
-        this.minimatch = new minimatch_1.Minimatch(pattern, minimatchOptions);
+        dispatch();
       }
-      /**
-       * Matches the pattern against the specified path
-       */
-      match(itemPath) {
-        if (this.segments[this.segments.length - 1] === "**") {
-          itemPath = pathHelper.normalizeSeparators(itemPath);
-          if (!itemPath.endsWith(path2.sep) && this.isImplicitPattern === false) {
-            itemPath = `${itemPath}${path2.sep}`;
-          }
-        } else {
-          itemPath = pathHelper.safeTrimTrailingSeparator(itemPath);
-        }
-        if (this.minimatch.match(itemPath)) {
-          return this.trailingSeparator ? internal_match_kind_1.MatchKind.Directory : internal_match_kind_1.MatchKind.All;
-        }
-        return internal_match_kind_1.MatchKind.None;
-      }
-      /**
-       * Indicates whether the pattern may match descendants of the specified path
-       */
-      partialMatch(itemPath) {
-        itemPath = pathHelper.safeTrimTrailingSeparator(itemPath);
-        if (pathHelper.dirname(itemPath) === itemPath) {
-          return this.rootRegExp.test(itemPath);
-        }
-        return this.minimatch.matchOne(itemPath.split(IS_WINDOWS ? /\\+/ : /\/+/), this.minimatch.set[0], true);
-      }
-      /**
-       * Escapes glob patterns within a path
-       */
-      static globEscape(s) {
-        return (IS_WINDOWS ? s : s.replace(/\\/g, "\\\\")).replace(/(\[)(?=[^/]+\])/g, "[[]").replace(/\?/g, "[?]").replace(/\*/g, "[*]");
-      }
-      /**
-       * Normalizes slashes and ensures absolute root
-       */
-      static fixupPattern(pattern, homedir) {
-        assert_1.default(pattern, "pattern cannot be empty");
-        const literalSegments = new internal_path_1.Path(pattern).segments.map((x) => Pattern.getLiteral(x));
-        assert_1.default(literalSegments.every((x, i) => (x !== "." || i === 0) && x !== ".."), `Invalid pattern '${pattern}'. Relative pathing '.' and '..' is not allowed.`);
-        assert_1.default(!pathHelper.hasRoot(pattern) || literalSegments[0], `Invalid pattern '${pattern}'. Root segment must not contain globs.`);
-        pattern = pathHelper.normalizeSeparators(pattern);
-        if (pattern === "." || pattern.startsWith(`.${path2.sep}`)) {
-          pattern = Pattern.globEscape(process.cwd()) + pattern.substr(1);
-        } else if (pattern === "~" || pattern.startsWith(`~${path2.sep}`)) {
-          homedir = homedir || os.homedir();
-          assert_1.default(homedir, "Unable to determine HOME directory");
-          assert_1.default(pathHelper.hasAbsoluteRoot(homedir), `Expected HOME directory to be a rooted path. Actual '${homedir}'`);
-          pattern = Pattern.globEscape(homedir) + pattern.substr(1);
-        } else if (IS_WINDOWS && (pattern.match(/^[A-Z]:$/i) || pattern.match(/^[A-Z]:[^\\]/i))) {
-          let root = pathHelper.ensureAbsoluteRoot("C:\\dummy-root", pattern.substr(0, 2));
-          if (pattern.length > 2 && !root.endsWith("\\")) {
-            root += "\\";
-          }
-          pattern = Pattern.globEscape(root) + pattern.substr(2);
-        } else if (IS_WINDOWS && (pattern === "\\" || pattern.match(/^\\[^\\]/))) {
-          let root = pathHelper.ensureAbsoluteRoot("C:\\dummy-root", "\\");
-          if (!root.endsWith("\\")) {
-            root += "\\";
-          }
-          pattern = Pattern.globEscape(root) + pattern.substr(1);
-        } else {
-          pattern = pathHelper.ensureAbsoluteRoot(Pattern.globEscape(process.cwd()), pattern);
-        }
-        return pathHelper.normalizeSeparators(pattern);
-      }
-      /**
-       * Attempts to unescape a pattern segment to create a literal path segment.
-       * Otherwise returns empty string.
-       */
-      static getLiteral(segment) {
-        let literal = "";
-        for (let i = 0; i < segment.length; i++) {
-          const c = segment[i];
-          if (c === "\\" && !IS_WINDOWS && i + 1 < segment.length) {
-            literal += segment[++i];
-            continue;
-          } else if (c === "*" || c === "?") {
-            return "";
-          } else if (c === "[" && i + 1 < segment.length) {
-            let set = "";
-            let closed = -1;
-            for (let i2 = i + 1; i2 < segment.length; i2++) {
-              const c2 = segment[i2];
-              if (c2 === "\\" && !IS_WINDOWS && i2 + 1 < segment.length) {
-                set += segment[++i2];
-                continue;
-              } else if (c2 === "]") {
-                closed = i2;
-                break;
-              } else {
-                set += c2;
-              }
-            }
-            if (closed >= 0) {
-              if (set.length > 1) {
-                return "";
-              }
-              if (set) {
-                literal += set;
-                i = closed;
-                continue;
-              }
-            }
-          }
-          literal += c;
-        }
-        return literal;
-      }
-      /**
-       * Escapes regexp special characters
-       * https://javascript.info/regexp-escaping
-       */
-      static regExpEscape(s) {
-        return s.replace(/[[\\^$.|?*+()]/g, "\\$&");
-      }
-    };
-    exports.Pattern = Pattern;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-search-state.js
-var require_internal_search_state = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-search-state.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SearchState = void 0;
-    var SearchState = class {
-      constructor(path2, level) {
-        this.path = path2;
-        this.level = level;
-      }
-    };
-    exports.SearchState = SearchState;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-globber.js
-var require_internal_globber = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-globber.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
-      function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
-        });
-      }
-      return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator["throw"](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    };
-    var __asyncValues = exports && exports.__asyncValues || function(o) {
-      if (!Symbol.asyncIterator)
-        throw new TypeError("Symbol.asyncIterator is not defined.");
-      var m = o[Symbol.asyncIterator], i;
-      return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
-        return this;
-      }, i);
-      function verb(n) {
-        i[n] = o[n] && function(v) {
-          return new Promise(function(resolve, reject) {
-            v = o[n](v), settle(resolve, reject, v.done, v.value);
-          });
-        };
-      }
-      function settle(resolve, reject, d, v) {
-        Promise.resolve(v).then(function(v2) {
-          resolve({ value: v2, done: d });
-        }, reject);
-      }
-    };
-    var __await = exports && exports.__await || function(v) {
-      return this instanceof __await ? (this.v = v, this) : new __await(v);
-    };
-    var __asyncGenerator = exports && exports.__asyncGenerator || function(thisArg, _arguments, generator) {
-      if (!Symbol.asyncIterator)
-        throw new TypeError("Symbol.asyncIterator is not defined.");
-      var g = generator.apply(thisArg, _arguments || []), i, q = [];
-      return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
-        return this;
-      }, i;
-      function verb(n) {
-        if (g[n])
-          i[n] = function(v) {
-            return new Promise(function(a, b) {
-              q.push([n, v, a, b]) > 1 || resume(n, v);
-            });
-          };
-      }
-      function resume(n, v) {
-        try {
-          step(g[n](v));
-        } catch (e) {
-          settle(q[0][3], e);
-        }
-      }
-      function step(r) {
-        r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
-      }
-      function fulfill(value) {
-        resume("next", value);
-      }
-      function reject(value) {
-        resume("throw", value);
-      }
-      function settle(f, v) {
-        if (f(v), q.shift(), q.length)
-          resume(q[0][0], q[0][1]);
-      }
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.DefaultGlobber = void 0;
-    var core = __importStar(require_core());
-    var fs2 = __importStar(require("fs"));
-    var globOptionsHelper = __importStar(require_internal_glob_options_helper());
-    var path2 = __importStar(require("path"));
-    var patternHelper = __importStar(require_internal_pattern_helper());
-    var internal_match_kind_1 = require_internal_match_kind();
-    var internal_pattern_1 = require_internal_pattern();
-    var internal_search_state_1 = require_internal_search_state();
-    var IS_WINDOWS = process.platform === "win32";
-    var DefaultGlobber = class {
-      constructor(options) {
-        this.patterns = [];
-        this.searchPaths = [];
-        this.options = globOptionsHelper.getOptions(options);
-      }
-      getSearchPaths() {
-        return this.searchPaths.slice();
-      }
-      glob() {
-        var e_1, _a;
-        return __awaiter(this, void 0, void 0, function* () {
-          const result = [];
-          try {
-            for (var _b = __asyncValues(this.globGenerator()), _c; _c = yield _b.next(), !_c.done; ) {
-              const itemPath = _c.value;
-              result.push(itemPath);
-            }
-          } catch (e_1_1) {
-            e_1 = { error: e_1_1 };
-          } finally {
-            try {
-              if (_c && !_c.done && (_a = _b.return))
-                yield _a.call(_b);
-            } finally {
-              if (e_1)
-                throw e_1.error;
-            }
-          }
-          return result;
-        });
-      }
-      globGenerator() {
-        return __asyncGenerator(this, arguments, function* globGenerator_1() {
-          const options = globOptionsHelper.getOptions(this.options);
-          const patterns = [];
-          for (const pattern of this.patterns) {
-            patterns.push(pattern);
-            if (options.implicitDescendants && (pattern.trailingSeparator || pattern.segments[pattern.segments.length - 1] !== "**")) {
-              patterns.push(new internal_pattern_1.Pattern(pattern.negate, true, pattern.segments.concat("**")));
-            }
-          }
-          const stack = [];
-          for (const searchPath of patternHelper.getSearchPaths(patterns)) {
-            core.debug(`Search path '${searchPath}'`);
-            try {
-              yield __await(fs2.promises.lstat(searchPath));
-            } catch (err) {
-              if (err.code === "ENOENT") {
-                continue;
-              }
-              throw err;
-            }
-            stack.unshift(new internal_search_state_1.SearchState(searchPath, 1));
-          }
-          const traversalChain = [];
-          while (stack.length) {
-            const item = stack.pop();
-            const match = patternHelper.match(patterns, item.path);
-            const partialMatch = !!match || patternHelper.partialMatch(patterns, item.path);
-            if (!match && !partialMatch) {
-              continue;
-            }
-            const stats = yield __await(
-              DefaultGlobber.stat(item, options, traversalChain)
-              // Broken symlink, or symlink cycle detected, or no longer exists
-            );
-            if (!stats) {
-              continue;
-            }
-            if (stats.isDirectory()) {
-              if (match & internal_match_kind_1.MatchKind.Directory && options.matchDirectories) {
-                yield yield __await(item.path);
-              } else if (!partialMatch) {
-                continue;
-              }
-              const childLevel = item.level + 1;
-              const childItems = (yield __await(fs2.promises.readdir(item.path))).map((x) => new internal_search_state_1.SearchState(path2.join(item.path, x), childLevel));
-              stack.push(...childItems.reverse());
-            } else if (match & internal_match_kind_1.MatchKind.File) {
-              yield yield __await(item.path);
-            }
-          }
-        });
-      }
-      /**
-       * Constructs a DefaultGlobber
-       */
-      static create(patterns, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-          const result = new DefaultGlobber(options);
-          if (IS_WINDOWS) {
-            patterns = patterns.replace(/\r\n/g, "\n");
-            patterns = patterns.replace(/\r/g, "\n");
-          }
-          const lines = patterns.split("\n").map((x) => x.trim());
-          for (const line of lines) {
-            if (!line || line.startsWith("#")) {
-              continue;
-            } else {
-              result.patterns.push(new internal_pattern_1.Pattern(line));
-            }
-          }
-          result.searchPaths.push(...patternHelper.getSearchPaths(result.patterns));
-          return result;
-        });
-      }
-      static stat(item, options, traversalChain) {
-        return __awaiter(this, void 0, void 0, function* () {
-          let stats;
-          if (options.followSymbolicLinks) {
-            try {
-              stats = yield fs2.promises.stat(item.path);
-            } catch (err) {
-              if (err.code === "ENOENT") {
-                if (options.omitBrokenSymbolicLinks) {
-                  core.debug(`Broken symlink '${item.path}'`);
-                  return void 0;
-                }
-                throw new Error(`No information found for the path '${item.path}'. This may indicate a broken symbolic link.`);
-              }
-              throw err;
-            }
-          } else {
-            stats = yield fs2.promises.lstat(item.path);
-          }
-          if (stats.isDirectory() && options.followSymbolicLinks) {
-            const realPath = yield fs2.promises.realpath(item.path);
-            while (traversalChain.length >= item.level) {
-              traversalChain.pop();
-            }
-            if (traversalChain.some((x) => x === realPath)) {
-              core.debug(`Symlink cycle detected for path '${item.path}' and realpath '${realPath}'`);
-              return void 0;
-            }
-            traversalChain.push(realPath);
-          }
-          return stats;
-        });
-      }
-    };
-    exports.DefaultGlobber = DefaultGlobber;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/internal-hash-files.js
-var require_internal_hash_files = __commonJS({
-  "../../node_modules/@actions/glob/lib/internal-hash-files.js"(exports) {
-    "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      Object.defineProperty(o, k2, { enumerable: true, get: function() {
-        return m[k];
-      } });
-    } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
-      o[k2] = m[k];
-    });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    } : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
-      function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
-        });
-      }
-      return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator["throw"](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    };
-    var __asyncValues = exports && exports.__asyncValues || function(o) {
-      if (!Symbol.asyncIterator)
-        throw new TypeError("Symbol.asyncIterator is not defined.");
-      var m = o[Symbol.asyncIterator], i;
-      return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
-        return this;
-      }, i);
-      function verb(n) {
-        i[n] = o[n] && function(v) {
-          return new Promise(function(resolve, reject) {
-            v = o[n](v), settle(resolve, reject, v.done, v.value);
-          });
-        };
-      }
-      function settle(resolve, reject, d, v) {
-        Promise.resolve(v).then(function(v2) {
-          resolve({ value: v2, done: d });
-        }, reject);
-      }
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.hashFiles = void 0;
-    var crypto4 = __importStar(require("crypto"));
-    var core = __importStar(require_core());
-    var fs2 = __importStar(require("fs"));
-    var stream = __importStar(require("stream"));
-    var util = __importStar(require("util"));
-    var path2 = __importStar(require("path"));
-    function hashFiles(globber, currentWorkspace, verbose = false) {
-      var e_1, _a;
-      var _b;
-      return __awaiter(this, void 0, void 0, function* () {
-        const writeDelegate = verbose ? core.info : core.debug;
-        let hasMatch = false;
-        const githubWorkspace = currentWorkspace ? currentWorkspace : (_b = process.env["GITHUB_WORKSPACE"]) !== null && _b !== void 0 ? _b : process.cwd();
-        const result = crypto4.createHash("sha256");
-        let count = 0;
-        try {
-          for (var _c = __asyncValues(globber.globGenerator()), _d; _d = yield _c.next(), !_d.done; ) {
-            const file = _d.value;
-            writeDelegate(file);
-            if (!file.startsWith(`${githubWorkspace}${path2.sep}`)) {
-              writeDelegate(`Ignore '${file}' since it is not under GITHUB_WORKSPACE.`);
-              continue;
-            }
-            if (fs2.statSync(file).isDirectory()) {
-              writeDelegate(`Skip directory '${file}'.`);
-              continue;
-            }
-            const hash = crypto4.createHash("sha256");
-            const pipeline = util.promisify(stream.pipeline);
-            yield pipeline(fs2.createReadStream(file), hash);
-            result.write(hash.digest());
-            count++;
-            if (!hasMatch) {
-              hasMatch = true;
-            }
-          }
-        } catch (e_1_1) {
-          e_1 = { error: e_1_1 };
-        } finally {
-          try {
-            if (_d && !_d.done && (_a = _c.return))
-              yield _a.call(_c);
-          } finally {
-            if (e_1)
-              throw e_1.error;
-          }
-        }
-        result.end();
-        if (hasMatch) {
-          writeDelegate(`Found ${count} files to hash.`);
-          return result.digest("hex");
-        } else {
-          writeDelegate(`No matches found for glob`);
-          return "";
-        }
-      });
-    }
-    exports.hashFiles = hashFiles;
-  }
-});
-
-// ../../node_modules/@actions/glob/lib/glob.js
-var require_glob = __commonJS({
-  "../../node_modules/@actions/glob/lib/glob.js"(exports) {
-    "use strict";
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
-      function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
-        });
-      }
-      return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-          try {
-            step(generator.next(value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function rejected(value) {
-          try {
-            step(generator["throw"](value));
-          } catch (e) {
-            reject(e);
-          }
-        }
-        function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
-    };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.hashFiles = exports.create = void 0;
-    var internal_globber_1 = require_internal_globber();
-    var internal_hash_files_1 = require_internal_hash_files();
-    function create2(patterns, options) {
-      return __awaiter(this, void 0, void 0, function* () {
-        return yield internal_globber_1.DefaultGlobber.create(patterns, options);
-      });
-    }
-    exports.create = create2;
-    function hashFiles(patterns, currentWorkspace = "", options, verbose = false) {
-      return __awaiter(this, void 0, void 0, function* () {
-        let followSymbolicLinks = true;
-        if (options && typeof options.followSymbolicLinks === "boolean") {
-          followSymbolicLinks = options.followSymbolicLinks;
-        }
-        const globber = yield create2(patterns, { followSymbolicLinks });
-        return internal_hash_files_1.hashFiles(globber, currentWorkspace, verbose);
-      });
-    }
-    exports.hashFiles = hashFiles;
-  }
-});
-
-// ../../node_modules/mime-db/db.json
-var require_db = __commonJS({
-  "../../node_modules/mime-db/db.json"(exports, module2) {
-    module2.exports = {
-      "application/1d-interleaved-parityfec": {
-        source: "iana"
-      },
-      "application/3gpdash-qoe-report+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/3gpp-ims+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/3gpphal+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/3gpphalforms+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/a2l": {
-        source: "iana"
-      },
-      "application/ace+cbor": {
-        source: "iana"
-      },
-      "application/activemessage": {
-        source: "iana"
-      },
-      "application/activity+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-costmap+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-costmapfilter+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-directory+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-endpointcost+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-endpointcostparams+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-endpointprop+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-endpointpropparams+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-error+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-networkmap+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-networkmapfilter+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-updatestreamcontrol+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/alto-updatestreamparams+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/aml": {
-        source: "iana"
-      },
-      "application/andrew-inset": {
-        source: "iana",
-        extensions: ["ez"]
-      },
-      "application/applefile": {
-        source: "iana"
-      },
-      "application/applixware": {
-        source: "apache",
-        extensions: ["aw"]
-      },
-      "application/at+jwt": {
-        source: "iana"
-      },
-      "application/atf": {
-        source: "iana"
-      },
-      "application/atfx": {
-        source: "iana"
-      },
-      "application/atom+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["atom"]
-      },
-      "application/atomcat+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["atomcat"]
-      },
-      "application/atomdeleted+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["atomdeleted"]
-      },
-      "application/atomicmail": {
-        source: "iana"
-      },
-      "application/atomsvc+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["atomsvc"]
-      },
-      "application/atsc-dwd+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["dwd"]
-      },
-      "application/atsc-dynamic-event-message": {
-        source: "iana"
-      },
-      "application/atsc-held+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["held"]
-      },
-      "application/atsc-rdt+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/atsc-rsat+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rsat"]
-      },
-      "application/atxml": {
-        source: "iana"
-      },
-      "application/auth-policy+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/bacnet-xdd+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/batch-smtp": {
-        source: "iana"
-      },
-      "application/bdoc": {
-        compressible: false,
-        extensions: ["bdoc"]
-      },
-      "application/beep+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/calendar+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/calendar+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xcs"]
-      },
-      "application/call-completion": {
-        source: "iana"
-      },
-      "application/cals-1840": {
-        source: "iana"
-      },
-      "application/captive+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cbor": {
-        source: "iana"
-      },
-      "application/cbor-seq": {
-        source: "iana"
-      },
-      "application/cccex": {
-        source: "iana"
-      },
-      "application/ccmp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/ccxml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ccxml"]
-      },
-      "application/cdfx+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["cdfx"]
-      },
-      "application/cdmi-capability": {
-        source: "iana",
-        extensions: ["cdmia"]
-      },
-      "application/cdmi-container": {
-        source: "iana",
-        extensions: ["cdmic"]
-      },
-      "application/cdmi-domain": {
-        source: "iana",
-        extensions: ["cdmid"]
-      },
-      "application/cdmi-object": {
-        source: "iana",
-        extensions: ["cdmio"]
-      },
-      "application/cdmi-queue": {
-        source: "iana",
-        extensions: ["cdmiq"]
-      },
-      "application/cdni": {
-        source: "iana"
-      },
-      "application/cea": {
-        source: "iana"
-      },
-      "application/cea-2018+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cellml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cfw": {
-        source: "iana"
-      },
-      "application/city+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/clr": {
-        source: "iana"
-      },
-      "application/clue+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/clue_info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cms": {
-        source: "iana"
-      },
-      "application/cnrp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/coap-group+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/coap-payload": {
-        source: "iana"
-      },
-      "application/commonground": {
-        source: "iana"
-      },
-      "application/conference-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cose": {
-        source: "iana"
-      },
-      "application/cose-key": {
-        source: "iana"
-      },
-      "application/cose-key-set": {
-        source: "iana"
-      },
-      "application/cpl+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["cpl"]
-      },
-      "application/csrattrs": {
-        source: "iana"
-      },
-      "application/csta+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cstadata+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/csvm+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/cu-seeme": {
-        source: "apache",
-        extensions: ["cu"]
-      },
-      "application/cwt": {
-        source: "iana"
-      },
-      "application/cybercash": {
-        source: "iana"
-      },
-      "application/dart": {
-        compressible: true
-      },
-      "application/dash+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mpd"]
-      },
-      "application/dash-patch+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mpp"]
-      },
-      "application/dashdelta": {
-        source: "iana"
-      },
-      "application/davmount+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["davmount"]
-      },
-      "application/dca-rft": {
-        source: "iana"
-      },
-      "application/dcd": {
-        source: "iana"
-      },
-      "application/dec-dx": {
-        source: "iana"
-      },
-      "application/dialog-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/dicom": {
-        source: "iana"
-      },
-      "application/dicom+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/dicom+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/dii": {
-        source: "iana"
-      },
-      "application/dit": {
-        source: "iana"
-      },
-      "application/dns": {
-        source: "iana"
-      },
-      "application/dns+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/dns-message": {
-        source: "iana"
-      },
-      "application/docbook+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["dbk"]
-      },
-      "application/dots+cbor": {
-        source: "iana"
-      },
-      "application/dskpp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/dssc+der": {
-        source: "iana",
-        extensions: ["dssc"]
-      },
-      "application/dssc+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xdssc"]
-      },
-      "application/dvcs": {
-        source: "iana"
-      },
-      "application/ecmascript": {
-        source: "iana",
-        compressible: true,
-        extensions: ["es", "ecma"]
-      },
-      "application/edi-consent": {
-        source: "iana"
-      },
-      "application/edi-x12": {
-        source: "iana",
-        compressible: false
-      },
-      "application/edifact": {
-        source: "iana",
-        compressible: false
-      },
-      "application/efi": {
-        source: "iana"
-      },
-      "application/elm+json": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/elm+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.cap+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/emergencycalldata.comment+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.control+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.deviceinfo+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.ecall.msd": {
-        source: "iana"
-      },
-      "application/emergencycalldata.providerinfo+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.serviceinfo+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.subscriberinfo+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emergencycalldata.veds+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/emma+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["emma"]
-      },
-      "application/emotionml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["emotionml"]
-      },
-      "application/encaprtp": {
-        source: "iana"
-      },
-      "application/epp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/epub+zip": {
-        source: "iana",
-        compressible: false,
-        extensions: ["epub"]
-      },
-      "application/eshop": {
-        source: "iana"
-      },
-      "application/exi": {
-        source: "iana",
-        extensions: ["exi"]
-      },
-      "application/expect-ct-report+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/express": {
-        source: "iana",
-        extensions: ["exp"]
-      },
-      "application/fastinfoset": {
-        source: "iana"
-      },
-      "application/fastsoap": {
-        source: "iana"
-      },
-      "application/fdt+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["fdt"]
-      },
-      "application/fhir+json": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/fhir+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/fido.trusted-apps+json": {
-        compressible: true
-      },
-      "application/fits": {
-        source: "iana"
-      },
-      "application/flexfec": {
-        source: "iana"
-      },
-      "application/font-sfnt": {
-        source: "iana"
-      },
-      "application/font-tdpfr": {
-        source: "iana",
-        extensions: ["pfr"]
-      },
-      "application/font-woff": {
-        source: "iana",
-        compressible: false
-      },
-      "application/framework-attributes+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/geo+json": {
-        source: "iana",
-        compressible: true,
-        extensions: ["geojson"]
-      },
-      "application/geo+json-seq": {
-        source: "iana"
-      },
-      "application/geopackage+sqlite3": {
-        source: "iana"
-      },
-      "application/geoxacml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/gltf-buffer": {
-        source: "iana"
-      },
-      "application/gml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["gml"]
-      },
-      "application/gpx+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["gpx"]
-      },
-      "application/gxf": {
-        source: "apache",
-        extensions: ["gxf"]
-      },
-      "application/gzip": {
-        source: "iana",
-        compressible: false,
-        extensions: ["gz"]
-      },
-      "application/h224": {
-        source: "iana"
-      },
-      "application/held+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/hjson": {
-        extensions: ["hjson"]
-      },
-      "application/http": {
-        source: "iana"
-      },
-      "application/hyperstudio": {
-        source: "iana",
-        extensions: ["stk"]
-      },
-      "application/ibe-key-request+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/ibe-pkg-reply+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/ibe-pp-data": {
-        source: "iana"
-      },
-      "application/iges": {
-        source: "iana"
-      },
-      "application/im-iscomposing+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/index": {
-        source: "iana"
-      },
-      "application/index.cmd": {
-        source: "iana"
-      },
-      "application/index.obj": {
-        source: "iana"
-      },
-      "application/index.response": {
-        source: "iana"
-      },
-      "application/index.vnd": {
-        source: "iana"
-      },
-      "application/inkml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ink", "inkml"]
-      },
-      "application/iotp": {
-        source: "iana"
-      },
-      "application/ipfix": {
-        source: "iana",
-        extensions: ["ipfix"]
-      },
-      "application/ipp": {
-        source: "iana"
-      },
-      "application/isup": {
-        source: "iana"
-      },
-      "application/its+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["its"]
-      },
-      "application/java-archive": {
-        source: "apache",
-        compressible: false,
-        extensions: ["jar", "war", "ear"]
-      },
-      "application/java-serialized-object": {
-        source: "apache",
-        compressible: false,
-        extensions: ["ser"]
-      },
-      "application/java-vm": {
-        source: "apache",
-        compressible: false,
-        extensions: ["class"]
-      },
-      "application/javascript": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["js", "mjs"]
-      },
-      "application/jf2feed+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/jose": {
-        source: "iana"
-      },
-      "application/jose+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/jrd+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/jscalendar+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/json": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["json", "map"]
-      },
-      "application/json-patch+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/json-seq": {
-        source: "iana"
-      },
-      "application/json5": {
-        extensions: ["json5"]
-      },
-      "application/jsonml+json": {
-        source: "apache",
-        compressible: true,
-        extensions: ["jsonml"]
-      },
-      "application/jwk+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/jwk-set+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/jwt": {
-        source: "iana"
-      },
-      "application/kpml-request+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/kpml-response+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/ld+json": {
-        source: "iana",
-        compressible: true,
-        extensions: ["jsonld"]
-      },
-      "application/lgr+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["lgr"]
-      },
-      "application/link-format": {
-        source: "iana"
-      },
-      "application/load-control+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/lost+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["lostxml"]
-      },
-      "application/lostsync+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/lpf+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/lxf": {
-        source: "iana"
-      },
-      "application/mac-binhex40": {
-        source: "iana",
-        extensions: ["hqx"]
-      },
-      "application/mac-compactpro": {
-        source: "apache",
-        extensions: ["cpt"]
-      },
-      "application/macwriteii": {
-        source: "iana"
-      },
-      "application/mads+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mads"]
-      },
-      "application/manifest+json": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["webmanifest"]
-      },
-      "application/marc": {
-        source: "iana",
-        extensions: ["mrc"]
-      },
-      "application/marcxml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mrcx"]
-      },
-      "application/mathematica": {
-        source: "iana",
-        extensions: ["ma", "nb", "mb"]
-      },
-      "application/mathml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mathml"]
-      },
-      "application/mathml-content+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mathml-presentation+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-associated-procedure-description+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-deregister+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-envelope+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-msk+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-msk-response+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-protection-description+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-reception-report+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-register+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-register-response+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-schedule+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbms-user-service-description+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mbox": {
-        source: "iana",
-        extensions: ["mbox"]
-      },
-      "application/media-policy-dataset+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mpf"]
-      },
-      "application/media_control+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mediaservercontrol+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mscml"]
-      },
-      "application/merge-patch+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/metalink+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["metalink"]
-      },
-      "application/metalink4+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["meta4"]
-      },
-      "application/mets+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mets"]
-      },
-      "application/mf4": {
-        source: "iana"
-      },
-      "application/mikey": {
-        source: "iana"
-      },
-      "application/mipc": {
-        source: "iana"
-      },
-      "application/missing-blocks+cbor-seq": {
-        source: "iana"
-      },
-      "application/mmt-aei+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["maei"]
-      },
-      "application/mmt-usd+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["musd"]
-      },
-      "application/mods+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mods"]
-      },
-      "application/moss-keys": {
-        source: "iana"
-      },
-      "application/moss-signature": {
-        source: "iana"
-      },
-      "application/mosskey-data": {
-        source: "iana"
-      },
-      "application/mosskey-request": {
-        source: "iana"
-      },
-      "application/mp21": {
-        source: "iana",
-        extensions: ["m21", "mp21"]
-      },
-      "application/mp4": {
-        source: "iana",
-        extensions: ["mp4s", "m4p"]
-      },
-      "application/mpeg4-generic": {
-        source: "iana"
-      },
-      "application/mpeg4-iod": {
-        source: "iana"
-      },
-      "application/mpeg4-iod-xmt": {
-        source: "iana"
-      },
-      "application/mrb-consumer+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/mrb-publish+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/msc-ivr+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/msc-mixer+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/msword": {
-        source: "iana",
-        compressible: false,
-        extensions: ["doc", "dot"]
-      },
-      "application/mud+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/multipart-core": {
-        source: "iana"
-      },
-      "application/mxf": {
-        source: "iana",
-        extensions: ["mxf"]
-      },
-      "application/n-quads": {
-        source: "iana",
-        extensions: ["nq"]
-      },
-      "application/n-triples": {
-        source: "iana",
-        extensions: ["nt"]
-      },
-      "application/nasdata": {
-        source: "iana"
-      },
-      "application/news-checkgroups": {
-        source: "iana",
-        charset: "US-ASCII"
-      },
-      "application/news-groupinfo": {
-        source: "iana",
-        charset: "US-ASCII"
-      },
-      "application/news-transmission": {
-        source: "iana"
-      },
-      "application/nlsml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/node": {
-        source: "iana",
-        extensions: ["cjs"]
-      },
-      "application/nss": {
-        source: "iana"
-      },
-      "application/oauth-authz-req+jwt": {
-        source: "iana"
-      },
-      "application/oblivious-dns-message": {
-        source: "iana"
-      },
-      "application/ocsp-request": {
-        source: "iana"
-      },
-      "application/ocsp-response": {
-        source: "iana"
-      },
-      "application/octet-stream": {
-        source: "iana",
-        compressible: false,
-        extensions: ["bin", "dms", "lrf", "mar", "so", "dist", "distz", "pkg", "bpk", "dump", "elc", "deploy", "exe", "dll", "deb", "dmg", "iso", "img", "msi", "msp", "msm", "buffer"]
-      },
-      "application/oda": {
-        source: "iana",
-        extensions: ["oda"]
-      },
-      "application/odm+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/odx": {
-        source: "iana"
-      },
-      "application/oebps-package+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["opf"]
-      },
-      "application/ogg": {
-        source: "iana",
-        compressible: false,
-        extensions: ["ogx"]
-      },
-      "application/omdoc+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["omdoc"]
-      },
-      "application/onenote": {
-        source: "apache",
-        extensions: ["onetoc", "onetoc2", "onetmp", "onepkg"]
-      },
-      "application/opc-nodeset+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/oscore": {
-        source: "iana"
-      },
-      "application/oxps": {
-        source: "iana",
-        extensions: ["oxps"]
-      },
-      "application/p21": {
-        source: "iana"
-      },
-      "application/p21+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/p2p-overlay+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["relo"]
-      },
-      "application/parityfec": {
-        source: "iana"
-      },
-      "application/passport": {
-        source: "iana"
-      },
-      "application/patch-ops-error+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xer"]
-      },
-      "application/pdf": {
-        source: "iana",
-        compressible: false,
-        extensions: ["pdf"]
-      },
-      "application/pdx": {
-        source: "iana"
-      },
-      "application/pem-certificate-chain": {
-        source: "iana"
-      },
-      "application/pgp-encrypted": {
-        source: "iana",
-        compressible: false,
-        extensions: ["pgp"]
-      },
-      "application/pgp-keys": {
-        source: "iana",
-        extensions: ["asc"]
-      },
-      "application/pgp-signature": {
-        source: "iana",
-        extensions: ["asc", "sig"]
-      },
-      "application/pics-rules": {
-        source: "apache",
-        extensions: ["prf"]
-      },
-      "application/pidf+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/pidf-diff+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/pkcs10": {
-        source: "iana",
-        extensions: ["p10"]
-      },
-      "application/pkcs12": {
-        source: "iana"
-      },
-      "application/pkcs7-mime": {
-        source: "iana",
-        extensions: ["p7m", "p7c"]
-      },
-      "application/pkcs7-signature": {
-        source: "iana",
-        extensions: ["p7s"]
-      },
-      "application/pkcs8": {
-        source: "iana",
-        extensions: ["p8"]
-      },
-      "application/pkcs8-encrypted": {
-        source: "iana"
-      },
-      "application/pkix-attr-cert": {
-        source: "iana",
-        extensions: ["ac"]
-      },
-      "application/pkix-cert": {
-        source: "iana",
-        extensions: ["cer"]
-      },
-      "application/pkix-crl": {
-        source: "iana",
-        extensions: ["crl"]
-      },
-      "application/pkix-pkipath": {
-        source: "iana",
-        extensions: ["pkipath"]
-      },
-      "application/pkixcmp": {
-        source: "iana",
-        extensions: ["pki"]
-      },
-      "application/pls+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["pls"]
-      },
-      "application/poc-settings+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/postscript": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ai", "eps", "ps"]
-      },
-      "application/ppsp-tracker+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/problem+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/problem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/provenance+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["provx"]
-      },
-      "application/prs.alvestrand.titrax-sheet": {
-        source: "iana"
-      },
-      "application/prs.cww": {
-        source: "iana",
-        extensions: ["cww"]
-      },
-      "application/prs.cyn": {
-        source: "iana",
-        charset: "7-BIT"
-      },
-      "application/prs.hpub+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/prs.nprend": {
-        source: "iana"
-      },
-      "application/prs.plucker": {
-        source: "iana"
-      },
-      "application/prs.rdf-xml-crypt": {
-        source: "iana"
-      },
-      "application/prs.xsf+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/pskc+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["pskcxml"]
-      },
-      "application/pvd+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/qsig": {
-        source: "iana"
-      },
-      "application/raml+yaml": {
-        compressible: true,
-        extensions: ["raml"]
-      },
-      "application/raptorfec": {
-        source: "iana"
-      },
-      "application/rdap+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/rdf+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rdf", "owl"]
-      },
-      "application/reginfo+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rif"]
-      },
-      "application/relax-ng-compact-syntax": {
-        source: "iana",
-        extensions: ["rnc"]
-      },
-      "application/remote-printing": {
-        source: "iana"
-      },
-      "application/reputon+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/resource-lists+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rl"]
-      },
-      "application/resource-lists-diff+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rld"]
-      },
-      "application/rfc+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/riscos": {
-        source: "iana"
-      },
-      "application/rlmi+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/rls-services+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rs"]
-      },
-      "application/route-apd+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rapd"]
-      },
-      "application/route-s-tsid+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["sls"]
-      },
-      "application/route-usd+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rusd"]
-      },
-      "application/rpki-ghostbusters": {
-        source: "iana",
-        extensions: ["gbr"]
-      },
-      "application/rpki-manifest": {
-        source: "iana",
-        extensions: ["mft"]
-      },
-      "application/rpki-publication": {
-        source: "iana"
-      },
-      "application/rpki-roa": {
-        source: "iana",
-        extensions: ["roa"]
-      },
-      "application/rpki-updown": {
-        source: "iana"
-      },
-      "application/rsd+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["rsd"]
-      },
-      "application/rss+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["rss"]
-      },
-      "application/rtf": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rtf"]
-      },
-      "application/rtploopback": {
-        source: "iana"
-      },
-      "application/rtx": {
-        source: "iana"
-      },
-      "application/samlassertion+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/samlmetadata+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sarif+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sarif-external-properties+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sbe": {
-        source: "iana"
-      },
-      "application/sbml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["sbml"]
-      },
-      "application/scaip+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/scim+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/scvp-cv-request": {
-        source: "iana",
-        extensions: ["scq"]
-      },
-      "application/scvp-cv-response": {
-        source: "iana",
-        extensions: ["scs"]
-      },
-      "application/scvp-vp-request": {
-        source: "iana",
-        extensions: ["spq"]
-      },
-      "application/scvp-vp-response": {
-        source: "iana",
-        extensions: ["spp"]
-      },
-      "application/sdp": {
-        source: "iana",
-        extensions: ["sdp"]
-      },
-      "application/secevent+jwt": {
-        source: "iana"
-      },
-      "application/senml+cbor": {
-        source: "iana"
-      },
-      "application/senml+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/senml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["senmlx"]
-      },
-      "application/senml-etch+cbor": {
-        source: "iana"
-      },
-      "application/senml-etch+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/senml-exi": {
-        source: "iana"
-      },
-      "application/sensml+cbor": {
-        source: "iana"
-      },
-      "application/sensml+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sensml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["sensmlx"]
-      },
-      "application/sensml-exi": {
-        source: "iana"
-      },
-      "application/sep+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sep-exi": {
-        source: "iana"
-      },
-      "application/session-info": {
-        source: "iana"
-      },
-      "application/set-payment": {
-        source: "iana"
-      },
-      "application/set-payment-initiation": {
-        source: "iana",
-        extensions: ["setpay"]
-      },
-      "application/set-registration": {
-        source: "iana"
-      },
-      "application/set-registration-initiation": {
-        source: "iana",
-        extensions: ["setreg"]
-      },
-      "application/sgml": {
-        source: "iana"
-      },
-      "application/sgml-open-catalog": {
-        source: "iana"
-      },
-      "application/shf+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["shf"]
-      },
-      "application/sieve": {
-        source: "iana",
-        extensions: ["siv", "sieve"]
-      },
-      "application/simple-filter+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/simple-message-summary": {
-        source: "iana"
-      },
-      "application/simplesymbolcontainer": {
-        source: "iana"
-      },
-      "application/sipc": {
-        source: "iana"
-      },
-      "application/slate": {
-        source: "iana"
-      },
-      "application/smil": {
-        source: "iana"
-      },
-      "application/smil+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["smi", "smil"]
-      },
-      "application/smpte336m": {
-        source: "iana"
-      },
-      "application/soap+fastinfoset": {
-        source: "iana"
-      },
-      "application/soap+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sparql-query": {
-        source: "iana",
-        extensions: ["rq"]
-      },
-      "application/sparql-results+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["srx"]
-      },
-      "application/spdx+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/spirits-event+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/sql": {
-        source: "iana"
-      },
-      "application/srgs": {
-        source: "iana",
-        extensions: ["gram"]
-      },
-      "application/srgs+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["grxml"]
-      },
-      "application/sru+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["sru"]
-      },
-      "application/ssdl+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["ssdl"]
-      },
-      "application/ssml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ssml"]
-      },
-      "application/stix+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/swid+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["swidtag"]
-      },
-      "application/tamp-apex-update": {
-        source: "iana"
-      },
-      "application/tamp-apex-update-confirm": {
-        source: "iana"
-      },
-      "application/tamp-community-update": {
-        source: "iana"
-      },
-      "application/tamp-community-update-confirm": {
-        source: "iana"
-      },
-      "application/tamp-error": {
-        source: "iana"
-      },
-      "application/tamp-sequence-adjust": {
-        source: "iana"
-      },
-      "application/tamp-sequence-adjust-confirm": {
-        source: "iana"
-      },
-      "application/tamp-status-query": {
-        source: "iana"
-      },
-      "application/tamp-status-response": {
-        source: "iana"
-      },
-      "application/tamp-update": {
-        source: "iana"
-      },
-      "application/tamp-update-confirm": {
-        source: "iana"
-      },
-      "application/tar": {
-        compressible: true
-      },
-      "application/taxii+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/td+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/tei+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["tei", "teicorpus"]
-      },
-      "application/tetra_isi": {
-        source: "iana"
-      },
-      "application/thraud+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["tfi"]
-      },
-      "application/timestamp-query": {
-        source: "iana"
-      },
-      "application/timestamp-reply": {
-        source: "iana"
-      },
-      "application/timestamped-data": {
-        source: "iana",
-        extensions: ["tsd"]
-      },
-      "application/tlsrpt+gzip": {
-        source: "iana"
-      },
-      "application/tlsrpt+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/tnauthlist": {
-        source: "iana"
-      },
-      "application/token-introspection+jwt": {
-        source: "iana"
-      },
-      "application/toml": {
-        compressible: true,
-        extensions: ["toml"]
-      },
-      "application/trickle-ice-sdpfrag": {
-        source: "iana"
-      },
-      "application/trig": {
-        source: "iana",
-        extensions: ["trig"]
-      },
-      "application/ttml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ttml"]
-      },
-      "application/tve-trigger": {
-        source: "iana"
-      },
-      "application/tzif": {
-        source: "iana"
-      },
-      "application/tzif-leap": {
-        source: "iana"
-      },
-      "application/ubjson": {
-        compressible: false,
-        extensions: ["ubj"]
-      },
-      "application/ulpfec": {
-        source: "iana"
-      },
-      "application/urc-grpsheet+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/urc-ressheet+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rsheet"]
-      },
-      "application/urc-targetdesc+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["td"]
-      },
-      "application/urc-uisocketdesc+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vcard+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vcard+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vemmi": {
-        source: "iana"
-      },
-      "application/vividence.scriptfile": {
-        source: "apache"
-      },
-      "application/vnd.1000minds.decision-model+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["1km"]
-      },
-      "application/vnd.3gpp-prose+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp-prose-pc3ch+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp-v2x-local-service-information": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.5gnas": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.access-transfer-events+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.bsf+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.gmop+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.gtpc": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.interworking-data": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.lpp": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.mc-signalling-ear": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.mcdata-affiliation-command+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcdata-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcdata-payload": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.mcdata-service-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcdata-signalling": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.mcdata-ue-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcdata-user-profile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-affiliation-command+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-floor-request+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-location-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-mbms-usage-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-service-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-signed+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-ue-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-ue-init-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcptt-user-profile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-affiliation-command+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-affiliation-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-location-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-mbms-usage-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-service-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-transmission-request+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-ue-config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mcvideo-user-profile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.mid-call+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.ngap": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.pfcp": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.pic-bw-large": {
-        source: "iana",
-        extensions: ["plb"]
-      },
-      "application/vnd.3gpp.pic-bw-small": {
-        source: "iana",
-        extensions: ["psb"]
-      },
-      "application/vnd.3gpp.pic-bw-var": {
-        source: "iana",
-        extensions: ["pvb"]
-      },
-      "application/vnd.3gpp.s1ap": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.sms": {
-        source: "iana"
-      },
-      "application/vnd.3gpp.sms+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.srvcc-ext+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.srvcc-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.state-and-event-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp.ussd+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp2.bcmcsinfo+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.3gpp2.sms": {
-        source: "iana"
-      },
-      "application/vnd.3gpp2.tcap": {
-        source: "iana",
-        extensions: ["tcap"]
-      },
-      "application/vnd.3lightssoftware.imagescal": {
-        source: "iana"
-      },
-      "application/vnd.3m.post-it-notes": {
-        source: "iana",
-        extensions: ["pwn"]
-      },
-      "application/vnd.accpac.simply.aso": {
-        source: "iana",
-        extensions: ["aso"]
-      },
-      "application/vnd.accpac.simply.imp": {
-        source: "iana",
-        extensions: ["imp"]
-      },
-      "application/vnd.acucobol": {
-        source: "iana",
-        extensions: ["acu"]
-      },
-      "application/vnd.acucorp": {
-        source: "iana",
-        extensions: ["atc", "acutc"]
-      },
-      "application/vnd.adobe.air-application-installer-package+zip": {
-        source: "apache",
-        compressible: false,
-        extensions: ["air"]
-      },
-      "application/vnd.adobe.flash.movie": {
-        source: "iana"
-      },
-      "application/vnd.adobe.formscentral.fcdt": {
-        source: "iana",
-        extensions: ["fcdt"]
-      },
-      "application/vnd.adobe.fxp": {
-        source: "iana",
-        extensions: ["fxp", "fxpl"]
-      },
-      "application/vnd.adobe.partial-upload": {
-        source: "iana"
-      },
-      "application/vnd.adobe.xdp+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xdp"]
-      },
-      "application/vnd.adobe.xfdf": {
-        source: "iana",
-        extensions: ["xfdf"]
-      },
-      "application/vnd.aether.imp": {
-        source: "iana"
-      },
-      "application/vnd.afpc.afplinedata": {
-        source: "iana"
-      },
-      "application/vnd.afpc.afplinedata-pagedef": {
-        source: "iana"
-      },
-      "application/vnd.afpc.cmoca-cmresource": {
-        source: "iana"
-      },
-      "application/vnd.afpc.foca-charset": {
-        source: "iana"
-      },
-      "application/vnd.afpc.foca-codedfont": {
-        source: "iana"
-      },
-      "application/vnd.afpc.foca-codepage": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca-cmtable": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca-formdef": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca-mediummap": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca-objectcontainer": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca-overlay": {
-        source: "iana"
-      },
-      "application/vnd.afpc.modca-pagesegment": {
-        source: "iana"
-      },
-      "application/vnd.age": {
-        source: "iana",
-        extensions: ["age"]
-      },
-      "application/vnd.ah-barcode": {
-        source: "iana"
-      },
-      "application/vnd.ahead.space": {
-        source: "iana",
-        extensions: ["ahead"]
-      },
-      "application/vnd.airzip.filesecure.azf": {
-        source: "iana",
-        extensions: ["azf"]
-      },
-      "application/vnd.airzip.filesecure.azs": {
-        source: "iana",
-        extensions: ["azs"]
-      },
-      "application/vnd.amadeus+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.amazon.ebook": {
-        source: "apache",
-        extensions: ["azw"]
-      },
-      "application/vnd.amazon.mobi8-ebook": {
-        source: "iana"
-      },
-      "application/vnd.americandynamics.acc": {
-        source: "iana",
-        extensions: ["acc"]
-      },
-      "application/vnd.amiga.ami": {
-        source: "iana",
-        extensions: ["ami"]
-      },
-      "application/vnd.amundsen.maze+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.android.ota": {
-        source: "iana"
-      },
-      "application/vnd.android.package-archive": {
-        source: "apache",
-        compressible: false,
-        extensions: ["apk"]
-      },
-      "application/vnd.anki": {
-        source: "iana"
-      },
-      "application/vnd.anser-web-certificate-issue-initiation": {
-        source: "iana",
-        extensions: ["cii"]
-      },
-      "application/vnd.anser-web-funds-transfer-initiation": {
-        source: "apache",
-        extensions: ["fti"]
-      },
-      "application/vnd.antix.game-component": {
-        source: "iana",
-        extensions: ["atx"]
-      },
-      "application/vnd.apache.arrow.file": {
-        source: "iana"
-      },
-      "application/vnd.apache.arrow.stream": {
-        source: "iana"
-      },
-      "application/vnd.apache.thrift.binary": {
-        source: "iana"
-      },
-      "application/vnd.apache.thrift.compact": {
-        source: "iana"
-      },
-      "application/vnd.apache.thrift.json": {
-        source: "iana"
-      },
-      "application/vnd.api+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.aplextor.warrp+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.apothekende.reservation+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.apple.installer+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mpkg"]
-      },
-      "application/vnd.apple.keynote": {
-        source: "iana",
-        extensions: ["key"]
-      },
-      "application/vnd.apple.mpegurl": {
-        source: "iana",
-        extensions: ["m3u8"]
-      },
-      "application/vnd.apple.numbers": {
-        source: "iana",
-        extensions: ["numbers"]
-      },
-      "application/vnd.apple.pages": {
-        source: "iana",
-        extensions: ["pages"]
-      },
-      "application/vnd.apple.pkpass": {
-        compressible: false,
-        extensions: ["pkpass"]
-      },
-      "application/vnd.arastra.swi": {
-        source: "iana"
-      },
-      "application/vnd.aristanetworks.swi": {
-        source: "iana",
-        extensions: ["swi"]
-      },
-      "application/vnd.artisan+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.artsquare": {
-        source: "iana"
-      },
-      "application/vnd.astraea-software.iota": {
-        source: "iana",
-        extensions: ["iota"]
-      },
-      "application/vnd.audiograph": {
-        source: "iana",
-        extensions: ["aep"]
-      },
-      "application/vnd.autopackage": {
-        source: "iana"
-      },
-      "application/vnd.avalon+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.avistar+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.balsamiq.bmml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["bmml"]
-      },
-      "application/vnd.balsamiq.bmpr": {
-        source: "iana"
-      },
-      "application/vnd.banana-accounting": {
-        source: "iana"
-      },
-      "application/vnd.bbf.usp.error": {
-        source: "iana"
-      },
-      "application/vnd.bbf.usp.msg": {
-        source: "iana"
-      },
-      "application/vnd.bbf.usp.msg+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.bekitzur-stech+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.bint.med-content": {
-        source: "iana"
-      },
-      "application/vnd.biopax.rdf+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.blink-idb-value-wrapper": {
-        source: "iana"
-      },
-      "application/vnd.blueice.multipass": {
-        source: "iana",
-        extensions: ["mpm"]
-      },
-      "application/vnd.bluetooth.ep.oob": {
-        source: "iana"
-      },
-      "application/vnd.bluetooth.le.oob": {
-        source: "iana"
-      },
-      "application/vnd.bmi": {
-        source: "iana",
-        extensions: ["bmi"]
-      },
-      "application/vnd.bpf": {
-        source: "iana"
-      },
-      "application/vnd.bpf3": {
-        source: "iana"
-      },
-      "application/vnd.businessobjects": {
-        source: "iana",
-        extensions: ["rep"]
-      },
-      "application/vnd.byu.uapi+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.cab-jscript": {
-        source: "iana"
-      },
-      "application/vnd.canon-cpdl": {
-        source: "iana"
-      },
-      "application/vnd.canon-lips": {
-        source: "iana"
-      },
-      "application/vnd.capasystems-pg+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.cendio.thinlinc.clientconf": {
-        source: "iana"
-      },
-      "application/vnd.century-systems.tcp_stream": {
-        source: "iana"
-      },
-      "application/vnd.chemdraw+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["cdxml"]
-      },
-      "application/vnd.chess-pgn": {
-        source: "iana"
-      },
-      "application/vnd.chipnuts.karaoke-mmd": {
-        source: "iana",
-        extensions: ["mmd"]
-      },
-      "application/vnd.ciedi": {
-        source: "iana"
-      },
-      "application/vnd.cinderella": {
-        source: "iana",
-        extensions: ["cdy"]
-      },
-      "application/vnd.cirpack.isdn-ext": {
-        source: "iana"
-      },
-      "application/vnd.citationstyles.style+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["csl"]
-      },
-      "application/vnd.claymore": {
-        source: "iana",
-        extensions: ["cla"]
-      },
-      "application/vnd.cloanto.rp9": {
-        source: "iana",
-        extensions: ["rp9"]
-      },
-      "application/vnd.clonk.c4group": {
-        source: "iana",
-        extensions: ["c4g", "c4d", "c4f", "c4p", "c4u"]
-      },
-      "application/vnd.cluetrust.cartomobile-config": {
-        source: "iana",
-        extensions: ["c11amc"]
-      },
-      "application/vnd.cluetrust.cartomobile-config-pkg": {
-        source: "iana",
-        extensions: ["c11amz"]
-      },
-      "application/vnd.coffeescript": {
-        source: "iana"
-      },
-      "application/vnd.collabio.xodocuments.document": {
-        source: "iana"
-      },
-      "application/vnd.collabio.xodocuments.document-template": {
-        source: "iana"
-      },
-      "application/vnd.collabio.xodocuments.presentation": {
-        source: "iana"
-      },
-      "application/vnd.collabio.xodocuments.presentation-template": {
-        source: "iana"
-      },
-      "application/vnd.collabio.xodocuments.spreadsheet": {
-        source: "iana"
-      },
-      "application/vnd.collabio.xodocuments.spreadsheet-template": {
-        source: "iana"
-      },
-      "application/vnd.collection+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.collection.doc+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.collection.next+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.comicbook+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.comicbook-rar": {
-        source: "iana"
-      },
-      "application/vnd.commerce-battelle": {
-        source: "iana"
-      },
-      "application/vnd.commonspace": {
-        source: "iana",
-        extensions: ["csp"]
-      },
-      "application/vnd.contact.cmsg": {
-        source: "iana",
-        extensions: ["cdbcmsg"]
-      },
-      "application/vnd.coreos.ignition+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.cosmocaller": {
-        source: "iana",
-        extensions: ["cmc"]
-      },
-      "application/vnd.crick.clicker": {
-        source: "iana",
-        extensions: ["clkx"]
-      },
-      "application/vnd.crick.clicker.keyboard": {
-        source: "iana",
-        extensions: ["clkk"]
-      },
-      "application/vnd.crick.clicker.palette": {
-        source: "iana",
-        extensions: ["clkp"]
-      },
-      "application/vnd.crick.clicker.template": {
-        source: "iana",
-        extensions: ["clkt"]
-      },
-      "application/vnd.crick.clicker.wordbank": {
-        source: "iana",
-        extensions: ["clkw"]
-      },
-      "application/vnd.criticaltools.wbs+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["wbs"]
-      },
-      "application/vnd.cryptii.pipe+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.crypto-shade-file": {
-        source: "iana"
-      },
-      "application/vnd.cryptomator.encrypted": {
-        source: "iana"
-      },
-      "application/vnd.cryptomator.vault": {
-        source: "iana"
-      },
-      "application/vnd.ctc-posml": {
-        source: "iana",
-        extensions: ["pml"]
-      },
-      "application/vnd.ctct.ws+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.cups-pdf": {
-        source: "iana"
-      },
-      "application/vnd.cups-postscript": {
-        source: "iana"
-      },
-      "application/vnd.cups-ppd": {
-        source: "iana",
-        extensions: ["ppd"]
-      },
-      "application/vnd.cups-raster": {
-        source: "iana"
-      },
-      "application/vnd.cups-raw": {
-        source: "iana"
-      },
-      "application/vnd.curl": {
-        source: "iana"
-      },
-      "application/vnd.curl.car": {
-        source: "apache",
-        extensions: ["car"]
-      },
-      "application/vnd.curl.pcurl": {
-        source: "apache",
-        extensions: ["pcurl"]
-      },
-      "application/vnd.cyan.dean.root+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.cybank": {
-        source: "iana"
-      },
-      "application/vnd.cyclonedx+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.cyclonedx+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.d2l.coursepackage1p0+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.d3m-dataset": {
-        source: "iana"
-      },
-      "application/vnd.d3m-problem": {
-        source: "iana"
-      },
-      "application/vnd.dart": {
-        source: "iana",
-        compressible: true,
-        extensions: ["dart"]
-      },
-      "application/vnd.data-vision.rdz": {
-        source: "iana",
-        extensions: ["rdz"]
-      },
-      "application/vnd.datapackage+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dataresource+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dbf": {
-        source: "iana",
-        extensions: ["dbf"]
-      },
-      "application/vnd.debian.binary-package": {
-        source: "iana"
-      },
-      "application/vnd.dece.data": {
-        source: "iana",
-        extensions: ["uvf", "uvvf", "uvd", "uvvd"]
-      },
-      "application/vnd.dece.ttml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["uvt", "uvvt"]
-      },
-      "application/vnd.dece.unspecified": {
-        source: "iana",
-        extensions: ["uvx", "uvvx"]
-      },
-      "application/vnd.dece.zip": {
-        source: "iana",
-        extensions: ["uvz", "uvvz"]
-      },
-      "application/vnd.denovo.fcselayout-link": {
-        source: "iana",
-        extensions: ["fe_launch"]
-      },
-      "application/vnd.desmume.movie": {
-        source: "iana"
-      },
-      "application/vnd.dir-bi.plate-dl-nosuffix": {
-        source: "iana"
-      },
-      "application/vnd.dm.delegation+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dna": {
-        source: "iana",
-        extensions: ["dna"]
-      },
-      "application/vnd.document+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dolby.mlp": {
-        source: "apache",
-        extensions: ["mlp"]
-      },
-      "application/vnd.dolby.mobile.1": {
-        source: "iana"
-      },
-      "application/vnd.dolby.mobile.2": {
-        source: "iana"
-      },
-      "application/vnd.doremir.scorecloud-binary-document": {
-        source: "iana"
-      },
-      "application/vnd.dpgraph": {
-        source: "iana",
-        extensions: ["dpg"]
-      },
-      "application/vnd.dreamfactory": {
-        source: "iana",
-        extensions: ["dfac"]
-      },
-      "application/vnd.drive+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ds-keypoint": {
-        source: "apache",
-        extensions: ["kpxx"]
-      },
-      "application/vnd.dtg.local": {
-        source: "iana"
-      },
-      "application/vnd.dtg.local.flash": {
-        source: "iana"
-      },
-      "application/vnd.dtg.local.html": {
-        source: "iana"
-      },
-      "application/vnd.dvb.ait": {
-        source: "iana",
-        extensions: ["ait"]
-      },
-      "application/vnd.dvb.dvbisl+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.dvbj": {
-        source: "iana"
-      },
-      "application/vnd.dvb.esgcontainer": {
-        source: "iana"
-      },
-      "application/vnd.dvb.ipdcdftnotifaccess": {
-        source: "iana"
-      },
-      "application/vnd.dvb.ipdcesgaccess": {
-        source: "iana"
-      },
-      "application/vnd.dvb.ipdcesgaccess2": {
-        source: "iana"
-      },
-      "application/vnd.dvb.ipdcesgpdd": {
-        source: "iana"
-      },
-      "application/vnd.dvb.ipdcroaming": {
-        source: "iana"
-      },
-      "application/vnd.dvb.iptv.alfec-base": {
-        source: "iana"
-      },
-      "application/vnd.dvb.iptv.alfec-enhancement": {
-        source: "iana"
-      },
-      "application/vnd.dvb.notif-aggregate-root+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.notif-container+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.notif-generic+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.notif-ia-msglist+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.notif-ia-registration-request+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.notif-ia-registration-response+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.notif-init+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.dvb.pfr": {
-        source: "iana"
-      },
-      "application/vnd.dvb.service": {
-        source: "iana",
-        extensions: ["svc"]
-      },
-      "application/vnd.dxr": {
-        source: "iana"
-      },
-      "application/vnd.dynageo": {
-        source: "iana",
-        extensions: ["geo"]
-      },
-      "application/vnd.dzr": {
-        source: "iana"
-      },
-      "application/vnd.easykaraoke.cdgdownload": {
-        source: "iana"
-      },
-      "application/vnd.ecdis-update": {
-        source: "iana"
-      },
-      "application/vnd.ecip.rlp": {
-        source: "iana"
-      },
-      "application/vnd.eclipse.ditto+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ecowin.chart": {
-        source: "iana",
-        extensions: ["mag"]
-      },
-      "application/vnd.ecowin.filerequest": {
-        source: "iana"
-      },
-      "application/vnd.ecowin.fileupdate": {
-        source: "iana"
-      },
-      "application/vnd.ecowin.series": {
-        source: "iana"
-      },
-      "application/vnd.ecowin.seriesrequest": {
-        source: "iana"
-      },
-      "application/vnd.ecowin.seriesupdate": {
-        source: "iana"
-      },
-      "application/vnd.efi.img": {
-        source: "iana"
-      },
-      "application/vnd.efi.iso": {
-        source: "iana"
-      },
-      "application/vnd.emclient.accessrequest+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.enliven": {
-        source: "iana",
-        extensions: ["nml"]
-      },
-      "application/vnd.enphase.envoy": {
-        source: "iana"
-      },
-      "application/vnd.eprints.data+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.epson.esf": {
-        source: "iana",
-        extensions: ["esf"]
-      },
-      "application/vnd.epson.msf": {
-        source: "iana",
-        extensions: ["msf"]
-      },
-      "application/vnd.epson.quickanime": {
-        source: "iana",
-        extensions: ["qam"]
-      },
-      "application/vnd.epson.salt": {
-        source: "iana",
-        extensions: ["slt"]
-      },
-      "application/vnd.epson.ssf": {
-        source: "iana",
-        extensions: ["ssf"]
-      },
-      "application/vnd.ericsson.quickcall": {
-        source: "iana"
-      },
-      "application/vnd.espass-espass+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.eszigno3+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["es3", "et3"]
-      },
-      "application/vnd.etsi.aoc+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.asic-e+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.etsi.asic-s+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.etsi.cug+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvcommand+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvdiscovery+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvprofile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvsad-bc+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvsad-cod+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvsad-npvr+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvservice+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvsync+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.iptvueprofile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.mcid+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.mheg5": {
-        source: "iana"
-      },
-      "application/vnd.etsi.overload-control-policy-dataset+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.pstn+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.sci+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.simservs+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.timestamp-token": {
-        source: "iana"
-      },
-      "application/vnd.etsi.tsl+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.etsi.tsl.der": {
-        source: "iana"
-      },
-      "application/vnd.eu.kasparian.car+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.eudora.data": {
-        source: "iana"
-      },
-      "application/vnd.evolv.ecig.profile": {
-        source: "iana"
-      },
-      "application/vnd.evolv.ecig.settings": {
-        source: "iana"
-      },
-      "application/vnd.evolv.ecig.theme": {
-        source: "iana"
-      },
-      "application/vnd.exstream-empower+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.exstream-package": {
-        source: "iana"
-      },
-      "application/vnd.ezpix-album": {
-        source: "iana",
-        extensions: ["ez2"]
-      },
-      "application/vnd.ezpix-package": {
-        source: "iana",
-        extensions: ["ez3"]
-      },
-      "application/vnd.f-secure.mobile": {
-        source: "iana"
-      },
-      "application/vnd.familysearch.gedcom+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.fastcopy-disk-image": {
-        source: "iana"
-      },
-      "application/vnd.fdf": {
-        source: "iana",
-        extensions: ["fdf"]
-      },
-      "application/vnd.fdsn.mseed": {
-        source: "iana",
-        extensions: ["mseed"]
-      },
-      "application/vnd.fdsn.seed": {
-        source: "iana",
-        extensions: ["seed", "dataless"]
-      },
-      "application/vnd.ffsns": {
-        source: "iana"
-      },
-      "application/vnd.ficlab.flb+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.filmit.zfc": {
-        source: "iana"
-      },
-      "application/vnd.fints": {
-        source: "iana"
-      },
-      "application/vnd.firemonkeys.cloudcell": {
-        source: "iana"
-      },
-      "application/vnd.flographit": {
-        source: "iana",
-        extensions: ["gph"]
-      },
-      "application/vnd.fluxtime.clip": {
-        source: "iana",
-        extensions: ["ftc"]
-      },
-      "application/vnd.font-fontforge-sfd": {
-        source: "iana"
-      },
-      "application/vnd.framemaker": {
-        source: "iana",
-        extensions: ["fm", "frame", "maker", "book"]
-      },
-      "application/vnd.frogans.fnc": {
-        source: "iana",
-        extensions: ["fnc"]
-      },
-      "application/vnd.frogans.ltf": {
-        source: "iana",
-        extensions: ["ltf"]
-      },
-      "application/vnd.fsc.weblaunch": {
-        source: "iana",
-        extensions: ["fsc"]
-      },
-      "application/vnd.fujifilm.fb.docuworks": {
-        source: "iana"
-      },
-      "application/vnd.fujifilm.fb.docuworks.binder": {
-        source: "iana"
-      },
-      "application/vnd.fujifilm.fb.docuworks.container": {
-        source: "iana"
-      },
-      "application/vnd.fujifilm.fb.jfi+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.fujitsu.oasys": {
-        source: "iana",
-        extensions: ["oas"]
-      },
-      "application/vnd.fujitsu.oasys2": {
-        source: "iana",
-        extensions: ["oa2"]
-      },
-      "application/vnd.fujitsu.oasys3": {
-        source: "iana",
-        extensions: ["oa3"]
-      },
-      "application/vnd.fujitsu.oasysgp": {
-        source: "iana",
-        extensions: ["fg5"]
-      },
-      "application/vnd.fujitsu.oasysprs": {
-        source: "iana",
-        extensions: ["bh2"]
-      },
-      "application/vnd.fujixerox.art-ex": {
-        source: "iana"
-      },
-      "application/vnd.fujixerox.art4": {
-        source: "iana"
-      },
-      "application/vnd.fujixerox.ddd": {
-        source: "iana",
-        extensions: ["ddd"]
-      },
-      "application/vnd.fujixerox.docuworks": {
-        source: "iana",
-        extensions: ["xdw"]
-      },
-      "application/vnd.fujixerox.docuworks.binder": {
-        source: "iana",
-        extensions: ["xbd"]
-      },
-      "application/vnd.fujixerox.docuworks.container": {
-        source: "iana"
-      },
-      "application/vnd.fujixerox.hbpl": {
-        source: "iana"
-      },
-      "application/vnd.fut-misnet": {
-        source: "iana"
-      },
-      "application/vnd.futoin+cbor": {
-        source: "iana"
-      },
-      "application/vnd.futoin+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.fuzzysheet": {
-        source: "iana",
-        extensions: ["fzs"]
-      },
-      "application/vnd.genomatix.tuxedo": {
-        source: "iana",
-        extensions: ["txd"]
-      },
-      "application/vnd.gentics.grd+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.geo+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.geocube+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.geogebra.file": {
-        source: "iana",
-        extensions: ["ggb"]
-      },
-      "application/vnd.geogebra.slides": {
-        source: "iana"
-      },
-      "application/vnd.geogebra.tool": {
-        source: "iana",
-        extensions: ["ggt"]
-      },
-      "application/vnd.geometry-explorer": {
-        source: "iana",
-        extensions: ["gex", "gre"]
-      },
-      "application/vnd.geonext": {
-        source: "iana",
-        extensions: ["gxt"]
-      },
-      "application/vnd.geoplan": {
-        source: "iana",
-        extensions: ["g2w"]
-      },
-      "application/vnd.geospace": {
-        source: "iana",
-        extensions: ["g3w"]
-      },
-      "application/vnd.gerber": {
-        source: "iana"
-      },
-      "application/vnd.globalplatform.card-content-mgt": {
-        source: "iana"
-      },
-      "application/vnd.globalplatform.card-content-mgt-response": {
-        source: "iana"
-      },
-      "application/vnd.gmx": {
-        source: "iana",
-        extensions: ["gmx"]
-      },
-      "application/vnd.google-apps.document": {
-        compressible: false,
-        extensions: ["gdoc"]
-      },
-      "application/vnd.google-apps.presentation": {
-        compressible: false,
-        extensions: ["gslides"]
-      },
-      "application/vnd.google-apps.spreadsheet": {
-        compressible: false,
-        extensions: ["gsheet"]
-      },
-      "application/vnd.google-earth.kml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["kml"]
-      },
-      "application/vnd.google-earth.kmz": {
-        source: "iana",
-        compressible: false,
-        extensions: ["kmz"]
-      },
-      "application/vnd.gov.sk.e-form+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.gov.sk.e-form+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.gov.sk.xmldatacontainer+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.grafeq": {
-        source: "iana",
-        extensions: ["gqf", "gqs"]
-      },
-      "application/vnd.gridmp": {
-        source: "iana"
-      },
-      "application/vnd.groove-account": {
-        source: "iana",
-        extensions: ["gac"]
-      },
-      "application/vnd.groove-help": {
-        source: "iana",
-        extensions: ["ghf"]
-      },
-      "application/vnd.groove-identity-message": {
-        source: "iana",
-        extensions: ["gim"]
-      },
-      "application/vnd.groove-injector": {
-        source: "iana",
-        extensions: ["grv"]
-      },
-      "application/vnd.groove-tool-message": {
-        source: "iana",
-        extensions: ["gtm"]
-      },
-      "application/vnd.groove-tool-template": {
-        source: "iana",
-        extensions: ["tpl"]
-      },
-      "application/vnd.groove-vcard": {
-        source: "iana",
-        extensions: ["vcg"]
-      },
-      "application/vnd.hal+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.hal+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["hal"]
-      },
-      "application/vnd.handheld-entertainment+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["zmm"]
-      },
-      "application/vnd.hbci": {
-        source: "iana",
-        extensions: ["hbci"]
-      },
-      "application/vnd.hc+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.hcl-bireports": {
-        source: "iana"
-      },
-      "application/vnd.hdt": {
-        source: "iana"
-      },
-      "application/vnd.heroku+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.hhe.lesson-player": {
-        source: "iana",
-        extensions: ["les"]
-      },
-      "application/vnd.hl7cda+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/vnd.hl7v2+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/vnd.hp-hpgl": {
-        source: "iana",
-        extensions: ["hpgl"]
-      },
-      "application/vnd.hp-hpid": {
-        source: "iana",
-        extensions: ["hpid"]
-      },
-      "application/vnd.hp-hps": {
-        source: "iana",
-        extensions: ["hps"]
-      },
-      "application/vnd.hp-jlyt": {
-        source: "iana",
-        extensions: ["jlt"]
-      },
-      "application/vnd.hp-pcl": {
-        source: "iana",
-        extensions: ["pcl"]
-      },
-      "application/vnd.hp-pclxl": {
-        source: "iana",
-        extensions: ["pclxl"]
-      },
-      "application/vnd.httphone": {
-        source: "iana"
-      },
-      "application/vnd.hydrostatix.sof-data": {
-        source: "iana",
-        extensions: ["sfd-hdstx"]
-      },
-      "application/vnd.hyper+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.hyper-item+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.hyperdrive+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.hzn-3d-crossword": {
-        source: "iana"
-      },
-      "application/vnd.ibm.afplinedata": {
-        source: "iana"
-      },
-      "application/vnd.ibm.electronic-media": {
-        source: "iana"
-      },
-      "application/vnd.ibm.minipay": {
-        source: "iana",
-        extensions: ["mpy"]
-      },
-      "application/vnd.ibm.modcap": {
-        source: "iana",
-        extensions: ["afp", "listafp", "list3820"]
-      },
-      "application/vnd.ibm.rights-management": {
-        source: "iana",
-        extensions: ["irm"]
-      },
-      "application/vnd.ibm.secure-container": {
-        source: "iana",
-        extensions: ["sc"]
-      },
-      "application/vnd.iccprofile": {
-        source: "iana",
-        extensions: ["icc", "icm"]
-      },
-      "application/vnd.ieee.1905": {
-        source: "iana"
-      },
-      "application/vnd.igloader": {
-        source: "iana",
-        extensions: ["igl"]
-      },
-      "application/vnd.imagemeter.folder+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.imagemeter.image+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.immervision-ivp": {
-        source: "iana",
-        extensions: ["ivp"]
-      },
-      "application/vnd.immervision-ivu": {
-        source: "iana",
-        extensions: ["ivu"]
-      },
-      "application/vnd.ims.imsccv1p1": {
-        source: "iana"
-      },
-      "application/vnd.ims.imsccv1p2": {
-        source: "iana"
-      },
-      "application/vnd.ims.imsccv1p3": {
-        source: "iana"
-      },
-      "application/vnd.ims.lis.v2.result+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ims.lti.v2.toolconsumerprofile+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ims.lti.v2.toolproxy+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ims.lti.v2.toolproxy.id+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ims.lti.v2.toolsettings+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ims.lti.v2.toolsettings.simple+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.informedcontrol.rms+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.informix-visionary": {
-        source: "iana"
-      },
-      "application/vnd.infotech.project": {
-        source: "iana"
-      },
-      "application/vnd.infotech.project+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.innopath.wamp.notification": {
-        source: "iana"
-      },
-      "application/vnd.insors.igm": {
-        source: "iana",
-        extensions: ["igm"]
-      },
-      "application/vnd.intercon.formnet": {
-        source: "iana",
-        extensions: ["xpw", "xpx"]
-      },
-      "application/vnd.intergeo": {
-        source: "iana",
-        extensions: ["i2g"]
-      },
-      "application/vnd.intertrust.digibox": {
-        source: "iana"
-      },
-      "application/vnd.intertrust.nncp": {
-        source: "iana"
-      },
-      "application/vnd.intu.qbo": {
-        source: "iana",
-        extensions: ["qbo"]
-      },
-      "application/vnd.intu.qfx": {
-        source: "iana",
-        extensions: ["qfx"]
-      },
-      "application/vnd.iptc.g2.catalogitem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.iptc.g2.conceptitem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.iptc.g2.knowledgeitem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.iptc.g2.newsitem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.iptc.g2.newsmessage+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.iptc.g2.packageitem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.iptc.g2.planningitem+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ipunplugged.rcprofile": {
-        source: "iana",
-        extensions: ["rcprofile"]
-      },
-      "application/vnd.irepository.package+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["irp"]
-      },
-      "application/vnd.is-xpr": {
-        source: "iana",
-        extensions: ["xpr"]
-      },
-      "application/vnd.isac.fcs": {
-        source: "iana",
-        extensions: ["fcs"]
-      },
-      "application/vnd.iso11783-10+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.jam": {
-        source: "iana",
-        extensions: ["jam"]
-      },
-      "application/vnd.japannet-directory-service": {
-        source: "iana"
-      },
-      "application/vnd.japannet-jpnstore-wakeup": {
-        source: "iana"
-      },
-      "application/vnd.japannet-payment-wakeup": {
-        source: "iana"
-      },
-      "application/vnd.japannet-registration": {
-        source: "iana"
-      },
-      "application/vnd.japannet-registration-wakeup": {
-        source: "iana"
-      },
-      "application/vnd.japannet-setstore-wakeup": {
-        source: "iana"
-      },
-      "application/vnd.japannet-verification": {
-        source: "iana"
-      },
-      "application/vnd.japannet-verification-wakeup": {
-        source: "iana"
-      },
-      "application/vnd.jcp.javame.midlet-rms": {
-        source: "iana",
-        extensions: ["rms"]
-      },
-      "application/vnd.jisp": {
-        source: "iana",
-        extensions: ["jisp"]
-      },
-      "application/vnd.joost.joda-archive": {
-        source: "iana",
-        extensions: ["joda"]
-      },
-      "application/vnd.jsk.isdn-ngn": {
-        source: "iana"
-      },
-      "application/vnd.kahootz": {
-        source: "iana",
-        extensions: ["ktz", "ktr"]
-      },
-      "application/vnd.kde.karbon": {
-        source: "iana",
-        extensions: ["karbon"]
-      },
-      "application/vnd.kde.kchart": {
-        source: "iana",
-        extensions: ["chrt"]
-      },
-      "application/vnd.kde.kformula": {
-        source: "iana",
-        extensions: ["kfo"]
-      },
-      "application/vnd.kde.kivio": {
-        source: "iana",
-        extensions: ["flw"]
-      },
-      "application/vnd.kde.kontour": {
-        source: "iana",
-        extensions: ["kon"]
-      },
-      "application/vnd.kde.kpresenter": {
-        source: "iana",
-        extensions: ["kpr", "kpt"]
-      },
-      "application/vnd.kde.kspread": {
-        source: "iana",
-        extensions: ["ksp"]
-      },
-      "application/vnd.kde.kword": {
-        source: "iana",
-        extensions: ["kwd", "kwt"]
-      },
-      "application/vnd.kenameaapp": {
-        source: "iana",
-        extensions: ["htke"]
-      },
-      "application/vnd.kidspiration": {
-        source: "iana",
-        extensions: ["kia"]
-      },
-      "application/vnd.kinar": {
-        source: "iana",
-        extensions: ["kne", "knp"]
-      },
-      "application/vnd.koan": {
-        source: "iana",
-        extensions: ["skp", "skd", "skt", "skm"]
-      },
-      "application/vnd.kodak-descriptor": {
-        source: "iana",
-        extensions: ["sse"]
-      },
-      "application/vnd.las": {
-        source: "iana"
-      },
-      "application/vnd.las.las+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.las.las+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["lasxml"]
-      },
-      "application/vnd.laszip": {
-        source: "iana"
-      },
-      "application/vnd.leap+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.liberty-request+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.llamagraphics.life-balance.desktop": {
-        source: "iana",
-        extensions: ["lbd"]
-      },
-      "application/vnd.llamagraphics.life-balance.exchange+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["lbe"]
-      },
-      "application/vnd.logipipe.circuit+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.loom": {
-        source: "iana"
-      },
-      "application/vnd.lotus-1-2-3": {
-        source: "iana",
-        extensions: ["123"]
-      },
-      "application/vnd.lotus-approach": {
-        source: "iana",
-        extensions: ["apr"]
-      },
-      "application/vnd.lotus-freelance": {
-        source: "iana",
-        extensions: ["pre"]
-      },
-      "application/vnd.lotus-notes": {
-        source: "iana",
-        extensions: ["nsf"]
-      },
-      "application/vnd.lotus-organizer": {
-        source: "iana",
-        extensions: ["org"]
-      },
-      "application/vnd.lotus-screencam": {
-        source: "iana",
-        extensions: ["scm"]
-      },
-      "application/vnd.lotus-wordpro": {
-        source: "iana",
-        extensions: ["lwp"]
-      },
-      "application/vnd.macports.portpkg": {
-        source: "iana",
-        extensions: ["portpkg"]
-      },
-      "application/vnd.mapbox-vector-tile": {
-        source: "iana",
-        extensions: ["mvt"]
-      },
-      "application/vnd.marlin.drm.actiontoken+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.marlin.drm.conftoken+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.marlin.drm.license+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.marlin.drm.mdcf": {
-        source: "iana"
-      },
-      "application/vnd.mason+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.maxar.archive.3tz+zip": {
-        source: "iana",
-        compressible: false
-      },
-      "application/vnd.maxmind.maxmind-db": {
-        source: "iana"
-      },
-      "application/vnd.mcd": {
-        source: "iana",
-        extensions: ["mcd"]
-      },
-      "application/vnd.medcalcdata": {
-        source: "iana",
-        extensions: ["mc1"]
-      },
-      "application/vnd.mediastation.cdkey": {
-        source: "iana",
-        extensions: ["cdkey"]
-      },
-      "application/vnd.meridian-slingshot": {
-        source: "iana"
-      },
-      "application/vnd.mfer": {
-        source: "iana",
-        extensions: ["mwf"]
-      },
-      "application/vnd.mfmp": {
-        source: "iana",
-        extensions: ["mfm"]
-      },
-      "application/vnd.micro+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.micrografx.flo": {
-        source: "iana",
-        extensions: ["flo"]
-      },
-      "application/vnd.micrografx.igx": {
-        source: "iana",
-        extensions: ["igx"]
-      },
-      "application/vnd.microsoft.portable-executable": {
-        source: "iana"
-      },
-      "application/vnd.microsoft.windows.thumbnail-cache": {
-        source: "iana"
-      },
-      "application/vnd.miele+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.mif": {
-        source: "iana",
-        extensions: ["mif"]
-      },
-      "application/vnd.minisoft-hp3000-save": {
-        source: "iana"
-      },
-      "application/vnd.mitsubishi.misty-guard.trustweb": {
-        source: "iana"
-      },
-      "application/vnd.mobius.daf": {
-        source: "iana",
-        extensions: ["daf"]
-      },
-      "application/vnd.mobius.dis": {
-        source: "iana",
-        extensions: ["dis"]
-      },
-      "application/vnd.mobius.mbk": {
-        source: "iana",
-        extensions: ["mbk"]
-      },
-      "application/vnd.mobius.mqy": {
-        source: "iana",
-        extensions: ["mqy"]
-      },
-      "application/vnd.mobius.msl": {
-        source: "iana",
-        extensions: ["msl"]
-      },
-      "application/vnd.mobius.plc": {
-        source: "iana",
-        extensions: ["plc"]
-      },
-      "application/vnd.mobius.txf": {
-        source: "iana",
-        extensions: ["txf"]
-      },
-      "application/vnd.mophun.application": {
-        source: "iana",
-        extensions: ["mpn"]
-      },
-      "application/vnd.mophun.certificate": {
-        source: "iana",
-        extensions: ["mpc"]
-      },
-      "application/vnd.motorola.flexsuite": {
-        source: "iana"
-      },
-      "application/vnd.motorola.flexsuite.adsi": {
-        source: "iana"
-      },
-      "application/vnd.motorola.flexsuite.fis": {
-        source: "iana"
-      },
-      "application/vnd.motorola.flexsuite.gotap": {
-        source: "iana"
-      },
-      "application/vnd.motorola.flexsuite.kmr": {
-        source: "iana"
-      },
-      "application/vnd.motorola.flexsuite.ttc": {
-        source: "iana"
-      },
-      "application/vnd.motorola.flexsuite.wem": {
-        source: "iana"
-      },
-      "application/vnd.motorola.iprm": {
-        source: "iana"
-      },
-      "application/vnd.mozilla.xul+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xul"]
-      },
-      "application/vnd.ms-3mfdocument": {
-        source: "iana"
-      },
-      "application/vnd.ms-artgalry": {
-        source: "iana",
-        extensions: ["cil"]
-      },
-      "application/vnd.ms-asf": {
-        source: "iana"
-      },
-      "application/vnd.ms-cab-compressed": {
-        source: "iana",
-        extensions: ["cab"]
-      },
-      "application/vnd.ms-color.iccprofile": {
-        source: "apache"
-      },
-      "application/vnd.ms-excel": {
-        source: "iana",
-        compressible: false,
-        extensions: ["xls", "xlm", "xla", "xlc", "xlt", "xlw"]
-      },
-      "application/vnd.ms-excel.addin.macroenabled.12": {
-        source: "iana",
-        extensions: ["xlam"]
-      },
-      "application/vnd.ms-excel.sheet.binary.macroenabled.12": {
-        source: "iana",
-        extensions: ["xlsb"]
-      },
-      "application/vnd.ms-excel.sheet.macroenabled.12": {
-        source: "iana",
-        extensions: ["xlsm"]
-      },
-      "application/vnd.ms-excel.template.macroenabled.12": {
-        source: "iana",
-        extensions: ["xltm"]
-      },
-      "application/vnd.ms-fontobject": {
-        source: "iana",
-        compressible: true,
-        extensions: ["eot"]
-      },
-      "application/vnd.ms-htmlhelp": {
-        source: "iana",
-        extensions: ["chm"]
-      },
-      "application/vnd.ms-ims": {
-        source: "iana",
-        extensions: ["ims"]
-      },
-      "application/vnd.ms-lrm": {
-        source: "iana",
-        extensions: ["lrm"]
-      },
-      "application/vnd.ms-office.activex+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ms-officetheme": {
-        source: "iana",
-        extensions: ["thmx"]
-      },
-      "application/vnd.ms-opentype": {
-        source: "apache",
-        compressible: true
-      },
-      "application/vnd.ms-outlook": {
-        compressible: false,
-        extensions: ["msg"]
-      },
-      "application/vnd.ms-package.obfuscated-opentype": {
-        source: "apache"
-      },
-      "application/vnd.ms-pki.seccat": {
-        source: "apache",
-        extensions: ["cat"]
-      },
-      "application/vnd.ms-pki.stl": {
-        source: "apache",
-        extensions: ["stl"]
-      },
-      "application/vnd.ms-playready.initiator+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ms-powerpoint": {
-        source: "iana",
-        compressible: false,
-        extensions: ["ppt", "pps", "pot"]
-      },
-      "application/vnd.ms-powerpoint.addin.macroenabled.12": {
-        source: "iana",
-        extensions: ["ppam"]
-      },
-      "application/vnd.ms-powerpoint.presentation.macroenabled.12": {
-        source: "iana",
-        extensions: ["pptm"]
-      },
-      "application/vnd.ms-powerpoint.slide.macroenabled.12": {
-        source: "iana",
-        extensions: ["sldm"]
-      },
-      "application/vnd.ms-powerpoint.slideshow.macroenabled.12": {
-        source: "iana",
-        extensions: ["ppsm"]
-      },
-      "application/vnd.ms-powerpoint.template.macroenabled.12": {
-        source: "iana",
-        extensions: ["potm"]
-      },
-      "application/vnd.ms-printdevicecapabilities+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ms-printing.printticket+xml": {
-        source: "apache",
-        compressible: true
-      },
-      "application/vnd.ms-printschematicket+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ms-project": {
-        source: "iana",
-        extensions: ["mpp", "mpt"]
-      },
-      "application/vnd.ms-tnef": {
-        source: "iana"
-      },
-      "application/vnd.ms-windows.devicepairing": {
-        source: "iana"
-      },
-      "application/vnd.ms-windows.nwprinting.oob": {
-        source: "iana"
-      },
-      "application/vnd.ms-windows.printerpairing": {
-        source: "iana"
-      },
-      "application/vnd.ms-windows.wsd.oob": {
-        source: "iana"
-      },
-      "application/vnd.ms-wmdrm.lic-chlg-req": {
-        source: "iana"
-      },
-      "application/vnd.ms-wmdrm.lic-resp": {
-        source: "iana"
-      },
-      "application/vnd.ms-wmdrm.meter-chlg-req": {
-        source: "iana"
-      },
-      "application/vnd.ms-wmdrm.meter-resp": {
-        source: "iana"
-      },
-      "application/vnd.ms-word.document.macroenabled.12": {
-        source: "iana",
-        extensions: ["docm"]
-      },
-      "application/vnd.ms-word.template.macroenabled.12": {
-        source: "iana",
-        extensions: ["dotm"]
-      },
-      "application/vnd.ms-works": {
-        source: "iana",
-        extensions: ["wps", "wks", "wcm", "wdb"]
-      },
-      "application/vnd.ms-wpl": {
-        source: "iana",
-        extensions: ["wpl"]
-      },
-      "application/vnd.ms-xpsdocument": {
-        source: "iana",
-        compressible: false,
-        extensions: ["xps"]
-      },
-      "application/vnd.msa-disk-image": {
-        source: "iana"
-      },
-      "application/vnd.mseq": {
-        source: "iana",
-        extensions: ["mseq"]
-      },
-      "application/vnd.msign": {
-        source: "iana"
-      },
-      "application/vnd.multiad.creator": {
-        source: "iana"
-      },
-      "application/vnd.multiad.creator.cif": {
-        source: "iana"
-      },
-      "application/vnd.music-niff": {
-        source: "iana"
-      },
-      "application/vnd.musician": {
-        source: "iana",
-        extensions: ["mus"]
-      },
-      "application/vnd.muvee.style": {
-        source: "iana",
-        extensions: ["msty"]
-      },
-      "application/vnd.mynfc": {
-        source: "iana",
-        extensions: ["taglet"]
-      },
-      "application/vnd.nacamar.ybrid+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.ncd.control": {
-        source: "iana"
-      },
-      "application/vnd.ncd.reference": {
-        source: "iana"
-      },
-      "application/vnd.nearst.inv+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.nebumind.line": {
-        source: "iana"
-      },
-      "application/vnd.nervana": {
-        source: "iana"
-      },
-      "application/vnd.netfpx": {
-        source: "iana"
-      },
-      "application/vnd.neurolanguage.nlu": {
-        source: "iana",
-        extensions: ["nlu"]
-      },
-      "application/vnd.nimn": {
-        source: "iana"
-      },
-      "application/vnd.nintendo.nitro.rom": {
-        source: "iana"
-      },
-      "application/vnd.nintendo.snes.rom": {
-        source: "iana"
-      },
-      "application/vnd.nitf": {
-        source: "iana",
-        extensions: ["ntf", "nitf"]
-      },
-      "application/vnd.noblenet-directory": {
-        source: "iana",
-        extensions: ["nnd"]
-      },
-      "application/vnd.noblenet-sealer": {
-        source: "iana",
-        extensions: ["nns"]
-      },
-      "application/vnd.noblenet-web": {
-        source: "iana",
-        extensions: ["nnw"]
-      },
-      "application/vnd.nokia.catalogs": {
-        source: "iana"
-      },
-      "application/vnd.nokia.conml+wbxml": {
-        source: "iana"
-      },
-      "application/vnd.nokia.conml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.nokia.iptv.config+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.nokia.isds-radio-presets": {
-        source: "iana"
-      },
-      "application/vnd.nokia.landmark+wbxml": {
-        source: "iana"
-      },
-      "application/vnd.nokia.landmark+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.nokia.landmarkcollection+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.nokia.n-gage.ac+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ac"]
-      },
-      "application/vnd.nokia.n-gage.data": {
-        source: "iana",
-        extensions: ["ngdat"]
-      },
-      "application/vnd.nokia.n-gage.symbian.install": {
-        source: "iana",
-        extensions: ["n-gage"]
-      },
-      "application/vnd.nokia.ncd": {
-        source: "iana"
-      },
-      "application/vnd.nokia.pcd+wbxml": {
-        source: "iana"
-      },
-      "application/vnd.nokia.pcd+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.nokia.radio-preset": {
-        source: "iana",
-        extensions: ["rpst"]
-      },
-      "application/vnd.nokia.radio-presets": {
-        source: "iana",
-        extensions: ["rpss"]
-      },
-      "application/vnd.novadigm.edm": {
-        source: "iana",
-        extensions: ["edm"]
-      },
-      "application/vnd.novadigm.edx": {
-        source: "iana",
-        extensions: ["edx"]
-      },
-      "application/vnd.novadigm.ext": {
-        source: "iana",
-        extensions: ["ext"]
-      },
-      "application/vnd.ntt-local.content-share": {
-        source: "iana"
-      },
-      "application/vnd.ntt-local.file-transfer": {
-        source: "iana"
-      },
-      "application/vnd.ntt-local.ogw_remote-access": {
-        source: "iana"
-      },
-      "application/vnd.ntt-local.sip-ta_remote": {
-        source: "iana"
-      },
-      "application/vnd.ntt-local.sip-ta_tcp_stream": {
-        source: "iana"
-      },
-      "application/vnd.oasis.opendocument.chart": {
-        source: "iana",
-        extensions: ["odc"]
-      },
-      "application/vnd.oasis.opendocument.chart-template": {
-        source: "iana",
-        extensions: ["otc"]
-      },
-      "application/vnd.oasis.opendocument.database": {
-        source: "iana",
-        extensions: ["odb"]
-      },
-      "application/vnd.oasis.opendocument.formula": {
-        source: "iana",
-        extensions: ["odf"]
-      },
-      "application/vnd.oasis.opendocument.formula-template": {
-        source: "iana",
-        extensions: ["odft"]
-      },
-      "application/vnd.oasis.opendocument.graphics": {
-        source: "iana",
-        compressible: false,
-        extensions: ["odg"]
-      },
-      "application/vnd.oasis.opendocument.graphics-template": {
-        source: "iana",
-        extensions: ["otg"]
-      },
-      "application/vnd.oasis.opendocument.image": {
-        source: "iana",
-        extensions: ["odi"]
-      },
-      "application/vnd.oasis.opendocument.image-template": {
-        source: "iana",
-        extensions: ["oti"]
-      },
-      "application/vnd.oasis.opendocument.presentation": {
-        source: "iana",
-        compressible: false,
-        extensions: ["odp"]
-      },
-      "application/vnd.oasis.opendocument.presentation-template": {
-        source: "iana",
-        extensions: ["otp"]
-      },
-      "application/vnd.oasis.opendocument.spreadsheet": {
-        source: "iana",
-        compressible: false,
-        extensions: ["ods"]
-      },
-      "application/vnd.oasis.opendocument.spreadsheet-template": {
-        source: "iana",
-        extensions: ["ots"]
-      },
-      "application/vnd.oasis.opendocument.text": {
-        source: "iana",
-        compressible: false,
-        extensions: ["odt"]
-      },
-      "application/vnd.oasis.opendocument.text-master": {
-        source: "iana",
-        extensions: ["odm"]
-      },
-      "application/vnd.oasis.opendocument.text-template": {
-        source: "iana",
-        extensions: ["ott"]
-      },
-      "application/vnd.oasis.opendocument.text-web": {
-        source: "iana",
-        extensions: ["oth"]
-      },
-      "application/vnd.obn": {
-        source: "iana"
-      },
-      "application/vnd.ocf+cbor": {
-        source: "iana"
-      },
-      "application/vnd.oci.image.manifest.v1+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oftn.l10n+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.contentaccessdownload+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.contentaccessstreaming+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.cspg-hexbinary": {
-        source: "iana"
-      },
-      "application/vnd.oipf.dae.svg+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.dae.xhtml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.mippvcontrolmessage+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.pae.gem": {
-        source: "iana"
-      },
-      "application/vnd.oipf.spdiscovery+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.spdlist+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.ueprofile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oipf.userprofile+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.olpc-sugar": {
-        source: "iana",
-        extensions: ["xo"]
-      },
-      "application/vnd.oma-scws-config": {
-        source: "iana"
-      },
-      "application/vnd.oma-scws-http-request": {
-        source: "iana"
-      },
-      "application/vnd.oma-scws-http-response": {
-        source: "iana"
-      },
-      "application/vnd.oma.bcast.associated-procedure-parameter+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.drm-trigger+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.imd+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.ltkm": {
-        source: "iana"
-      },
-      "application/vnd.oma.bcast.notification+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.provisioningtrigger": {
-        source: "iana"
-      },
-      "application/vnd.oma.bcast.sgboot": {
-        source: "iana"
-      },
-      "application/vnd.oma.bcast.sgdd+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.sgdu": {
-        source: "iana"
-      },
-      "application/vnd.oma.bcast.simple-symbol-container": {
-        source: "iana"
-      },
-      "application/vnd.oma.bcast.smartcard-trigger+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.sprov+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.bcast.stkm": {
-        source: "iana"
-      },
-      "application/vnd.oma.cab-address-book+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.cab-feature-handler+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.cab-pcc+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.cab-subs-invite+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.cab-user-prefs+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.dcd": {
-        source: "iana"
-      },
-      "application/vnd.oma.dcdc": {
-        source: "iana"
-      },
-      "application/vnd.oma.dd2+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["dd2"]
-      },
-      "application/vnd.oma.drm.risd+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.group-usage-list+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.lwm2m+cbor": {
-        source: "iana"
-      },
-      "application/vnd.oma.lwm2m+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.lwm2m+tlv": {
-        source: "iana"
-      },
-      "application/vnd.oma.pal+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.poc.detailed-progress-report+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.poc.final-report+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.poc.groups+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.poc.invocation-descriptor+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.poc.optimized-progress-report+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.push": {
-        source: "iana"
-      },
-      "application/vnd.oma.scidm.messages+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oma.xcap-directory+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.omads-email+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/vnd.omads-file+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/vnd.omads-folder+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/vnd.omaloc-supl-init": {
-        source: "iana"
-      },
-      "application/vnd.onepager": {
-        source: "iana"
-      },
-      "application/vnd.onepagertamp": {
-        source: "iana"
-      },
-      "application/vnd.onepagertamx": {
-        source: "iana"
-      },
-      "application/vnd.onepagertat": {
-        source: "iana"
-      },
-      "application/vnd.onepagertatp": {
-        source: "iana"
-      },
-      "application/vnd.onepagertatx": {
-        source: "iana"
-      },
-      "application/vnd.openblox.game+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["obgx"]
-      },
-      "application/vnd.openblox.game-binary": {
-        source: "iana"
-      },
-      "application/vnd.openeye.oeb": {
-        source: "iana"
-      },
-      "application/vnd.openofficeorg.extension": {
-        source: "apache",
-        extensions: ["oxt"]
-      },
-      "application/vnd.openstreetmap.data+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["osm"]
-      },
-      "application/vnd.opentimestamps.ots": {
-        source: "iana"
-      },
-      "application/vnd.openxmlformats-officedocument.custom-properties+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.customxmlproperties+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawing+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawingml.chart+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawingml.diagramcolors+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawingml.diagramdata+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawingml.diagramlayout+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.drawingml.diagramstyle+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.extended-properties+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.commentauthors+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.comments+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.handoutmaster+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.notesmaster+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.notesslide+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation": {
-        source: "iana",
-        compressible: false,
-        extensions: ["pptx"]
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.presprops+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slide": {
-        source: "iana",
-        extensions: ["sldx"]
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slide+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slidelayout+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slidemaster+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slideshow": {
-        source: "iana",
-        extensions: ["ppsx"]
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.slideupdateinfo+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.tablestyles+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.tags+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.template": {
-        source: "iana",
-        extensions: ["potx"]
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.template.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.presentationml.viewprops+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.calcchain+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.externallink+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcachedefinition+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcacherecords+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.pivottable+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.querytable+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.revisionheaders+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.revisionlog+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sharedstrings+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
-        source: "iana",
-        compressible: false,
-        extensions: ["xlsx"]
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheetmetadata+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.tablesinglecells+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.template": {
-        source: "iana",
-        extensions: ["xltx"]
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.usernames+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.volatiledependencies+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.theme+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.themeoverride+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.vmldrawing": {
-        source: "iana"
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
-        source: "iana",
-        compressible: false,
-        extensions: ["docx"]
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.fonttable+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.template": {
-        source: "iana",
-        extensions: ["dotx"]
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.websettings+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-package.core-properties+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.openxmlformats-package.relationships+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oracle.resource+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.orange.indata": {
-        source: "iana"
-      },
-      "application/vnd.osa.netdeploy": {
-        source: "iana"
-      },
-      "application/vnd.osgeo.mapguide.package": {
-        source: "iana",
-        extensions: ["mgp"]
-      },
-      "application/vnd.osgi.bundle": {
-        source: "iana"
-      },
-      "application/vnd.osgi.dp": {
-        source: "iana",
-        extensions: ["dp"]
-      },
-      "application/vnd.osgi.subsystem": {
-        source: "iana",
-        extensions: ["esa"]
-      },
-      "application/vnd.otps.ct-kip+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.oxli.countgraph": {
-        source: "iana"
-      },
-      "application/vnd.pagerduty+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.palm": {
-        source: "iana",
-        extensions: ["pdb", "pqa", "oprc"]
-      },
-      "application/vnd.panoply": {
-        source: "iana"
-      },
-      "application/vnd.paos.xml": {
-        source: "iana"
-      },
-      "application/vnd.patentdive": {
-        source: "iana"
-      },
-      "application/vnd.patientecommsdoc": {
-        source: "iana"
-      },
-      "application/vnd.pawaafile": {
-        source: "iana",
-        extensions: ["paw"]
-      },
-      "application/vnd.pcos": {
-        source: "iana"
-      },
-      "application/vnd.pg.format": {
-        source: "iana",
-        extensions: ["str"]
-      },
-      "application/vnd.pg.osasli": {
-        source: "iana",
-        extensions: ["ei6"]
-      },
-      "application/vnd.piaccess.application-licence": {
-        source: "iana"
-      },
-      "application/vnd.picsel": {
-        source: "iana",
-        extensions: ["efif"]
-      },
-      "application/vnd.pmi.widget": {
-        source: "iana",
-        extensions: ["wg"]
-      },
-      "application/vnd.poc.group-advertisement+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.pocketlearn": {
-        source: "iana",
-        extensions: ["plf"]
-      },
-      "application/vnd.powerbuilder6": {
-        source: "iana",
-        extensions: ["pbd"]
-      },
-      "application/vnd.powerbuilder6-s": {
-        source: "iana"
-      },
-      "application/vnd.powerbuilder7": {
-        source: "iana"
-      },
-      "application/vnd.powerbuilder7-s": {
-        source: "iana"
-      },
-      "application/vnd.powerbuilder75": {
-        source: "iana"
-      },
-      "application/vnd.powerbuilder75-s": {
-        source: "iana"
-      },
-      "application/vnd.preminet": {
-        source: "iana"
-      },
-      "application/vnd.previewsystems.box": {
-        source: "iana",
-        extensions: ["box"]
-      },
-      "application/vnd.proteus.magazine": {
-        source: "iana",
-        extensions: ["mgz"]
-      },
-      "application/vnd.psfs": {
-        source: "iana"
-      },
-      "application/vnd.publishare-delta-tree": {
-        source: "iana",
-        extensions: ["qps"]
-      },
-      "application/vnd.pvi.ptid1": {
-        source: "iana",
-        extensions: ["ptid"]
-      },
-      "application/vnd.pwg-multiplexed": {
-        source: "iana"
-      },
-      "application/vnd.pwg-xhtml-print+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.qualcomm.brew-app-res": {
-        source: "iana"
-      },
-      "application/vnd.quarantainenet": {
-        source: "iana"
-      },
-      "application/vnd.quark.quarkxpress": {
-        source: "iana",
-        extensions: ["qxd", "qxt", "qwd", "qwt", "qxl", "qxb"]
-      },
-      "application/vnd.quobject-quoxdocument": {
-        source: "iana"
-      },
-      "application/vnd.radisys.moml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-audit+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-audit-conf+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-audit-conn+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-audit-dialog+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-audit-stream+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-conf+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog-base+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog-fax-detect+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog-fax-sendrecv+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog-group+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog-speech+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.radisys.msml-dialog-transform+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.rainstor.data": {
-        source: "iana"
-      },
-      "application/vnd.rapid": {
-        source: "iana"
-      },
-      "application/vnd.rar": {
-        source: "iana",
-        extensions: ["rar"]
-      },
-      "application/vnd.realvnc.bed": {
-        source: "iana",
-        extensions: ["bed"]
-      },
-      "application/vnd.recordare.musicxml": {
-        source: "iana",
-        extensions: ["mxl"]
-      },
-      "application/vnd.recordare.musicxml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["musicxml"]
-      },
-      "application/vnd.renlearn.rlprint": {
-        source: "iana"
-      },
-      "application/vnd.resilient.logic": {
-        source: "iana"
-      },
-      "application/vnd.restful+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.rig.cryptonote": {
-        source: "iana",
-        extensions: ["cryptonote"]
-      },
-      "application/vnd.rim.cod": {
-        source: "apache",
-        extensions: ["cod"]
-      },
-      "application/vnd.rn-realmedia": {
-        source: "apache",
-        extensions: ["rm"]
-      },
-      "application/vnd.rn-realmedia-vbr": {
-        source: "apache",
-        extensions: ["rmvb"]
-      },
-      "application/vnd.route66.link66+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["link66"]
-      },
-      "application/vnd.rs-274x": {
-        source: "iana"
-      },
-      "application/vnd.ruckus.download": {
-        source: "iana"
-      },
-      "application/vnd.s3sms": {
-        source: "iana"
-      },
-      "application/vnd.sailingtracker.track": {
-        source: "iana",
-        extensions: ["st"]
-      },
-      "application/vnd.sar": {
-        source: "iana"
-      },
-      "application/vnd.sbm.cid": {
-        source: "iana"
-      },
-      "application/vnd.sbm.mid2": {
-        source: "iana"
-      },
-      "application/vnd.scribus": {
-        source: "iana"
-      },
-      "application/vnd.sealed.3df": {
-        source: "iana"
-      },
-      "application/vnd.sealed.csf": {
-        source: "iana"
-      },
-      "application/vnd.sealed.doc": {
-        source: "iana"
-      },
-      "application/vnd.sealed.eml": {
-        source: "iana"
-      },
-      "application/vnd.sealed.mht": {
-        source: "iana"
-      },
-      "application/vnd.sealed.net": {
-        source: "iana"
-      },
-      "application/vnd.sealed.ppt": {
-        source: "iana"
-      },
-      "application/vnd.sealed.tiff": {
-        source: "iana"
-      },
-      "application/vnd.sealed.xls": {
-        source: "iana"
-      },
-      "application/vnd.sealedmedia.softseal.html": {
-        source: "iana"
-      },
-      "application/vnd.sealedmedia.softseal.pdf": {
-        source: "iana"
-      },
-      "application/vnd.seemail": {
-        source: "iana",
-        extensions: ["see"]
-      },
-      "application/vnd.seis+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.sema": {
-        source: "iana",
-        extensions: ["sema"]
-      },
-      "application/vnd.semd": {
-        source: "iana",
-        extensions: ["semd"]
-      },
-      "application/vnd.semf": {
-        source: "iana",
-        extensions: ["semf"]
-      },
-      "application/vnd.shade-save-file": {
-        source: "iana"
-      },
-      "application/vnd.shana.informed.formdata": {
-        source: "iana",
-        extensions: ["ifm"]
-      },
-      "application/vnd.shana.informed.formtemplate": {
-        source: "iana",
-        extensions: ["itp"]
-      },
-      "application/vnd.shana.informed.interchange": {
-        source: "iana",
-        extensions: ["iif"]
-      },
-      "application/vnd.shana.informed.package": {
-        source: "iana",
-        extensions: ["ipk"]
-      },
-      "application/vnd.shootproof+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.shopkick+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.shp": {
-        source: "iana"
-      },
-      "application/vnd.shx": {
-        source: "iana"
-      },
-      "application/vnd.sigrok.session": {
-        source: "iana"
-      },
-      "application/vnd.simtech-mindmapper": {
-        source: "iana",
-        extensions: ["twd", "twds"]
-      },
-      "application/vnd.siren+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.smaf": {
-        source: "iana",
-        extensions: ["mmf"]
-      },
-      "application/vnd.smart.notebook": {
-        source: "iana"
-      },
-      "application/vnd.smart.teacher": {
-        source: "iana",
-        extensions: ["teacher"]
-      },
-      "application/vnd.snesdev-page-table": {
-        source: "iana"
-      },
-      "application/vnd.software602.filler.form+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["fo"]
-      },
-      "application/vnd.software602.filler.form-xml-zip": {
-        source: "iana"
-      },
-      "application/vnd.solent.sdkm+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["sdkm", "sdkd"]
-      },
-      "application/vnd.spotfire.dxp": {
-        source: "iana",
-        extensions: ["dxp"]
-      },
-      "application/vnd.spotfire.sfs": {
-        source: "iana",
-        extensions: ["sfs"]
-      },
-      "application/vnd.sqlite3": {
-        source: "iana"
-      },
-      "application/vnd.sss-cod": {
-        source: "iana"
-      },
-      "application/vnd.sss-dtf": {
-        source: "iana"
-      },
-      "application/vnd.sss-ntf": {
-        source: "iana"
-      },
-      "application/vnd.stardivision.calc": {
-        source: "apache",
-        extensions: ["sdc"]
-      },
-      "application/vnd.stardivision.draw": {
-        source: "apache",
-        extensions: ["sda"]
-      },
-      "application/vnd.stardivision.impress": {
-        source: "apache",
-        extensions: ["sdd"]
-      },
-      "application/vnd.stardivision.math": {
-        source: "apache",
-        extensions: ["smf"]
-      },
-      "application/vnd.stardivision.writer": {
-        source: "apache",
-        extensions: ["sdw", "vor"]
-      },
-      "application/vnd.stardivision.writer-global": {
-        source: "apache",
-        extensions: ["sgl"]
-      },
-      "application/vnd.stepmania.package": {
-        source: "iana",
-        extensions: ["smzip"]
-      },
-      "application/vnd.stepmania.stepchart": {
-        source: "iana",
-        extensions: ["sm"]
-      },
-      "application/vnd.street-stream": {
-        source: "iana"
-      },
-      "application/vnd.sun.wadl+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["wadl"]
-      },
-      "application/vnd.sun.xml.calc": {
-        source: "apache",
-        extensions: ["sxc"]
-      },
-      "application/vnd.sun.xml.calc.template": {
-        source: "apache",
-        extensions: ["stc"]
-      },
-      "application/vnd.sun.xml.draw": {
-        source: "apache",
-        extensions: ["sxd"]
-      },
-      "application/vnd.sun.xml.draw.template": {
-        source: "apache",
-        extensions: ["std"]
-      },
-      "application/vnd.sun.xml.impress": {
-        source: "apache",
-        extensions: ["sxi"]
-      },
-      "application/vnd.sun.xml.impress.template": {
-        source: "apache",
-        extensions: ["sti"]
-      },
-      "application/vnd.sun.xml.math": {
-        source: "apache",
-        extensions: ["sxm"]
-      },
-      "application/vnd.sun.xml.writer": {
-        source: "apache",
-        extensions: ["sxw"]
-      },
-      "application/vnd.sun.xml.writer.global": {
-        source: "apache",
-        extensions: ["sxg"]
-      },
-      "application/vnd.sun.xml.writer.template": {
-        source: "apache",
-        extensions: ["stw"]
-      },
-      "application/vnd.sus-calendar": {
-        source: "iana",
-        extensions: ["sus", "susp"]
-      },
-      "application/vnd.svd": {
-        source: "iana",
-        extensions: ["svd"]
-      },
-      "application/vnd.swiftview-ics": {
-        source: "iana"
-      },
-      "application/vnd.sycle+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.syft+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.symbian.install": {
-        source: "apache",
-        extensions: ["sis", "sisx"]
-      },
-      "application/vnd.syncml+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["xsm"]
-      },
-      "application/vnd.syncml.dm+wbxml": {
-        source: "iana",
-        charset: "UTF-8",
-        extensions: ["bdm"]
-      },
-      "application/vnd.syncml.dm+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["xdm"]
-      },
-      "application/vnd.syncml.dm.notification": {
-        source: "iana"
-      },
-      "application/vnd.syncml.dmddf+wbxml": {
-        source: "iana"
-      },
-      "application/vnd.syncml.dmddf+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["ddf"]
-      },
-      "application/vnd.syncml.dmtnds+wbxml": {
-        source: "iana"
-      },
-      "application/vnd.syncml.dmtnds+xml": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true
-      },
-      "application/vnd.syncml.ds.notification": {
-        source: "iana"
-      },
-      "application/vnd.tableschema+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.tao.intent-module-archive": {
-        source: "iana",
-        extensions: ["tao"]
-      },
-      "application/vnd.tcpdump.pcap": {
-        source: "iana",
-        extensions: ["pcap", "cap", "dmp"]
-      },
-      "application/vnd.think-cell.ppttc+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.tmd.mediaflex.api+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.tml": {
-        source: "iana"
-      },
-      "application/vnd.tmobile-livetv": {
-        source: "iana",
-        extensions: ["tmo"]
-      },
-      "application/vnd.tri.onesource": {
-        source: "iana"
-      },
-      "application/vnd.trid.tpt": {
-        source: "iana",
-        extensions: ["tpt"]
-      },
-      "application/vnd.triscape.mxs": {
-        source: "iana",
-        extensions: ["mxs"]
-      },
-      "application/vnd.trueapp": {
-        source: "iana",
-        extensions: ["tra"]
-      },
-      "application/vnd.truedoc": {
-        source: "iana"
-      },
-      "application/vnd.ubisoft.webplayer": {
-        source: "iana"
-      },
-      "application/vnd.ufdl": {
-        source: "iana",
-        extensions: ["ufd", "ufdl"]
-      },
-      "application/vnd.uiq.theme": {
-        source: "iana",
-        extensions: ["utz"]
-      },
-      "application/vnd.umajin": {
-        source: "iana",
-        extensions: ["umj"]
-      },
-      "application/vnd.unity": {
-        source: "iana",
-        extensions: ["unityweb"]
-      },
-      "application/vnd.uoml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["uoml"]
-      },
-      "application/vnd.uplanet.alert": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.alert-wbxml": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.bearer-choice": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.bearer-choice-wbxml": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.cacheop": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.cacheop-wbxml": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.channel": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.channel-wbxml": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.list": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.list-wbxml": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.listcmd": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.listcmd-wbxml": {
-        source: "iana"
-      },
-      "application/vnd.uplanet.signal": {
-        source: "iana"
-      },
-      "application/vnd.uri-map": {
-        source: "iana"
-      },
-      "application/vnd.valve.source.material": {
-        source: "iana"
-      },
-      "application/vnd.vcx": {
-        source: "iana",
-        extensions: ["vcx"]
-      },
-      "application/vnd.vd-study": {
-        source: "iana"
-      },
-      "application/vnd.vectorworks": {
-        source: "iana"
-      },
-      "application/vnd.vel+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.verimatrix.vcas": {
-        source: "iana"
-      },
-      "application/vnd.veritone.aion+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.veryant.thin": {
-        source: "iana"
-      },
-      "application/vnd.ves.encrypted": {
-        source: "iana"
-      },
-      "application/vnd.vidsoft.vidconference": {
-        source: "iana"
-      },
-      "application/vnd.visio": {
-        source: "iana",
-        extensions: ["vsd", "vst", "vss", "vsw"]
-      },
-      "application/vnd.visionary": {
-        source: "iana",
-        extensions: ["vis"]
-      },
-      "application/vnd.vividence.scriptfile": {
-        source: "iana"
-      },
-      "application/vnd.vsf": {
-        source: "iana",
-        extensions: ["vsf"]
-      },
-      "application/vnd.wap.sic": {
-        source: "iana"
-      },
-      "application/vnd.wap.slc": {
-        source: "iana"
-      },
-      "application/vnd.wap.wbxml": {
-        source: "iana",
-        charset: "UTF-8",
-        extensions: ["wbxml"]
-      },
-      "application/vnd.wap.wmlc": {
-        source: "iana",
-        extensions: ["wmlc"]
-      },
-      "application/vnd.wap.wmlscriptc": {
-        source: "iana",
-        extensions: ["wmlsc"]
-      },
-      "application/vnd.webturbo": {
-        source: "iana",
-        extensions: ["wtb"]
-      },
-      "application/vnd.wfa.dpp": {
-        source: "iana"
-      },
-      "application/vnd.wfa.p2p": {
-        source: "iana"
-      },
-      "application/vnd.wfa.wsc": {
-        source: "iana"
-      },
-      "application/vnd.windows.devicepairing": {
-        source: "iana"
-      },
-      "application/vnd.wmc": {
-        source: "iana"
-      },
-      "application/vnd.wmf.bootstrap": {
-        source: "iana"
-      },
-      "application/vnd.wolfram.mathematica": {
-        source: "iana"
-      },
-      "application/vnd.wolfram.mathematica.package": {
-        source: "iana"
-      },
-      "application/vnd.wolfram.player": {
-        source: "iana",
-        extensions: ["nbp"]
-      },
-      "application/vnd.wordperfect": {
-        source: "iana",
-        extensions: ["wpd"]
-      },
-      "application/vnd.wqd": {
-        source: "iana",
-        extensions: ["wqd"]
-      },
-      "application/vnd.wrq-hp3000-labelled": {
-        source: "iana"
-      },
-      "application/vnd.wt.stf": {
-        source: "iana",
-        extensions: ["stf"]
-      },
-      "application/vnd.wv.csp+wbxml": {
-        source: "iana"
-      },
-      "application/vnd.wv.csp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.wv.ssp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.xacml+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.xara": {
-        source: "iana",
-        extensions: ["xar"]
-      },
-      "application/vnd.xfdl": {
-        source: "iana",
-        extensions: ["xfdl"]
-      },
-      "application/vnd.xfdl.webform": {
-        source: "iana"
-      },
-      "application/vnd.xmi+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vnd.xmpie.cpkg": {
-        source: "iana"
-      },
-      "application/vnd.xmpie.dpkg": {
-        source: "iana"
-      },
-      "application/vnd.xmpie.plan": {
-        source: "iana"
-      },
-      "application/vnd.xmpie.ppkg": {
-        source: "iana"
-      },
-      "application/vnd.xmpie.xlim": {
-        source: "iana"
-      },
-      "application/vnd.yamaha.hv-dic": {
-        source: "iana",
-        extensions: ["hvd"]
-      },
-      "application/vnd.yamaha.hv-script": {
-        source: "iana",
-        extensions: ["hvs"]
-      },
-      "application/vnd.yamaha.hv-voice": {
-        source: "iana",
-        extensions: ["hvp"]
-      },
-      "application/vnd.yamaha.openscoreformat": {
-        source: "iana",
-        extensions: ["osf"]
-      },
-      "application/vnd.yamaha.openscoreformat.osfpvg+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["osfpvg"]
-      },
-      "application/vnd.yamaha.remote-setup": {
-        source: "iana"
-      },
-      "application/vnd.yamaha.smaf-audio": {
-        source: "iana",
-        extensions: ["saf"]
-      },
-      "application/vnd.yamaha.smaf-phrase": {
-        source: "iana",
-        extensions: ["spf"]
-      },
-      "application/vnd.yamaha.through-ngn": {
-        source: "iana"
-      },
-      "application/vnd.yamaha.tunnel-udpencap": {
-        source: "iana"
-      },
-      "application/vnd.yaoweme": {
-        source: "iana"
-      },
-      "application/vnd.yellowriver-custom-menu": {
-        source: "iana",
-        extensions: ["cmp"]
-      },
-      "application/vnd.youtube.yt": {
-        source: "iana"
-      },
-      "application/vnd.zul": {
-        source: "iana",
-        extensions: ["zir", "zirz"]
-      },
-      "application/vnd.zzazz.deck+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["zaz"]
-      },
-      "application/voicexml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["vxml"]
-      },
-      "application/voucher-cms+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/vq-rtcpxr": {
-        source: "iana"
-      },
-      "application/wasm": {
-        source: "iana",
-        compressible: true,
-        extensions: ["wasm"]
-      },
-      "application/watcherinfo+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["wif"]
-      },
-      "application/webpush-options+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/whoispp-query": {
-        source: "iana"
-      },
-      "application/whoispp-response": {
-        source: "iana"
-      },
-      "application/widget": {
-        source: "iana",
-        extensions: ["wgt"]
-      },
-      "application/winhlp": {
-        source: "apache",
-        extensions: ["hlp"]
-      },
-      "application/wita": {
-        source: "iana"
-      },
-      "application/wordperfect5.1": {
-        source: "iana"
-      },
-      "application/wsdl+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["wsdl"]
-      },
-      "application/wspolicy+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["wspolicy"]
-      },
-      "application/x-7z-compressed": {
-        source: "apache",
-        compressible: false,
-        extensions: ["7z"]
-      },
-      "application/x-abiword": {
-        source: "apache",
-        extensions: ["abw"]
-      },
-      "application/x-ace-compressed": {
-        source: "apache",
-        extensions: ["ace"]
-      },
-      "application/x-amf": {
-        source: "apache"
-      },
-      "application/x-apple-diskimage": {
-        source: "apache",
-        extensions: ["dmg"]
-      },
-      "application/x-arj": {
-        compressible: false,
-        extensions: ["arj"]
-      },
-      "application/x-authorware-bin": {
-        source: "apache",
-        extensions: ["aab", "x32", "u32", "vox"]
-      },
-      "application/x-authorware-map": {
-        source: "apache",
-        extensions: ["aam"]
-      },
-      "application/x-authorware-seg": {
-        source: "apache",
-        extensions: ["aas"]
-      },
-      "application/x-bcpio": {
-        source: "apache",
-        extensions: ["bcpio"]
-      },
-      "application/x-bdoc": {
-        compressible: false,
-        extensions: ["bdoc"]
-      },
-      "application/x-bittorrent": {
-        source: "apache",
-        extensions: ["torrent"]
-      },
-      "application/x-blorb": {
-        source: "apache",
-        extensions: ["blb", "blorb"]
-      },
-      "application/x-bzip": {
-        source: "apache",
-        compressible: false,
-        extensions: ["bz"]
-      },
-      "application/x-bzip2": {
-        source: "apache",
-        compressible: false,
-        extensions: ["bz2", "boz"]
-      },
-      "application/x-cbr": {
-        source: "apache",
-        extensions: ["cbr", "cba", "cbt", "cbz", "cb7"]
-      },
-      "application/x-cdlink": {
-        source: "apache",
-        extensions: ["vcd"]
-      },
-      "application/x-cfs-compressed": {
-        source: "apache",
-        extensions: ["cfs"]
-      },
-      "application/x-chat": {
-        source: "apache",
-        extensions: ["chat"]
-      },
-      "application/x-chess-pgn": {
-        source: "apache",
-        extensions: ["pgn"]
-      },
-      "application/x-chrome-extension": {
-        extensions: ["crx"]
-      },
-      "application/x-cocoa": {
-        source: "nginx",
-        extensions: ["cco"]
-      },
-      "application/x-compress": {
-        source: "apache"
-      },
-      "application/x-conference": {
-        source: "apache",
-        extensions: ["nsc"]
-      },
-      "application/x-cpio": {
-        source: "apache",
-        extensions: ["cpio"]
-      },
-      "application/x-csh": {
-        source: "apache",
-        extensions: ["csh"]
-      },
-      "application/x-deb": {
-        compressible: false
-      },
-      "application/x-debian-package": {
-        source: "apache",
-        extensions: ["deb", "udeb"]
-      },
-      "application/x-dgc-compressed": {
-        source: "apache",
-        extensions: ["dgc"]
-      },
-      "application/x-director": {
-        source: "apache",
-        extensions: ["dir", "dcr", "dxr", "cst", "cct", "cxt", "w3d", "fgd", "swa"]
-      },
-      "application/x-doom": {
-        source: "apache",
-        extensions: ["wad"]
-      },
-      "application/x-dtbncx+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["ncx"]
-      },
-      "application/x-dtbook+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["dtb"]
-      },
-      "application/x-dtbresource+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["res"]
-      },
-      "application/x-dvi": {
-        source: "apache",
-        compressible: false,
-        extensions: ["dvi"]
-      },
-      "application/x-envoy": {
-        source: "apache",
-        extensions: ["evy"]
-      },
-      "application/x-eva": {
-        source: "apache",
-        extensions: ["eva"]
-      },
-      "application/x-font-bdf": {
-        source: "apache",
-        extensions: ["bdf"]
-      },
-      "application/x-font-dos": {
-        source: "apache"
-      },
-      "application/x-font-framemaker": {
-        source: "apache"
-      },
-      "application/x-font-ghostscript": {
-        source: "apache",
-        extensions: ["gsf"]
-      },
-      "application/x-font-libgrx": {
-        source: "apache"
-      },
-      "application/x-font-linux-psf": {
-        source: "apache",
-        extensions: ["psf"]
-      },
-      "application/x-font-pcf": {
-        source: "apache",
-        extensions: ["pcf"]
-      },
-      "application/x-font-snf": {
-        source: "apache",
-        extensions: ["snf"]
-      },
-      "application/x-font-speedo": {
-        source: "apache"
-      },
-      "application/x-font-sunos-news": {
-        source: "apache"
-      },
-      "application/x-font-type1": {
-        source: "apache",
-        extensions: ["pfa", "pfb", "pfm", "afm"]
-      },
-      "application/x-font-vfont": {
-        source: "apache"
-      },
-      "application/x-freearc": {
-        source: "apache",
-        extensions: ["arc"]
-      },
-      "application/x-futuresplash": {
-        source: "apache",
-        extensions: ["spl"]
-      },
-      "application/x-gca-compressed": {
-        source: "apache",
-        extensions: ["gca"]
-      },
-      "application/x-glulx": {
-        source: "apache",
-        extensions: ["ulx"]
-      },
-      "application/x-gnumeric": {
-        source: "apache",
-        extensions: ["gnumeric"]
-      },
-      "application/x-gramps-xml": {
-        source: "apache",
-        extensions: ["gramps"]
-      },
-      "application/x-gtar": {
-        source: "apache",
-        extensions: ["gtar"]
-      },
-      "application/x-gzip": {
-        source: "apache"
-      },
-      "application/x-hdf": {
-        source: "apache",
-        extensions: ["hdf"]
-      },
-      "application/x-httpd-php": {
-        compressible: true,
-        extensions: ["php"]
-      },
-      "application/x-install-instructions": {
-        source: "apache",
-        extensions: ["install"]
-      },
-      "application/x-iso9660-image": {
-        source: "apache",
-        extensions: ["iso"]
-      },
-      "application/x-iwork-keynote-sffkey": {
-        extensions: ["key"]
-      },
-      "application/x-iwork-numbers-sffnumbers": {
-        extensions: ["numbers"]
-      },
-      "application/x-iwork-pages-sffpages": {
-        extensions: ["pages"]
-      },
-      "application/x-java-archive-diff": {
-        source: "nginx",
-        extensions: ["jardiff"]
-      },
-      "application/x-java-jnlp-file": {
-        source: "apache",
-        compressible: false,
-        extensions: ["jnlp"]
-      },
-      "application/x-javascript": {
-        compressible: true
-      },
-      "application/x-keepass2": {
-        extensions: ["kdbx"]
-      },
-      "application/x-latex": {
-        source: "apache",
-        compressible: false,
-        extensions: ["latex"]
-      },
-      "application/x-lua-bytecode": {
-        extensions: ["luac"]
-      },
-      "application/x-lzh-compressed": {
-        source: "apache",
-        extensions: ["lzh", "lha"]
-      },
-      "application/x-makeself": {
-        source: "nginx",
-        extensions: ["run"]
-      },
-      "application/x-mie": {
-        source: "apache",
-        extensions: ["mie"]
-      },
-      "application/x-mobipocket-ebook": {
-        source: "apache",
-        extensions: ["prc", "mobi"]
-      },
-      "application/x-mpegurl": {
-        compressible: false
-      },
-      "application/x-ms-application": {
-        source: "apache",
-        extensions: ["application"]
-      },
-      "application/x-ms-shortcut": {
-        source: "apache",
-        extensions: ["lnk"]
-      },
-      "application/x-ms-wmd": {
-        source: "apache",
-        extensions: ["wmd"]
-      },
-      "application/x-ms-wmz": {
-        source: "apache",
-        extensions: ["wmz"]
-      },
-      "application/x-ms-xbap": {
-        source: "apache",
-        extensions: ["xbap"]
-      },
-      "application/x-msaccess": {
-        source: "apache",
-        extensions: ["mdb"]
-      },
-      "application/x-msbinder": {
-        source: "apache",
-        extensions: ["obd"]
-      },
-      "application/x-mscardfile": {
-        source: "apache",
-        extensions: ["crd"]
-      },
-      "application/x-msclip": {
-        source: "apache",
-        extensions: ["clp"]
-      },
-      "application/x-msdos-program": {
-        extensions: ["exe"]
-      },
-      "application/x-msdownload": {
-        source: "apache",
-        extensions: ["exe", "dll", "com", "bat", "msi"]
-      },
-      "application/x-msmediaview": {
-        source: "apache",
-        extensions: ["mvb", "m13", "m14"]
-      },
-      "application/x-msmetafile": {
-        source: "apache",
-        extensions: ["wmf", "wmz", "emf", "emz"]
-      },
-      "application/x-msmoney": {
-        source: "apache",
-        extensions: ["mny"]
-      },
-      "application/x-mspublisher": {
-        source: "apache",
-        extensions: ["pub"]
-      },
-      "application/x-msschedule": {
-        source: "apache",
-        extensions: ["scd"]
-      },
-      "application/x-msterminal": {
-        source: "apache",
-        extensions: ["trm"]
-      },
-      "application/x-mswrite": {
-        source: "apache",
-        extensions: ["wri"]
-      },
-      "application/x-netcdf": {
-        source: "apache",
-        extensions: ["nc", "cdf"]
-      },
-      "application/x-ns-proxy-autoconfig": {
-        compressible: true,
-        extensions: ["pac"]
-      },
-      "application/x-nzb": {
-        source: "apache",
-        extensions: ["nzb"]
-      },
-      "application/x-perl": {
-        source: "nginx",
-        extensions: ["pl", "pm"]
-      },
-      "application/x-pilot": {
-        source: "nginx",
-        extensions: ["prc", "pdb"]
-      },
-      "application/x-pkcs12": {
-        source: "apache",
-        compressible: false,
-        extensions: ["p12", "pfx"]
-      },
-      "application/x-pkcs7-certificates": {
-        source: "apache",
-        extensions: ["p7b", "spc"]
-      },
-      "application/x-pkcs7-certreqresp": {
-        source: "apache",
-        extensions: ["p7r"]
-      },
-      "application/x-pki-message": {
-        source: "iana"
-      },
-      "application/x-rar-compressed": {
-        source: "apache",
-        compressible: false,
-        extensions: ["rar"]
-      },
-      "application/x-redhat-package-manager": {
-        source: "nginx",
-        extensions: ["rpm"]
-      },
-      "application/x-research-info-systems": {
-        source: "apache",
-        extensions: ["ris"]
-      },
-      "application/x-sea": {
-        source: "nginx",
-        extensions: ["sea"]
-      },
-      "application/x-sh": {
-        source: "apache",
-        compressible: true,
-        extensions: ["sh"]
-      },
-      "application/x-shar": {
-        source: "apache",
-        extensions: ["shar"]
-      },
-      "application/x-shockwave-flash": {
-        source: "apache",
-        compressible: false,
-        extensions: ["swf"]
-      },
-      "application/x-silverlight-app": {
-        source: "apache",
-        extensions: ["xap"]
-      },
-      "application/x-sql": {
-        source: "apache",
-        extensions: ["sql"]
-      },
-      "application/x-stuffit": {
-        source: "apache",
-        compressible: false,
-        extensions: ["sit"]
-      },
-      "application/x-stuffitx": {
-        source: "apache",
-        extensions: ["sitx"]
-      },
-      "application/x-subrip": {
-        source: "apache",
-        extensions: ["srt"]
-      },
-      "application/x-sv4cpio": {
-        source: "apache",
-        extensions: ["sv4cpio"]
-      },
-      "application/x-sv4crc": {
-        source: "apache",
-        extensions: ["sv4crc"]
-      },
-      "application/x-t3vm-image": {
-        source: "apache",
-        extensions: ["t3"]
-      },
-      "application/x-tads": {
-        source: "apache",
-        extensions: ["gam"]
-      },
-      "application/x-tar": {
-        source: "apache",
-        compressible: true,
-        extensions: ["tar"]
-      },
-      "application/x-tcl": {
-        source: "apache",
-        extensions: ["tcl", "tk"]
-      },
-      "application/x-tex": {
-        source: "apache",
-        extensions: ["tex"]
-      },
-      "application/x-tex-tfm": {
-        source: "apache",
-        extensions: ["tfm"]
-      },
-      "application/x-texinfo": {
-        source: "apache",
-        extensions: ["texinfo", "texi"]
-      },
-      "application/x-tgif": {
-        source: "apache",
-        extensions: ["obj"]
-      },
-      "application/x-ustar": {
-        source: "apache",
-        extensions: ["ustar"]
-      },
-      "application/x-virtualbox-hdd": {
-        compressible: true,
-        extensions: ["hdd"]
-      },
-      "application/x-virtualbox-ova": {
-        compressible: true,
-        extensions: ["ova"]
-      },
-      "application/x-virtualbox-ovf": {
-        compressible: true,
-        extensions: ["ovf"]
-      },
-      "application/x-virtualbox-vbox": {
-        compressible: true,
-        extensions: ["vbox"]
-      },
-      "application/x-virtualbox-vbox-extpack": {
-        compressible: false,
-        extensions: ["vbox-extpack"]
-      },
-      "application/x-virtualbox-vdi": {
-        compressible: true,
-        extensions: ["vdi"]
-      },
-      "application/x-virtualbox-vhd": {
-        compressible: true,
-        extensions: ["vhd"]
-      },
-      "application/x-virtualbox-vmdk": {
-        compressible: true,
-        extensions: ["vmdk"]
-      },
-      "application/x-wais-source": {
-        source: "apache",
-        extensions: ["src"]
-      },
-      "application/x-web-app-manifest+json": {
-        compressible: true,
-        extensions: ["webapp"]
-      },
-      "application/x-www-form-urlencoded": {
-        source: "iana",
-        compressible: true
-      },
-      "application/x-x509-ca-cert": {
-        source: "iana",
-        extensions: ["der", "crt", "pem"]
-      },
-      "application/x-x509-ca-ra-cert": {
-        source: "iana"
-      },
-      "application/x-x509-next-ca-cert": {
-        source: "iana"
-      },
-      "application/x-xfig": {
-        source: "apache",
-        extensions: ["fig"]
-      },
-      "application/x-xliff+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["xlf"]
-      },
-      "application/x-xpinstall": {
-        source: "apache",
-        compressible: false,
-        extensions: ["xpi"]
-      },
-      "application/x-xz": {
-        source: "apache",
-        extensions: ["xz"]
-      },
-      "application/x-zmachine": {
-        source: "apache",
-        extensions: ["z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8"]
-      },
-      "application/x400-bp": {
-        source: "iana"
-      },
-      "application/xacml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/xaml+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["xaml"]
-      },
-      "application/xcap-att+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xav"]
-      },
-      "application/xcap-caps+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xca"]
-      },
-      "application/xcap-diff+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xdf"]
-      },
-      "application/xcap-el+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xel"]
-      },
-      "application/xcap-error+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/xcap-ns+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xns"]
-      },
-      "application/xcon-conference-info+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/xcon-conference-info-diff+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/xenc+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xenc"]
-      },
-      "application/xhtml+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xhtml", "xht"]
-      },
-      "application/xhtml-voice+xml": {
-        source: "apache",
-        compressible: true
-      },
-      "application/xliff+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xlf"]
-      },
-      "application/xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xml", "xsl", "xsd", "rng"]
-      },
-      "application/xml-dtd": {
-        source: "iana",
-        compressible: true,
-        extensions: ["dtd"]
-      },
-      "application/xml-external-parsed-entity": {
-        source: "iana"
-      },
-      "application/xml-patch+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/xmpp+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/xop+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xop"]
-      },
-      "application/xproc+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["xpl"]
-      },
-      "application/xslt+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xsl", "xslt"]
-      },
-      "application/xspf+xml": {
-        source: "apache",
-        compressible: true,
-        extensions: ["xspf"]
-      },
-      "application/xv+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["mxml", "xhvml", "xvml", "xvm"]
-      },
-      "application/yang": {
-        source: "iana",
-        extensions: ["yang"]
-      },
-      "application/yang-data+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/yang-data+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/yang-patch+json": {
-        source: "iana",
-        compressible: true
-      },
-      "application/yang-patch+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "application/yin+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["yin"]
-      },
-      "application/zip": {
-        source: "iana",
-        compressible: false,
-        extensions: ["zip"]
-      },
-      "application/zlib": {
-        source: "iana"
-      },
-      "application/zstd": {
-        source: "iana"
-      },
-      "audio/1d-interleaved-parityfec": {
-        source: "iana"
-      },
-      "audio/32kadpcm": {
-        source: "iana"
-      },
-      "audio/3gpp": {
-        source: "iana",
-        compressible: false,
-        extensions: ["3gpp"]
-      },
-      "audio/3gpp2": {
-        source: "iana"
-      },
-      "audio/aac": {
-        source: "iana"
-      },
-      "audio/ac3": {
-        source: "iana"
-      },
-      "audio/adpcm": {
-        source: "apache",
-        extensions: ["adp"]
-      },
-      "audio/amr": {
-        source: "iana",
-        extensions: ["amr"]
-      },
-      "audio/amr-wb": {
-        source: "iana"
-      },
-      "audio/amr-wb+": {
-        source: "iana"
-      },
-      "audio/aptx": {
-        source: "iana"
-      },
-      "audio/asc": {
-        source: "iana"
-      },
-      "audio/atrac-advanced-lossless": {
-        source: "iana"
-      },
-      "audio/atrac-x": {
-        source: "iana"
-      },
-      "audio/atrac3": {
-        source: "iana"
-      },
-      "audio/basic": {
-        source: "iana",
-        compressible: false,
-        extensions: ["au", "snd"]
-      },
-      "audio/bv16": {
-        source: "iana"
-      },
-      "audio/bv32": {
-        source: "iana"
-      },
-      "audio/clearmode": {
-        source: "iana"
-      },
-      "audio/cn": {
-        source: "iana"
-      },
-      "audio/dat12": {
-        source: "iana"
-      },
-      "audio/dls": {
-        source: "iana"
-      },
-      "audio/dsr-es201108": {
-        source: "iana"
-      },
-      "audio/dsr-es202050": {
-        source: "iana"
-      },
-      "audio/dsr-es202211": {
-        source: "iana"
-      },
-      "audio/dsr-es202212": {
-        source: "iana"
-      },
-      "audio/dv": {
-        source: "iana"
-      },
-      "audio/dvi4": {
-        source: "iana"
-      },
-      "audio/eac3": {
-        source: "iana"
-      },
-      "audio/encaprtp": {
-        source: "iana"
-      },
-      "audio/evrc": {
-        source: "iana"
-      },
-      "audio/evrc-qcp": {
-        source: "iana"
-      },
-      "audio/evrc0": {
-        source: "iana"
-      },
-      "audio/evrc1": {
-        source: "iana"
-      },
-      "audio/evrcb": {
-        source: "iana"
-      },
-      "audio/evrcb0": {
-        source: "iana"
-      },
-      "audio/evrcb1": {
-        source: "iana"
-      },
-      "audio/evrcnw": {
-        source: "iana"
-      },
-      "audio/evrcnw0": {
-        source: "iana"
-      },
-      "audio/evrcnw1": {
-        source: "iana"
-      },
-      "audio/evrcwb": {
-        source: "iana"
-      },
-      "audio/evrcwb0": {
-        source: "iana"
-      },
-      "audio/evrcwb1": {
-        source: "iana"
-      },
-      "audio/evs": {
-        source: "iana"
-      },
-      "audio/flexfec": {
-        source: "iana"
-      },
-      "audio/fwdred": {
-        source: "iana"
-      },
-      "audio/g711-0": {
-        source: "iana"
-      },
-      "audio/g719": {
-        source: "iana"
-      },
-      "audio/g722": {
-        source: "iana"
-      },
-      "audio/g7221": {
-        source: "iana"
-      },
-      "audio/g723": {
-        source: "iana"
-      },
-      "audio/g726-16": {
-        source: "iana"
-      },
-      "audio/g726-24": {
-        source: "iana"
-      },
-      "audio/g726-32": {
-        source: "iana"
-      },
-      "audio/g726-40": {
-        source: "iana"
-      },
-      "audio/g728": {
-        source: "iana"
-      },
-      "audio/g729": {
-        source: "iana"
-      },
-      "audio/g7291": {
-        source: "iana"
-      },
-      "audio/g729d": {
-        source: "iana"
-      },
-      "audio/g729e": {
-        source: "iana"
-      },
-      "audio/gsm": {
-        source: "iana"
-      },
-      "audio/gsm-efr": {
-        source: "iana"
-      },
-      "audio/gsm-hr-08": {
-        source: "iana"
-      },
-      "audio/ilbc": {
-        source: "iana"
-      },
-      "audio/ip-mr_v2.5": {
-        source: "iana"
-      },
-      "audio/isac": {
-        source: "apache"
-      },
-      "audio/l16": {
-        source: "iana"
-      },
-      "audio/l20": {
-        source: "iana"
-      },
-      "audio/l24": {
-        source: "iana",
-        compressible: false
-      },
-      "audio/l8": {
-        source: "iana"
-      },
-      "audio/lpc": {
-        source: "iana"
-      },
-      "audio/melp": {
-        source: "iana"
-      },
-      "audio/melp1200": {
-        source: "iana"
-      },
-      "audio/melp2400": {
-        source: "iana"
-      },
-      "audio/melp600": {
-        source: "iana"
-      },
-      "audio/mhas": {
-        source: "iana"
-      },
-      "audio/midi": {
-        source: "apache",
-        extensions: ["mid", "midi", "kar", "rmi"]
-      },
-      "audio/mobile-xmf": {
-        source: "iana",
-        extensions: ["mxmf"]
-      },
-      "audio/mp3": {
-        compressible: false,
-        extensions: ["mp3"]
-      },
-      "audio/mp4": {
-        source: "iana",
-        compressible: false,
-        extensions: ["m4a", "mp4a"]
-      },
-      "audio/mp4a-latm": {
-        source: "iana"
-      },
-      "audio/mpa": {
-        source: "iana"
-      },
-      "audio/mpa-robust": {
-        source: "iana"
-      },
-      "audio/mpeg": {
-        source: "iana",
-        compressible: false,
-        extensions: ["mpga", "mp2", "mp2a", "mp3", "m2a", "m3a"]
-      },
-      "audio/mpeg4-generic": {
-        source: "iana"
-      },
-      "audio/musepack": {
-        source: "apache"
-      },
-      "audio/ogg": {
-        source: "iana",
-        compressible: false,
-        extensions: ["oga", "ogg", "spx", "opus"]
-      },
-      "audio/opus": {
-        source: "iana"
-      },
-      "audio/parityfec": {
-        source: "iana"
-      },
-      "audio/pcma": {
-        source: "iana"
-      },
-      "audio/pcma-wb": {
-        source: "iana"
-      },
-      "audio/pcmu": {
-        source: "iana"
-      },
-      "audio/pcmu-wb": {
-        source: "iana"
-      },
-      "audio/prs.sid": {
-        source: "iana"
-      },
-      "audio/qcelp": {
-        source: "iana"
-      },
-      "audio/raptorfec": {
-        source: "iana"
-      },
-      "audio/red": {
-        source: "iana"
-      },
-      "audio/rtp-enc-aescm128": {
-        source: "iana"
-      },
-      "audio/rtp-midi": {
-        source: "iana"
-      },
-      "audio/rtploopback": {
-        source: "iana"
-      },
-      "audio/rtx": {
-        source: "iana"
-      },
-      "audio/s3m": {
-        source: "apache",
-        extensions: ["s3m"]
-      },
-      "audio/scip": {
-        source: "iana"
-      },
-      "audio/silk": {
-        source: "apache",
-        extensions: ["sil"]
-      },
-      "audio/smv": {
-        source: "iana"
-      },
-      "audio/smv-qcp": {
-        source: "iana"
-      },
-      "audio/smv0": {
-        source: "iana"
-      },
-      "audio/sofa": {
-        source: "iana"
-      },
-      "audio/sp-midi": {
-        source: "iana"
-      },
-      "audio/speex": {
-        source: "iana"
-      },
-      "audio/t140c": {
-        source: "iana"
-      },
-      "audio/t38": {
-        source: "iana"
-      },
-      "audio/telephone-event": {
-        source: "iana"
-      },
-      "audio/tetra_acelp": {
-        source: "iana"
-      },
-      "audio/tetra_acelp_bb": {
-        source: "iana"
-      },
-      "audio/tone": {
-        source: "iana"
-      },
-      "audio/tsvcis": {
-        source: "iana"
-      },
-      "audio/uemclip": {
-        source: "iana"
-      },
-      "audio/ulpfec": {
-        source: "iana"
-      },
-      "audio/usac": {
-        source: "iana"
-      },
-      "audio/vdvi": {
-        source: "iana"
-      },
-      "audio/vmr-wb": {
-        source: "iana"
-      },
-      "audio/vnd.3gpp.iufp": {
-        source: "iana"
-      },
-      "audio/vnd.4sb": {
-        source: "iana"
-      },
-      "audio/vnd.audiokoz": {
-        source: "iana"
-      },
-      "audio/vnd.celp": {
-        source: "iana"
-      },
-      "audio/vnd.cisco.nse": {
-        source: "iana"
-      },
-      "audio/vnd.cmles.radio-events": {
-        source: "iana"
-      },
-      "audio/vnd.cns.anp1": {
-        source: "iana"
-      },
-      "audio/vnd.cns.inf1": {
-        source: "iana"
-      },
-      "audio/vnd.dece.audio": {
-        source: "iana",
-        extensions: ["uva", "uvva"]
-      },
-      "audio/vnd.digital-winds": {
-        source: "iana",
-        extensions: ["eol"]
-      },
-      "audio/vnd.dlna.adts": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.heaac.1": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.heaac.2": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.mlp": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.mps": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.pl2": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.pl2x": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.pl2z": {
-        source: "iana"
-      },
-      "audio/vnd.dolby.pulse.1": {
-        source: "iana"
-      },
-      "audio/vnd.dra": {
-        source: "iana",
-        extensions: ["dra"]
-      },
-      "audio/vnd.dts": {
-        source: "iana",
-        extensions: ["dts"]
-      },
-      "audio/vnd.dts.hd": {
-        source: "iana",
-        extensions: ["dtshd"]
-      },
-      "audio/vnd.dts.uhd": {
-        source: "iana"
-      },
-      "audio/vnd.dvb.file": {
-        source: "iana"
-      },
-      "audio/vnd.everad.plj": {
-        source: "iana"
-      },
-      "audio/vnd.hns.audio": {
-        source: "iana"
-      },
-      "audio/vnd.lucent.voice": {
-        source: "iana",
-        extensions: ["lvp"]
-      },
-      "audio/vnd.ms-playready.media.pya": {
-        source: "iana",
-        extensions: ["pya"]
-      },
-      "audio/vnd.nokia.mobile-xmf": {
-        source: "iana"
-      },
-      "audio/vnd.nortel.vbk": {
-        source: "iana"
-      },
-      "audio/vnd.nuera.ecelp4800": {
-        source: "iana",
-        extensions: ["ecelp4800"]
-      },
-      "audio/vnd.nuera.ecelp7470": {
-        source: "iana",
-        extensions: ["ecelp7470"]
-      },
-      "audio/vnd.nuera.ecelp9600": {
-        source: "iana",
-        extensions: ["ecelp9600"]
-      },
-      "audio/vnd.octel.sbc": {
-        source: "iana"
-      },
-      "audio/vnd.presonus.multitrack": {
-        source: "iana"
-      },
-      "audio/vnd.qcelp": {
-        source: "iana"
-      },
-      "audio/vnd.rhetorex.32kadpcm": {
-        source: "iana"
-      },
-      "audio/vnd.rip": {
-        source: "iana",
-        extensions: ["rip"]
-      },
-      "audio/vnd.rn-realaudio": {
-        compressible: false
-      },
-      "audio/vnd.sealedmedia.softseal.mpeg": {
-        source: "iana"
-      },
-      "audio/vnd.vmx.cvsd": {
-        source: "iana"
-      },
-      "audio/vnd.wave": {
-        compressible: false
-      },
-      "audio/vorbis": {
-        source: "iana",
-        compressible: false
-      },
-      "audio/vorbis-config": {
-        source: "iana"
-      },
-      "audio/wav": {
-        compressible: false,
-        extensions: ["wav"]
-      },
-      "audio/wave": {
-        compressible: false,
-        extensions: ["wav"]
-      },
-      "audio/webm": {
-        source: "apache",
-        compressible: false,
-        extensions: ["weba"]
-      },
-      "audio/x-aac": {
-        source: "apache",
-        compressible: false,
-        extensions: ["aac"]
-      },
-      "audio/x-aiff": {
-        source: "apache",
-        extensions: ["aif", "aiff", "aifc"]
-      },
-      "audio/x-caf": {
-        source: "apache",
-        compressible: false,
-        extensions: ["caf"]
-      },
-      "audio/x-flac": {
-        source: "apache",
-        extensions: ["flac"]
-      },
-      "audio/x-m4a": {
-        source: "nginx",
-        extensions: ["m4a"]
-      },
-      "audio/x-matroska": {
-        source: "apache",
-        extensions: ["mka"]
-      },
-      "audio/x-mpegurl": {
-        source: "apache",
-        extensions: ["m3u"]
-      },
-      "audio/x-ms-wax": {
-        source: "apache",
-        extensions: ["wax"]
-      },
-      "audio/x-ms-wma": {
-        source: "apache",
-        extensions: ["wma"]
-      },
-      "audio/x-pn-realaudio": {
-        source: "apache",
-        extensions: ["ram", "ra"]
-      },
-      "audio/x-pn-realaudio-plugin": {
-        source: "apache",
-        extensions: ["rmp"]
-      },
-      "audio/x-realaudio": {
-        source: "nginx",
-        extensions: ["ra"]
-      },
-      "audio/x-tta": {
-        source: "apache"
-      },
-      "audio/x-wav": {
-        source: "apache",
-        extensions: ["wav"]
-      },
-      "audio/xm": {
-        source: "apache",
-        extensions: ["xm"]
-      },
-      "chemical/x-cdx": {
-        source: "apache",
-        extensions: ["cdx"]
-      },
-      "chemical/x-cif": {
-        source: "apache",
-        extensions: ["cif"]
-      },
-      "chemical/x-cmdf": {
-        source: "apache",
-        extensions: ["cmdf"]
-      },
-      "chemical/x-cml": {
-        source: "apache",
-        extensions: ["cml"]
-      },
-      "chemical/x-csml": {
-        source: "apache",
-        extensions: ["csml"]
-      },
-      "chemical/x-pdb": {
-        source: "apache"
-      },
-      "chemical/x-xyz": {
-        source: "apache",
-        extensions: ["xyz"]
-      },
-      "font/collection": {
-        source: "iana",
-        extensions: ["ttc"]
-      },
-      "font/otf": {
-        source: "iana",
-        compressible: true,
-        extensions: ["otf"]
-      },
-      "font/sfnt": {
-        source: "iana"
-      },
-      "font/ttf": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ttf"]
-      },
-      "font/woff": {
-        source: "iana",
-        extensions: ["woff"]
-      },
-      "font/woff2": {
-        source: "iana",
-        extensions: ["woff2"]
-      },
-      "image/aces": {
-        source: "iana",
-        extensions: ["exr"]
-      },
-      "image/apng": {
-        compressible: false,
-        extensions: ["apng"]
-      },
-      "image/avci": {
-        source: "iana",
-        extensions: ["avci"]
-      },
-      "image/avcs": {
-        source: "iana",
-        extensions: ["avcs"]
-      },
-      "image/avif": {
-        source: "iana",
-        compressible: false,
-        extensions: ["avif"]
-      },
-      "image/bmp": {
-        source: "iana",
-        compressible: true,
-        extensions: ["bmp"]
-      },
-      "image/cgm": {
-        source: "iana",
-        extensions: ["cgm"]
-      },
-      "image/dicom-rle": {
-        source: "iana",
-        extensions: ["drle"]
-      },
-      "image/emf": {
-        source: "iana",
-        extensions: ["emf"]
-      },
-      "image/fits": {
-        source: "iana",
-        extensions: ["fits"]
-      },
-      "image/g3fax": {
-        source: "iana",
-        extensions: ["g3"]
-      },
-      "image/gif": {
-        source: "iana",
-        compressible: false,
-        extensions: ["gif"]
-      },
-      "image/heic": {
-        source: "iana",
-        extensions: ["heic"]
-      },
-      "image/heic-sequence": {
-        source: "iana",
-        extensions: ["heics"]
-      },
-      "image/heif": {
-        source: "iana",
-        extensions: ["heif"]
-      },
-      "image/heif-sequence": {
-        source: "iana",
-        extensions: ["heifs"]
-      },
-      "image/hej2k": {
-        source: "iana",
-        extensions: ["hej2"]
-      },
-      "image/hsj2": {
-        source: "iana",
-        extensions: ["hsj2"]
-      },
-      "image/ief": {
-        source: "iana",
-        extensions: ["ief"]
-      },
-      "image/jls": {
-        source: "iana",
-        extensions: ["jls"]
-      },
-      "image/jp2": {
-        source: "iana",
-        compressible: false,
-        extensions: ["jp2", "jpg2"]
-      },
-      "image/jpeg": {
-        source: "iana",
-        compressible: false,
-        extensions: ["jpeg", "jpg", "jpe"]
-      },
-      "image/jph": {
-        source: "iana",
-        extensions: ["jph"]
-      },
-      "image/jphc": {
-        source: "iana",
-        extensions: ["jhc"]
-      },
-      "image/jpm": {
-        source: "iana",
-        compressible: false,
-        extensions: ["jpm"]
-      },
-      "image/jpx": {
-        source: "iana",
-        compressible: false,
-        extensions: ["jpx", "jpf"]
-      },
-      "image/jxr": {
-        source: "iana",
-        extensions: ["jxr"]
-      },
-      "image/jxra": {
-        source: "iana",
-        extensions: ["jxra"]
-      },
-      "image/jxrs": {
-        source: "iana",
-        extensions: ["jxrs"]
-      },
-      "image/jxs": {
-        source: "iana",
-        extensions: ["jxs"]
-      },
-      "image/jxsc": {
-        source: "iana",
-        extensions: ["jxsc"]
-      },
-      "image/jxsi": {
-        source: "iana",
-        extensions: ["jxsi"]
-      },
-      "image/jxss": {
-        source: "iana",
-        extensions: ["jxss"]
-      },
-      "image/ktx": {
-        source: "iana",
-        extensions: ["ktx"]
-      },
-      "image/ktx2": {
-        source: "iana",
-        extensions: ["ktx2"]
-      },
-      "image/naplps": {
-        source: "iana"
-      },
-      "image/pjpeg": {
-        compressible: false
-      },
-      "image/png": {
-        source: "iana",
-        compressible: false,
-        extensions: ["png"]
-      },
-      "image/prs.btif": {
-        source: "iana",
-        extensions: ["btif"]
-      },
-      "image/prs.pti": {
-        source: "iana",
-        extensions: ["pti"]
-      },
-      "image/pwg-raster": {
-        source: "iana"
-      },
-      "image/sgi": {
-        source: "apache",
-        extensions: ["sgi"]
-      },
-      "image/svg+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["svg", "svgz"]
-      },
-      "image/t38": {
-        source: "iana",
-        extensions: ["t38"]
-      },
-      "image/tiff": {
-        source: "iana",
-        compressible: false,
-        extensions: ["tif", "tiff"]
-      },
-      "image/tiff-fx": {
-        source: "iana",
-        extensions: ["tfx"]
-      },
-      "image/vnd.adobe.photoshop": {
-        source: "iana",
-        compressible: true,
-        extensions: ["psd"]
-      },
-      "image/vnd.airzip.accelerator.azv": {
-        source: "iana",
-        extensions: ["azv"]
-      },
-      "image/vnd.cns.inf2": {
-        source: "iana"
-      },
-      "image/vnd.dece.graphic": {
-        source: "iana",
-        extensions: ["uvi", "uvvi", "uvg", "uvvg"]
-      },
-      "image/vnd.djvu": {
-        source: "iana",
-        extensions: ["djvu", "djv"]
-      },
-      "image/vnd.dvb.subtitle": {
-        source: "iana",
-        extensions: ["sub"]
-      },
-      "image/vnd.dwg": {
-        source: "iana",
-        extensions: ["dwg"]
-      },
-      "image/vnd.dxf": {
-        source: "iana",
-        extensions: ["dxf"]
-      },
-      "image/vnd.fastbidsheet": {
-        source: "iana",
-        extensions: ["fbs"]
-      },
-      "image/vnd.fpx": {
-        source: "iana",
-        extensions: ["fpx"]
-      },
-      "image/vnd.fst": {
-        source: "iana",
-        extensions: ["fst"]
-      },
-      "image/vnd.fujixerox.edmics-mmr": {
-        source: "iana",
-        extensions: ["mmr"]
-      },
-      "image/vnd.fujixerox.edmics-rlc": {
-        source: "iana",
-        extensions: ["rlc"]
-      },
-      "image/vnd.globalgraphics.pgb": {
-        source: "iana"
-      },
-      "image/vnd.microsoft.icon": {
-        source: "iana",
-        compressible: true,
-        extensions: ["ico"]
-      },
-      "image/vnd.mix": {
-        source: "iana"
-      },
-      "image/vnd.mozilla.apng": {
-        source: "iana"
-      },
-      "image/vnd.ms-dds": {
-        compressible: true,
-        extensions: ["dds"]
-      },
-      "image/vnd.ms-modi": {
-        source: "iana",
-        extensions: ["mdi"]
-      },
-      "image/vnd.ms-photo": {
-        source: "apache",
-        extensions: ["wdp"]
-      },
-      "image/vnd.net-fpx": {
-        source: "iana",
-        extensions: ["npx"]
-      },
-      "image/vnd.pco.b16": {
-        source: "iana",
-        extensions: ["b16"]
-      },
-      "image/vnd.radiance": {
-        source: "iana"
-      },
-      "image/vnd.sealed.png": {
-        source: "iana"
-      },
-      "image/vnd.sealedmedia.softseal.gif": {
-        source: "iana"
-      },
-      "image/vnd.sealedmedia.softseal.jpg": {
-        source: "iana"
-      },
-      "image/vnd.svf": {
-        source: "iana"
-      },
-      "image/vnd.tencent.tap": {
-        source: "iana",
-        extensions: ["tap"]
-      },
-      "image/vnd.valve.source.texture": {
-        source: "iana",
-        extensions: ["vtf"]
-      },
-      "image/vnd.wap.wbmp": {
-        source: "iana",
-        extensions: ["wbmp"]
-      },
-      "image/vnd.xiff": {
-        source: "iana",
-        extensions: ["xif"]
-      },
-      "image/vnd.zbrush.pcx": {
-        source: "iana",
-        extensions: ["pcx"]
-      },
-      "image/webp": {
-        source: "apache",
-        extensions: ["webp"]
-      },
-      "image/wmf": {
-        source: "iana",
-        extensions: ["wmf"]
-      },
-      "image/x-3ds": {
-        source: "apache",
-        extensions: ["3ds"]
-      },
-      "image/x-cmu-raster": {
-        source: "apache",
-        extensions: ["ras"]
-      },
-      "image/x-cmx": {
-        source: "apache",
-        extensions: ["cmx"]
-      },
-      "image/x-freehand": {
-        source: "apache",
-        extensions: ["fh", "fhc", "fh4", "fh5", "fh7"]
-      },
-      "image/x-icon": {
-        source: "apache",
-        compressible: true,
-        extensions: ["ico"]
-      },
-      "image/x-jng": {
-        source: "nginx",
-        extensions: ["jng"]
-      },
-      "image/x-mrsid-image": {
-        source: "apache",
-        extensions: ["sid"]
-      },
-      "image/x-ms-bmp": {
-        source: "nginx",
-        compressible: true,
-        extensions: ["bmp"]
-      },
-      "image/x-pcx": {
-        source: "apache",
-        extensions: ["pcx"]
-      },
-      "image/x-pict": {
-        source: "apache",
-        extensions: ["pic", "pct"]
-      },
-      "image/x-portable-anymap": {
-        source: "apache",
-        extensions: ["pnm"]
-      },
-      "image/x-portable-bitmap": {
-        source: "apache",
-        extensions: ["pbm"]
-      },
-      "image/x-portable-graymap": {
-        source: "apache",
-        extensions: ["pgm"]
-      },
-      "image/x-portable-pixmap": {
-        source: "apache",
-        extensions: ["ppm"]
-      },
-      "image/x-rgb": {
-        source: "apache",
-        extensions: ["rgb"]
-      },
-      "image/x-tga": {
-        source: "apache",
-        extensions: ["tga"]
-      },
-      "image/x-xbitmap": {
-        source: "apache",
-        extensions: ["xbm"]
-      },
-      "image/x-xcf": {
-        compressible: false
-      },
-      "image/x-xpixmap": {
-        source: "apache",
-        extensions: ["xpm"]
-      },
-      "image/x-xwindowdump": {
-        source: "apache",
-        extensions: ["xwd"]
-      },
-      "message/cpim": {
-        source: "iana"
-      },
-      "message/delivery-status": {
-        source: "iana"
-      },
-      "message/disposition-notification": {
-        source: "iana",
-        extensions: [
-          "disposition-notification"
-        ]
-      },
-      "message/external-body": {
-        source: "iana"
-      },
-      "message/feedback-report": {
-        source: "iana"
-      },
-      "message/global": {
-        source: "iana",
-        extensions: ["u8msg"]
-      },
-      "message/global-delivery-status": {
-        source: "iana",
-        extensions: ["u8dsn"]
-      },
-      "message/global-disposition-notification": {
-        source: "iana",
-        extensions: ["u8mdn"]
-      },
-      "message/global-headers": {
-        source: "iana",
-        extensions: ["u8hdr"]
-      },
-      "message/http": {
-        source: "iana",
-        compressible: false
-      },
-      "message/imdn+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "message/news": {
-        source: "iana"
-      },
-      "message/partial": {
-        source: "iana",
-        compressible: false
-      },
-      "message/rfc822": {
-        source: "iana",
-        compressible: true,
-        extensions: ["eml", "mime"]
-      },
-      "message/s-http": {
-        source: "iana"
-      },
-      "message/sip": {
-        source: "iana"
-      },
-      "message/sipfrag": {
-        source: "iana"
-      },
-      "message/tracking-status": {
-        source: "iana"
-      },
-      "message/vnd.si.simp": {
-        source: "iana"
-      },
-      "message/vnd.wfa.wsc": {
-        source: "iana",
-        extensions: ["wsc"]
-      },
-      "model/3mf": {
-        source: "iana",
-        extensions: ["3mf"]
-      },
-      "model/e57": {
-        source: "iana"
-      },
-      "model/gltf+json": {
-        source: "iana",
-        compressible: true,
-        extensions: ["gltf"]
-      },
-      "model/gltf-binary": {
-        source: "iana",
-        compressible: true,
-        extensions: ["glb"]
-      },
-      "model/iges": {
-        source: "iana",
-        compressible: false,
-        extensions: ["igs", "iges"]
-      },
-      "model/mesh": {
-        source: "iana",
-        compressible: false,
-        extensions: ["msh", "mesh", "silo"]
-      },
-      "model/mtl": {
-        source: "iana",
-        extensions: ["mtl"]
-      },
-      "model/obj": {
-        source: "iana",
-        extensions: ["obj"]
-      },
-      "model/step": {
-        source: "iana"
-      },
-      "model/step+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["stpx"]
-      },
-      "model/step+zip": {
-        source: "iana",
-        compressible: false,
-        extensions: ["stpz"]
-      },
-      "model/step-xml+zip": {
-        source: "iana",
-        compressible: false,
-        extensions: ["stpxz"]
-      },
-      "model/stl": {
-        source: "iana",
-        extensions: ["stl"]
-      },
-      "model/vnd.collada+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["dae"]
-      },
-      "model/vnd.dwf": {
-        source: "iana",
-        extensions: ["dwf"]
-      },
-      "model/vnd.flatland.3dml": {
-        source: "iana"
-      },
-      "model/vnd.gdl": {
-        source: "iana",
-        extensions: ["gdl"]
-      },
-      "model/vnd.gs-gdl": {
-        source: "apache"
-      },
-      "model/vnd.gs.gdl": {
-        source: "iana"
-      },
-      "model/vnd.gtw": {
-        source: "iana",
-        extensions: ["gtw"]
-      },
-      "model/vnd.moml+xml": {
-        source: "iana",
-        compressible: true
-      },
-      "model/vnd.mts": {
-        source: "iana",
-        extensions: ["mts"]
-      },
-      "model/vnd.opengex": {
-        source: "iana",
-        extensions: ["ogex"]
-      },
-      "model/vnd.parasolid.transmit.binary": {
-        source: "iana",
-        extensions: ["x_b"]
-      },
-      "model/vnd.parasolid.transmit.text": {
-        source: "iana",
-        extensions: ["x_t"]
-      },
-      "model/vnd.pytha.pyox": {
-        source: "iana"
-      },
-      "model/vnd.rosette.annotated-data-model": {
-        source: "iana"
-      },
-      "model/vnd.sap.vds": {
-        source: "iana",
-        extensions: ["vds"]
-      },
-      "model/vnd.usdz+zip": {
-        source: "iana",
-        compressible: false,
-        extensions: ["usdz"]
-      },
-      "model/vnd.valve.source.compiled-map": {
-        source: "iana",
-        extensions: ["bsp"]
-      },
-      "model/vnd.vtu": {
-        source: "iana",
-        extensions: ["vtu"]
-      },
-      "model/vrml": {
-        source: "iana",
-        compressible: false,
-        extensions: ["wrl", "vrml"]
-      },
-      "model/x3d+binary": {
-        source: "apache",
-        compressible: false,
-        extensions: ["x3db", "x3dbz"]
-      },
-      "model/x3d+fastinfoset": {
-        source: "iana",
-        extensions: ["x3db"]
-      },
-      "model/x3d+vrml": {
-        source: "apache",
-        compressible: false,
-        extensions: ["x3dv", "x3dvz"]
-      },
-      "model/x3d+xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["x3d", "x3dz"]
-      },
-      "model/x3d-vrml": {
-        source: "iana",
-        extensions: ["x3dv"]
-      },
-      "multipart/alternative": {
-        source: "iana",
-        compressible: false
-      },
-      "multipart/appledouble": {
-        source: "iana"
-      },
-      "multipart/byteranges": {
-        source: "iana"
-      },
-      "multipart/digest": {
-        source: "iana"
-      },
-      "multipart/encrypted": {
-        source: "iana",
-        compressible: false
-      },
-      "multipart/form-data": {
-        source: "iana",
-        compressible: false
-      },
-      "multipart/header-set": {
-        source: "iana"
-      },
-      "multipart/mixed": {
-        source: "iana"
-      },
-      "multipart/multilingual": {
-        source: "iana"
-      },
-      "multipart/parallel": {
-        source: "iana"
-      },
-      "multipart/related": {
-        source: "iana",
-        compressible: false
-      },
-      "multipart/report": {
-        source: "iana"
-      },
-      "multipart/signed": {
-        source: "iana",
-        compressible: false
-      },
-      "multipart/vnd.bint.med-plus": {
-        source: "iana"
-      },
-      "multipart/voice-message": {
-        source: "iana"
-      },
-      "multipart/x-mixed-replace": {
-        source: "iana"
-      },
-      "text/1d-interleaved-parityfec": {
-        source: "iana"
-      },
-      "text/cache-manifest": {
-        source: "iana",
-        compressible: true,
-        extensions: ["appcache", "manifest"]
-      },
-      "text/calendar": {
-        source: "iana",
-        extensions: ["ics", "ifb"]
-      },
-      "text/calender": {
-        compressible: true
-      },
-      "text/cmd": {
-        compressible: true
-      },
-      "text/coffeescript": {
-        extensions: ["coffee", "litcoffee"]
-      },
-      "text/cql": {
-        source: "iana"
-      },
-      "text/cql-expression": {
-        source: "iana"
-      },
-      "text/cql-identifier": {
-        source: "iana"
-      },
-      "text/css": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["css"]
-      },
-      "text/csv": {
-        source: "iana",
-        compressible: true,
-        extensions: ["csv"]
-      },
-      "text/csv-schema": {
-        source: "iana"
-      },
-      "text/directory": {
-        source: "iana"
-      },
-      "text/dns": {
-        source: "iana"
-      },
-      "text/ecmascript": {
-        source: "iana"
-      },
-      "text/encaprtp": {
-        source: "iana"
-      },
-      "text/enriched": {
-        source: "iana"
-      },
-      "text/fhirpath": {
-        source: "iana"
-      },
-      "text/flexfec": {
-        source: "iana"
-      },
-      "text/fwdred": {
-        source: "iana"
-      },
-      "text/gff3": {
-        source: "iana"
-      },
-      "text/grammar-ref-list": {
-        source: "iana"
-      },
-      "text/html": {
-        source: "iana",
-        compressible: true,
-        extensions: ["html", "htm", "shtml"]
-      },
-      "text/jade": {
-        extensions: ["jade"]
-      },
-      "text/javascript": {
-        source: "iana",
-        compressible: true
-      },
-      "text/jcr-cnd": {
-        source: "iana"
-      },
-      "text/jsx": {
-        compressible: true,
-        extensions: ["jsx"]
-      },
-      "text/less": {
-        compressible: true,
-        extensions: ["less"]
-      },
-      "text/markdown": {
-        source: "iana",
-        compressible: true,
-        extensions: ["markdown", "md"]
-      },
-      "text/mathml": {
-        source: "nginx",
-        extensions: ["mml"]
-      },
-      "text/mdx": {
-        compressible: true,
-        extensions: ["mdx"]
-      },
-      "text/mizar": {
-        source: "iana"
-      },
-      "text/n3": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["n3"]
-      },
-      "text/parameters": {
-        source: "iana",
-        charset: "UTF-8"
-      },
-      "text/parityfec": {
-        source: "iana"
-      },
-      "text/plain": {
-        source: "iana",
-        compressible: true,
-        extensions: ["txt", "text", "conf", "def", "list", "log", "in", "ini"]
-      },
-      "text/provenance-notation": {
-        source: "iana",
-        charset: "UTF-8"
-      },
-      "text/prs.fallenstein.rst": {
-        source: "iana"
-      },
-      "text/prs.lines.tag": {
-        source: "iana",
-        extensions: ["dsc"]
-      },
-      "text/prs.prop.logic": {
-        source: "iana"
-      },
-      "text/raptorfec": {
-        source: "iana"
-      },
-      "text/red": {
-        source: "iana"
-      },
-      "text/rfc822-headers": {
-        source: "iana"
-      },
-      "text/richtext": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rtx"]
-      },
-      "text/rtf": {
-        source: "iana",
-        compressible: true,
-        extensions: ["rtf"]
-      },
-      "text/rtp-enc-aescm128": {
-        source: "iana"
-      },
-      "text/rtploopback": {
-        source: "iana"
-      },
-      "text/rtx": {
-        source: "iana"
-      },
-      "text/sgml": {
-        source: "iana",
-        extensions: ["sgml", "sgm"]
-      },
-      "text/shaclc": {
-        source: "iana"
-      },
-      "text/shex": {
-        source: "iana",
-        extensions: ["shex"]
-      },
-      "text/slim": {
-        extensions: ["slim", "slm"]
-      },
-      "text/spdx": {
-        source: "iana",
-        extensions: ["spdx"]
-      },
-      "text/strings": {
-        source: "iana"
-      },
-      "text/stylus": {
-        extensions: ["stylus", "styl"]
-      },
-      "text/t140": {
-        source: "iana"
-      },
-      "text/tab-separated-values": {
-        source: "iana",
-        compressible: true,
-        extensions: ["tsv"]
-      },
-      "text/troff": {
-        source: "iana",
-        extensions: ["t", "tr", "roff", "man", "me", "ms"]
-      },
-      "text/turtle": {
-        source: "iana",
-        charset: "UTF-8",
-        extensions: ["ttl"]
-      },
-      "text/ulpfec": {
-        source: "iana"
-      },
-      "text/uri-list": {
-        source: "iana",
-        compressible: true,
-        extensions: ["uri", "uris", "urls"]
-      },
-      "text/vcard": {
-        source: "iana",
-        compressible: true,
-        extensions: ["vcard"]
-      },
-      "text/vnd.a": {
-        source: "iana"
-      },
-      "text/vnd.abc": {
-        source: "iana"
-      },
-      "text/vnd.ascii-art": {
-        source: "iana"
-      },
-      "text/vnd.curl": {
-        source: "iana",
-        extensions: ["curl"]
-      },
-      "text/vnd.curl.dcurl": {
-        source: "apache",
-        extensions: ["dcurl"]
-      },
-      "text/vnd.curl.mcurl": {
-        source: "apache",
-        extensions: ["mcurl"]
-      },
-      "text/vnd.curl.scurl": {
-        source: "apache",
-        extensions: ["scurl"]
-      },
-      "text/vnd.debian.copyright": {
-        source: "iana",
-        charset: "UTF-8"
-      },
-      "text/vnd.dmclientscript": {
-        source: "iana"
-      },
-      "text/vnd.dvb.subtitle": {
-        source: "iana",
-        extensions: ["sub"]
-      },
-      "text/vnd.esmertec.theme-descriptor": {
-        source: "iana",
-        charset: "UTF-8"
-      },
-      "text/vnd.familysearch.gedcom": {
-        source: "iana",
-        extensions: ["ged"]
-      },
-      "text/vnd.ficlab.flt": {
-        source: "iana"
-      },
-      "text/vnd.fly": {
-        source: "iana",
-        extensions: ["fly"]
-      },
-      "text/vnd.fmi.flexstor": {
-        source: "iana",
-        extensions: ["flx"]
-      },
-      "text/vnd.gml": {
-        source: "iana"
-      },
-      "text/vnd.graphviz": {
-        source: "iana",
-        extensions: ["gv"]
-      },
-      "text/vnd.hans": {
-        source: "iana"
-      },
-      "text/vnd.hgl": {
-        source: "iana"
-      },
-      "text/vnd.in3d.3dml": {
-        source: "iana",
-        extensions: ["3dml"]
-      },
-      "text/vnd.in3d.spot": {
-        source: "iana",
-        extensions: ["spot"]
-      },
-      "text/vnd.iptc.newsml": {
-        source: "iana"
-      },
-      "text/vnd.iptc.nitf": {
-        source: "iana"
-      },
-      "text/vnd.latex-z": {
-        source: "iana"
-      },
-      "text/vnd.motorola.reflex": {
-        source: "iana"
-      },
-      "text/vnd.ms-mediapackage": {
-        source: "iana"
-      },
-      "text/vnd.net2phone.commcenter.command": {
-        source: "iana"
-      },
-      "text/vnd.radisys.msml-basic-layout": {
-        source: "iana"
-      },
-      "text/vnd.senx.warpscript": {
-        source: "iana"
-      },
-      "text/vnd.si.uricatalogue": {
-        source: "iana"
-      },
-      "text/vnd.sosi": {
-        source: "iana"
-      },
-      "text/vnd.sun.j2me.app-descriptor": {
-        source: "iana",
-        charset: "UTF-8",
-        extensions: ["jad"]
-      },
-      "text/vnd.trolltech.linguist": {
-        source: "iana",
-        charset: "UTF-8"
-      },
-      "text/vnd.wap.si": {
-        source: "iana"
-      },
-      "text/vnd.wap.sl": {
-        source: "iana"
-      },
-      "text/vnd.wap.wml": {
-        source: "iana",
-        extensions: ["wml"]
-      },
-      "text/vnd.wap.wmlscript": {
-        source: "iana",
-        extensions: ["wmls"]
-      },
-      "text/vtt": {
-        source: "iana",
-        charset: "UTF-8",
-        compressible: true,
-        extensions: ["vtt"]
-      },
-      "text/x-asm": {
-        source: "apache",
-        extensions: ["s", "asm"]
-      },
-      "text/x-c": {
-        source: "apache",
-        extensions: ["c", "cc", "cxx", "cpp", "h", "hh", "dic"]
-      },
-      "text/x-component": {
-        source: "nginx",
-        extensions: ["htc"]
-      },
-      "text/x-fortran": {
-        source: "apache",
-        extensions: ["f", "for", "f77", "f90"]
-      },
-      "text/x-gwt-rpc": {
-        compressible: true
-      },
-      "text/x-handlebars-template": {
-        extensions: ["hbs"]
-      },
-      "text/x-java-source": {
-        source: "apache",
-        extensions: ["java"]
-      },
-      "text/x-jquery-tmpl": {
-        compressible: true
-      },
-      "text/x-lua": {
-        extensions: ["lua"]
-      },
-      "text/x-markdown": {
-        compressible: true,
-        extensions: ["mkd"]
-      },
-      "text/x-nfo": {
-        source: "apache",
-        extensions: ["nfo"]
-      },
-      "text/x-opml": {
-        source: "apache",
-        extensions: ["opml"]
-      },
-      "text/x-org": {
-        compressible: true,
-        extensions: ["org"]
-      },
-      "text/x-pascal": {
-        source: "apache",
-        extensions: ["p", "pas"]
-      },
-      "text/x-processing": {
-        compressible: true,
-        extensions: ["pde"]
-      },
-      "text/x-sass": {
-        extensions: ["sass"]
-      },
-      "text/x-scss": {
-        extensions: ["scss"]
-      },
-      "text/x-setext": {
-        source: "apache",
-        extensions: ["etx"]
-      },
-      "text/x-sfv": {
-        source: "apache",
-        extensions: ["sfv"]
-      },
-      "text/x-suse-ymp": {
-        compressible: true,
-        extensions: ["ymp"]
-      },
-      "text/x-uuencode": {
-        source: "apache",
-        extensions: ["uu"]
-      },
-      "text/x-vcalendar": {
-        source: "apache",
-        extensions: ["vcs"]
-      },
-      "text/x-vcard": {
-        source: "apache",
-        extensions: ["vcf"]
-      },
-      "text/xml": {
-        source: "iana",
-        compressible: true,
-        extensions: ["xml"]
-      },
-      "text/xml-external-parsed-entity": {
-        source: "iana"
-      },
-      "text/yaml": {
-        compressible: true,
-        extensions: ["yaml", "yml"]
-      },
-      "video/1d-interleaved-parityfec": {
-        source: "iana"
-      },
-      "video/3gpp": {
-        source: "iana",
-        extensions: ["3gp", "3gpp"]
-      },
-      "video/3gpp-tt": {
-        source: "iana"
-      },
-      "video/3gpp2": {
-        source: "iana",
-        extensions: ["3g2"]
-      },
-      "video/av1": {
-        source: "iana"
-      },
-      "video/bmpeg": {
-        source: "iana"
-      },
-      "video/bt656": {
-        source: "iana"
-      },
-      "video/celb": {
-        source: "iana"
-      },
-      "video/dv": {
-        source: "iana"
-      },
-      "video/encaprtp": {
-        source: "iana"
-      },
-      "video/ffv1": {
-        source: "iana"
-      },
-      "video/flexfec": {
-        source: "iana"
-      },
-      "video/h261": {
-        source: "iana",
-        extensions: ["h261"]
-      },
-      "video/h263": {
-        source: "iana",
-        extensions: ["h263"]
-      },
-      "video/h263-1998": {
-        source: "iana"
-      },
-      "video/h263-2000": {
-        source: "iana"
-      },
-      "video/h264": {
-        source: "iana",
-        extensions: ["h264"]
-      },
-      "video/h264-rcdo": {
-        source: "iana"
-      },
-      "video/h264-svc": {
-        source: "iana"
-      },
-      "video/h265": {
-        source: "iana"
-      },
-      "video/iso.segment": {
-        source: "iana",
-        extensions: ["m4s"]
-      },
-      "video/jpeg": {
-        source: "iana",
-        extensions: ["jpgv"]
-      },
-      "video/jpeg2000": {
-        source: "iana"
-      },
-      "video/jpm": {
-        source: "apache",
-        extensions: ["jpm", "jpgm"]
-      },
-      "video/jxsv": {
-        source: "iana"
-      },
-      "video/mj2": {
-        source: "iana",
-        extensions: ["mj2", "mjp2"]
-      },
-      "video/mp1s": {
-        source: "iana"
-      },
-      "video/mp2p": {
-        source: "iana"
-      },
-      "video/mp2t": {
-        source: "iana",
-        extensions: ["ts"]
-      },
-      "video/mp4": {
-        source: "iana",
-        compressible: false,
-        extensions: ["mp4", "mp4v", "mpg4"]
-      },
-      "video/mp4v-es": {
-        source: "iana"
-      },
-      "video/mpeg": {
-        source: "iana",
-        compressible: false,
-        extensions: ["mpeg", "mpg", "mpe", "m1v", "m2v"]
-      },
-      "video/mpeg4-generic": {
-        source: "iana"
-      },
-      "video/mpv": {
-        source: "iana"
-      },
-      "video/nv": {
-        source: "iana"
-      },
-      "video/ogg": {
-        source: "iana",
-        compressible: false,
-        extensions: ["ogv"]
-      },
-      "video/parityfec": {
-        source: "iana"
-      },
-      "video/pointer": {
-        source: "iana"
-      },
-      "video/quicktime": {
-        source: "iana",
-        compressible: false,
-        extensions: ["qt", "mov"]
-      },
-      "video/raptorfec": {
-        source: "iana"
-      },
-      "video/raw": {
-        source: "iana"
-      },
-      "video/rtp-enc-aescm128": {
-        source: "iana"
-      },
-      "video/rtploopback": {
-        source: "iana"
-      },
-      "video/rtx": {
-        source: "iana"
-      },
-      "video/scip": {
-        source: "iana"
-      },
-      "video/smpte291": {
-        source: "iana"
-      },
-      "video/smpte292m": {
-        source: "iana"
-      },
-      "video/ulpfec": {
-        source: "iana"
-      },
-      "video/vc1": {
-        source: "iana"
-      },
-      "video/vc2": {
-        source: "iana"
-      },
-      "video/vnd.cctv": {
-        source: "iana"
-      },
-      "video/vnd.dece.hd": {
-        source: "iana",
-        extensions: ["uvh", "uvvh"]
-      },
-      "video/vnd.dece.mobile": {
-        source: "iana",
-        extensions: ["uvm", "uvvm"]
-      },
-      "video/vnd.dece.mp4": {
-        source: "iana"
-      },
-      "video/vnd.dece.pd": {
-        source: "iana",
-        extensions: ["uvp", "uvvp"]
-      },
-      "video/vnd.dece.sd": {
-        source: "iana",
-        extensions: ["uvs", "uvvs"]
-      },
-      "video/vnd.dece.video": {
-        source: "iana",
-        extensions: ["uvv", "uvvv"]
-      },
-      "video/vnd.directv.mpeg": {
-        source: "iana"
-      },
-      "video/vnd.directv.mpeg-tts": {
-        source: "iana"
-      },
-      "video/vnd.dlna.mpeg-tts": {
-        source: "iana"
-      },
-      "video/vnd.dvb.file": {
-        source: "iana",
-        extensions: ["dvb"]
-      },
-      "video/vnd.fvt": {
-        source: "iana",
-        extensions: ["fvt"]
-      },
-      "video/vnd.hns.video": {
-        source: "iana"
-      },
-      "video/vnd.iptvforum.1dparityfec-1010": {
-        source: "iana"
-      },
-      "video/vnd.iptvforum.1dparityfec-2005": {
-        source: "iana"
-      },
-      "video/vnd.iptvforum.2dparityfec-1010": {
-        source: "iana"
-      },
-      "video/vnd.iptvforum.2dparityfec-2005": {
-        source: "iana"
-      },
-      "video/vnd.iptvforum.ttsavc": {
-        source: "iana"
-      },
-      "video/vnd.iptvforum.ttsmpeg2": {
-        source: "iana"
-      },
-      "video/vnd.motorola.video": {
-        source: "iana"
-      },
-      "video/vnd.motorola.videop": {
-        source: "iana"
-      },
-      "video/vnd.mpegurl": {
-        source: "iana",
-        extensions: ["mxu", "m4u"]
-      },
-      "video/vnd.ms-playready.media.pyv": {
-        source: "iana",
-        extensions: ["pyv"]
-      },
-      "video/vnd.nokia.interleaved-multimedia": {
-        source: "iana"
-      },
-      "video/vnd.nokia.mp4vr": {
-        source: "iana"
-      },
-      "video/vnd.nokia.videovoip": {
-        source: "iana"
-      },
-      "video/vnd.objectvideo": {
-        source: "iana"
-      },
-      "video/vnd.radgamettools.bink": {
-        source: "iana"
-      },
-      "video/vnd.radgamettools.smacker": {
-        source: "iana"
-      },
-      "video/vnd.sealed.mpeg1": {
-        source: "iana"
-      },
-      "video/vnd.sealed.mpeg4": {
-        source: "iana"
-      },
-      "video/vnd.sealed.swf": {
-        source: "iana"
-      },
-      "video/vnd.sealedmedia.softseal.mov": {
-        source: "iana"
-      },
-      "video/vnd.uvvu.mp4": {
-        source: "iana",
-        extensions: ["uvu", "uvvu"]
-      },
-      "video/vnd.vivo": {
-        source: "iana",
-        extensions: ["viv"]
-      },
-      "video/vnd.youtube.yt": {
-        source: "iana"
-      },
-      "video/vp8": {
-        source: "iana"
-      },
-      "video/vp9": {
-        source: "iana"
-      },
-      "video/webm": {
-        source: "apache",
-        compressible: false,
-        extensions: ["webm"]
-      },
-      "video/x-f4v": {
-        source: "apache",
-        extensions: ["f4v"]
-      },
-      "video/x-fli": {
-        source: "apache",
-        extensions: ["fli"]
-      },
-      "video/x-flv": {
-        source: "apache",
-        compressible: false,
-        extensions: ["flv"]
-      },
-      "video/x-m4v": {
-        source: "apache",
-        extensions: ["m4v"]
-      },
-      "video/x-matroska": {
-        source: "apache",
-        compressible: false,
-        extensions: ["mkv", "mk3d", "mks"]
-      },
-      "video/x-mng": {
-        source: "apache",
-        extensions: ["mng"]
-      },
-      "video/x-ms-asf": {
-        source: "apache",
-        extensions: ["asf", "asx"]
-      },
-      "video/x-ms-vob": {
-        source: "apache",
-        extensions: ["vob"]
-      },
-      "video/x-ms-wm": {
-        source: "apache",
-        extensions: ["wm"]
-      },
-      "video/x-ms-wmv": {
-        source: "apache",
-        compressible: false,
-        extensions: ["wmv"]
-      },
-      "video/x-ms-wmx": {
-        source: "apache",
-        extensions: ["wmx"]
-      },
-      "video/x-ms-wvx": {
-        source: "apache",
-        extensions: ["wvx"]
-      },
-      "video/x-msvideo": {
-        source: "apache",
-        extensions: ["avi"]
-      },
-      "video/x-sgi-movie": {
-        source: "apache",
-        extensions: ["movie"]
-      },
-      "video/x-smv": {
-        source: "apache",
-        extensions: ["smv"]
-      },
-      "x-conference/x-cooltalk": {
-        source: "apache",
-        extensions: ["ice"]
-      },
-      "x-shader/x-fragment": {
-        compressible: true
-      },
-      "x-shader/x-vertex": {
-        compressible: true
-      }
-    };
-  }
-});
-
-// ../../node_modules/mime-db/index.js
-var require_mime_db = __commonJS({
-  "../../node_modules/mime-db/index.js"(exports, module2) {
-    module2.exports = require_db();
-  }
-});
-
-// ../../node_modules/mime-types/index.js
-var require_mime_types = __commonJS({
-  "../../node_modules/mime-types/index.js"(exports) {
-    "use strict";
-    var db = require_mime_db();
-    var extname = require("path").extname;
-    var EXTRACT_TYPE_REGEXP = /^\s*([^;\s]*)(?:;|\s|$)/;
-    var TEXT_TYPE_REGEXP = /^text\//i;
-    exports.charset = charset;
-    exports.charsets = { lookup: charset };
-    exports.contentType = contentType;
-    exports.extension = extension;
-    exports.extensions = /* @__PURE__ */ Object.create(null);
-    exports.lookup = lookup;
-    exports.types = /* @__PURE__ */ Object.create(null);
-    populateMaps(exports.extensions, exports.types);
-    function charset(type) {
-      if (!type || typeof type !== "string") {
-        return false;
-      }
-      var match = EXTRACT_TYPE_REGEXP.exec(type);
-      var mime = match && db[match[1].toLowerCase()];
-      if (mime && mime.charset) {
-        return mime.charset;
-      }
-      if (match && TEXT_TYPE_REGEXP.test(match[1])) {
-        return "UTF-8";
-      }
-      return false;
-    }
-    function contentType(str) {
-      if (!str || typeof str !== "string") {
-        return false;
-      }
-      var mime = str.indexOf("/") === -1 ? exports.lookup(str) : str;
-      if (!mime) {
-        return false;
-      }
-      if (mime.indexOf("charset") === -1) {
-        var charset2 = exports.charset(mime);
-        if (charset2)
-          mime += "; charset=" + charset2.toLowerCase();
-      }
-      return mime;
-    }
-    function extension(type) {
-      if (!type || typeof type !== "string") {
-        return false;
-      }
-      var match = EXTRACT_TYPE_REGEXP.exec(type);
-      var exts = match && exports.extensions[match[1].toLowerCase()];
-      if (!exts || !exts.length) {
-        return false;
-      }
-      return exts[0];
-    }
-    function lookup(path2) {
-      if (!path2 || typeof path2 !== "string") {
-        return false;
-      }
-      var extension2 = extname("x." + path2).toLowerCase().substr(1);
-      if (!extension2) {
-        return false;
-      }
-      return exports.types[extension2] || false;
-    }
-    function populateMaps(extensions, types) {
-      var preference = ["nginx", "apache", void 0, "iana"];
-      Object.keys(db).forEach(function forEachMimeType(type) {
-        var mime = db[type];
-        var exts = mime.extensions;
-        if (!exts || !exts.length) {
+      var offset = null;
+      function dispatch() {
+        if (!pending) {
+          if (caughtEnd)
+            done = true;
           return;
         }
-        extensions[type] = exts;
-        for (var i = 0; i < exts.length; i++) {
-          var extension2 = exts[i];
-          if (types[extension2]) {
-            var from = preference.indexOf(db[types[extension2]].source);
-            var to = preference.indexOf(mime.source);
-            if (types[extension2] !== "application/octet-stream" && (from > to || from === to && types[extension2].substr(0, 12) === "application/")) {
-              continue;
+        if (typeof pending === "function") {
+          pending();
+        } else {
+          var bytes = offset + pending.bytes;
+          if (buffers.length >= bytes) {
+            var buf;
+            if (offset == null) {
+              buf = buffers.splice(0, bytes);
+              if (!pending.skip) {
+                buf = buf.slice();
+              }
+            } else {
+              if (!pending.skip) {
+                buf = buffers.slice(offset, bytes);
+              }
+              offset = bytes;
+            }
+            if (pending.skip) {
+              pending.cb();
+            } else {
+              pending.cb(buf);
             }
           }
-          types[extension2] = type;
+        }
+      }
+      function builder(saw) {
+        function next() {
+          if (!done)
+            saw.next();
+        }
+        var self = words(function(bytes, cb) {
+          return function(name) {
+            getBytes(bytes, function(buf) {
+              vars.set(name, cb(buf));
+              next();
+            });
+          };
+        });
+        self.tap = function(cb) {
+          saw.nest(cb, vars.store);
+        };
+        self.into = function(key, cb) {
+          if (!vars.get(key))
+            vars.set(key, {});
+          var parent = vars;
+          vars = Vars(parent.get(key));
+          saw.nest(function() {
+            cb.apply(this, arguments);
+            this.tap(function() {
+              vars = parent;
+            });
+          }, vars.store);
+        };
+        self.flush = function() {
+          vars.store = {};
+          next();
+        };
+        self.loop = function(cb) {
+          var end = false;
+          saw.nest(false, function loop() {
+            this.vars = vars.store;
+            cb.call(this, function() {
+              end = true;
+              next();
+            }, vars.store);
+            this.tap(function() {
+              if (end)
+                saw.next();
+              else
+                loop.call(this);
+            }.bind(this));
+          }, vars.store);
+        };
+        self.buffer = function(name, bytes) {
+          if (typeof bytes === "string") {
+            bytes = vars.get(bytes);
+          }
+          getBytes(bytes, function(buf) {
+            vars.set(name, buf);
+            next();
+          });
+        };
+        self.skip = function(bytes) {
+          if (typeof bytes === "string") {
+            bytes = vars.get(bytes);
+          }
+          getBytes(bytes, function() {
+            next();
+          });
+        };
+        self.scan = function find(name, search) {
+          if (typeof search === "string") {
+            search = new Buffer(search);
+          } else if (!Buffer.isBuffer(search)) {
+            throw new Error("search must be a Buffer or a string");
+          }
+          var taken = 0;
+          pending = function() {
+            var pos = buffers.indexOf(search, offset + taken);
+            var i = pos - offset - taken;
+            if (pos !== -1) {
+              pending = null;
+              if (offset != null) {
+                vars.set(
+                  name,
+                  buffers.slice(offset, offset + taken + i)
+                );
+                offset += taken + i + search.length;
+              } else {
+                vars.set(
+                  name,
+                  buffers.slice(0, taken + i)
+                );
+                buffers.splice(0, taken + i + search.length);
+              }
+              next();
+              dispatch();
+            } else {
+              i = Math.max(buffers.length - search.length - offset - taken, 0);
+            }
+            taken += i;
+          };
+          dispatch();
+        };
+        self.peek = function(cb) {
+          offset = 0;
+          saw.nest(function() {
+            cb.call(this, vars.store);
+            this.tap(function() {
+              offset = null;
+            });
+          });
+        };
+        return self;
+      }
+      ;
+      var stream = Chainsaw.light(builder);
+      stream.writable = true;
+      var buffers = Buffers();
+      stream.write = function(buf) {
+        buffers.push(buf);
+        dispatch();
+      };
+      var vars = Vars();
+      var done = false, caughtEnd = false;
+      stream.end = function() {
+        caughtEnd = true;
+      };
+      stream.pipe = Stream.prototype.pipe;
+      Object.getOwnPropertyNames(EventEmitter.prototype).forEach(function(name) {
+        stream[name] = EventEmitter.prototype[name];
+      });
+      return stream;
+    };
+    exports.parse = function parse2(buffer) {
+      var self = words(function(bytes, cb) {
+        return function(name) {
+          if (offset + bytes <= buffer.length) {
+            var buf = buffer.slice(offset, offset + bytes);
+            offset += bytes;
+            vars.set(name, cb(buf));
+          } else {
+            vars.set(name, null);
+          }
+          return self;
+        };
+      });
+      var offset = 0;
+      var vars = Vars();
+      self.vars = vars.store;
+      self.tap = function(cb) {
+        cb.call(self, vars.store);
+        return self;
+      };
+      self.into = function(key, cb) {
+        if (!vars.get(key)) {
+          vars.set(key, {});
+        }
+        var parent = vars;
+        vars = Vars(parent.get(key));
+        cb.call(self, vars.store);
+        vars = parent;
+        return self;
+      };
+      self.loop = function(cb) {
+        var end = false;
+        var ender = function() {
+          end = true;
+        };
+        while (end === false) {
+          cb.call(self, ender, vars.store);
+        }
+        return self;
+      };
+      self.buffer = function(name, size) {
+        if (typeof size === "string") {
+          size = vars.get(size);
+        }
+        var buf = buffer.slice(offset, Math.min(buffer.length, offset + size));
+        offset += size;
+        vars.set(name, buf);
+        return self;
+      };
+      self.skip = function(bytes) {
+        if (typeof bytes === "string") {
+          bytes = vars.get(bytes);
+        }
+        offset += bytes;
+        return self;
+      };
+      self.scan = function(name, search) {
+        if (typeof search === "string") {
+          search = new Buffer(search);
+        } else if (!Buffer.isBuffer(search)) {
+          throw new Error("search must be a Buffer or a string");
+        }
+        vars.set(name, null);
+        for (var i = 0; i + offset <= buffer.length - search.length + 1; i++) {
+          for (var j = 0; j < search.length && buffer[offset + i + j] === search[j]; j++)
+            ;
+          if (j === search.length)
+            break;
+        }
+        vars.set(name, buffer.slice(offset, offset + i));
+        offset += i + search.length;
+        return self;
+      };
+      self.peek = function(cb) {
+        var was = offset;
+        cb.call(self, vars.store);
+        offset = was;
+        return self;
+      };
+      self.flush = function() {
+        vars.store = {};
+        return self;
+      };
+      self.eof = function() {
+        return offset >= buffer.length;
+      };
+      return self;
+    };
+    function decodeLEu(bytes) {
+      var acc = 0;
+      for (var i = 0; i < bytes.length; i++) {
+        acc += Math.pow(256, i) * bytes[i];
+      }
+      return acc;
+    }
+    function decodeBEu(bytes) {
+      var acc = 0;
+      for (var i = 0; i < bytes.length; i++) {
+        acc += Math.pow(256, bytes.length - i - 1) * bytes[i];
+      }
+      return acc;
+    }
+    function decodeBEs(bytes) {
+      var val = decodeBEu(bytes);
+      if ((bytes[0] & 128) == 128) {
+        val -= Math.pow(256, bytes.length);
+      }
+      return val;
+    }
+    function decodeLEs(bytes) {
+      var val = decodeLEu(bytes);
+      if ((bytes[bytes.length - 1] & 128) == 128) {
+        val -= Math.pow(256, bytes.length);
+      }
+      return val;
+    }
+    function words(decode) {
+      var self = {};
+      [1, 2, 4, 8].forEach(function(bytes) {
+        var bits = bytes * 8;
+        self["word" + bits + "le"] = self["word" + bits + "lu"] = decode(bytes, decodeLEu);
+        self["word" + bits + "ls"] = decode(bytes, decodeLEs);
+        self["word" + bits + "be"] = self["word" + bits + "bu"] = decode(bytes, decodeBEu);
+        self["word" + bits + "bs"] = decode(bytes, decodeBEs);
+      });
+      self.word8 = self.word8u = self.word8be;
+      self.word8s = self.word8bs;
+      return self;
+    }
+  }
+});
+
+// ../../node_modules/unzip-stream/lib/matcher-stream.js
+var require_matcher_stream = __commonJS({
+  "../../node_modules/unzip-stream/lib/matcher-stream.js"(exports, module2) {
+    var Transform = require("stream").Transform;
+    var util = require("util");
+    function MatcherStream(patternDesc, matchFn) {
+      if (!(this instanceof MatcherStream)) {
+        return new MatcherStream();
+      }
+      Transform.call(this);
+      var p = typeof patternDesc === "object" ? patternDesc.pattern : patternDesc;
+      this.pattern = Buffer.isBuffer(p) ? p : Buffer.from(p);
+      this.requiredLength = this.pattern.length;
+      if (patternDesc.requiredExtraSize)
+        this.requiredLength += patternDesc.requiredExtraSize;
+      this.data = new Buffer("");
+      this.bytesSoFar = 0;
+      this.matchFn = matchFn;
+    }
+    util.inherits(MatcherStream, Transform);
+    MatcherStream.prototype.checkDataChunk = function(ignoreMatchZero) {
+      var enoughData = this.data.length >= this.requiredLength;
+      if (!enoughData) {
+        return;
+      }
+      var matchIndex = this.data.indexOf(this.pattern, ignoreMatchZero ? 1 : 0);
+      if (matchIndex >= 0 && matchIndex + this.requiredLength > this.data.length) {
+        if (matchIndex > 0) {
+          var packet = this.data.slice(0, matchIndex);
+          this.push(packet);
+          this.bytesSoFar += matchIndex;
+          this.data = this.data.slice(matchIndex);
+        }
+        return;
+      }
+      if (matchIndex === -1) {
+        var packetLen = this.data.length - this.requiredLength + 1;
+        var packet = this.data.slice(0, packetLen);
+        this.push(packet);
+        this.bytesSoFar += packetLen;
+        this.data = this.data.slice(packetLen);
+        return;
+      }
+      if (matchIndex > 0) {
+        var packet = this.data.slice(0, matchIndex);
+        this.data = this.data.slice(matchIndex);
+        this.push(packet);
+        this.bytesSoFar += matchIndex;
+      }
+      var finished = this.matchFn ? this.matchFn(this.data, this.bytesSoFar) : true;
+      if (finished) {
+        this.data = new Buffer("");
+        return;
+      }
+      return true;
+    };
+    MatcherStream.prototype._transform = function(chunk, encoding, cb) {
+      this.data = Buffer.concat([this.data, chunk]);
+      var firstIteration = true;
+      while (this.checkDataChunk(!firstIteration)) {
+        firstIteration = false;
+      }
+      cb();
+    };
+    MatcherStream.prototype._flush = function(cb) {
+      if (this.data.length > 0) {
+        var firstIteration = true;
+        while (this.checkDataChunk(!firstIteration)) {
+          firstIteration = false;
+        }
+      }
+      if (this.data.length > 0) {
+        this.push(this.data);
+        this.data = null;
+      }
+      cb();
+    };
+    module2.exports = MatcherStream;
+  }
+});
+
+// ../../node_modules/unzip-stream/lib/entry.js
+var require_entry = __commonJS({
+  "../../node_modules/unzip-stream/lib/entry.js"(exports, module2) {
+    "use strict";
+    var stream = require("stream");
+    var inherits = require("util").inherits;
+    function Entry() {
+      if (!(this instanceof Entry)) {
+        return new Entry();
+      }
+      stream.PassThrough.call(this);
+      this.path = null;
+      this.type = null;
+      this.isDirectory = false;
+    }
+    inherits(Entry, stream.PassThrough);
+    Entry.prototype.autodrain = function() {
+      return this.pipe(new stream.Transform({ transform: function(d, e, cb) {
+        cb();
+      } }));
+    };
+    module2.exports = Entry;
+  }
+});
+
+// ../../node_modules/unzip-stream/lib/unzip-stream.js
+var require_unzip_stream = __commonJS({
+  "../../node_modules/unzip-stream/lib/unzip-stream.js"(exports, module2) {
+    "use strict";
+    var binary = require_binary();
+    var stream = require("stream");
+    var util = require("util");
+    var zlib = require("zlib");
+    var MatcherStream = require_matcher_stream();
+    var Entry = require_entry();
+    var states = {
+      STREAM_START: 0,
+      START: 1,
+      LOCAL_FILE_HEADER: 2,
+      LOCAL_FILE_HEADER_SUFFIX: 3,
+      FILE_DATA: 4,
+      FILE_DATA_END: 5,
+      DATA_DESCRIPTOR: 6,
+      CENTRAL_DIRECTORY_FILE_HEADER: 7,
+      CENTRAL_DIRECTORY_FILE_HEADER_SUFFIX: 8,
+      CDIR64_END: 9,
+      CDIR64_END_DATA_SECTOR: 10,
+      CDIR64_LOCATOR: 11,
+      CENTRAL_DIRECTORY_END: 12,
+      CENTRAL_DIRECTORY_END_COMMENT: 13,
+      TRAILING_JUNK: 14,
+      ERROR: 99
+    };
+    var FOUR_GIGS = 4294967296;
+    var SIG_LOCAL_FILE_HEADER = 67324752;
+    var SIG_DATA_DESCRIPTOR = 134695760;
+    var SIG_CDIR_RECORD = 33639248;
+    var SIG_CDIR64_RECORD_END = 101075792;
+    var SIG_CDIR64_LOCATOR_END = 117853008;
+    var SIG_CDIR_RECORD_END = 101010256;
+    function UnzipStream(options) {
+      if (!(this instanceof UnzipStream)) {
+        return new UnzipStream(options);
+      }
+      stream.Transform.call(this);
+      this.options = options || {};
+      this.data = new Buffer("");
+      this.state = states.STREAM_START;
+      this.skippedBytes = 0;
+      this.parsedEntity = null;
+      this.outStreamInfo = {};
+    }
+    util.inherits(UnzipStream, stream.Transform);
+    UnzipStream.prototype.processDataChunk = function(chunk) {
+      var requiredLength;
+      switch (this.state) {
+        case states.STREAM_START:
+        case states.START:
+          requiredLength = 4;
+          break;
+        case states.LOCAL_FILE_HEADER:
+          requiredLength = 26;
+          break;
+        case states.LOCAL_FILE_HEADER_SUFFIX:
+          requiredLength = this.parsedEntity.fileNameLength + this.parsedEntity.extraFieldLength;
+          break;
+        case states.DATA_DESCRIPTOR:
+          requiredLength = 12;
+          break;
+        case states.CENTRAL_DIRECTORY_FILE_HEADER:
+          requiredLength = 42;
+          break;
+        case states.CENTRAL_DIRECTORY_FILE_HEADER_SUFFIX:
+          requiredLength = this.parsedEntity.fileNameLength + this.parsedEntity.extraFieldLength + this.parsedEntity.fileCommentLength;
+          break;
+        case states.CDIR64_END:
+          requiredLength = 52;
+          break;
+        case states.CDIR64_END_DATA_SECTOR:
+          requiredLength = this.parsedEntity.centralDirectoryRecordSize - 44;
+          break;
+        case states.CDIR64_LOCATOR:
+          requiredLength = 16;
+          break;
+        case states.CENTRAL_DIRECTORY_END:
+          requiredLength = 18;
+          break;
+        case states.CENTRAL_DIRECTORY_END_COMMENT:
+          requiredLength = this.parsedEntity.commentLength;
+          break;
+        case states.FILE_DATA:
+          return 0;
+        case states.FILE_DATA_END:
+          return 0;
+        case states.TRAILING_JUNK:
+          if (this.options.debug)
+            console.log("found", chunk.length, "bytes of TRAILING_JUNK");
+          return chunk.length;
+        default:
+          return chunk.length;
+      }
+      var chunkLength = chunk.length;
+      if (chunkLength < requiredLength) {
+        return 0;
+      }
+      switch (this.state) {
+        case states.STREAM_START:
+        case states.START:
+          var signature = chunk.readUInt32LE(0);
+          switch (signature) {
+            case SIG_LOCAL_FILE_HEADER:
+              this.state = states.LOCAL_FILE_HEADER;
+              break;
+            case SIG_CDIR_RECORD:
+              this.state = states.CENTRAL_DIRECTORY_FILE_HEADER;
+              break;
+            case SIG_CDIR64_RECORD_END:
+              this.state = states.CDIR64_END;
+              break;
+            case SIG_CDIR64_LOCATOR_END:
+              this.state = states.CDIR64_LOCATOR;
+              break;
+            case SIG_CDIR_RECORD_END:
+              this.state = states.CENTRAL_DIRECTORY_END;
+              break;
+            default:
+              var isStreamStart = this.state === states.STREAM_START;
+              if (!isStreamStart && (signature & 65535) !== 19280 && this.skippedBytes < 26) {
+                var remaining = signature;
+                var toSkip = 4;
+                for (var i = 1; i < 4 && remaining !== 0; i++) {
+                  remaining = remaining >>> 8;
+                  if ((remaining & 255) === 80) {
+                    toSkip = i;
+                    break;
+                  }
+                }
+                this.skippedBytes += toSkip;
+                if (this.options.debug)
+                  console.log("Skipped", this.skippedBytes, "bytes");
+                return toSkip;
+              }
+              this.state = states.ERROR;
+              var errMsg = isStreamStart ? "Not a valid zip file" : "Invalid signature in zip file";
+              if (this.options.debug) {
+                var sig = chunk.readUInt32LE(0);
+                var asString;
+                try {
+                  asString = chunk.slice(0, 4).toString();
+                } catch (e) {
+                }
+                console.log("Unexpected signature in zip file: 0x" + sig.toString(16), '"' + asString + '", skipped', this.skippedBytes, "bytes");
+              }
+              this.emit("error", new Error(errMsg));
+              return chunk.length;
+          }
+          this.skippedBytes = 0;
+          return requiredLength;
+        case states.LOCAL_FILE_HEADER:
+          this.parsedEntity = this._readFile(chunk);
+          this.state = states.LOCAL_FILE_HEADER_SUFFIX;
+          return requiredLength;
+        case states.LOCAL_FILE_HEADER_SUFFIX:
+          var entry = new Entry();
+          var isUtf8 = (this.parsedEntity.flags & 2048) !== 0;
+          entry.path = this._decodeString(chunk.slice(0, this.parsedEntity.fileNameLength), isUtf8);
+          var extraDataBuffer = chunk.slice(this.parsedEntity.fileNameLength, this.parsedEntity.fileNameLength + this.parsedEntity.extraFieldLength);
+          var extra = this._readExtraFields(extraDataBuffer);
+          if (extra && extra.parsed) {
+            if (extra.parsed.path && !isUtf8) {
+              entry.path = extra.parsed.path;
+            }
+            if (Number.isFinite(extra.parsed.uncompressedSize) && this.parsedEntity.uncompressedSize === FOUR_GIGS - 1) {
+              this.parsedEntity.uncompressedSize = extra.parsed.uncompressedSize;
+            }
+            if (Number.isFinite(extra.parsed.compressedSize) && this.parsedEntity.compressedSize === FOUR_GIGS - 1) {
+              this.parsedEntity.compressedSize = extra.parsed.compressedSize;
+            }
+          }
+          this.parsedEntity.extra = extra.parsed || {};
+          if (this.options.debug) {
+            const debugObj = Object.assign({}, this.parsedEntity, {
+              path: entry.path,
+              flags: "0x" + this.parsedEntity.flags.toString(16),
+              extraFields: extra && extra.debug
+            });
+            console.log("decoded LOCAL_FILE_HEADER:", JSON.stringify(debugObj, null, 2));
+          }
+          this._prepareOutStream(this.parsedEntity, entry);
+          this.emit("entry", entry);
+          this.state = states.FILE_DATA;
+          return requiredLength;
+        case states.CENTRAL_DIRECTORY_FILE_HEADER:
+          this.parsedEntity = this._readCentralDirectoryEntry(chunk);
+          this.state = states.CENTRAL_DIRECTORY_FILE_HEADER_SUFFIX;
+          return requiredLength;
+        case states.CENTRAL_DIRECTORY_FILE_HEADER_SUFFIX:
+          var isUtf8 = (this.parsedEntity.flags & 2048) !== 0;
+          var path2 = this._decodeString(chunk.slice(0, this.parsedEntity.fileNameLength), isUtf8);
+          var extraDataBuffer = chunk.slice(this.parsedEntity.fileNameLength, this.parsedEntity.fileNameLength + this.parsedEntity.extraFieldLength);
+          var extra = this._readExtraFields(extraDataBuffer);
+          if (extra && extra.parsed && extra.parsed.path && !isUtf8) {
+            path2 = extra.parsed.path;
+          }
+          this.parsedEntity.extra = extra.parsed;
+          var isUnix = (this.parsedEntity.versionMadeBy & 65280) >> 8 === 3;
+          var unixAttrs, isSymlink;
+          if (isUnix) {
+            unixAttrs = this.parsedEntity.externalFileAttributes >>> 16;
+            var fileType = unixAttrs >>> 12;
+            isSymlink = (fileType & 10) === 10;
+          }
+          if (this.options.debug) {
+            const debugObj = Object.assign({}, this.parsedEntity, {
+              path: path2,
+              flags: "0x" + this.parsedEntity.flags.toString(16),
+              unixAttrs: unixAttrs && "0" + unixAttrs.toString(8),
+              isSymlink,
+              extraFields: extra.debug
+            });
+            console.log("decoded CENTRAL_DIRECTORY_FILE_HEADER:", JSON.stringify(debugObj, null, 2));
+          }
+          this.state = states.START;
+          return requiredLength;
+        case states.CDIR64_END:
+          this.parsedEntity = this._readEndOfCentralDirectory64(chunk);
+          if (this.options.debug) {
+            console.log("decoded CDIR64_END_RECORD:", this.parsedEntity);
+          }
+          this.state = states.CDIR64_END_DATA_SECTOR;
+          return requiredLength;
+        case states.CDIR64_END_DATA_SECTOR:
+          this.state = states.START;
+          return requiredLength;
+        case states.CDIR64_LOCATOR:
+          this.state = states.START;
+          return requiredLength;
+        case states.CENTRAL_DIRECTORY_END:
+          this.parsedEntity = this._readEndOfCentralDirectory(chunk);
+          if (this.options.debug) {
+            console.log("decoded CENTRAL_DIRECTORY_END:", this.parsedEntity);
+          }
+          this.state = states.CENTRAL_DIRECTORY_END_COMMENT;
+          return requiredLength;
+        case states.CENTRAL_DIRECTORY_END_COMMENT:
+          if (this.options.debug) {
+            console.log("decoded CENTRAL_DIRECTORY_END_COMMENT:", chunk.slice(0, requiredLength).toString());
+          }
+          this.state = states.TRAILING_JUNK;
+          return requiredLength;
+        case states.ERROR:
+          return chunk.length;
+        default:
+          console.log("didn't handle state #", this.state, "discarding");
+          return chunk.length;
+      }
+    };
+    UnzipStream.prototype._prepareOutStream = function(vars, entry) {
+      var self = this;
+      var isDirectory = vars.uncompressedSize === 0 && /[\/\\]$/.test(entry.path);
+      entry.path = entry.path.replace(/^([/\\]*[.]+[/\\]+)*[/\\]*/, "");
+      entry.type = isDirectory ? "Directory" : "File";
+      entry.isDirectory = isDirectory;
+      var fileSizeKnown = !(vars.flags & 8);
+      if (fileSizeKnown) {
+        entry.size = vars.uncompressedSize;
+      }
+      var isVersionSupported = vars.versionsNeededToExtract <= 45;
+      this.outStreamInfo = {
+        stream: null,
+        limit: fileSizeKnown ? vars.compressedSize : -1,
+        written: 0
+      };
+      if (!fileSizeKnown) {
+        var pattern = new Buffer(4);
+        pattern.writeUInt32LE(SIG_DATA_DESCRIPTOR, 0);
+        var zip64Mode = vars.extra.zip64Mode;
+        var extraSize = zip64Mode ? 20 : 12;
+        var searchPattern = {
+          pattern,
+          requiredExtraSize: extraSize
+        };
+        var matcherStream = new MatcherStream(searchPattern, function(matchedChunk, sizeSoFar) {
+          var vars2 = self._readDataDescriptor(matchedChunk, zip64Mode);
+          var compressedSizeMatches = vars2.compressedSize === sizeSoFar;
+          if (!zip64Mode && !compressedSizeMatches && sizeSoFar >= FOUR_GIGS) {
+            var overflown = sizeSoFar - FOUR_GIGS;
+            while (overflown >= 0) {
+              compressedSizeMatches = vars2.compressedSize === overflown;
+              if (compressedSizeMatches)
+                break;
+              overflown -= FOUR_GIGS;
+            }
+          }
+          if (!compressedSizeMatches) {
+            return;
+          }
+          self.state = states.FILE_DATA_END;
+          var sliceOffset = zip64Mode ? 24 : 16;
+          if (self.data.length > 0) {
+            self.data = Buffer.concat([matchedChunk.slice(sliceOffset), self.data]);
+          } else {
+            self.data = matchedChunk.slice(sliceOffset);
+          }
+          return true;
+        });
+        this.outStreamInfo.stream = matcherStream;
+      } else {
+        this.outStreamInfo.stream = new stream.PassThrough();
+      }
+      var isEncrypted = vars.flags & 1 || vars.flags & 64;
+      if (isEncrypted || !isVersionSupported) {
+        var message = isEncrypted ? "Encrypted files are not supported!" : "Zip version " + Math.floor(vars.versionsNeededToExtract / 10) + "." + vars.versionsNeededToExtract % 10 + " is not supported";
+        entry.skip = true;
+        setImmediate(() => {
+          entry.emit("error", new Error(message));
+        });
+        this.outStreamInfo.stream.pipe(new Entry().autodrain());
+        return;
+      }
+      var isCompressed = vars.compressionMethod > 0;
+      if (isCompressed) {
+        var inflater = zlib.createInflateRaw();
+        inflater.on("error", function(err) {
+          self.state = states.ERROR;
+          self.emit("error", err);
+        });
+        this.outStreamInfo.stream.pipe(inflater).pipe(entry);
+      } else {
+        this.outStreamInfo.stream.pipe(entry);
+      }
+      if (this._drainAllEntries) {
+        entry.autodrain();
+      }
+    };
+    UnzipStream.prototype._readFile = function(data) {
+      var vars = binary.parse(data).word16lu("versionsNeededToExtract").word16lu("flags").word16lu("compressionMethod").word16lu("lastModifiedTime").word16lu("lastModifiedDate").word32lu("crc32").word32lu("compressedSize").word32lu("uncompressedSize").word16lu("fileNameLength").word16lu("extraFieldLength").vars;
+      return vars;
+    };
+    UnzipStream.prototype._readExtraFields = function(data) {
+      var extra = {};
+      var result = { parsed: extra };
+      if (this.options.debug) {
+        result.debug = [];
+      }
+      var index = 0;
+      while (index < data.length) {
+        var vars = binary.parse(data).skip(index).word16lu("extraId").word16lu("extraSize").vars;
+        index += 4;
+        var fieldType = void 0;
+        switch (vars.extraId) {
+          case 1:
+            fieldType = "Zip64 extended information extra field";
+            var z64vars = binary.parse(data.slice(index, index + vars.extraSize)).word64lu("uncompressedSize").word64lu("compressedSize").word64lu("offsetToLocalHeader").word32lu("diskStartNumber").vars;
+            if (z64vars.uncompressedSize !== null) {
+              extra.uncompressedSize = z64vars.uncompressedSize;
+            }
+            if (z64vars.compressedSize !== null) {
+              extra.compressedSize = z64vars.compressedSize;
+            }
+            extra.zip64Mode = true;
+            break;
+          case 10:
+            fieldType = "NTFS extra field";
+            break;
+          case 21589:
+            fieldType = "extended timestamp";
+            var timestampFields = data.readUInt8(index);
+            var offset = 1;
+            if (vars.extraSize >= offset + 4 && timestampFields & 1) {
+              extra.mtime = new Date(data.readUInt32LE(index + offset) * 1e3);
+              offset += 4;
+            }
+            if (vars.extraSize >= offset + 4 && timestampFields & 2) {
+              extra.atime = new Date(data.readUInt32LE(index + offset) * 1e3);
+              offset += 4;
+            }
+            if (vars.extraSize >= offset + 4 && timestampFields & 4) {
+              extra.ctime = new Date(data.readUInt32LE(index + offset) * 1e3);
+            }
+            break;
+          case 28789:
+            fieldType = "Info-ZIP Unicode Path Extra Field";
+            var fieldVer = data.readUInt8(index);
+            if (fieldVer === 1) {
+              var offset = 1;
+              var nameCrc32 = data.readUInt32LE(index + offset);
+              offset += 4;
+              var pathBuffer = data.slice(index + offset);
+              extra.path = pathBuffer.toString();
+            }
+            break;
+          case 13:
+          case 22613:
+            fieldType = vars.extraId === 13 ? "PKWARE Unix" : "Info-ZIP UNIX (type 1)";
+            var offset = 0;
+            if (vars.extraSize >= 8) {
+              var atime = new Date(data.readUInt32LE(index + offset) * 1e3);
+              offset += 4;
+              var mtime = new Date(data.readUInt32LE(index + offset) * 1e3);
+              offset += 4;
+              extra.atime = atime;
+              extra.mtime = mtime;
+              if (vars.extraSize >= 12) {
+                var uid = data.readUInt16LE(index + offset);
+                offset += 2;
+                var gid = data.readUInt16LE(index + offset);
+                offset += 2;
+                extra.uid = uid;
+                extra.gid = gid;
+              }
+            }
+            break;
+          case 30805:
+            fieldType = "Info-ZIP UNIX (type 2)";
+            var offset = 0;
+            if (vars.extraSize >= 4) {
+              var uid = data.readUInt16LE(index + offset);
+              offset += 2;
+              var gid = data.readUInt16LE(index + offset);
+              offset += 2;
+              extra.uid = uid;
+              extra.gid = gid;
+            }
+            break;
+          case 30837:
+            fieldType = "Info-ZIP New Unix";
+            var offset = 0;
+            var extraVer = data.readUInt8(index);
+            offset += 1;
+            if (extraVer === 1) {
+              var uidSize = data.readUInt8(index + offset);
+              offset += 1;
+              if (uidSize <= 6) {
+                extra.uid = data.readUIntLE(index + offset, uidSize);
+              }
+              offset += uidSize;
+              var gidSize = data.readUInt8(index + offset);
+              offset += 1;
+              if (gidSize <= 6) {
+                extra.gid = data.readUIntLE(index + offset, gidSize);
+              }
+            }
+            break;
+          case 30062:
+            fieldType = "ASi Unix";
+            var offset = 0;
+            if (vars.extraSize >= 14) {
+              var crc = data.readUInt32LE(index + offset);
+              offset += 4;
+              var mode = data.readUInt16LE(index + offset);
+              offset += 2;
+              var sizdev = data.readUInt32LE(index + offset);
+              offset += 4;
+              var uid = data.readUInt16LE(index + offset);
+              offset += 2;
+              var gid = data.readUInt16LE(index + offset);
+              offset += 2;
+              extra.mode = mode;
+              extra.uid = uid;
+              extra.gid = gid;
+              if (vars.extraSize > 14) {
+                var start = index + offset;
+                var end = index + vars.extraSize - 14;
+                var symlinkName = this._decodeString(data.slice(start, end));
+                extra.symlink = symlinkName;
+              }
+            }
+            break;
+        }
+        if (this.options.debug) {
+          result.debug.push({
+            extraId: "0x" + vars.extraId.toString(16),
+            description: fieldType,
+            data: data.slice(index, index + vars.extraSize).inspect()
+          });
+        }
+        index += vars.extraSize;
+      }
+      return result;
+    };
+    UnzipStream.prototype._readDataDescriptor = function(data, zip64Mode) {
+      if (zip64Mode) {
+        var vars = binary.parse(data).word32lu("dataDescriptorSignature").word32lu("crc32").word64lu("compressedSize").word64lu("uncompressedSize").vars;
+        return vars;
+      }
+      var vars = binary.parse(data).word32lu("dataDescriptorSignature").word32lu("crc32").word32lu("compressedSize").word32lu("uncompressedSize").vars;
+      return vars;
+    };
+    UnzipStream.prototype._readCentralDirectoryEntry = function(data) {
+      var vars = binary.parse(data).word16lu("versionMadeBy").word16lu("versionsNeededToExtract").word16lu("flags").word16lu("compressionMethod").word16lu("lastModifiedTime").word16lu("lastModifiedDate").word32lu("crc32").word32lu("compressedSize").word32lu("uncompressedSize").word16lu("fileNameLength").word16lu("extraFieldLength").word16lu("fileCommentLength").word16lu("diskNumber").word16lu("internalFileAttributes").word32lu("externalFileAttributes").word32lu("offsetToLocalFileHeader").vars;
+      return vars;
+    };
+    UnzipStream.prototype._readEndOfCentralDirectory64 = function(data) {
+      var vars = binary.parse(data).word64lu("centralDirectoryRecordSize").word16lu("versionMadeBy").word16lu("versionsNeededToExtract").word32lu("diskNumber").word32lu("diskNumberWithCentralDirectoryStart").word64lu("centralDirectoryEntries").word64lu("totalCentralDirectoryEntries").word64lu("sizeOfCentralDirectory").word64lu("offsetToStartOfCentralDirectory").vars;
+      return vars;
+    };
+    UnzipStream.prototype._readEndOfCentralDirectory = function(data) {
+      var vars = binary.parse(data).word16lu("diskNumber").word16lu("diskStart").word16lu("centralDirectoryEntries").word16lu("totalCentralDirectoryEntries").word32lu("sizeOfCentralDirectory").word32lu("offsetToStartOfCentralDirectory").word16lu("commentLength").vars;
+      return vars;
+    };
+    var cp437 = "\0\u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C\u25BA\u25C4\u2195\u203C\xB6\xA7\u25AC\u21A8\u2191\u2193\u2192\u2190\u221F\u2194\u25B2\u25BC !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u2302\xC7\xFC\xE9\xE2\xE4\xE0\xE5\xE7\xEA\xEB\xE8\xEF\xEE\xEC\xC4\xC5\xC9\xE6\xC6\xF4\xF6\xF2\xFB\xF9\xFF\xD6\xDC\xA2\xA3\xA5\u20A7\u0192\xE1\xED\xF3\xFA\xF1\xD1\xAA\xBA\xBF\u2310\xAC\xBD\xBC\xA1\xAB\xBB\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580\u03B1\xDF\u0393\u03C0\u03A3\u03C3\xB5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229\u2261\xB1\u2265\u2264\u2320\u2321\xF7\u2248\xB0\u2219\xB7\u221A\u207F\xB2\u25A0 ";
+    UnzipStream.prototype._decodeString = function(buffer, isUtf8) {
+      if (isUtf8) {
+        return buffer.toString("utf8");
+      }
+      if (this.options.decodeString) {
+        return this.options.decodeString(buffer);
+      }
+      let result = "";
+      for (var i = 0; i < buffer.length; i++) {
+        result += cp437[buffer[i]];
+      }
+      return result;
+    };
+    UnzipStream.prototype._parseOrOutput = function(encoding, cb) {
+      var consume;
+      while ((consume = this.processDataChunk(this.data)) > 0) {
+        this.data = this.data.slice(consume);
+        if (this.data.length === 0)
+          break;
+      }
+      if (this.state === states.FILE_DATA) {
+        if (this.outStreamInfo.limit >= 0) {
+          var remaining = this.outStreamInfo.limit - this.outStreamInfo.written;
+          var packet;
+          if (remaining < this.data.length) {
+            packet = this.data.slice(0, remaining);
+            this.data = this.data.slice(remaining);
+          } else {
+            packet = this.data;
+            this.data = new Buffer("");
+          }
+          this.outStreamInfo.written += packet.length;
+          if (this.outStreamInfo.limit === this.outStreamInfo.written) {
+            this.state = states.START;
+            this.outStreamInfo.stream.end(packet, encoding, cb);
+          } else {
+            this.outStreamInfo.stream.write(packet, encoding, cb);
+          }
+        } else {
+          var packet = this.data;
+          this.data = new Buffer("");
+          this.outStreamInfo.written += packet.length;
+          var outputStream = this.outStreamInfo.stream;
+          outputStream.write(packet, encoding, () => {
+            if (this.state === states.FILE_DATA_END) {
+              this.state = states.START;
+              return outputStream.end(cb);
+            }
+            cb();
+          });
+        }
+        return;
+      }
+      cb();
+    };
+    UnzipStream.prototype.drainAll = function() {
+      this._drainAllEntries = true;
+    };
+    UnzipStream.prototype._transform = function(chunk, encoding, cb) {
+      var self = this;
+      if (self.data.length > 0) {
+        self.data = Buffer.concat([self.data, chunk]);
+      } else {
+        self.data = chunk;
+      }
+      var startDataLength = self.data.length;
+      var done = function() {
+        if (self.data.length > 0 && self.data.length < startDataLength) {
+          startDataLength = self.data.length;
+          self._parseOrOutput(encoding, done);
+          return;
+        }
+        cb();
+      };
+      self._parseOrOutput(encoding, done);
+    };
+    UnzipStream.prototype._flush = function(cb) {
+      var self = this;
+      if (self.data.length > 0) {
+        self._parseOrOutput("buffer", function() {
+          if (self.data.length > 0)
+            return setImmediate(function() {
+              self._flush(cb);
+            });
+          cb();
+        });
+        return;
+      }
+      if (self.state === states.FILE_DATA) {
+        return cb(new Error("Stream finished in an invalid state, uncompression failed"));
+      }
+      setImmediate(cb);
+    };
+    module2.exports = UnzipStream;
+  }
+});
+
+// ../../node_modules/unzip-stream/lib/parser-stream.js
+var require_parser_stream = __commonJS({
+  "../../node_modules/unzip-stream/lib/parser-stream.js"(exports, module2) {
+    var Transform = require("stream").Transform;
+    var util = require("util");
+    var UnzipStream = require_unzip_stream();
+    function ParserStream(opts) {
+      if (!(this instanceof ParserStream)) {
+        return new ParserStream(opts);
+      }
+      var transformOpts = opts || {};
+      Transform.call(this, { readableObjectMode: true });
+      this.opts = opts || {};
+      this.unzipStream = new UnzipStream(this.opts);
+      var self = this;
+      this.unzipStream.on("entry", function(entry) {
+        self.push(entry);
+      });
+      this.unzipStream.on("error", function(error2) {
+        self.emit("error", error2);
+      });
+    }
+    util.inherits(ParserStream, Transform);
+    ParserStream.prototype._transform = function(chunk, encoding, cb) {
+      this.unzipStream.write(chunk, encoding, cb);
+    };
+    ParserStream.prototype._flush = function(cb) {
+      var self = this;
+      this.unzipStream.end(function() {
+        process.nextTick(function() {
+          self.emit("close");
+        });
+        cb();
+      });
+    };
+    ParserStream.prototype.on = function(eventName, fn) {
+      if (eventName === "entry") {
+        return Transform.prototype.on.call(this, "data", fn);
+      }
+      return Transform.prototype.on.call(this, eventName, fn);
+    };
+    ParserStream.prototype.drainAll = function() {
+      this.unzipStream.drainAll();
+      return this.pipe(new Transform({ objectMode: true, transform: function(d, e, cb) {
+        cb();
+      } }));
+    };
+    module2.exports = ParserStream;
+  }
+});
+
+// ../../node_modules/mkdirp/index.js
+var require_mkdirp = __commonJS({
+  "../../node_modules/mkdirp/index.js"(exports, module2) {
+    var path2 = require("path");
+    var fs4 = require("fs");
+    var _0777 = parseInt("0777", 8);
+    module2.exports = mkdirP.mkdirp = mkdirP.mkdirP = mkdirP;
+    function mkdirP(p, opts, f, made) {
+      if (typeof opts === "function") {
+        f = opts;
+        opts = {};
+      } else if (!opts || typeof opts !== "object") {
+        opts = { mode: opts };
+      }
+      var mode = opts.mode;
+      var xfs = opts.fs || fs4;
+      if (mode === void 0) {
+        mode = _0777;
+      }
+      if (!made)
+        made = null;
+      var cb = f || /* istanbul ignore next */
+      function() {
+      };
+      p = path2.resolve(p);
+      xfs.mkdir(p, mode, function(er) {
+        if (!er) {
+          made = made || p;
+          return cb(null, made);
+        }
+        switch (er.code) {
+          case "ENOENT":
+            if (path2.dirname(p) === p)
+              return cb(er);
+            mkdirP(path2.dirname(p), opts, function(er2, made2) {
+              if (er2)
+                cb(er2, made2);
+              else
+                mkdirP(p, opts, cb, made2);
+            });
+            break;
+          default:
+            xfs.stat(p, function(er2, stat) {
+              if (er2 || !stat.isDirectory())
+                cb(er, made);
+              else
+                cb(null, made);
+            });
+            break;
         }
       });
     }
+    mkdirP.sync = function sync(p, opts, made) {
+      if (!opts || typeof opts !== "object") {
+        opts = { mode: opts };
+      }
+      var mode = opts.mode;
+      var xfs = opts.fs || fs4;
+      if (mode === void 0) {
+        mode = _0777;
+      }
+      if (!made)
+        made = null;
+      p = path2.resolve(p);
+      try {
+        xfs.mkdirSync(p, mode);
+        made = made || p;
+      } catch (err0) {
+        switch (err0.code) {
+          case "ENOENT":
+            made = sync(path2.dirname(p), opts, made);
+            sync(p, opts, made);
+            break;
+          default:
+            var stat;
+            try {
+              stat = xfs.statSync(p);
+            } catch (err1) {
+              throw err0;
+            }
+            if (!stat.isDirectory())
+              throw err0;
+            break;
+        }
+      }
+      return made;
+    };
+  }
+});
+
+// ../../node_modules/unzip-stream/lib/extract.js
+var require_extract = __commonJS({
+  "../../node_modules/unzip-stream/lib/extract.js"(exports, module2) {
+    var fs4 = require("fs");
+    var path2 = require("path");
+    var util = require("util");
+    var mkdirp = require_mkdirp();
+    var Transform = require("stream").Transform;
+    var UnzipStream = require_unzip_stream();
+    function Extract(opts) {
+      if (!(this instanceof Extract))
+        return new Extract(opts);
+      Transform.call(this);
+      this.opts = opts || {};
+      this.unzipStream = new UnzipStream(this.opts);
+      this.unfinishedEntries = 0;
+      this.afterFlushWait = false;
+      this.createdDirectories = {};
+      var self = this;
+      this.unzipStream.on("entry", this._processEntry.bind(this));
+      this.unzipStream.on("error", function(error2) {
+        self.emit("error", error2);
+      });
+    }
+    util.inherits(Extract, Transform);
+    Extract.prototype._transform = function(chunk, encoding, cb) {
+      this.unzipStream.write(chunk, encoding, cb);
+    };
+    Extract.prototype._flush = function(cb) {
+      var self = this;
+      var allDone = function() {
+        process.nextTick(function() {
+          self.emit("close");
+        });
+        cb();
+      };
+      this.unzipStream.end(function() {
+        if (self.unfinishedEntries > 0) {
+          self.afterFlushWait = true;
+          return self.on("await-finished", allDone);
+        }
+        allDone();
+      });
+    };
+    Extract.prototype._processEntry = function(entry) {
+      var self = this;
+      var destPath = path2.join(this.opts.path, entry.path);
+      var directory = entry.isDirectory ? destPath : path2.dirname(destPath);
+      this.unfinishedEntries++;
+      var writeFileFn = function() {
+        var pipedStream = fs4.createWriteStream(destPath);
+        pipedStream.on("close", function() {
+          self.unfinishedEntries--;
+          self._notifyAwaiter();
+        });
+        pipedStream.on("error", function(error2) {
+          self.emit("error", error2);
+        });
+        entry.pipe(pipedStream);
+      };
+      if (this.createdDirectories[directory] || directory === ".") {
+        return writeFileFn();
+      }
+      mkdirp(directory, function(err) {
+        if (err)
+          return self.emit("error", err);
+        self.createdDirectories[directory] = true;
+        if (entry.isDirectory) {
+          self.unfinishedEntries--;
+          self._notifyAwaiter();
+          return;
+        }
+        writeFileFn();
+      });
+    };
+    Extract.prototype._notifyAwaiter = function() {
+      if (this.afterFlushWait && this.unfinishedEntries === 0) {
+        this.emit("await-finished");
+        this.afterFlushWait = false;
+      }
+    };
+    module2.exports = Extract;
+  }
+});
+
+// ../../node_modules/unzip-stream/unzip.js
+var require_unzip = __commonJS({
+  "../../node_modules/unzip-stream/unzip.js"(exports) {
+    "use strict";
+    exports.Parse = require_parser_stream();
+    exports.Extract = require_extract();
+  }
+});
+
+// src/utils.ts
+function downloadArtifact(runId, artifactName, extractPath) {
+  return __async(this, null, function* () {
+    const octokit = github.getOctokit(core2.getInput("github-token") || process.env.GITHUB_TOKEN);
+    const artifactInfo = (yield octokit.rest.actions.listWorkflowRunArtifacts(__spreadProps(__spreadValues({}, github.context.repo), {
+      run_id: runId
+    }))).data.artifacts.find((a) => a.name === artifactName);
+    if (artifactInfo == null) {
+      throw new Error(`Could not find artifact ${artifactName} for run ID ${runId}`);
+    }
+    const artifactRaw = Buffer.from((yield octokit.rest.actions.downloadArtifact(__spreadProps(__spreadValues({}, github.context.repo), {
+      artifact_id: artifactInfo.id,
+      archive_format: "zip"
+    }))).data);
+    if (extractPath != null) {
+      fs2.mkdirSync(extractPath, { recursive: true });
+    }
+    yield (0, import_util.promisify)(import_stream.pipeline)(
+      import_stream.Readable.from(artifactRaw),
+      require_unzip().Extract({ path: extractPath != null ? extractPath : process.cwd() })
+    );
+  });
+}
+function findCurrentPr(state = "open") {
+  return __async(this, null, function* () {
+    const octokit = github.getOctokit(core2.getInput("github-token") || process.env.GITHUB_TOKEN);
+    if (github.context.payload.workflow_run == null) {
+      const prs = (yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, github.context.repo), {
+        commit_sha: github.context.sha
+      }))).data.filter((pr) => !state || pr.state === state);
+      return prs.find((pr) => github.context.payload.ref === `refs/heads/${pr.head.ref}`) || prs[0];
+    } else {
+      const [owner, repo] = github.context.payload.workflow_run.head_repository.full_name.split("/", 2);
+      const prs = (yield octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+        owner,
+        repo,
+        commit_sha: github.context.payload.workflow_run.head_sha
+      })).data.filter((pr) => (!state || pr.state === state) && pr.base.repo.full_name === github.context.payload.workflow_run.repository.full_name);
+      return prs.find((pr) => pr.head.ref === github.context.payload.workflow_run.head_branch) || prs[0];
+    }
+  });
+}
+var fs2, import_stream, import_util, core2, github;
+var init_utils = __esm({
+  "src/utils.ts"() {
+    "use strict";
+    fs2 = __toESM(require("fs"));
+    import_stream = require("stream");
+    import_util = require("util");
+    core2 = __toESM(require_core());
+    github = __toESM(require_github2());
+  }
+});
+
+// scripts/sonarConfig.ts
+var sonarConfig_exports = {};
+__export(sonarConfig_exports, {
+  default: () => sonarConfig_default
+});
+function downloadCoverageReports(context3) {
+  return __async(this, null, function* () {
+    if (context3.ci.service !== "github" || process.env.COVERAGE_ARTIFACT == null) {
+      return;
+    }
+    const [artifactName, extractPath] = process.env.COVERAGE_ARTIFACT.split(":", 2);
+    yield downloadArtifact(github2.context.payload.workflow_run.id, artifactName, extractPath);
+  });
+}
+function getPrHeadRef(pr) {
+  if (pr.base.repo.full_name === pr.head.repo.full_name) {
+    return pr.head.ref;
+  } else {
+    return `${pr.head.repo.full_name.split("/")[0]}:${pr.head.ref}`;
+  }
+}
+function rewriteCoverageReports(context3) {
+  if (context3.ci.service !== "github") {
+    return;
+  }
+  const sonarProps = properties.of("sonar-project.properties");
+  const reportPaths = sonarProps.get("sonar.javascript.lcov.reportPaths");
+  if (typeof reportPaths !== "string") {
+    return;
+  }
+  context3.logger.info("Fixing coverage paths for SonarCloud");
+  const pattern = new RegExp(context3.env.GITHUB_WORKSPACE, "g");
+  for (const reportPath of reportPaths.split(",")) {
+    const reportText = fs3.readFileSync(reportPath, "utf-8");
+    fs3.writeFileSync(reportPath, reportText.replace(pattern, "/github/workspace"));
+  }
+}
+function sonarConfig_default(context3) {
+  return __async(this, null, function* () {
+    var _a, _b;
+    const sonarProps = {};
+    const packageJson = JSON.parse(fs3.readFileSync(fs3.existsSync("lerna.json") ? "lerna.json" : "package.json", "utf-8"));
+    sonarProps["sonar.projectVersion"] = packageJson.version;
+    sonarProps["sonar.links.ci"] = `https://github.com/${context3.ci.slug}/actions/runs/${context3.ci.build}`;
+    if (github2.context.payload.workflow_run != null) {
+      sonarProps["sonar.scm.revision"] = github2.context.payload.workflow_run.head_sha;
+    }
+    const pr = yield findCurrentPr();
+    if (pr != null) {
+      sonarProps["sonar.pullrequest.key"] = pr.number;
+      sonarProps["sonar.pullrequest.branch"] = getPrHeadRef(pr);
+      sonarProps["sonar.pullrequest.base"] = pr.base.ref;
+    } else {
+      sonarProps["sonar.branch.name"] = (_b = (_a = github2.context.payload.workflow_run) == null ? void 0 : _a.head_branch) != null ? _b : context3.ci.branch;
+    }
+    context3.logger.info("Sonar scan properties:\n" + JSON.stringify(sonarProps, null, 2));
+    fs3.appendFileSync("sonar-project.properties", Object.entries(sonarProps).map(([k, v]) => `${k}=${v}`).join("\n"));
+    yield downloadCoverageReports(context3);
+    rewriteCoverageReports(context3);
+  });
+}
+var fs3, github2, properties;
+var init_sonarConfig = __esm({
+  "scripts/sonarConfig.ts"() {
+    "use strict";
+    fs3 = __toESM(require("fs"));
+    github2 = __toESM(require_github2());
+    properties = __toESM(require_dist_node());
+    init_utils();
   }
 });
 
 // src/index.ts
-var src_exports = {};
-__export(src_exports, {
-  DEFAULT_RELEASE_LABELS: () => DEFAULT_RELEASE_LABELS,
-  fail: () => fail_default,
-  init: () => init_default,
-  publish: () => publish_default,
-  success: () => success_default,
-  utils: () => utils_exports
-});
-module.exports = __toCommonJS(src_exports);
-
-// src/init.ts
-var import_request_error = __toESM(require_dist_node2());
-var import_delay = __toESM(require_delay());
+var path = __toESM(require("path"));
+var core3 = __toESM(require_core());
 var import_core = __toESM(require_lib5());
 
-// src/config.ts
-var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor", "release-major"];
-
-// src/utils.ts
-var utils_exports = {};
-__export(utils_exports, {
-  getOctokit: () => getOctokit2
-});
-var github = __toESM(require_github2());
-var import_utils = __toESM(require_utils8());
-var import_plugin_enterprise_server = __toESM(require_dist_node13());
-function getOctokit2(context, config) {
-  if (config.githubUrl != null) {
-    const octokit = import_utils.GitHub.plugin(import_plugin_enterprise_server.enterpriseServer34);
-    const githubUrl = config.githubUrl.endsWith("/") ? config.githubUrl : config.githubUrl + "/";
-    return new octokit((0, import_utils.getOctokitOptions)(context.env.GITHUB_TOKEN, {
-      baseUrl: githubUrl + "api/v3"
-    }));
+// src/loader.ts
+var SCRIPTS = {
+  npmUpdate: (init_npmUpdate(), __toCommonJS(npmUpdate_exports)),
+  sonarConfig: (init_sonarConfig(), __toCommonJS(sonarConfig_exports))
+};
+var RELEASE_SCRIPTS = ["npmUpdate"];
+function loadScript(scriptName) {
+  if (!Object.keys(SCRIPTS).includes(scriptName)) {
+    throw new Error(`Could not find script to run: ${scriptName}`);
   }
-  return github.getOctokit(context.env.GITHUB_TOKEN);
+  return SCRIPTS[scriptName].default;
 }
 
-// src/init.ts
-function init_default(context, config) {
+// src/index.ts
+init_utils();
+function run() {
   return __async(this, null, function* () {
-    if (context.env.GITHUB_TOKEN == null) {
-      throw new Error("Required environment variable GITHUB_TOKEN is undefined");
-    }
-    if (config.checkPrLabels && import_core.Inputs.newVersion == null) {
-      const releaseType = yield getPrReleaseType(context, config);
-      const oldVersion = (context.version.new || context.version.old).split("-")[0];
-      context.version.new = releaseType != null ? require_semver2().inc(oldVersion, releaseType) : oldVersion;
-    }
-  });
-}
-function getPrReleaseType(context, config) {
-  return __async(this, null, function* () {
-    const octokit = getOctokit2(context, config);
-    const prs = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-      commit_sha: context.ci.commit
-    }));
-    if (prs.data.length === 0) {
-      context.logger.warn(`Could not find pull request associated with commit ${context.ci.commit}`);
-      return null;
-    }
-    const prNumber = prs.data[0].number;
-    const labels = yield octokit.rest.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
-      issue_number: prNumber
-    }));
-    if (labels.data.findIndex((label) => label.name === "released") !== -1) {
-      context.logger.warn("Pull request already released, no new version detected");
-      return null;
-    }
-    const events = yield octokit.rest.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
-      issue_number: prNumber,
-      per_page: 100
-    }));
-    const collaborators = yield octokit.rest.repos.listCollaborators(context.ci.repo);
-    const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-    let approvedLabelEvents = findApprovedLabelEvents(events.data, collaborators.data, releaseLabels);
-    if (approvedLabelEvents.length !== 1 && !context.dryRun) {
-      const timeoutInMinutes = 30;
-      for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
-        yield octokit.rest.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
-          issue_number: prNumber,
-          name
-        }));
-      }
-      const oldVersion = (context.version.new || context.version.old).split("-")[0];
-      const prereleaseSuffix = context.version.prerelease != null ? `-${context.version.prerelease}` : "";
-      const semverInc = require_inc();
-      let commentBody = `Version info from a repo admin is required to publish a new version. Please add one of the following labels within ${timeoutInMinutes} minutes:
-* **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)
-* **${releaseLabels[1]}**: \`${semverInc(oldVersion, "patch")}${prereleaseSuffix}\`
-`;
-      if (context.branch.level !== "patch") {
-        commentBody += `* **${releaseLabels[2]}**: \`${semverInc(oldVersion, "minor")}${prereleaseSuffix}\`
-`;
-      }
-      if (context.branch.level !== "patch" && context.branch.level !== "minor") {
-        commentBody += `* **${releaseLabels[3]}**: \`${semverInc(oldVersion, "major")}${prereleaseSuffix}\`
-`;
-      }
-      const comment = yield octokit.rest.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
-        issue_number: prNumber,
-        body: commentBody + "\n<sub>Powered by Octorelease :rocket:</sub>"
-      }));
-      context.logger.info("Waiting for repo admin to add release label to pull request...");
-      const startTime = (/* @__PURE__ */ new Date()).getTime();
-      const timeoutInMsec = timeoutInMinutes * 6e4;
-      let lastEtag = events.headers.etag;
-      while (approvedLabelEvents.length !== 1 && (/* @__PURE__ */ new Date()).getTime() - startTime < timeoutInMsec) {
-        yield (0, import_delay.default)(1e3);
-        try {
-          const response = yield octokit.rest.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
-            issue_number: prNumber,
-            per_page: 100,
-            headers: { "if-none-match": lastEtag }
-          }));
-          approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
-          lastEtag = response.headers.etag;
-        } catch (error) {
-          if (!(error instanceof import_request_error.RequestError && error.status === 304)) {
-            throw error;
-          }
-        }
-      }
-      if (approvedLabelEvents.length === 1) {
-        context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ` + approvedLabelEvents[0].actor.login);
-      } else {
-        context.logger.info("Timed out waiting for release label");
-      }
-      yield octokit.rest.issues.deleteComment(__spreadProps(__spreadValues({}, context.ci.repo), {
-        comment_id: comment.data.id
-      }));
-    }
-    if (approvedLabelEvents.length === 1) {
-      return [null, "patch", "minor", "major"][releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
-    }
-    return null;
-  });
-}
-function findApprovedLabelEvents(events, collaborators, releaseLabels) {
-  return events.filter((event, idx) => {
-    const futureEvents = events.slice(idx + 1);
-    if (event.event !== "labeled") {
-      return false;
-    } else if (futureEvents.findIndex((e) => e.event === "merged") !== -1) {
-      return false;
-    } else if (futureEvents.findIndex((e) => e.event === "unlabeled" && e.label.name === event.label.name) !== -1) {
-      return false;
-    } else if (collaborators.findIndex((user) => {
-      var _a;
-      return user.id === event.actor.id && ((_a = user.permissions) == null ? void 0 : _a.admin);
-    }) === -1) {
-      return false;
-    } else if (!releaseLabels.includes(event.label.name)) {
-      return false;
-    }
-    return true;
-  });
-}
-
-// src/publish.ts
-var fs = __toESM(require("fs"));
-var path = __toESM(require("path"));
-var glob = __toESM(require_glob());
-var import_request_error2 = __toESM(require_dist_node2());
-var import_core2 = __toESM(require_lib5());
-function publish_default(context, config) {
-  return __async(this, null, function* () {
-    if (!config.createRelease && !config.assets) {
-      return;
-    }
-    const octokit = getOctokit2(context, config);
-    const release = yield createRelease(context, octokit);
-    if (config.assets != null && config.assets.length > 0) {
-      const assetPaths = typeof config.assets === "string" ? [config.assets] : config.assets;
-      yield uploadAssets(context, octokit, release, assetPaths);
-    }
-  });
-}
-function createRelease(context, octokit) {
-  return __async(this, null, function* () {
-    const tagName = context.tagPrefix + context.version.new;
-    let release;
+    var _a;
     try {
-      release = yield octokit.repos.getReleaseByTag(__spreadProps(__spreadValues({}, context.ci.repo), {
-        tag: tagName
-      }));
-    } catch (error) {
-      if (!(error instanceof import_request_error2.RequestError && error.status === 404)) {
-        throw error;
+      const workingDir = core3.getInput("working-dir");
+      if (workingDir) {
+        process.chdir(path.resolve(workingDir));
       }
-    }
-    if (release == null) {
-      context.logger.info(`Creating GitHub release with tag ${tagName}`);
-      release = (yield import_core2.utils.dryRunTask(context, "create GitHub release", () => __async(this, null, function* () {
-        return octokit.repos.createRelease(__spreadProps(__spreadValues({}, context.ci.repo), {
-          tag_name: tagName,
-          body: context.releaseNotes
-        }));
-      }))) || { data: {} };
-    }
-    return release;
-  });
-}
-function uploadAssets(context, octokit, release, assetPaths) {
-  return __async(this, null, function* () {
-    const globber = yield glob.create(assetPaths.join("\n"));
-    const artifactPaths = yield globber.glob();
-    const mime = require_mime_types();
-    for (const artifactPath of artifactPaths) {
-      const assetName = path.basename(artifactPath);
-      if (release.data.assets && release.data.assets.findIndex((asset) => asset.name === assetName) !== -1) {
-        context.logger.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
-        continue;
+      const prBranch = (_a = yield findCurrentPr()) == null ? void 0 : _a.base.ref;
+      const context3 = yield import_core.utils.buildContext({
+        branch: prBranch,
+        force: !RELEASE_SCRIPTS.includes(core3.getInput("script"))
+      });
+      if (context3 == null) {
+        core3.info("Current branch is not targeting a release branch, exiting now");
+        process.exit();
       }
-      context.logger.info(`Uploading release asset ${artifactPath}`);
-      yield import_core2.utils.dryRunTask(context, "upload GitHub release asset", () => __async(this, null, function* () {
-        yield octokit.repos.uploadReleaseAsset(__spreadProps(__spreadValues({}, context.ci.repo), {
-          release_id: release.data.id,
-          name: assetName,
-          // Need to upload as buffer because converting to string corrupts binary data
-          data: fs.readFileSync(artifactPath),
-          url: release.data.upload_url,
-          headers: {
-            "Content-Length": fs.statSync(artifactPath).size,
-            "Content-Type": mime.lookup(artifactPath) || "application/octet-stream"
-          }
-        }));
-      }));
-    }
-  });
-}
-
-// src/success.ts
-var import_core3 = __toESM(require_lib5());
-function success_default(context, config) {
-  return __async(this, null, function* () {
-    if (Object.keys(context.releasedPackages).length === 0) {
-      return;
-    }
-    const octokit = getOctokit2(context, config);
-    const prs = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-      commit_sha: context.ci.commit
-    }));
-    if (prs.data.length === 0) {
-      return;
-    }
-    yield import_core3.utils.dryRunTask(context, "add released label to pull request", () => __async(this, null, function* () {
-      yield octokit.rest.issues.addLabels(__spreadProps(__spreadValues({}, context.ci.repo), {
-        issue_number: prs.data[0].number,
-        labels: ["released"]
-      }));
-    }));
-    const packageList = [];
-    for (const pkgType of Object.keys(context.releasedPackages)) {
-      for (const { name, url } of context.releasedPackages[pkgType]) {
-        const pkgName = url != null ? `[${name}](${url})` : `\`${name}\``;
-        packageList.push(`**${pkgType}**: ${pkgName}`);
+      yield loadScript(core3.getInput("script"))(context3);
+    } catch (error2) {
+      if (error2 instanceof Error) {
+        core3.error(error2.stack || error2.message);
       }
-    }
-    yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
-      yield octokit.rest.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
-        issue_number: prs.data[0].number,
-        body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
-
-The following packages have been published:
-` + packageList.map((line) => `* ${line}`).join("\n") + `
-
-<sub>Powered by Octorelease :rocket:</sub>`
-      }));
-    }));
-  });
-}
-
-// src/fail.ts
-var import_core4 = __toESM(require_lib5());
-function fail_default(context, config) {
-  return __async(this, null, function* () {
-    if (!config.checkPrLabels) {
-      return;
-    }
-    const octokit = getOctokit2(context, config);
-    const prs = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-      commit_sha: context.ci.commit
-    }));
-    if (prs.data.length === 0) {
-      return;
-    }
-    const prNumber = prs.data[0].number;
-    const labels = yield octokit.rest.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
-      issue_number: prNumber
-    }));
-    const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-    for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
-      yield import_core4.utils.dryRunTask(context, `remove pull request label "${name}"`, () => __async(this, null, function* () {
-        yield octokit.rest.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
-          issue_number: prNumber,
-          name
-        }));
-      }));
+      core3.setFailed(error2);
     }
   });
 }
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  DEFAULT_RELEASE_LABELS,
-  fail,
-  init,
-  publish,
-  success,
-  utils
-});
+run();
 /*! Bundled license information:
 
 is-number/index.js:
@@ -42061,21 +28332,5 @@ is-plain-object/dist/is-plain-object.js:
    *
    * Copyright (c) 2014-2017, Jon Schlinkert.
    * Released under the MIT License.
-   *)
-
-mime-db/index.js:
-  (*!
-   * mime-db
-   * Copyright(c) 2014 Jonathan Ong
-   * Copyright(c) 2015-2022 Douglas Christopher Wilson
-   * MIT Licensed
-   *)
-
-mime-types/index.js:
-  (*!
-   * mime-types
-   * Copyright(c) 2014 Jonathan Ong
-   * Copyright(c) 2015 Douglas Christopher Wilson
-   * MIT Licensed
    *)
 */

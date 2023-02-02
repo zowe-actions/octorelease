@@ -34,7 +34,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
 async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<string | null> {
     const octokit = utils.getOctokit(context, config);
-    const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
+    const prs = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
         commit_sha: context.ci.commit
     });
@@ -45,7 +45,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     }
 
     const prNumber = prs.data[0].number;
-    const labels = await octokit.issues.listLabelsOnIssue({
+    const labels = await octokit.rest.issues.listLabelsOnIssue({
         ...context.ci.repo,
         issue_number: prNumber
     });
@@ -55,12 +55,12 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         return null;
     }
 
-    const events = await octokit.issues.listEvents({
+    const events = await octokit.rest.issues.listEvents({
         ...context.ci.repo,
         issue_number: prNumber,
         per_page: 100
     });
-    const collaborators = await octokit.repos.listCollaborators(context.ci.repo);
+    const collaborators = await octokit.rest.repos.listCollaborators(context.ci.repo);
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
     let approvedLabelEvents = findApprovedLabelEvents(events.data, collaborators.data, releaseLabels);
 
@@ -69,7 +69,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
 
         // Remove unapproved release labels
         for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
-            await octokit.issues.removeLabel({
+            await octokit.rest.issues.removeLabel({
                 ...context.ci.repo,
                 issue_number: prNumber,
                 name
@@ -90,7 +90,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         if (context.branch.level !== "patch" && context.branch.level !== "minor") {
             commentBody += `* **${releaseLabels[3]}**: \`${semverInc(oldVersion, "major")}${prereleaseSuffix}\`\n`;
         }
-        const comment = await octokit.issues.createComment({
+        const comment = await octokit.rest.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
             body: commentBody + "\n<sub>Powered by Octorelease :rocket:</sub>"
@@ -105,7 +105,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
             await delay(1000);
 
             try {
-                const response = await octokit.issues.listEvents({
+                const response = await octokit.rest.issues.listEvents({
                     ...context.ci.repo,
                     issue_number: prNumber,
                     per_page: 100,
@@ -128,7 +128,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         }
 
         // Delete comment since it is no longer useful
-        await octokit.issues.deleteComment({
+        await octokit.rest.issues.deleteComment({
             ...context.ci.repo,
             comment_id: comment.data.id
         });
