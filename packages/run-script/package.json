@@ -1,0 +1,33 @@
+{
+  "name": "@octorelease/run-script",
+  "version": "0.1.0",
+  "description": "GitHub action to run scripts in Octorelease context.",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -b && npm run lint",
+    "lint": "eslint src",
+    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/run-script.js --platform=node",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "octorelease"
+  ],
+  "author": "t1m0thyj",
+  "license": "Apache-2.0",
+  "private": true,
+  "dependencies": {
+    "@actions/core": "^1.8.2",
+    "@actions/exec": "^1.1.0",
+    "@actions/github": "^5.0.3",
+    "@octorelease/core": "^0.1.8",
+    "@octorelease/git": "^0.1.0",
+    "java-properties": "^1.0.2",
+    "pluralize": "^8.0.0",
+    "unzip-stream": "^0.3.1"
+  }
+}

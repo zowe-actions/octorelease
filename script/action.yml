@@ -1,0 +1,22 @@
+name: 'octorelease-script'
+description: 'GitHub action to run scripts in Octorelease context'
+author: 't1m0thyj'
+inputs:
+  github-token:
+    description: 'Personal access token for authentication to GitHub APIs'
+    default: ${{ github.token }}
+    required: false
+  script:
+    description: 'Name of script to run from the scripts directory'
+    required: true
+    default: ''
+  working-dir:
+    description: 'Custom working directory to use instead of the project root'
+    required: false
+    default: ''
+outputs:
+  result:
+    description: 'The output of the script for other steps to reference'
+runs:
+  using: 'node16'
+  main: '../dist/run-script.js'

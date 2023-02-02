@@ -26,7 +26,13 @@
       "path": "packages/github"
     },
     {
+      "path": "packages/lerna"
+    },
+    {
       "path": "packages/npm"
+    },
+    {
+      "path": "packages/run-script"
     }
   ]
 }

@@ -1,0 +1,38 @@
+{
+  "name": "@octorelease/lerna",
+  "version": "0.1.3",
+  "description": "Octorelease plugin to perform actions related to NPM for Lerna monorepo.",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -b && npm run lint",
+    "lint": "eslint src",
+    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/lerna.js --platform=node",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "lerna",
+    "npm",
+    "octorelease",
+    "plugin",
+    "publish",
+    "version"
+  ],
+  "author": "t1m0thyj",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@actions/exec": "^1.1.0",
+    "@octorelease/npm": "^0.1.5"
+  },
+  "peerDependencies": {
+    "@octorelease/core": "^0.1.0"
+  }
+}
