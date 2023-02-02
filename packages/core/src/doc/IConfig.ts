@@ -26,7 +26,7 @@ export type BranchConfig = string | IProtectedBranch;
  * Union type for plugin configuration. Can be string specifying plugin name
  * or tuple containing plugin name and configuration object.
  */
-export type PluginConfig = string | [string, Record<string, any>];
+export type PluginConfig = string | [string, Record<string, any>, string];
 
 /**
  * Configuration object loaded from release config file

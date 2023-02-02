@@ -71,7 +71,7 @@ export interface IContext {
      * Key-value pairs of plugin names and configuration objects
      * @example { "@octorelease/changelog": {}, "@octorelease/github": { assets: "*.tgz" } }
      */
-    plugins: { [key: string]: Record<string, any> };
+    plugins: { [key: string]: Record<string | symbol, any> };
 
     /**
      * Key-value pairs of release types and released package info

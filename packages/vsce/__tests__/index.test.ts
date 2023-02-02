@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-export * from "./IConfig";
-export * from "./IContext";
-export * from "./IPlugin";
-export * from "./IPluginsLoaded";
-export * from "./IProtectedBranch";
-export * from "./IReleasedPackage";
-export * from "./IVersionInfo";
+import * as plugin from "../src";
 
-export const SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");
+describe("VSCE plugin", () => {
+    it("should export stages", () => {
+        expect(plugin.init).toBeDefined();
+        expect(plugin.publish).toBeDefined();
+    });
+});

@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/octorelease/octorelease.git"
+    "url": "git+https://github.com/zowe-actions/octorelease.git"
   },
   "keywords": [],
   "author": "t1m0thyj",
@@ -36,8 +36,8 @@
     "jest": "^27.0.0",
     "jest-circus": "^27.0.0",
     "ts-jest": "^27.0.0",
-    "typedoc": "^0.22.12",
-    "typedoc-plugin-markdown": "^3.11.14",
-    "typescript": "^4.3.0"
+    "typedoc": "^0.23.0",
+    "typedoc-plugin-markdown": "^3.13.0",
+    "typescript": "^4.4.0"
   }
 }

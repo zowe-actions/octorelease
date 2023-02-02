@@ -18,7 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IPluginsLoaded, IProtectedBranch, IVersionInfo } from "./doc";
+import { IContext, IPluginsLoaded, IProtectedBranch, IVersionInfo, SYMBOL_PLUGIN_DIR } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
@@ -53,7 +53,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         if (typeof pc === "string") {
             pluginConfig[pc] = {};
         } else {
-            pluginConfig[pc[0]] = pc[1];
+            pluginConfig[pc[0]] = { ...pc[1], [SYMBOL_PLUGIN_DIR]: pc[2] };
         }
     }
 

@@ -33,6 +33,9 @@
     },
     {
       "path": "packages/run-script"
+    },
+    {
+      "path": "packages/vsce"
     }
   ]
 }

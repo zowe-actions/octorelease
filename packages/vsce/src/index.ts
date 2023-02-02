@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-export * from "./IConfig";
-export * from "./IContext";
-export * from "./IPlugin";
-export * from "./IPluginsLoaded";
-export * from "./IProtectedBranch";
-export * from "./IReleasedPackage";
-export * from "./IVersionInfo";
-
-export const SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");
+export { default as init } from "./init";
+export { default as publish } from "./publish";
+export * from "./config";
+export * as utils from "./utils";
