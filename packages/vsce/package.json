@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -b && npm run lint",
     "lint": "eslint src",
-    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/npm.js --platform=node",
+    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/vsce.js --platform=node",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
