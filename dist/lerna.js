@@ -20883,6 +20883,7 @@ __export(utils_exports, {
   lernaList: () => lernaList,
   lernaVersion: () => lernaVersion
 });
+var fs2 = __toESM(require("fs"));
 var exec = __toESM(require_exec());
 function lernaList(onlyChanged) {
   return __async(this, null, function* () {
@@ -20911,7 +20912,9 @@ function lernaVersion(newVersion) {
       "--no-git-tag-version",
       "--yes"
     ]);
-    yield exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
+    if (!fs2.existsSync("yarn.lock")) {
+      yield exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
+    }
   });
 }
 
@@ -20937,15 +20940,20 @@ function success_default(context, config) {
 }
 
 // src/version.ts
-var fs2 = __toESM(require("fs"));
 var path = __toESM(require("path"));
+var import_find_up = __toESM(require_find_up());
 function version_default2(context, _config) {
   return __async(this, null, function* () {
     if (context.version.new != null) {
       const packageInfo = yield lernaList(true);
       yield lernaVersion(context.version.new);
-      const lockfilePath = fs2.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
-      context.changedFiles.push("lerna.json", "package.json", lockfilePath);
+      context.changedFiles.push("lerna.json", "package.json");
+      const lockfilePath = yield (0, import_find_up.default)(["package-lock.json", "npm-shrinkwrap.json", "yarn.lock"]);
+      if (lockfilePath != null) {
+        context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
+      } else {
+        context.logger.warn("Could not find lockfile to update version in");
+      }
       for (const { location } of packageInfo) {
         const relLocation = path.relative(process.cwd(), location);
         context.changedFiles.push(path.join(relLocation, "package.json"));

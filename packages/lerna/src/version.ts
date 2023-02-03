@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
 import * as path from "path";
+import findUp from "find-up";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
@@ -24,8 +24,13 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
     if (context.version.new != null) {
         const packageInfo = await utils.lernaList(true);
         await utils.lernaVersion(context.version.new);
-        const lockfilePath = fs.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
-        context.changedFiles.push("lerna.json", "package.json", lockfilePath);
+        context.changedFiles.push("lerna.json", "package.json");
+        const lockfilePath = await findUp(["package-lock.json", "npm-shrinkwrap.json", "yarn.lock"]);
+        if (lockfilePath != null) {
+            context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
+        } else {
+            context.logger.warn("Could not find lockfile to update version in");
+        }
         for (const { location } of packageInfo) {
             const relLocation = path.relative(process.cwd(), location);
             context.changedFiles.push(path.join(relLocation, "package.json"));

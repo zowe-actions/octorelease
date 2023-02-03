@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as fs from "fs";
 import * as exec from "@actions/exec";
 
 export async function lernaList(onlyChanged?: boolean): Promise<Record<string, any>[]> {
@@ -33,6 +34,8 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
 export async function lernaVersion(newVersion: string): Promise<void> {
     await exec.exec("npx", ["lerna", "version", newVersion,
         "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
-    // Update subpackage versions in lockfile (requires npm@8.5 or newer)
-    await exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
+    if (!fs.existsSync("yarn.lock")) {
+        // Update subpackage versions in lockfile (requires npm@8.5 or newer)
+        await exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
+    }
 }

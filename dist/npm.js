@@ -19903,7 +19903,7 @@ function publish_default(context, config) {
         context.releasedPackages.vsce = [
           ...context.releasedPackages.vsce || [],
           {
-            name: `${packageJson.name}@${packageJson.version}`,
+            name: `${extensionName}@${packageJson.version}`,
             url: `https://marketplace.visualstudio.com/items?itemName=${extensionName}`
           }
         ];
@@ -19918,7 +19918,7 @@ function publish_default(context, config) {
         context.releasedPackages.vsce = [
           ...context.releasedPackages.vsce || [],
           {
-            name: `${packageJson.name}@${packageJson.version} (OVSX)`,
+            name: `${extensionName}@${packageJson.version} (OVSX)`,
             url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}`
           }
         ];

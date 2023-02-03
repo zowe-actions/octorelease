@@ -22,8 +22,10 @@ import { IContext, utils as coreUtils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
+type Octokit = ReturnType<typeof utils.getOctokit>;
+
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    if (!config.createRelease && !config.assets) {
+    if (!(config.draftRelease || config.publishRelease) && !config.assets) {
         return;
     }
 
@@ -33,15 +35,25 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         const assetPaths: string[] = (typeof config.assets === "string") ? [config.assets] : config.assets;
         await uploadAssets(context, octokit, release, assetPaths);
     }
+
+    if (config.publishRelease) {
+        await coreUtils.dryRunTask(context, "publish GitHub release", async () => {
+            await octokit.rest.repos.updateRelease({
+                ...context.ci.repo,
+                release_id: release.data.id,
+                draft: false
+            });
+        });
+    }
 }
 
-async function createRelease(context: IContext, octokit: any): Promise<any> {
+async function createRelease(context: IContext, octokit: Octokit): Promise<any> {
     const tagName = context.tagPrefix + context.version.new;
     let release: any;
 
     // Get release if it already exists
     try {
-        release = await octokit.repos.getReleaseByTag({
+        release = await octokit.rest.repos.getReleaseByTag({
             ...context.ci.repo,
             tag: tagName
         });
@@ -55,10 +67,11 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
     if (release == null) {
         context.logger.info(`Creating GitHub release with tag ${tagName}`);
         release = await coreUtils.dryRunTask(context, "create GitHub release", async () => {
-            return octokit.repos.createRelease({
+            return octokit.rest.repos.createRelease({
                 ...context.ci.repo,
                 tag_name: tagName,
-                body: context.releaseNotes
+                body: context.releaseNotes,
+                draft: true
             });
         }) || { data: {} };
     }
@@ -66,7 +79,7 @@ async function createRelease(context: IContext, octokit: any): Promise<any> {
     return release;
 }
 
-async function uploadAssets(context: IContext, octokit: any, release: any, assetPaths: string[]): Promise<void> {
+async function uploadAssets(context: IContext, octokit: Octokit, release: any, assetPaths: string[]): Promise<void> {
     const globber = await glob.create(assetPaths.join("\n"));
     const artifactPaths: string[] = await globber.glob();
     const mime = require("mime-types");
@@ -82,7 +95,7 @@ async function uploadAssets(context: IContext, octokit: any, release: any, asset
 
         context.logger.info(`Uploading release asset ${artifactPath}`);
         await coreUtils.dryRunTask(context, "upload GitHub release asset", async () => {
-            await octokit.repos.uploadReleaseAsset({
+            await octokit.rest.repos.uploadReleaseAsset({
                 ...context.ci.repo,
                 release_id: release.data.id,
                 name: assetName,

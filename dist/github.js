@@ -41882,7 +41882,7 @@ var import_request_error2 = __toESM(require_dist_node2());
 var import_core2 = __toESM(require_lib5());
 function publish_default(context, config) {
   return __async(this, null, function* () {
-    if (!config.createRelease && !config.assets) {
+    if (!(config.draftRelease || config.publishRelease) && !config.assets) {
       return;
     }
     const octokit = getOctokit2(context, config);
@@ -41891,6 +41891,14 @@ function publish_default(context, config) {
       const assetPaths = typeof config.assets === "string" ? [config.assets] : config.assets;
       yield uploadAssets(context, octokit, release, assetPaths);
     }
+    if (config.publishRelease) {
+      yield import_core2.utils.dryRunTask(context, "publish GitHub release", () => __async(this, null, function* () {
+        yield octokit.rest.repos.updateRelease(__spreadProps(__spreadValues({}, context.ci.repo), {
+          release_id: release.data.id,
+          draft: false
+        }));
+      }));
+    }
   });
 }
 function createRelease(context, octokit) {
@@ -41898,7 +41906,7 @@ function createRelease(context, octokit) {
     const tagName = context.tagPrefix + context.version.new;
     let release;
     try {
-      release = yield octokit.repos.getReleaseByTag(__spreadProps(__spreadValues({}, context.ci.repo), {
+      release = yield octokit.rest.repos.getReleaseByTag(__spreadProps(__spreadValues({}, context.ci.repo), {
         tag: tagName
       }));
     } catch (error) {
@@ -41909,9 +41917,10 @@ function createRelease(context, octokit) {
     if (release == null) {
       context.logger.info(`Creating GitHub release with tag ${tagName}`);
       release = (yield import_core2.utils.dryRunTask(context, "create GitHub release", () => __async(this, null, function* () {
-        return octokit.repos.createRelease(__spreadProps(__spreadValues({}, context.ci.repo), {
+        return octokit.rest.repos.createRelease(__spreadProps(__spreadValues({}, context.ci.repo), {
           tag_name: tagName,
-          body: context.releaseNotes
+          body: context.releaseNotes,
+          draft: true
         }));
       }))) || { data: {} };
     }
@@ -41931,7 +41940,7 @@ function uploadAssets(context, octokit, release, assetPaths) {
       }
       context.logger.info(`Uploading release asset ${artifactPath}`);
       yield import_core2.utils.dryRunTask(context, "upload GitHub release asset", () => __async(this, null, function* () {
-        yield octokit.repos.uploadReleaseAsset(__spreadProps(__spreadValues({}, context.ci.repo), {
+        yield octokit.rest.repos.uploadReleaseAsset(__spreadProps(__spreadValues({}, context.ci.repo), {
           release_id: release.data.id,
           name: assetName,
           // Need to upload as buffer because converting to string corrupts binary data
