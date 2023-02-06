@@ -25,7 +25,7 @@ import * as utils from "./utils";
 type Octokit = ReturnType<typeof utils.getOctokit>;
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    if (!(config.draftRelease || config.publishRelease) && !config.assets) {
+    if (!config.publishRelease && !config.assets) {
         return;
     }
 

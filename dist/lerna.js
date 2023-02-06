@@ -3712,7 +3712,7 @@ var require_stages = __commonJS({
       oldEnv.env = {};
       for (const [k, v] of Object.entries(newEnv.env || {})) {
         oldEnv.env[k] = process.env[k];
-        process.env[k] = v;
+        process.env[k] = v.toString();
       }
       return oldEnv;
     }
@@ -3722,7 +3722,7 @@ var require_stages = __commonJS({
       }
       for (const [k, v] of Object.entries(oldEnv.env || {})) {
         if (v != null) {
-          process.env[k] = v;
+          process.env[k] = v.toString();
         } else {
           delete process.env[k];
         }
@@ -19668,7 +19668,7 @@ var require_utils5 = __commonJS({
         const pluginConfig = {};
         for (const pc of config.config.plugins || []) {
           if (typeof pc === "string") {
-            pluginConfig[pc] = [];
+            pluginConfig[pc] = [{}];
           } else {
             pluginConfig[pc[0]] = pc.slice(1);
           }

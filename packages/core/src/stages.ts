@@ -125,7 +125,7 @@ function loadEnv(newEnv: Env): Env {
     oldEnv.env = {};
     for (const [k, v] of Object.entries(newEnv.env || {})) {
         oldEnv.env[k] = process.env[k] as string;
-        process.env[k] = v as string;
+        process.env[k] = v.toString();
     }
 
     return oldEnv;
@@ -138,7 +138,7 @@ function unloadEnv(oldEnv: Env) {
 
     for (const [k, v] of Object.entries(oldEnv.env || {})) {
         if (v != null) {
-            process.env[k] = v as string;
+            process.env[k] = v.toString();
         } else {
             delete process.env[k];
         }

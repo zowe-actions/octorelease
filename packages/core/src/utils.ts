@@ -51,7 +51,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
     const pluginConfig: Record<string, Record<string, any>[]> = {};
     for (const pc of (config.config.plugins || [])) {
         if (typeof pc === "string") {
-            pluginConfig[pc] = [];
+            pluginConfig[pc] = [{}];
         } else {
             pluginConfig[pc[0]] = pc.slice(1);
         }

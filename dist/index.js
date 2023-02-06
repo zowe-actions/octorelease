@@ -19269,7 +19269,7 @@ function loadEnv(newEnv) {
   oldEnv.env = {};
   for (const [k, v] of Object.entries(newEnv.env || {})) {
     oldEnv.env[k] = process.env[k];
-    process.env[k] = v;
+    process.env[k] = v.toString();
   }
   return oldEnv;
 }
@@ -19279,7 +19279,7 @@ function unloadEnv(oldEnv) {
   }
   for (const [k, v] of Object.entries(oldEnv.env || {})) {
     if (v != null) {
-      process.env[k] = v;
+      process.env[k] = v.toString();
     } else {
       delete process.env[k];
     }
@@ -19359,7 +19359,7 @@ function buildContext(opts) {
     const pluginConfig = {};
     for (const pc of config.config.plugins || []) {
       if (typeof pc === "string") {
-        pluginConfig[pc] = [];
+        pluginConfig[pc] = [{}];
       } else {
         pluginConfig[pc[0]] = pc.slice(1);
       }

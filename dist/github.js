@@ -2856,7 +2856,7 @@ var require_stages = __commonJS({
       oldEnv.env = {};
       for (const [k, v] of Object.entries(newEnv.env || {})) {
         oldEnv.env[k] = process.env[k];
-        process.env[k] = v;
+        process.env[k] = v.toString();
       }
       return oldEnv;
     }
@@ -2866,7 +2866,7 @@ var require_stages = __commonJS({
       }
       for (const [k, v] of Object.entries(oldEnv.env || {})) {
         if (v != null) {
-          process.env[k] = v;
+          process.env[k] = v.toString();
         } else {
           delete process.env[k];
         }
@@ -19871,7 +19871,7 @@ var require_utils5 = __commonJS({
         const pluginConfig = {};
         for (const pc of config.config.plugins || []) {
           if (typeof pc === "string") {
-            pluginConfig[pc] = [];
+            pluginConfig[pc] = [{}];
           } else {
             pluginConfig[pc[0]] = pc.slice(1);
           }
@@ -41845,7 +41845,7 @@ var import_request_error2 = __toESM(require_dist_node2());
 var import_core2 = __toESM(require_lib5());
 function publish_default(context, config) {
   return __async(this, null, function* () {
-    if (!(config.draftRelease || config.publishRelease) && !config.assets) {
+    if (!config.publishRelease && !config.assets) {
       return;
     }
     const octokit = getOctokit2(context, config);
