@@ -4152,21 +4152,34 @@ function version_default2(context, config) {
     const headerLine = config.headerLine || "## Recent Changes";
     if (context.workspaces != null) {
       const globber = yield glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
-      let releaseNotes = "";
+      const releaseNotes = {};
       for (const packageDir of yield globber.glob()) {
         const changelogPath = path.join(path.relative(context.rootDir, packageDir), changelogFile);
         const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
         if (packageReleaseNotes != null) {
-          releaseNotes += `**${path.basename(packageDir)}**
-${packageReleaseNotes}
-
-`;
+          releaseNotes[path.basename(packageDir)] = packageReleaseNotes;
         }
         if (updatePackageChangelog(context, changelogPath, headerLine)) {
           context.changedFiles.push(changelogPath);
         }
       }
-      context.releaseNotes = releaseNotes || void 0;
+      if (Object.keys(releaseNotes).length === 0) {
+        return;
+      } else if (config.displayNames == null) {
+        context.releaseNotes = Object.entries(releaseNotes).map(([k, v]) => `# ${k}
+${v}
+`).join("\n");
+      } else {
+        const orderedSections = [];
+        for (const [k, v] of Object.entries(config.displayNames)) {
+          if (k in releaseNotes) {
+            orderedSections.push(`# ${v}
+${releaseNotes[k]}
+`);
+          }
+        }
+        context.releaseNotes = orderedSections.join("\n");
+      }
     } else {
       context.releaseNotes = getPackageChangelog(context, changelogFile, headerLine);
       if (updatePackageChangelog(context, changelogFile, headerLine)) {

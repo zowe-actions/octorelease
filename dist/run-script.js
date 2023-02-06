@@ -2318,7 +2318,6 @@ var require_doc = __commonJS({
           __createBinding(exports2, m, p);
     };
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SYMBOL_PLUGIN_DIR = void 0;
     __exportStar(require_IConfig(), exports);
     __exportStar(require_IContext(), exports);
     __exportStar(require_IPlugin(), exports);
@@ -2326,7 +2325,6 @@ var require_doc = __commonJS({
     __exportStar(require_IProtectedBranch(), exports);
     __exportStar(require_IReleasedPackage(), exports);
     __exportStar(require_IVersionInfo(), exports);
-    exports.SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");
   }
 });
 
@@ -2580,7 +2578,6 @@ var require_stages = __commonJS({
     exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
     var path2 = __importStar(require("path"));
     var core4 = __importStar(require_core());
-    var doc_1 = require_doc();
     var inputs_1 = require_inputs();
     function fail(context3, pluginsLoaded) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -2614,37 +2611,57 @@ var require_stages = __commonJS({
     exports.version = version2;
     function runStage(context3, pluginsLoaded, stage) {
       return __awaiter(this, void 0, void 0, function* () {
-        if (stage.canSkip !== false && shouldSkipStage(stage.name)) {
+        if (shouldSkipStage(stage)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
           if (pluginModule[stage.name] != null) {
-            const pluginConfig = context3.plugins[pluginName] || {};
-            let oldCwd;
-            context3.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-            if (pluginConfig[doc_1.SYMBOL_PLUGIN_DIR] != null) {
-              oldCwd = process.cwd();
-              process.chdir(path2.resolve(pluginConfig[doc_1.SYMBOL_PLUGIN_DIR]));
-            }
-            context3.logger.pluginName = pluginName;
-            try {
-              yield pluginModule[stage.name](context3, pluginConfig);
-            } finally {
-              if (oldCwd != null) {
-                process.chdir(oldCwd);
+            for (const pluginConfig of context3.plugins[pluginName] || []) {
+              context3.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+              const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+              context3.logger.pluginName = pluginName;
+              try {
+                yield pluginModule[stage.name](context3, pluginConfig);
+              } finally {
+                context3.logger.pluginName = void 0;
+                unloadEnv(oldEnv);
               }
-              context3.logger.pluginName = void 0;
             }
           }
         }
       });
     }
-    function shouldSkipStage(name) {
-      if (inputs_1.Inputs.skipStages.includes(name)) {
-        core4.info(`Skipping "${name}" stage`);
+    function shouldSkipStage(stage) {
+      if (stage.canSkip !== false && inputs_1.Inputs.skipStages.includes(stage.name)) {
+        core4.info(`Skipping "${stage.name}" stage`);
         return true;
       }
       return false;
+    }
+    function loadEnv(newEnv) {
+      const oldEnv = {};
+      if (newEnv.cwd != null) {
+        oldEnv.cwd = process.cwd();
+        process.chdir(path2.resolve(newEnv.cwd));
+      }
+      oldEnv.env = {};
+      for (const [k, v] of Object.entries(newEnv.env || {})) {
+        oldEnv.env[k] = process.env[k];
+        process.env[k] = v;
+      }
+      return oldEnv;
+    }
+    function unloadEnv(oldEnv) {
+      if (oldEnv.cwd != null) {
+        process.chdir(oldEnv.cwd);
+      }
+      for (const [k, v] of Object.entries(oldEnv.env || {})) {
+        if (v != null) {
+          process.env[k] = v;
+        } else {
+          delete process.env[k];
+        }
+      }
     }
   }
 });
@@ -19621,7 +19638,6 @@ var require_utils5 = __commonJS({
     var path2 = __importStar(require("path"));
     var exec3 = __importStar(require_exec());
     var cosmiconfig_1 = require_dist2();
-    var doc_1 = require_doc();
     var inputs_1 = require_inputs();
     var logger_1 = require_logger();
     function buildContext(opts) {
@@ -19646,9 +19662,9 @@ var require_utils5 = __commonJS({
         const pluginConfig = {};
         for (const pc of config.config.plugins || []) {
           if (typeof pc === "string") {
-            pluginConfig[pc] = {};
+            pluginConfig[pc] = [];
           } else {
-            pluginConfig[pc[0]] = Object.assign(Object.assign({}, pc[1]), { [doc_1.SYMBOL_PLUGIN_DIR]: pc[2] });
+            pluginConfig[pc[0]] = pc.slice(1);
           }
         }
         const tagPrefix = config.config.tagPrefix || "v";

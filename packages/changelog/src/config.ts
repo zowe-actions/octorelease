@@ -16,5 +16,6 @@
 
 export interface IPluginConfig {
     changelogFile?: string;
+    displayNames?: Record<string, string>;
     headerLine?: string;
 }

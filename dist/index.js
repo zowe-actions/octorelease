@@ -19206,11 +19206,6 @@ Inputs.rootDir = process.cwd();
 // src/stages.ts
 var path2 = __toESM(require("path"));
 var core2 = __toESM(require_core());
-
-// src/doc/index.ts
-var SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");
-
-// src/stages.ts
 function fail(context, pluginsLoaded) {
   return __async(this, null, function* () {
     yield runStage(context, pluginsLoaded, { name: "fail" });
@@ -19238,37 +19233,57 @@ function version2(context, pluginsLoaded) {
 }
 function runStage(context, pluginsLoaded, stage) {
   return __async(this, null, function* () {
-    if (stage.canSkip !== false && shouldSkipStage(stage.name)) {
+    if (shouldSkipStage(stage)) {
       return;
     }
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
       if (pluginModule[stage.name] != null) {
-        const pluginConfig = context.plugins[pluginName] || {};
-        let oldCwd;
-        context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-        if (pluginConfig[SYMBOL_PLUGIN_DIR] != null) {
-          oldCwd = process.cwd();
-          process.chdir(path2.resolve(pluginConfig[SYMBOL_PLUGIN_DIR]));
-        }
-        context.logger.pluginName = pluginName;
-        try {
-          yield pluginModule[stage.name](context, pluginConfig);
-        } finally {
-          if (oldCwd != null) {
-            process.chdir(oldCwd);
+        for (const pluginConfig of context.plugins[pluginName] || []) {
+          context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+          const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+          context.logger.pluginName = pluginName;
+          try {
+            yield pluginModule[stage.name](context, pluginConfig);
+          } finally {
+            context.logger.pluginName = void 0;
+            unloadEnv(oldEnv);
           }
-          context.logger.pluginName = void 0;
         }
       }
     }
   });
 }
-function shouldSkipStage(name) {
-  if (Inputs.skipStages.includes(name)) {
-    core2.info(`Skipping "${name}" stage`);
+function shouldSkipStage(stage) {
+  if (stage.canSkip !== false && Inputs.skipStages.includes(stage.name)) {
+    core2.info(`Skipping "${stage.name}" stage`);
     return true;
   }
   return false;
+}
+function loadEnv(newEnv) {
+  const oldEnv = {};
+  if (newEnv.cwd != null) {
+    oldEnv.cwd = process.cwd();
+    process.chdir(path2.resolve(newEnv.cwd));
+  }
+  oldEnv.env = {};
+  for (const [k, v] of Object.entries(newEnv.env || {})) {
+    oldEnv.env[k] = process.env[k];
+    process.env[k] = v;
+  }
+  return oldEnv;
+}
+function unloadEnv(oldEnv) {
+  if (oldEnv.cwd != null) {
+    process.chdir(oldEnv.cwd);
+  }
+  for (const [k, v] of Object.entries(oldEnv.env || {})) {
+    if (v != null) {
+      process.env[k] = v;
+    } else {
+      delete process.env[k];
+    }
+  }
 }
 
 // src/utils.ts
@@ -19344,9 +19359,9 @@ function buildContext(opts) {
     const pluginConfig = {};
     for (const pc of config.config.plugins || []) {
       if (typeof pc === "string") {
-        pluginConfig[pc] = {};
+        pluginConfig[pc] = [];
       } else {
-        pluginConfig[pc[0]] = __spreadProps(__spreadValues({}, pc[1]), { [SYMBOL_PLUGIN_DIR]: pc[2] });
+        pluginConfig[pc[0]] = pc.slice(1);
       }
     }
     const tagPrefix = config.config.tagPrefix || "v";

@@ -18,7 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IPluginsLoaded, IProtectedBranch, IVersionInfo, SYMBOL_PLUGIN_DIR } from "./doc";
+import { IContext, IPluginsLoaded, IProtectedBranch, IVersionInfo } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
@@ -48,12 +48,12 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         branchInfo.channel = branchInfo.name;
     }
 
-    const pluginConfig: Record<string, Record<string, any>> = {};
+    const pluginConfig: Record<string, Record<string, any>[]> = {};
     for (const pc of (config.config.plugins || [])) {
         if (typeof pc === "string") {
-            pluginConfig[pc] = {};
+            pluginConfig[pc] = [];
         } else {
-            pluginConfig[pc[0]] = { ...pc[1], [SYMBOL_PLUGIN_DIR]: pc[2] };
+            pluginConfig[pc[0]] = pc.slice(1);
         }
     }
 

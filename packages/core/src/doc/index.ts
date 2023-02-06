@@ -21,5 +21,3 @@ export * from "./IPluginsLoaded";
 export * from "./IProtectedBranch";
 export * from "./IReleasedPackage";
 export * from "./IVersionInfo";
-
-export const SYMBOL_PLUGIN_DIR = Symbol("__PluginDir__");

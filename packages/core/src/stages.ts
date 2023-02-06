@@ -16,10 +16,18 @@
 
 import * as path from "path";
 import * as core from "@actions/core";
-import { IContext, IPluginsLoaded, SYMBOL_PLUGIN_DIR } from "./doc";
+import { IContext, IPluginsLoaded } from "./doc";
 import { Inputs } from "./inputs";
 
-type StageName = "fail" | "init" | "publish" | "success" | "version";
+type Env = {
+    cwd?: string;
+    env?: Record<string, string>;
+}
+
+type Stage = {
+    name: "fail" | "init" | "publish" | "success" | "version",
+    canSkip?: boolean
+}
 
 /**
  * Run "fail" stage for loaded plugins that have a "fail" handler.
@@ -71,30 +79,24 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
     await runStage(context, pluginsLoaded, { name: "version" });
 }
 
-async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded,
-    stage: { name: StageName, canSkip?: boolean }): Promise<void> {
-    if (stage.canSkip !== false && shouldSkipStage(stage.name)) {
+async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage: Stage): Promise<void> {
+    if (shouldSkipStage(stage)) {
         return;
     }
 
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
         if (pluginModule[stage.name] != null) {
-            const pluginConfig = context.plugins[pluginName] || {};
-            let oldCwd: string | undefined;
-            context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-            if (pluginConfig[SYMBOL_PLUGIN_DIR] != null) {
-                oldCwd = process.cwd();
-                process.chdir(path.resolve(pluginConfig[SYMBOL_PLUGIN_DIR]));
-            }
-            context.logger.pluginName = pluginName;
+            for (const pluginConfig of (context.plugins[pluginName] || [])) {
+                context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+                const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+                context.logger.pluginName = pluginName;
 
-            try {
-                await (pluginModule[stage.name] as any)(context, pluginConfig);
-            } finally {
-                if (oldCwd != null) {
-                    process.chdir(oldCwd);
+                try {
+                    await (pluginModule[stage.name] as any)(context, pluginConfig);
+                } finally {
+                    context.logger.pluginName = undefined;
+                    unloadEnv(oldEnv);
                 }
-                context.logger.pluginName = undefined;
             }
         }
     }
@@ -102,13 +104,43 @@ async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded,
 
 /**
  * Check if stage should be skipped based on `Inputs.skipStages`.
- * @param name Name of stage to skip
+ * @param stage Stage to check
  * @returns True if stage should be skipped
  */
-function shouldSkipStage(name: StageName): boolean {
-    if (Inputs.skipStages.includes(name)) {
-        core.info(`Skipping "${name}" stage`);
+function shouldSkipStage(stage: Stage): boolean {
+    if (stage.canSkip !== false && Inputs.skipStages.includes(stage.name)) {
+        core.info(`Skipping "${stage.name}" stage`);
         return true;
     }
     return false;
+}
+
+function loadEnv(newEnv: Env): Env {
+    const oldEnv: Env = {};
+    if (newEnv.cwd != null) {
+        oldEnv.cwd = process.cwd();
+        process.chdir(path.resolve(newEnv.cwd));
+    }
+
+    oldEnv.env = {};
+    for (const [k, v] of Object.entries(newEnv.env || {})) {
+        oldEnv.env[k] = process.env[k] as string;
+        process.env[k] = v as string;
+    }
+
+    return oldEnv;
+}
+
+function unloadEnv(oldEnv: Env) {
+    if (oldEnv.cwd != null) {
+        process.chdir(oldEnv.cwd);
+    }
+
+    for (const [k, v] of Object.entries(oldEnv.env || {})) {
+        if (v != null) {
+            process.env[k] = v as string;
+        } else {
+            delete process.env[k];
+        }
+    }
 }
