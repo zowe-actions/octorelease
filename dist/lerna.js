@@ -3675,22 +3675,24 @@ var require_stages = __commonJS({
     }
     exports.version = version2;
     function runStage(context, pluginsLoaded, stage) {
+      var _a;
       return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage(stage)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-          if (pluginModule[stage.name] != null) {
-            for (const pluginConfig of context.plugins[pluginName] || []) {
-              context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-              const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-              context.logger.pluginName = pluginName;
-              try {
-                yield pluginModule[stage.name](context, pluginConfig);
-              } finally {
-                context.logger.pluginName = void 0;
-                unloadEnv(oldEnv);
-              }
+          for (const pluginConfig of context.plugins[pluginName] || []) {
+            if (pluginModule[stage.name] == null || ((_a = pluginConfig.$skip) === null || _a === void 0 ? void 0 : _a.includes(stage.name))) {
+              continue;
+            }
+            context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+            const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule[stage.name](context, pluginConfig);
+            } finally {
+              context.logger.pluginName = void 0;
+              unloadEnv(oldEnv);
             }
           }
         }
@@ -20060,7 +20062,7 @@ var require_init = __commonJS({
           context.version.new = packageJson.version;
           publishConfig = packageJson.publishConfig;
         } catch (_a) {
-          context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
+          throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
         }
         if (config.pruneShrinkwrap && !fs3.existsSync("npm-shrinkwrap.json")) {
           throw new Error("Could not find npm-shrinkwrap.json but the pruneShrinkwrap option was specified");
@@ -20871,7 +20873,7 @@ function init_default(context, config) {
       context.version.new = lernaJson.version;
       publishConfig = (_a = lernaJson.command) == null ? void 0 : _a.publish;
     } catch (e) {
-      context.logger.warn(`Missing or invalid lerna.json in branch ${context.branch.name}`);
+      throw new Error(`Missing or invalid lerna.json in branch ${context.branch.name}`);
     }
     try {
       const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
@@ -20880,7 +20882,7 @@ function init_default(context, config) {
         publishConfig = packageJson.publishConfig;
       }
     } catch (e) {
-      context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
+      throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
     context.branch.channel = context.branch.channel || "latest";
     if (config.npmPublish === false) {
@@ -20961,20 +20963,18 @@ var path = __toESM(require("path"));
 var import_find_up = __toESM(require_find_up());
 function version_default2(context, _config) {
   return __async(this, null, function* () {
-    if (context.version.new != null) {
-      const packageInfo = yield lernaList(true);
-      yield lernaVersion(context.version.new);
-      context.changedFiles.push("lerna.json", "package.json");
-      const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
-      if (lockfilePath != null) {
-        context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
-      } else {
-        context.logger.warn("Could not find lockfile to update version in");
-      }
-      for (const { location } of packageInfo) {
-        const relLocation = path.relative(context.rootDir, location);
-        context.changedFiles.push(path.join(relLocation, "package.json"));
-      }
+    const packageInfo = yield lernaList(true);
+    yield lernaVersion(context.version.new);
+    context.changedFiles.push("lerna.json", "package.json");
+    const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
+    if (lockfilePath != null) {
+      context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
+    } else {
+      context.logger.warn("Could not find lockfile to update version in");
+    }
+    for (const { location } of packageInfo) {
+      const relLocation = path.relative(context.rootDir, location);
+      context.changedFiles.push(path.join(relLocation, "package.json"));
     }
   });
 }

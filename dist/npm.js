@@ -3651,22 +3651,24 @@ var require_stages = __commonJS({
     }
     exports.version = version2;
     function runStage(context, pluginsLoaded, stage) {
+      var _a;
       return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage(stage)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-          if (pluginModule[stage.name] != null) {
-            for (const pluginConfig of context.plugins[pluginName] || []) {
-              context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-              const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-              context.logger.pluginName = pluginName;
-              try {
-                yield pluginModule[stage.name](context, pluginConfig);
-              } finally {
-                context.logger.pluginName = void 0;
-                unloadEnv(oldEnv);
-              }
+          for (const pluginConfig of context.plugins[pluginName] || []) {
+            if (pluginModule[stage.name] == null || ((_a = pluginConfig.$skip) === null || _a === void 0 ? void 0 : _a.includes(stage.name))) {
+              continue;
+            }
+            context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+            const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule[stage.name](context, pluginConfig);
+            } finally {
+              context.logger.pluginName = void 0;
+              unloadEnv(oldEnv);
             }
           }
         }
@@ -20302,7 +20304,7 @@ function init_default(context, config) {
       context.version.new = packageJson.version;
       publishConfig = packageJson.publishConfig;
     } catch (e) {
-      context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
+      throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
     if (config.pruneShrinkwrap && !fs2.existsSync("npm-shrinkwrap.json")) {
       throw new Error("Could not find npm-shrinkwrap.json but the pruneShrinkwrap option was specified");

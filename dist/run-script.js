@@ -2610,22 +2610,24 @@ var require_stages = __commonJS({
     }
     exports.version = version2;
     function runStage(context3, pluginsLoaded, stage) {
+      var _a;
       return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage(stage)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-          if (pluginModule[stage.name] != null) {
-            for (const pluginConfig of context3.plugins[pluginName] || []) {
-              context3.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-              const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-              context3.logger.pluginName = pluginName;
-              try {
-                yield pluginModule[stage.name](context3, pluginConfig);
-              } finally {
-                context3.logger.pluginName = void 0;
-                unloadEnv(oldEnv);
-              }
+          for (const pluginConfig of context3.plugins[pluginName] || []) {
+            if (pluginModule[stage.name] == null || ((_a = pluginConfig.$skip) === null || _a === void 0 ? void 0 : _a.includes(stage.name))) {
+              continue;
+            }
+            context3.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+            const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+            context3.logger.pluginName = pluginName;
+            try {
+              yield pluginModule[stage.name](context3, pluginConfig);
+            } finally {
+              context3.logger.pluginName = void 0;
+              unloadEnv(oldEnv);
             }
           }
         }

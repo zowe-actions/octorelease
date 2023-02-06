@@ -61,3 +61,7 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
         await exec.exec("npx", cmdArgs);
     });
 }
+
+export async function verifyToken(tool: "ovsx" | "vsce", publisher: string): Promise<void> {
+    await exec.exec("npx", [tool, "verify-pat", publisher]);
+}

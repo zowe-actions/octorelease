@@ -3651,22 +3651,24 @@ var require_stages = __commonJS({
     }
     exports.version = version2;
     function runStage(context, pluginsLoaded, stage) {
+      var _a;
       return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage(stage)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-          if (pluginModule[stage.name] != null) {
-            for (const pluginConfig of context.plugins[pluginName] || []) {
-              context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-              const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-              context.logger.pluginName = pluginName;
-              try {
-                yield pluginModule[stage.name](context, pluginConfig);
-              } finally {
-                context.logger.pluginName = void 0;
-                unloadEnv(oldEnv);
-              }
+          for (const pluginConfig of context.plugins[pluginName] || []) {
+            if (pluginModule[stage.name] == null || ((_a = pluginConfig.$skip) === null || _a === void 0 ? void 0 : _a.includes(stage.name))) {
+              continue;
+            }
+            context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+            const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+            context.logger.pluginName = pluginName;
+            try {
+              yield pluginModule[stage.name](context, pluginConfig);
+            } finally {
+              context.logger.pluginName = void 0;
+              unloadEnv(oldEnv);
             }
           }
         }
@@ -19813,38 +19815,19 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 
 // src/init.ts
-var fs = __toESM(require("fs"));
-function init_default(context, config) {
-  return __async(this, null, function* () {
-    try {
-      const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-      context.logger.info(`VS Code extension: ${packageJson.publisher}.${packageJson.name}`);
-    } catch (e) {
-      context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
-    }
-    if (config.vscePublish !== false && context.env.VSCE_PAT == null) {
-      throw new Error("Required environment variable VSCE_PAT is undefined");
-    }
-    if (config.ovsxPublish && context.env.OVSX_PAT == null) {
-      throw new Error("Required environment variable OVSX_PAT is undefined");
-    }
-  });
-}
-
-// src/publish.ts
-var fs3 = __toESM(require("fs"));
-var path2 = __toESM(require("path"));
+var fs2 = __toESM(require("fs"));
 
 // src/utils.ts
 var utils_exports = {};
 __export(utils_exports, {
   ovsxInfo: () => ovsxInfo,
   ovsxPublish: () => ovsxPublish,
+  verifyToken: () => verifyToken,
   vsceInfo: () => vsceInfo,
   vscePackage: () => vscePackage,
   vscePublish: () => vscePublish
 });
-var fs2 = __toESM(require("fs"));
+var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_core = __toESM(require_lib5());
@@ -19859,7 +19842,7 @@ function ovsxPublish(context, vsixPath) {
     const cmdArgs = ["ovsx", "publish"];
     if (vsixPath != null) {
       cmdArgs.push("--packagePath", vsixPath);
-    } else if (fs2.existsSync(path.join(context.rootDir, "yarn.lock"))) {
+    } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
@@ -19877,7 +19860,7 @@ function vscePackage(context) {
   return __async(this, null, function* () {
     var _a;
     const cmdArgs = ["vsce", "package"];
-    if (fs2.existsSync(path.join((context == null ? void 0 : context.rootDir) || "", "yarn.lock"))) {
+    if (fs.existsSync(path.join((context == null ? void 0 : context.rootDir) || "", "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
     const cmdOutput = yield exec.getExecOutput("npx", cmdArgs);
@@ -19889,7 +19872,7 @@ function vscePublish(context, vsixPath) {
     const cmdArgs = ["vsce", "publish"];
     if (vsixPath != null) {
       cmdArgs.push("--packagePath", vsixPath);
-    } else if (fs2.existsSync(path.join(context.rootDir, "yarn.lock"))) {
+    } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
@@ -19897,8 +19880,40 @@ function vscePublish(context, vsixPath) {
     }));
   });
 }
+function verifyToken(tool, publisher) {
+  return __async(this, null, function* () {
+    yield exec.exec("npx", [tool, "verify-pat", publisher]);
+  });
+}
+
+// src/init.ts
+function init_default(context, config) {
+  return __async(this, null, function* () {
+    let packageJson;
+    try {
+      packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
+      context.logger.info(`VS Code extension: ${packageJson.publisher}.${packageJson.name}`);
+    } catch (e) {
+      throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
+    }
+    if (config.vscePublish !== false && context.env.VSCE_PAT == null) {
+      throw new Error("Required environment variable VSCE_PAT is undefined");
+    }
+    if (config.ovsxPublish && context.env.OVSX_PAT == null) {
+      throw new Error("Required environment variable OVSX_PAT is undefined");
+    }
+    if (config.vscePublish !== false) {
+      yield verifyToken("vsce", packageJson.publisher);
+    }
+    if (config.ovsxPublish) {
+      yield verifyToken("ovsx", packageJson.publisher);
+    }
+  });
+}
 
 // src/publish.ts
+var fs3 = __toESM(require("fs"));
+var path2 = __toESM(require("path"));
 function publish_default(context, config) {
   return __async(this, null, function* () {
     const packageJson = JSON.parse(fs3.readFileSync("package.json", "utf-8"));

@@ -26,7 +26,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         context.version.new = lernaJson.version;
         publishConfig = lernaJson.command?.publish;
     } catch {
-        context.logger.warn(`Missing or invalid lerna.json in branch ${context.branch.name}`);
+        throw new Error(`Missing or invalid lerna.json in branch ${context.branch.name}`);
     }
 
     try {
@@ -36,7 +36,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             publishConfig = packageJson.publishConfig;
         }
     } catch {
-        context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
+        throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
 
     context.branch.channel = context.branch.channel || "latest";

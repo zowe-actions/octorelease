@@ -17,13 +17,15 @@
 import * as fs from "fs";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    let packageJson;
     try {
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+        packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         context.logger.info(`VS Code extension: ${packageJson.publisher}.${packageJson.name}`);
     } catch {
-        context.logger.warn(`Missing or invalid package.json in branch ${context.branch.name}`);
+        throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
 
     if (config.vscePublish !== false && context.env.VSCE_PAT == null) {
@@ -32,5 +34,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     if (config.ovsxPublish && context.env.OVSX_PAT == null) {
         throw new Error("Required environment variable OVSX_PAT is undefined");
+    }
+
+    if (config.vscePublish !== false) {
+        await utils.verifyToken("vsce", packageJson.publisher);
+    }
+
+    if (config.ovsxPublish) {
+        await utils.verifyToken("ovsx", packageJson.publisher);
     }
 }

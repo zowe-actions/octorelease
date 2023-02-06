@@ -21,19 +21,17 @@ import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
-    if (context.version.new != null) {
-        const packageInfo = await utils.lernaList(true);
-        await utils.lernaVersion(context.version.new);
-        context.changedFiles.push("lerna.json", "package.json");
-        const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
-        if (lockfilePath != null) {
-            context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
-        } else {
-            context.logger.warn("Could not find lockfile to update version in");
-        }
-        for (const { location } of packageInfo) {
-            const relLocation = path.relative(context.rootDir, location);
-            context.changedFiles.push(path.join(relLocation, "package.json"));
-        }
+    const packageInfo = await utils.lernaList(true);
+    await utils.lernaVersion(context.version.new);
+    context.changedFiles.push("lerna.json", "package.json");
+    const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
+    if (lockfilePath != null) {
+        context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
+    } else {
+        context.logger.warn("Could not find lockfile to update version in");
+    }
+    for (const { location } of packageInfo) {
+        const relLocation = path.relative(context.rootDir, location);
+        context.changedFiles.push(path.join(relLocation, "package.json"));
     }
 }

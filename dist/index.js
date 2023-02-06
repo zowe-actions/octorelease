@@ -19233,21 +19233,23 @@ function version2(context, pluginsLoaded) {
 }
 function runStage(context, pluginsLoaded, stage) {
   return __async(this, null, function* () {
+    var _a;
     if (shouldSkipStage(stage)) {
       return;
     }
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-      if (pluginModule[stage.name] != null) {
-        for (const pluginConfig of context.plugins[pluginName] || []) {
-          context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
-          const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-          context.logger.pluginName = pluginName;
-          try {
-            yield pluginModule[stage.name](context, pluginConfig);
-          } finally {
-            context.logger.pluginName = void 0;
-            unloadEnv(oldEnv);
-          }
+      for (const pluginConfig of context.plugins[pluginName] || []) {
+        if (pluginModule[stage.name] == null || ((_a = pluginConfig.$skip) == null ? void 0 : _a.includes(stage.name))) {
+          continue;
+        }
+        context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+        const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
+        context.logger.pluginName = pluginName;
+        try {
+          yield pluginModule[stage.name](context, pluginConfig);
+        } finally {
+          context.logger.pluginName = void 0;
+          unloadEnv(oldEnv);
         }
       }
     }
