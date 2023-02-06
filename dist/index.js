@@ -19360,6 +19360,7 @@ function buildContext(opts) {
       logger: new Logger(),
       plugins: pluginConfig,
       releasedPackages: {},
+      rootDir: process.cwd(),
       tagPrefix,
       version: versionInfo
     };

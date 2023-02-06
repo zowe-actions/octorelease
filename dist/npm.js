@@ -19644,6 +19644,7 @@ var require_utils5 = __commonJS({
           logger: new logger_1.Logger(),
           plugins: pluginConfig,
           releasedPackages: {},
+          rootDir: process.cwd(),
           tagPrefix,
           version: versionInfo
         };
@@ -20411,7 +20412,7 @@ function version_default2(context, _config) {
     context.changedFiles.push("package.json");
     const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
-      context.changedFiles.push(path4.relative(process.cwd(), lockfilePath));
+      context.changedFiles.push(path4.relative(context.rootDir, lockfilePath));
     } else {
       context.logger.warn("Could not find lockfile to update version in");
     }

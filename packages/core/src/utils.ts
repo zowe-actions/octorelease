@@ -69,6 +69,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
+        rootDir: process.cwd(),
         tagPrefix,
         version: versionInfo
     };

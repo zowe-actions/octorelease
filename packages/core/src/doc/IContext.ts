@@ -85,6 +85,11 @@ export interface IContext {
     releaseNotes?: string;
 
     /**
+     * Absolute path of project root directory
+     */
+    rootDir: string;
+
+    /**
      * Git tag prefix that precedes version number (default is "v")
      */
     tagPrefix: string;

@@ -19644,6 +19644,7 @@ var require_utils5 = __commonJS({
           logger: new logger_1.Logger(),
           plugins: pluginConfig,
           releasedPackages: {},
+          rootDir: process.cwd(),
           tagPrefix,
           version: versionInfo
         };

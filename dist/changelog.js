@@ -4154,7 +4154,7 @@ function version_default2(context, config) {
       const globber = yield glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
       let releaseNotes = "";
       for (const packageDir of yield globber.glob()) {
-        const changelogPath = path.join(path.relative(process.cwd(), packageDir), changelogFile);
+        const changelogPath = path.join(path.relative(context.rootDir, packageDir), changelogFile);
         const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
         if (packageReleaseNotes != null) {
           releaseNotes += `**${path.basename(packageDir)}**

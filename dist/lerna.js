@@ -19668,6 +19668,7 @@ var require_utils5 = __commonJS({
           logger: new logger_1.Logger(),
           plugins: pluginConfig,
           releasedPackages: {},
+          rootDir: process.cwd(),
           tagPrefix,
           version: versionInfo
         };
@@ -20754,7 +20755,7 @@ var require_version = __commonJS({
         context.changedFiles.push("package.json");
         const lockfilePath = yield (0, find_up_1.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
         if (lockfilePath != null) {
-          context.changedFiles.push(path2.relative(process.cwd(), lockfilePath));
+          context.changedFiles.push(path2.relative(context.rootDir, lockfilePath));
         } else {
           context.logger.warn("Could not find lockfile to update version in");
         }
@@ -20950,12 +20951,12 @@ function version_default2(context, _config) {
       context.changedFiles.push("lerna.json", "package.json");
       const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
       if (lockfilePath != null) {
-        context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
+        context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
       } else {
         context.logger.warn("Could not find lockfile to update version in");
       }
       for (const { location } of packageInfo) {
-        const relLocation = path.relative(process.cwd(), location);
+        const relLocation = path.relative(context.rootDir, location);
         context.changedFiles.push(path.join(relLocation, "package.json"));
       }
     }
