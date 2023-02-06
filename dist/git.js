@@ -1221,7 +1221,7 @@ function version_default(context, config) {
   return __async(this, null, function* () {
     const commitMessage = config.commitMessage || "Bump version to {{version}}";
     let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
-    yield gitAdd(...context.changedFiles);
+    yield gitAdd(...new Set(context.changedFiles));
     let shouldPush = false;
     if (yield gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
       shouldPush = true;

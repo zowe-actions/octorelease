@@ -25,7 +25,7 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
         const packageInfo = await utils.lernaList(true);
         await utils.lernaVersion(context.version.new);
         context.changedFiles.push("lerna.json", "package.json");
-        const lockfilePath = await findUp(["package-lock.json", "npm-shrinkwrap.json", "yarn.lock"]);
+        const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
         if (lockfilePath != null) {
             context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
         } else {

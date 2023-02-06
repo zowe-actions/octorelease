@@ -20752,7 +20752,7 @@ var require_version = __commonJS({
       return __awaiter(this, void 0, void 0, function* () {
         yield utils.npmVersion(context.version.new);
         context.changedFiles.push("package.json");
-        const lockfilePath = yield (0, find_up_1.default)(["package-lock.json", "npm-shrinkwrap.json"]);
+        const lockfilePath = yield (0, find_up_1.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
         if (lockfilePath != null) {
           context.changedFiles.push(path2.relative(process.cwd(), lockfilePath));
         } else {
@@ -20948,7 +20948,7 @@ function version_default2(context, _config) {
       const packageInfo = yield lernaList(true);
       yield lernaVersion(context.version.new);
       context.changedFiles.push("lerna.json", "package.json");
-      const lockfilePath = yield (0, import_find_up.default)(["package-lock.json", "npm-shrinkwrap.json", "yarn.lock"]);
+      const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
       if (lockfilePath != null) {
         context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
       } else {

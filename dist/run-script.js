@@ -20098,7 +20098,7 @@ var require_version = __commonJS({
       return __awaiter(this, void 0, void 0, function* () {
         const commitMessage = config.commitMessage || "Bump version to {{version}}";
         let tagMessage = config.tagMessage || context3.branch.channel && `Release {{version}} to ${context3.branch.channel}`;
-        yield utils.gitAdd(...context3.changedFiles);
+        yield utils.gitAdd(...new Set(context3.changedFiles));
         let shouldPush = false;
         if (yield utils.gitCommit(commitMessage.replace("{{version}}", context3.version.new))) {
           shouldPush = true;

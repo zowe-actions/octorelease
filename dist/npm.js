@@ -20409,7 +20409,7 @@ function version_default2(context, _config) {
   return __async(this, null, function* () {
     yield npmVersion(context.version.new);
     context.changedFiles.push("package.json");
-    const lockfilePath = yield (0, import_find_up.default)(["package-lock.json", "npm-shrinkwrap.json"]);
+    const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
       context.changedFiles.push(path4.relative(process.cwd(), lockfilePath));
     } else {

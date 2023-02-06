@@ -23,7 +23,7 @@ import * as utils from "./utils";
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
     await utils.npmVersion(context.version.new);
     context.changedFiles.push("package.json");
-    const lockfilePath = await findUp(["package-lock.json", "npm-shrinkwrap.json"]);
+    const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
         context.changedFiles.push(path.relative(process.cwd(), lockfilePath));
     } else {
