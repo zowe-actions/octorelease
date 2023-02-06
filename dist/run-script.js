@@ -20951,9 +20951,9 @@ var require_is_plain_object = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/endpoint/dist-node/index.js
+// ../../node_modules/@octokit/endpoint/dist-node/index.js
 var require_dist_node3 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/endpoint/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/endpoint/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var isPlainObject = require_is_plain_object();
@@ -24368,9 +24368,9 @@ var require_once = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/request-error/dist-node/index.js
+// ../../node_modules/@octokit/request-error/dist-node/index.js
 var require_dist_node5 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/request-error/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/request-error/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function _interopDefault(ex) {
@@ -24422,9 +24422,9 @@ var require_dist_node5 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js
+// ../../node_modules/@octokit/request/dist-node/index.js
 var require_dist_node6 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/request/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function _interopDefault(ex) {
@@ -24577,9 +24577,9 @@ var require_dist_node6 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/graphql/dist-node/index.js
+// ../../node_modules/@octokit/graphql/dist-node/index.js
 var require_dist_node7 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/graphql/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/graphql/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var request = require_dist_node6();
@@ -24675,9 +24675,9 @@ var require_dist_node7 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/auth-token/dist-node/index.js
+// ../../node_modules/@octokit/auth-token/dist-node/index.js
 var require_dist_node8 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/auth-token/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/auth-token/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var REGEX_IS_INSTALLATION_LEGACY = /^v1\./;
@@ -24721,9 +24721,9 @@ var require_dist_node8 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/core/dist-node/index.js
+// ../../node_modules/@octokit/core/dist-node/index.js
 var require_dist_node9 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/core/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/core/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var universalUserAgent = require_dist_node2();

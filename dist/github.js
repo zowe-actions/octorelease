@@ -20316,9 +20316,9 @@ var require_is_plain_object = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/endpoint/dist-node/index.js
+// ../../node_modules/@octokit/endpoint/dist-node/index.js
 var require_dist_node5 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/endpoint/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/endpoint/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var isPlainObject = require_is_plain_object();
@@ -23639,63 +23639,9 @@ var require_lib7 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/request-error/dist-node/index.js
+// ../../node_modules/@octokit/request/dist-node/index.js
 var require_dist_node6 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/request-error/dist-node/index.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function _interopDefault(ex) {
-      return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
-    }
-    var deprecation = require_dist_node();
-    var once = _interopDefault(require_once());
-    var logOnceCode = once((deprecation2) => console.warn(deprecation2));
-    var logOnceHeaders = once((deprecation2) => console.warn(deprecation2));
-    var RequestError3 = class extends Error {
-      constructor(message, statusCode, options) {
-        super(message);
-        if (Error.captureStackTrace) {
-          Error.captureStackTrace(this, this.constructor);
-        }
-        this.name = "HttpError";
-        this.status = statusCode;
-        let headers;
-        if ("headers" in options && typeof options.headers !== "undefined") {
-          headers = options.headers;
-        }
-        if ("response" in options) {
-          this.response = options.response;
-          headers = options.response.headers;
-        }
-        const requestCopy = Object.assign({}, options.request);
-        if (options.request.headers.authorization) {
-          requestCopy.headers = Object.assign({}, options.request.headers, {
-            authorization: options.request.headers.authorization.replace(/ .*$/, " [REDACTED]")
-          });
-        }
-        requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-        this.request = requestCopy;
-        Object.defineProperty(this, "code", {
-          get() {
-            logOnceCode(new deprecation.Deprecation("[@octokit/request-error] `error.code` is deprecated, use `error.status`."));
-            return statusCode;
-          }
-        });
-        Object.defineProperty(this, "headers", {
-          get() {
-            logOnceHeaders(new deprecation.Deprecation("[@octokit/request-error] `error.headers` is deprecated, use `error.response.headers`."));
-            return headers || {};
-          }
-        });
-      }
-    };
-    exports.RequestError = RequestError3;
-  }
-});
-
-// ../../node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js
-var require_dist_node7 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js"(exports) {
+  "../../node_modules/@octokit/request/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function _interopDefault(ex) {
@@ -23705,7 +23651,7 @@ var require_dist_node7 = __commonJS({
     var universalUserAgent = require_dist_node4();
     var isPlainObject = require_is_plain_object();
     var nodeFetch = _interopDefault(require_lib7());
-    var requestError = require_dist_node6();
+    var requestError = require_dist_node2();
     var VERSION = "5.6.3";
     function getBufferResponse(response) {
       return response.arrayBuffer();
@@ -23848,12 +23794,12 @@ var require_dist_node7 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/graphql/dist-node/index.js
-var require_dist_node8 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/graphql/dist-node/index.js"(exports) {
+// ../../node_modules/@octokit/graphql/dist-node/index.js
+var require_dist_node7 = __commonJS({
+  "../../node_modules/@octokit/graphql/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var request = require_dist_node7();
+    var request = require_dist_node6();
     var universalUserAgent = require_dist_node4();
     var VERSION = "4.8.0";
     function _buildMessageForResponseErrors(data) {
@@ -23946,9 +23892,9 @@ var require_dist_node8 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/auth-token/dist-node/index.js
-var require_dist_node9 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/auth-token/dist-node/index.js"(exports) {
+// ../../node_modules/@octokit/auth-token/dist-node/index.js
+var require_dist_node8 = __commonJS({
+  "../../node_modules/@octokit/auth-token/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var REGEX_IS_INSTALLATION_LEGACY = /^v1\./;
@@ -23992,16 +23938,16 @@ var require_dist_node9 = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/github/node_modules/@octokit/core/dist-node/index.js
-var require_dist_node10 = __commonJS({
-  "../../node_modules/@actions/github/node_modules/@octokit/core/dist-node/index.js"(exports) {
+// ../../node_modules/@octokit/core/dist-node/index.js
+var require_dist_node9 = __commonJS({
+  "../../node_modules/@octokit/core/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var universalUserAgent = require_dist_node4();
     var beforeAfterHook = require_before_after_hook();
-    var request = require_dist_node7();
-    var graphql = require_dist_node8();
-    var authToken = require_dist_node9();
+    var request = require_dist_node6();
+    var graphql = require_dist_node7();
+    var authToken = require_dist_node8();
     function _objectWithoutPropertiesLoose(source, excluded) {
       if (source == null)
         return {};
@@ -24141,7 +24087,7 @@ var require_dist_node10 = __commonJS({
 });
 
 // ../../node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js
-var require_dist_node11 = __commonJS({
+var require_dist_node10 = __commonJS({
   "../../node_modules/@octokit/plugin-rest-endpoint-methods/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -25215,7 +25161,7 @@ var require_dist_node11 = __commonJS({
 });
 
 // ../../node_modules/@octokit/plugin-paginate-rest/dist-node/index.js
-var require_dist_node12 = __commonJS({
+var require_dist_node11 = __commonJS({
   "../../node_modules/@octokit/plugin-paginate-rest/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -25406,9 +25352,9 @@ var require_utils8 = __commonJS({
     exports.getOctokitOptions = exports.GitHub = exports.defaults = exports.context = void 0;
     var Context = __importStar(require_context());
     var Utils = __importStar(require_utils6());
-    var core_1 = require_dist_node10();
-    var plugin_rest_endpoint_methods_1 = require_dist_node11();
-    var plugin_paginate_rest_1 = require_dist_node12();
+    var core_1 = require_dist_node9();
+    var plugin_rest_endpoint_methods_1 = require_dist_node10();
+    var plugin_paginate_rest_1 = require_dist_node11();
     exports.context = new Context.Context();
     var baseUrl = Utils.getApiBaseUrl();
     exports.defaults = {
@@ -25476,7 +25422,7 @@ var require_github2 = __commonJS({
 });
 
 // ../../node_modules/@octokit/plugin-enterprise-server/dist-node/index.js
-var require_dist_node13 = __commonJS({
+var require_dist_node12 = __commonJS({
   "../../node_modules/@octokit/plugin-enterprise-server/dist-node/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -41742,7 +41688,7 @@ __export(utils_exports, {
 });
 var github = __toESM(require_github2());
 var import_utils = __toESM(require_utils8());
-var import_plugin_enterprise_server = __toESM(require_dist_node13());
+var import_plugin_enterprise_server = __toESM(require_dist_node12());
 function getOctokit2(context, config) {
   if (config.githubUrl != null) {
     const octokit = import_utils.GitHub.plugin(import_plugin_enterprise_server.enterpriseServer34);
