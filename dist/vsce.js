@@ -116,7 +116,7 @@ var require_io_util = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
     var fs4 = __importStar(require("fs"));
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     _a = fs4.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
     exports.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
@@ -163,7 +163,7 @@ var require_io_util = __commonJS({
         }
         if (stats && stats.isFile()) {
           if (exports.IS_WINDOWS) {
-            const upperExt = path2.extname(filePath).toUpperCase();
+            const upperExt = path3.extname(filePath).toUpperCase();
             if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
               return filePath;
             }
@@ -187,11 +187,11 @@ var require_io_util = __commonJS({
           if (stats && stats.isFile()) {
             if (exports.IS_WINDOWS) {
               try {
-                const directory = path2.dirname(filePath);
-                const upperName = path2.basename(filePath).toUpperCase();
+                const directory = path3.dirname(filePath);
+                const upperName = path3.basename(filePath).toUpperCase();
                 for (const actualName of yield exports.readdir(directory)) {
                   if (upperName === actualName.toUpperCase()) {
-                    filePath = path2.join(directory, actualName);
+                    filePath = path3.join(directory, actualName);
                     break;
                   }
                 }
@@ -292,7 +292,7 @@ var require_io = __commonJS({
     exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
     var assert_1 = require("assert");
     var childProcess = __importStar(require("child_process"));
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
     var exec3 = util_1.promisify(childProcess.exec);
@@ -304,7 +304,7 @@ var require_io = __commonJS({
         if (destStat && destStat.isFile() && !force) {
           return;
         }
-        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path2.join(dest, path2.basename(source)) : dest;
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path3.join(dest, path3.basename(source)) : dest;
         if (!(yield ioUtil.exists(source))) {
           throw new Error(`no such file or directory: ${source}`);
         }
@@ -316,7 +316,7 @@ var require_io = __commonJS({
             yield cpDirRecursive(source, newDest, 0, force);
           }
         } else {
-          if (path2.relative(source, newDest) === "") {
+          if (path3.relative(source, newDest) === "") {
             throw new Error(`'${newDest}' and '${source}' are the same file`);
           }
           yield copyFile(source, newDest, force);
@@ -329,7 +329,7 @@ var require_io = __commonJS({
         if (yield ioUtil.exists(dest)) {
           let destExists = true;
           if (yield ioUtil.isDirectory(dest)) {
-            dest = path2.join(dest, path2.basename(source));
+            dest = path3.join(dest, path3.basename(source));
             destExists = yield ioUtil.exists(dest);
           }
           if (destExists) {
@@ -340,7 +340,7 @@ var require_io = __commonJS({
             }
           }
         }
-        yield mkdirP(path2.dirname(dest));
+        yield mkdirP(path3.dirname(dest));
         yield ioUtil.rename(source, dest);
       });
     }
@@ -428,7 +428,7 @@ var require_io = __commonJS({
         }
         const extensions = [];
         if (ioUtil.IS_WINDOWS && process.env["PATHEXT"]) {
-          for (const extension of process.env["PATHEXT"].split(path2.delimiter)) {
+          for (const extension of process.env["PATHEXT"].split(path3.delimiter)) {
             if (extension) {
               extensions.push(extension);
             }
@@ -441,12 +441,12 @@ var require_io = __commonJS({
           }
           return [];
         }
-        if (tool.includes(path2.sep)) {
+        if (tool.includes(path3.sep)) {
           return [];
         }
         const directories = [];
         if (process.env.PATH) {
-          for (const p of process.env.PATH.split(path2.delimiter)) {
+          for (const p of process.env.PATH.split(path3.delimiter)) {
             if (p) {
               directories.push(p);
             }
@@ -454,7 +454,7 @@ var require_io = __commonJS({
         }
         const matches = [];
         for (const directory of directories) {
-          const filePath = yield ioUtil.tryGetExecutablePath(path2.join(directory, tool), extensions);
+          const filePath = yield ioUtil.tryGetExecutablePath(path3.join(directory, tool), extensions);
           if (filePath) {
             matches.push(filePath);
           }
@@ -575,7 +575,7 @@ var require_toolrunner = __commonJS({
     var os = __importStar(require("os"));
     var events = __importStar(require("events"));
     var child = __importStar(require("child_process"));
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     var io = __importStar(require_io());
     var ioUtil = __importStar(require_io_util());
     var timers_1 = require("timers");
@@ -790,7 +790,7 @@ var require_toolrunner = __commonJS({
       exec() {
         return __awaiter(this, void 0, void 0, function* () {
           if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) {
-            this.toolPath = path2.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
+            this.toolPath = path3.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
           }
           this.toolPath = yield io.which(this.toolPath, true);
           return new Promise((resolve2, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -3126,7 +3126,7 @@ var require_path_utils = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.toPlatformPath = exports.toWin32Path = exports.toPosixPath = void 0;
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     function toPosixPath(pth) {
       return pth.replace(/[\\]/g, "/");
     }
@@ -3136,7 +3136,7 @@ var require_path_utils = __commonJS({
     }
     exports.toWin32Path = toWin32Path;
     function toPlatformPath(pth) {
-      return pth.replace(/[/\\]/g, path2.sep);
+      return pth.replace(/[/\\]/g, path3.sep);
     }
     exports.toPlatformPath = toPlatformPath;
   }
@@ -3207,7 +3207,7 @@ var require_core = __commonJS({
     var file_command_1 = require_file_command();
     var utils_1 = require_utils();
     var os = __importStar(require("os"));
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     var oidc_utils_1 = require_oidc_utils();
     var ExitCode;
     (function(ExitCode2) {
@@ -3235,7 +3235,7 @@ var require_core = __commonJS({
       } else {
         command_1.issueCommand("add-path", {}, inputPath);
       }
-      process.env["PATH"] = `${inputPath}${path2.delimiter}${process.env["PATH"]}`;
+      process.env["PATH"] = `${inputPath}${path3.delimiter}${process.env["PATH"]}`;
     }
     exports.addPath = addPath;
     function getInput(name, options) {
@@ -3409,7 +3409,7 @@ var require_inputs = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Inputs = void 0;
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     var core = __importStar(require_core());
     var Inputs = class {
       /**
@@ -3430,7 +3430,7 @@ var require_inputs = __commonJS({
        */
       static get configDir() {
         const input = core.getInput("config-dir");
-        return input ? path2.resolve(this.rootDir, input) : void 0;
+        return input ? path3.resolve(this.rootDir, input) : void 0;
       }
       /**
        * Don't make any changes but report what would have been done.
@@ -3619,7 +3619,7 @@ var require_stages = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.version = exports.success = exports.publish = exports.init = exports.fail = void 0;
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     var core = __importStar(require_core());
     var doc_1 = require_doc();
     var inputs_1 = require_inputs();
@@ -3665,7 +3665,7 @@ var require_stages = __commonJS({
             context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             if (pluginConfig[doc_1.SYMBOL_PLUGIN_DIR] != null) {
               oldCwd = process.cwd();
-              process.chdir(path2.resolve(pluginConfig[doc_1.SYMBOL_PLUGIN_DIR]));
+              process.chdir(path3.resolve(pluginConfig[doc_1.SYMBOL_PLUGIN_DIR]));
             }
             context.logger.pluginName = pluginName;
             try {
@@ -3694,7 +3694,7 @@ var require_stages = __commonJS({
 var require_resolve_from = __commonJS({
   "../../node_modules/resolve-from/index.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var Module = require("module");
     var fs4 = require("fs");
     var resolveFrom = (fromDir, moduleId, silent) => {
@@ -3708,14 +3708,14 @@ var require_resolve_from = __commonJS({
         fromDir = fs4.realpathSync(fromDir);
       } catch (err) {
         if (err.code === "ENOENT") {
-          fromDir = path2.resolve(fromDir);
+          fromDir = path3.resolve(fromDir);
         } else if (silent) {
           return null;
         } else {
           throw err;
         }
       }
-      const fromFile = path2.join(fromDir, "noop.js");
+      const fromFile = path3.join(fromDir, "noop.js");
       const resolveFileName = () => Module._resolveFilename(moduleId, {
         id: fromFile,
         filename: fromFile,
@@ -3787,7 +3787,7 @@ var require_parent_module = __commonJS({
 var require_import_fresh = __commonJS({
   "../../node_modules/import-fresh/index.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var resolveFrom = require_resolve_from();
     var parentModule = require_parent_module();
     module2.exports = (moduleId) => {
@@ -3795,7 +3795,7 @@ var require_import_fresh = __commonJS({
         throw new TypeError("Expected a string");
       }
       const parentPath = parentModule(__filename);
-      const cwd = parentPath ? path2.dirname(parentPath) : __dirname;
+      const cwd = parentPath ? path3.dirname(parentPath) : __dirname;
       const filePath = resolveFrom(cwd, moduleId);
       const oldModule = require.cache[filePath];
       if (oldModule && oldModule.parent) {
@@ -5237,15 +5237,15 @@ var require_route = __commonJS({
       };
     }
     function wrapConversion(toModel, graph) {
-      var path2 = [graph[toModel].parent, toModel];
+      var path3 = [graph[toModel].parent, toModel];
       var fn = conversions[graph[toModel].parent][toModel];
       var cur = graph[toModel].parent;
       while (graph[cur].parent) {
-        path2.unshift(graph[cur].parent);
+        path3.unshift(graph[cur].parent);
         fn = link(conversions[graph[cur].parent][cur], fn);
         cur = graph[cur].parent;
       }
-      fn.conversion = path2;
+      fn.conversion = path3;
       return fn;
     }
     module2.exports = function(fromModel) {
@@ -8443,10 +8443,10 @@ ${indent}${str}`;
         return String(this.value);
       }
     };
-    function collectionFromPath(schema, path2, value) {
+    function collectionFromPath(schema, path3, value) {
       let v = value;
-      for (let i = path2.length - 1; i >= 0; --i) {
-        const k = path2[i];
+      for (let i = path3.length - 1; i >= 0; --i) {
+        const k = path3[i];
         if (Number.isInteger(k) && k >= 0) {
           const a = [];
           a[k] = v;
@@ -8464,18 +8464,18 @@ ${indent}${str}`;
       }
       return schema.createNode(v, false);
     }
-    var isEmptyPath = (path2) => path2 == null || typeof path2 === "object" && path2[Symbol.iterator]().next().done;
+    var isEmptyPath = (path3) => path3 == null || typeof path3 === "object" && path3[Symbol.iterator]().next().done;
     var Collection = class extends Node {
       constructor(schema) {
         super();
         PlainValue._defineProperty(this, "items", []);
         this.schema = schema;
       }
-      addIn(path2, value) {
-        if (isEmptyPath(path2))
+      addIn(path3, value) {
+        if (isEmptyPath(path3))
           this.add(value);
         else {
-          const [key, ...rest] = path2;
+          const [key, ...rest] = path3;
           const node = this.get(key, true);
           if (node instanceof Collection)
             node.addIn(rest, value);
@@ -10707,8 +10707,8 @@ ${pair.comment}` : item.comment;
     }
     function warnFileDeprecation(filename) {
       if (shouldWarn(true)) {
-        const path2 = filename.replace(/.*yaml[/\\]/i, "").replace(/\.js$/, "").replace(/\\/g, "/");
-        warn(`The endpoint 'yaml/${path2}' will be removed in a future release.`, "DeprecationWarning");
+        const path3 = filename.replace(/.*yaml[/\\]/i, "").replace(/\.js$/, "").replace(/\\/g, "/");
+        warn(`The endpoint 'yaml/${path3}' will be removed in a future release.`, "DeprecationWarning");
       }
     }
     var warned = {};
@@ -11650,23 +11650,23 @@ ${cbNode.commentBefore}` : cb;
         assertCollection(this.contents);
         return this.contents.add(value);
       }
-      addIn(path2, value) {
+      addIn(path3, value) {
         assertCollection(this.contents);
-        this.contents.addIn(path2, value);
+        this.contents.addIn(path3, value);
       }
       delete(key) {
         assertCollection(this.contents);
         return this.contents.delete(key);
       }
-      deleteIn(path2) {
-        if (resolveSeq.isEmptyPath(path2)) {
+      deleteIn(path3) {
+        if (resolveSeq.isEmptyPath(path3)) {
           if (this.contents == null)
             return false;
           this.contents = null;
           return true;
         }
         assertCollection(this.contents);
-        return this.contents.deleteIn(path2);
+        return this.contents.deleteIn(path3);
       }
       getDefaults() {
         return Document.defaults[this.version] || Document.defaults[this.options.version] || {};
@@ -11674,29 +11674,29 @@ ${cbNode.commentBefore}` : cb;
       get(key, keepScalar) {
         return this.contents instanceof resolveSeq.Collection ? this.contents.get(key, keepScalar) : void 0;
       }
-      getIn(path2, keepScalar) {
-        if (resolveSeq.isEmptyPath(path2))
+      getIn(path3, keepScalar) {
+        if (resolveSeq.isEmptyPath(path3))
           return !keepScalar && this.contents instanceof resolveSeq.Scalar ? this.contents.value : this.contents;
-        return this.contents instanceof resolveSeq.Collection ? this.contents.getIn(path2, keepScalar) : void 0;
+        return this.contents instanceof resolveSeq.Collection ? this.contents.getIn(path3, keepScalar) : void 0;
       }
       has(key) {
         return this.contents instanceof resolveSeq.Collection ? this.contents.has(key) : false;
       }
-      hasIn(path2) {
-        if (resolveSeq.isEmptyPath(path2))
+      hasIn(path3) {
+        if (resolveSeq.isEmptyPath(path3))
           return this.contents !== void 0;
-        return this.contents instanceof resolveSeq.Collection ? this.contents.hasIn(path2) : false;
+        return this.contents instanceof resolveSeq.Collection ? this.contents.hasIn(path3) : false;
       }
       set(key, value) {
         assertCollection(this.contents);
         this.contents.set(key, value);
       }
-      setIn(path2, value) {
-        if (resolveSeq.isEmptyPath(path2))
+      setIn(path3, value) {
+        if (resolveSeq.isEmptyPath(path3))
           this.contents = value;
         else {
           assertCollection(this.contents);
-          this.contents.setIn(path2, value);
+          this.contents.setIn(path3, value);
         }
       }
       setSchema(id, customTags) {
@@ -12024,11 +12024,11 @@ var require_getPropertyByPath = __commonJS({
       value: true
     });
     exports.getPropertyByPath = getPropertyByPath;
-    function getPropertyByPath(source, path2) {
-      if (typeof path2 === "string" && Object.prototype.hasOwnProperty.call(source, path2)) {
-        return source[path2];
+    function getPropertyByPath(source, path3) {
+      if (typeof path3 === "string" && Object.prototype.hasOwnProperty.call(source, path3)) {
+        return source[path3];
       }
-      const parsedPath = typeof path2 === "string" ? path2.split(".") : path2;
+      const parsedPath = typeof path3 === "string" ? path3.split(".") : path3;
       return parsedPath.reduce((previous, key) => {
         if (previous === void 0) {
           return previous;
@@ -13693,7 +13693,7 @@ var require_braces = __commonJS({
 var require_constants2 = __commonJS({
   "../../node_modules/picomatch/lib/constants.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var WIN_SLASH = "\\\\/";
     var WIN_NO_SLASH = `[^${WIN_SLASH}]`;
     var DOT_LITERAL = "\\.";
@@ -13863,7 +13863,7 @@ var require_constants2 = __commonJS({
       /* | */
       CHAR_ZERO_WIDTH_NOBREAK_SPACE: 65279,
       /* \uFEFF */
-      SEP: path2.sep,
+      SEP: path3.sep,
       /**
        * Create EXTGLOB_CHARS
        */
@@ -13890,7 +13890,7 @@ var require_constants2 = __commonJS({
 var require_utils3 = __commonJS({
   "../../node_modules/picomatch/lib/utils.js"(exports) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var win32 = process.platform === "win32";
     var {
       REGEX_BACKSLASH,
@@ -13919,7 +13919,7 @@ var require_utils3 = __commonJS({
       if (options && typeof options.windows === "boolean") {
         return options.windows;
       }
-      return win32 === true || path2.sep === "\\";
+      return win32 === true || path3.sep === "\\";
     };
     exports.escapeLast = (input, char, lastIdx) => {
       const idx = input.lastIndexOf(char, lastIdx);
@@ -15067,7 +15067,7 @@ var require_parse2 = __commonJS({
 var require_picomatch = __commonJS({
   "../../node_modules/picomatch/lib/picomatch.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var scan = require_scan();
     var parse2 = require_parse2();
     var utils2 = require_utils3();
@@ -15153,7 +15153,7 @@ var require_picomatch = __commonJS({
     };
     picomatch.matchBase = (input, glob, options, posix = utils2.isWindows(options)) => {
       const regex = glob instanceof RegExp ? glob : picomatch.makeRe(glob, options);
-      return regex.test(path2.basename(input));
+      return regex.test(path3.basename(input));
     };
     picomatch.isMatch = (str, patterns, options) => picomatch(patterns, options)(str);
     picomatch.parse = (pattern, options) => {
@@ -16512,7 +16512,7 @@ var require_windows = __commonJS({
     module2.exports = isexe;
     isexe.sync = sync;
     var fs4 = require("fs");
-    function checkPathExt(path2, options) {
+    function checkPathExt(path3, options) {
       var pathext = options.pathExt !== void 0 ? options.pathExt : process.env.PATHEXT;
       if (!pathext) {
         return true;
@@ -16523,25 +16523,25 @@ var require_windows = __commonJS({
       }
       for (var i = 0; i < pathext.length; i++) {
         var p = pathext[i].toLowerCase();
-        if (p && path2.substr(-p.length).toLowerCase() === p) {
+        if (p && path3.substr(-p.length).toLowerCase() === p) {
           return true;
         }
       }
       return false;
     }
-    function checkStat(stat, path2, options) {
+    function checkStat(stat, path3, options) {
       if (!stat.isSymbolicLink() && !stat.isFile()) {
         return false;
       }
-      return checkPathExt(path2, options);
+      return checkPathExt(path3, options);
     }
-    function isexe(path2, options, cb) {
-      fs4.stat(path2, function(er, stat) {
-        cb(er, er ? false : checkStat(stat, path2, options));
+    function isexe(path3, options, cb) {
+      fs4.stat(path3, function(er, stat) {
+        cb(er, er ? false : checkStat(stat, path3, options));
       });
     }
-    function sync(path2, options) {
-      return checkStat(fs4.statSync(path2), path2, options);
+    function sync(path3, options) {
+      return checkStat(fs4.statSync(path3), path3, options);
     }
   }
 });
@@ -16552,13 +16552,13 @@ var require_mode = __commonJS({
     module2.exports = isexe;
     isexe.sync = sync;
     var fs4 = require("fs");
-    function isexe(path2, options, cb) {
-      fs4.stat(path2, function(er, stat) {
+    function isexe(path3, options, cb) {
+      fs4.stat(path3, function(er, stat) {
         cb(er, er ? false : checkStat(stat, options));
       });
     }
-    function sync(path2, options) {
-      return checkStat(fs4.statSync(path2), options);
+    function sync(path3, options) {
+      return checkStat(fs4.statSync(path3), options);
     }
     function checkStat(stat, options) {
       return stat.isFile() && checkMode(stat, options);
@@ -16591,7 +16591,7 @@ var require_isexe = __commonJS({
     }
     module2.exports = isexe;
     isexe.sync = sync;
-    function isexe(path2, options, cb) {
+    function isexe(path3, options, cb) {
       if (typeof options === "function") {
         cb = options;
         options = {};
@@ -16601,7 +16601,7 @@ var require_isexe = __commonJS({
           throw new TypeError("callback not provided");
         }
         return new Promise(function(resolve2, reject) {
-          isexe(path2, options || {}, function(er, is) {
+          isexe(path3, options || {}, function(er, is) {
             if (er) {
               reject(er);
             } else {
@@ -16610,7 +16610,7 @@ var require_isexe = __commonJS({
           });
         });
       }
-      core(path2, options || {}, function(er, is) {
+      core(path3, options || {}, function(er, is) {
         if (er) {
           if (er.code === "EACCES" || options && options.ignoreErrors) {
             er = null;
@@ -16620,9 +16620,9 @@ var require_isexe = __commonJS({
         cb(er, is);
       });
     }
-    function sync(path2, options) {
+    function sync(path3, options) {
       try {
-        return core.sync(path2, options || {});
+        return core.sync(path3, options || {});
       } catch (er) {
         if (options && options.ignoreErrors || er.code === "EACCES") {
           return false;
@@ -16638,7 +16638,7 @@ var require_isexe = __commonJS({
 var require_which = __commonJS({
   "../../node_modules/which/which.js"(exports, module2) {
     var isWindows = process.platform === "win32" || process.env.OSTYPE === "cygwin" || process.env.OSTYPE === "msys";
-    var path2 = require("path");
+    var path3 = require("path");
     var COLON = isWindows ? ";" : ":";
     var isexe = require_isexe();
     var getNotFoundError = (cmd) => Object.assign(new Error(`not found: ${cmd}`), { code: "ENOENT" });
@@ -16676,7 +16676,7 @@ var require_which = __commonJS({
           return opt.all && found.length ? resolve2(found) : reject(getNotFoundError(cmd));
         const ppRaw = pathEnv[i];
         const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
-        const pCmd = path2.join(pathPart, cmd);
+        const pCmd = path3.join(pathPart, cmd);
         const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd : pCmd;
         resolve2(subStep(p, i, 0));
       });
@@ -16703,7 +16703,7 @@ var require_which = __commonJS({
       for (let i = 0; i < pathEnv.length; i++) {
         const ppRaw = pathEnv[i];
         const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
-        const pCmd = path2.join(pathPart, cmd);
+        const pCmd = path3.join(pathPart, cmd);
         const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd : pCmd;
         for (let j = 0; j < pathExt.length; j++) {
           const cur = p + pathExt[j];
@@ -16751,7 +16751,7 @@ var require_path_key = __commonJS({
 var require_resolveCommand = __commonJS({
   "../../node_modules/cross-spawn/lib/util/resolveCommand.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var which = require_which();
     var getPathKey = require_path_key();
     function resolveCommandAttempt(parsed, withoutPathExt) {
@@ -16769,7 +16769,7 @@ var require_resolveCommand = __commonJS({
       try {
         resolved = which.sync(parsed.command, {
           path: env[getPathKey({ env })],
-          pathExt: withoutPathExt ? path2.delimiter : void 0
+          pathExt: withoutPathExt ? path3.delimiter : void 0
         });
       } catch (e) {
       } finally {
@@ -16778,7 +16778,7 @@ var require_resolveCommand = __commonJS({
         }
       }
       if (resolved) {
-        resolved = path2.resolve(hasCustomCwd ? parsed.options.cwd : "", resolved);
+        resolved = path3.resolve(hasCustomCwd ? parsed.options.cwd : "", resolved);
       }
       return resolved;
     }
@@ -16832,8 +16832,8 @@ var require_shebang_command = __commonJS({
       if (!match) {
         return null;
       }
-      const [path2, argument] = match[0].replace(/#! ?/, "").split(" ");
-      const binary = path2.split("/").pop();
+      const [path3, argument] = match[0].replace(/#! ?/, "").split(" ");
+      const binary = path3.split("/").pop();
       if (binary === "env") {
         return argument;
       }
@@ -16868,7 +16868,7 @@ var require_readShebang = __commonJS({
 var require_parse3 = __commonJS({
   "../../node_modules/cross-spawn/lib/parse.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var resolveCommand = require_resolveCommand();
     var escape = require_escape();
     var readShebang = require_readShebang();
@@ -16893,7 +16893,7 @@ var require_parse3 = __commonJS({
       const needsShell = !isExecutableRegExp.test(commandFile);
       if (parsed.options.forceShell || needsShell) {
         const needsDoubleEscapeMetaChars = isCmdShimRegExp.test(commandFile);
-        parsed.command = path2.normalize(parsed.command);
+        parsed.command = path3.normalize(parsed.command);
         parsed.command = escape.command(parsed.command);
         parsed.args = parsed.args.map((arg) => escape.argument(arg, needsDoubleEscapeMetaChars));
         const shellCommand = [parsed.command].concat(parsed.args).join(" ");
@@ -17025,7 +17025,7 @@ var require_strip_final_newline = __commonJS({
 var require_npm_run_path = __commonJS({
   "../../node_modules/npm-run-path/index.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var pathKey = require_path_key();
     var npmRunPath = (options) => {
       options = {
@@ -17035,16 +17035,16 @@ var require_npm_run_path = __commonJS({
         ...options
       };
       let previous;
-      let cwdPath = path2.resolve(options.cwd);
+      let cwdPath = path3.resolve(options.cwd);
       const result = [];
       while (previous !== cwdPath) {
-        result.push(path2.join(cwdPath, "node_modules/.bin"));
+        result.push(path3.join(cwdPath, "node_modules/.bin"));
         previous = cwdPath;
-        cwdPath = path2.resolve(cwdPath, "..");
+        cwdPath = path3.resolve(cwdPath, "..");
       }
-      const execPathDir = path2.resolve(options.cwd, options.execPath, "..");
+      const execPathDir = path3.resolve(options.cwd, options.execPath, "..");
       result.push(execPathDir);
-      return result.concat(options.path).join(path2.delimiter);
+      return result.concat(options.path).join(path3.delimiter);
     };
     module2.exports = npmRunPath;
     module2.exports.default = npmRunPath;
@@ -17054,9 +17054,9 @@ var require_npm_run_path = __commonJS({
         ...options
       };
       const env = { ...options.env };
-      const path3 = pathKey({ env });
-      options.path = env[path3];
-      env[path3] = module2.exports(options);
+      const path4 = pathKey({ env });
+      options.path = env[path4];
+      env[path4] = module2.exports(options);
       return env;
     };
   }
@@ -18238,7 +18238,7 @@ var require_command2 = __commonJS({
 var require_execa = __commonJS({
   "../../node_modules/execa/index.js"(exports, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var childProcess = require("child_process");
     var crossSpawn = require_cross_spawn();
     var stripFinalNewline = require_strip_final_newline();
@@ -18280,7 +18280,7 @@ var require_execa = __commonJS({
       };
       options.env = getEnv(options);
       options.stdio = normalizeStdio(options);
-      if (process.platform === "win32" && path2.basename(file, ".exe") === "cmd") {
+      if (process.platform === "win32" && path3.basename(file, ".exe") === "cmd") {
         args.unshift("/q");
       }
       return { file, args, options, parsed };
@@ -19600,7 +19600,7 @@ var require_utils5 = __commonJS({
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getLastCommitMessage = exports.verifyConditions = exports.loadPlugins = exports.dryRunTask = exports.buildContext = void 0;
     var fs4 = __importStar(require("fs"));
-    var path2 = __importStar(require("path"));
+    var path3 = __importStar(require("path"));
     var exec3 = __importStar(require_exec());
     var cosmiconfig_1 = require_dist2();
     var doc_1 = require_doc();
@@ -19672,7 +19672,7 @@ var require_utils5 = __commonJS({
           if (pluginName.startsWith("@octorelease/") && !fs4.existsSync(pluginPath)) {
             pluginPath = pluginName.replace("@octorelease", __dirname);
           }
-          pluginsLoaded[pluginName] = require(path2.resolve(pluginPath));
+          pluginsLoaded[pluginName] = require(path3.resolve(pluginPath));
         }
         return pluginsLoaded;
       });
@@ -19817,7 +19817,7 @@ function init_default(context, config) {
 
 // src/publish.ts
 var fs3 = __toESM(require("fs"));
-var path = __toESM(require("path"));
+var path2 = __toESM(require("path"));
 
 // src/utils.ts
 var utils_exports = {};
@@ -19829,6 +19829,7 @@ __export(utils_exports, {
   vscePublish: () => vscePublish
 });
 var fs2 = __toESM(require("fs"));
+var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_core = __toESM(require_lib5());
 function ovsxInfo(extensionName) {
@@ -19842,7 +19843,7 @@ function ovsxPublish(context, vsixPath) {
     const cmdArgs = ["ovsx", "publish"];
     if (vsixPath != null) {
       cmdArgs.push("--packagePath", vsixPath);
-    } else if (fs2.existsSync("yarn.lock")) {
+    } else if (fs2.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
@@ -19856,11 +19857,11 @@ function vsceInfo(extensionName) {
     return JSON.parse(cmdOutput.stdout);
   });
 }
-function vscePackage() {
+function vscePackage(context) {
   return __async(this, null, function* () {
     var _a;
     const cmdArgs = ["vsce", "package"];
-    if (fs2.existsSync("yarn.lock")) {
+    if (fs2.existsSync(path.join((context == null ? void 0 : context.rootDir) || "", "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
     const cmdOutput = yield exec.getExecOutput("npx", cmdArgs);
@@ -19872,7 +19873,7 @@ function vscePublish(context, vsixPath) {
     const cmdArgs = ["vsce", "publish"];
     if (vsixPath != null) {
       cmdArgs.push("--packagePath", vsixPath);
-    } else if (fs2.existsSync("yarn.lock")) {
+    } else if (fs2.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
@@ -19888,8 +19889,8 @@ function publish_default(context, config) {
     const extensionName = `${packageJson.publisher}.${packageJson.name}`;
     let vsixPath;
     if (config.vsixDir != null) {
-      const tempVsixPath = yield vscePackage();
-      vsixPath = path.resolve(config.vsixDir, path.basename(tempVsixPath));
+      const tempVsixPath = yield vscePackage(context);
+      vsixPath = path2.resolve(config.vsixDir, path2.basename(tempVsixPath));
       fs3.mkdirSync(config.vsixDir, { recursive: true });
       fs3.renameSync(tempVsixPath, vsixPath);
     }

@@ -15,6 +15,7 @@
  */
 
 import * as fs from "fs";
+import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
@@ -27,7 +28,7 @@ export async function ovsxPublish(context: IContext, vsixPath?: string): Promise
     const cmdArgs = ["ovsx", "publish"];
     if (vsixPath != null) {
         cmdArgs.push("--packagePath", vsixPath);
-    } else if (fs.existsSync("yarn.lock")) {
+    } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
     await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {
@@ -40,9 +41,9 @@ export async function vsceInfo(extensionName: string): Promise<any> {
     return JSON.parse(cmdOutput.stdout);
 }
 
-export async function vscePackage(): Promise<string> {
+export async function vscePackage(context?: IContext): Promise<string> {
     const cmdArgs = ["vsce", "package"];
-    if (fs.existsSync("yarn.lock")) {
+    if (fs.existsSync(path.join(context?.rootDir || "", "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
     const cmdOutput = await exec.getExecOutput("npx", cmdArgs);
@@ -53,7 +54,7 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
     const cmdArgs = ["vsce", "publish"];
     if (vsixPath != null) {
         cmdArgs.push("--packagePath", vsixPath);
-    } else if (fs.existsSync("yarn.lock")) {
+    } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
     await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {

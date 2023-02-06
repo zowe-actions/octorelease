@@ -26,7 +26,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     let vsixPath: string | undefined;
 
     if (config.vsixDir != null) {
-        const tempVsixPath = await utils.vscePackage();
+        const tempVsixPath = await utils.vscePackage(context);
         vsixPath = path.resolve(config.vsixDir, path.basename(tempVsixPath));
         fs.mkdirSync(config.vsixDir, { recursive: true });
         fs.renameSync(tempVsixPath, vsixPath);
