@@ -20318,7 +20318,7 @@ function publish_default(context, config, inDir) {
     if (config.tarballDir != null) {
       const tgzFile = yield npmPack(inDir);
       fs3.mkdirSync(config.tarballDir, { recursive: true });
-      fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(config.tarballDir, tgzFile));
+      fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
     }
     if (config.npmPublish === false) {
       return;

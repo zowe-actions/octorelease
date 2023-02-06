@@ -35,7 +35,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     if (config.tarballDir != null) {
         const tgzFile = await utils.npmPack(inDir);
         fs.mkdirSync(config.tarballDir, { recursive: true });
-        fs.renameSync(path.join(cwd, tgzFile), path.resolve(config.tarballDir, tgzFile));
+        fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.rootDir, config.tarballDir, tgzFile));
     }
 
     if (config.npmPublish === false) {

@@ -19890,7 +19890,7 @@ function publish_default(context, config) {
     let vsixPath;
     if (config.vsixDir != null) {
       const tempVsixPath = yield vscePackage(context);
-      vsixPath = path2.resolve(config.vsixDir, path2.basename(tempVsixPath));
+      vsixPath = path2.resolve(context.rootDir, config.vsixDir, path2.basename(tempVsixPath));
       fs3.mkdirSync(config.vsixDir, { recursive: true });
       fs3.renameSync(tempVsixPath, vsixPath);
     }
