@@ -26,8 +26,11 @@
     "@actions/github": "^5.0.3",
     "@octorelease/core": "^0.1.8",
     "@octorelease/git": "^0.1.0",
+    "@octorelease/lerna": "^0.1.0",
+    "@octorelease/npm": "^0.1.0",
     "java-properties": "^1.0.2",
     "pluralize": "^8.0.0",
+    "semver": "^6.3.0",
     "unzip-stream": "^0.3.1"
   }
 }

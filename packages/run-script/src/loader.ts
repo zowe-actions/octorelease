@@ -18,6 +18,7 @@ import { IContext } from "@octorelease/core";
 
 const SCRIPTS: { [key: string]: any } = {
     npmUpdate: require("../scripts/npmUpdate"),
+    prepareRelease: require("../scripts/prepareRelease"),
     sonarConfig: require("../scripts/sonarConfig")
 };
 
