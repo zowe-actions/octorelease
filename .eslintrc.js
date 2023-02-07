@@ -10,6 +10,7 @@ module.exports = {
     ],
     "ignorePatterns": [
         "**/*.js",
+        "**/*.mjs",
         "**/*.d.ts"
     ],
     "parser": "@typescript-eslint/parser",

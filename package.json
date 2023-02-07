@@ -3,11 +3,11 @@
   "private": true,
   "description": "Extensible GitHub action to publish semantic releases.",
   "main": "index.js",
-  "bin": "dist/index.js",
+  "bin": "dist/index.mjs",
   "scripts": {
     "build": "tsc -b --force",
     "lint": "eslint packages/**/*.ts",
-    "pack": "npm run pack --workspaces",
+    "pack": "node esbuild.mjs",
     "test": "jest",
     "typedoc": "typedoc --plugin typedoc-plugin-markdown --out docs/typedoc packages/core/src/index.ts",
     "watch": "tsc -w",

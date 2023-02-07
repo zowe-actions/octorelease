@@ -1,58 +1,12 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
+import { createRequire } from 'module'; const require = createRequire(import.meta.url);
+import {
+  __commonJS,
+  __require
+} from "./chunk-R3TGK222.mjs";
 
-// ../../node_modules/@actions/io/lib/io-util.js
+// node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
-  "../../node_modules/@actions/io/lib/io-util.js"(exports) {
+  "node_modules/@actions/io/lib/io-util.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -112,9 +66,9 @@ var require_io_util = __commonJS({
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-    var fs2 = __importStar(require("fs"));
-    var path2 = __importStar(require("path"));
-    _a = fs2.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+    var fs = __importStar(__require("fs"));
+    var path = __importStar(__require("path"));
+    _a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
     exports.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -160,7 +114,7 @@ var require_io_util = __commonJS({
         }
         if (stats && stats.isFile()) {
           if (exports.IS_WINDOWS) {
-            const upperExt = path2.extname(filePath).toUpperCase();
+            const upperExt = path.extname(filePath).toUpperCase();
             if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
               return filePath;
             }
@@ -184,11 +138,11 @@ var require_io_util = __commonJS({
           if (stats && stats.isFile()) {
             if (exports.IS_WINDOWS) {
               try {
-                const directory = path2.dirname(filePath);
-                const upperName = path2.basename(filePath).toUpperCase();
+                const directory = path.dirname(filePath);
+                const upperName = path.basename(filePath).toUpperCase();
                 for (const actualName of yield exports.readdir(directory)) {
                   if (upperName === actualName.toUpperCase()) {
-                    filePath = path2.join(directory, actualName);
+                    filePath = path.join(directory, actualName);
                     break;
                   }
                 }
@@ -226,9 +180,9 @@ var require_io_util = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/io/lib/io.js
+// node_modules/@actions/io/lib/io.js
 var require_io = __commonJS({
-  "../../node_modules/@actions/io/lib/io.js"(exports) {
+  "node_modules/@actions/io/lib/io.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -287,12 +241,12 @@ var require_io = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
-    var assert_1 = require("assert");
-    var childProcess = __importStar(require("child_process"));
-    var path2 = __importStar(require("path"));
-    var util_1 = require("util");
+    var assert_1 = __require("assert");
+    var childProcess = __importStar(__require("child_process"));
+    var path = __importStar(__require("path"));
+    var util_1 = __require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec3 = util_1.promisify(childProcess.exec);
+    var exec = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -301,7 +255,7 @@ var require_io = __commonJS({
         if (destStat && destStat.isFile() && !force) {
           return;
         }
-        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path2.join(dest, path2.basename(source)) : dest;
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path.join(dest, path.basename(source)) : dest;
         if (!(yield ioUtil.exists(source))) {
           throw new Error(`no such file or directory: ${source}`);
         }
@@ -313,7 +267,7 @@ var require_io = __commonJS({
             yield cpDirRecursive(source, newDest, 0, force);
           }
         } else {
-          if (path2.relative(source, newDest) === "") {
+          if (path.relative(source, newDest) === "") {
             throw new Error(`'${newDest}' and '${source}' are the same file`);
           }
           yield copyFile(source, newDest, force);
@@ -326,7 +280,7 @@ var require_io = __commonJS({
         if (yield ioUtil.exists(dest)) {
           let destExists = true;
           if (yield ioUtil.isDirectory(dest)) {
-            dest = path2.join(dest, path2.basename(source));
+            dest = path.join(dest, path.basename(source));
             destExists = yield ioUtil.exists(dest);
           }
           if (destExists) {
@@ -337,7 +291,7 @@ var require_io = __commonJS({
             }
           }
         }
-        yield mkdirP(path2.dirname(dest));
+        yield mkdirP(path.dirname(dest));
         yield ioUtil.rename(source, dest);
       });
     }
@@ -351,11 +305,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath }
               });
             } else {
-              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath }
               });
             }
@@ -425,7 +379,7 @@ var require_io = __commonJS({
         }
         const extensions = [];
         if (ioUtil.IS_WINDOWS && process.env["PATHEXT"]) {
-          for (const extension of process.env["PATHEXT"].split(path2.delimiter)) {
+          for (const extension of process.env["PATHEXT"].split(path.delimiter)) {
             if (extension) {
               extensions.push(extension);
             }
@@ -438,12 +392,12 @@ var require_io = __commonJS({
           }
           return [];
         }
-        if (tool.includes(path2.sep)) {
+        if (tool.includes(path.sep)) {
           return [];
         }
         const directories = [];
         if (process.env.PATH) {
-          for (const p of process.env.PATH.split(path2.delimiter)) {
+          for (const p of process.env.PATH.split(path.delimiter)) {
             if (p) {
               directories.push(p);
             }
@@ -451,7 +405,7 @@ var require_io = __commonJS({
         }
         const matches = [];
         for (const directory of directories) {
-          const filePath = yield ioUtil.tryGetExecutablePath(path2.join(directory, tool), extensions);
+          const filePath = yield ioUtil.tryGetExecutablePath(path.join(directory, tool), extensions);
           if (filePath) {
             matches.push(filePath);
           }
@@ -508,9 +462,9 @@ var require_io = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/exec/lib/toolrunner.js
+// node_modules/@actions/exec/lib/toolrunner.js
 var require_toolrunner = __commonJS({
-  "../../node_modules/@actions/exec/lib/toolrunner.js"(exports) {
+  "node_modules/@actions/exec/lib/toolrunner.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -569,13 +523,13 @@ var require_toolrunner = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.argStringToArray = exports.ToolRunner = void 0;
-    var os2 = __importStar(require("os"));
-    var events = __importStar(require("events"));
-    var child = __importStar(require("child_process"));
-    var path2 = __importStar(require("path"));
+    var os = __importStar(__require("os"));
+    var events = __importStar(__require("events"));
+    var child = __importStar(__require("child_process"));
+    var path = __importStar(__require("path"));
     var io = __importStar(require_io());
     var ioUtil = __importStar(require_io_util());
-    var timers_1 = require("timers");
+    var timers_1 = __require("timers");
     var IS_WINDOWS = process.platform === "win32";
     var ToolRunner = class extends events.EventEmitter {
       constructor(toolPath, args, options) {
@@ -624,12 +578,12 @@ var require_toolrunner = __commonJS({
       _processLineBuffer(data, strBuffer, onLine) {
         try {
           let s = strBuffer + data.toString();
-          let n = s.indexOf(os2.EOL);
+          let n = s.indexOf(os.EOL);
           while (n > -1) {
             const line = s.substring(0, n);
             onLine(line);
-            s = s.substring(n + os2.EOL.length);
-            n = s.indexOf(os2.EOL);
+            s = s.substring(n + os.EOL.length);
+            n = s.indexOf(os.EOL);
           }
           return s;
         } catch (err) {
@@ -787,7 +741,7 @@ var require_toolrunner = __commonJS({
       exec() {
         return __awaiter(this, void 0, void 0, function* () {
           if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) {
-            this.toolPath = path2.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
+            this.toolPath = path.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
           }
           this.toolPath = yield io.which(this.toolPath, true);
           return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
@@ -798,7 +752,7 @@ var require_toolrunner = __commonJS({
             }
             const optionsNonNull = this._cloneExecOptions(this.options);
             if (!optionsNonNull.silent && optionsNonNull.outStream) {
-              optionsNonNull.outStream.write(this._getCommandString(optionsNonNull) + os2.EOL);
+              optionsNonNull.outStream.write(this._getCommandString(optionsNonNull) + os.EOL);
             }
             const state = new ExecState(optionsNonNull, this.toolPath);
             state.on("debug", (message) => {
@@ -997,9 +951,9 @@ var require_toolrunner = __commonJS({
   }
 });
 
-// ../../node_modules/@actions/exec/lib/exec.js
+// node_modules/@actions/exec/lib/exec.js
 var require_exec = __commonJS({
-  "../../node_modules/@actions/exec/lib/exec.js"(exports) {
+  "node_modules/@actions/exec/lib/exec.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -1058,9 +1012,9 @@ var require_exec = __commonJS({
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getExecOutput = exports.exec = void 0;
-    var string_decoder_1 = require("string_decoder");
+    var string_decoder_1 = __require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec3(commandLine, args, options) {
+    function exec(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -1072,8 +1026,8 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec3;
-    function getExecOutput2(commandLine, args, options) {
+    exports.exec = exec;
+    function getExecOutput(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -1095,7 +1049,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -1105,143 +1059,10 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput2;
+    exports.getExecOutput = getExecOutput;
   }
 });
 
-// src/index.ts
-var src_exports = {};
-__export(src_exports, {
-  init: () => init_default,
-  utils: () => utils_exports,
-  version: () => version_default
-});
-module.exports = __toCommonJS(src_exports);
-
-// src/utils.ts
-var utils_exports = {};
-__export(utils_exports, {
-  gitAdd: () => gitAdd,
-  gitCommit: () => gitCommit,
-  gitConfig: () => gitConfig,
-  gitPush: () => gitPush,
-  gitTag: () => gitTag
-});
-var fs = __toESM(require("fs"));
-var os = __toESM(require("os"));
-var path = __toESM(require("path"));
-var url = __toESM(require("url"));
-var exec = __toESM(require_exec());
-function gitAdd(...files) {
-  return __async(this, null, function* () {
-    yield exec.exec("git", ["add", ...files]);
-  });
-}
-function gitCommit(message, amend) {
-  return __async(this, null, function* () {
-    if (!amend) {
-      const cmdOutput = yield exec.getExecOutput("git", ["diff", "--name-only", "--cached"]);
-      if (cmdOutput.stdout.trim().length == 0) {
-        return false;
-      }
-    }
-    const cmdArgs = ["commit", "-s", "-m", message.includes("[ci skip]") ? message : `${message} [ci skip]`];
-    if (amend) {
-      cmdArgs.push("--amend");
-    }
-    yield exec.exec("git", cmdArgs);
-    return true;
-  });
-}
-function gitConfig(context) {
-  return __async(this, null, function* () {
-    yield exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
-    yield exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
-    if (context.env.GIT_CREDENTIALS != null) {
-      yield exec.exec("git", ["config", "--global", "credential.helper", "store"]);
-      const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
-      const gitUrl = new url.URL(cmdOutput.stdout);
-      fs.appendFileSync(
-        path.join(os.homedir(), ".git-credentials"),
-        `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`
-      );
-    }
-    yield exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);
-  });
-}
-function gitPush(context, branch, tags) {
-  return __async(this, null, function* () {
-    if (!tags) {
-      const cmdOutput = yield exec.getExecOutput("git", ["cherry"]);
-      if (cmdOutput.stdout.trim().length == 0) {
-        return false;
-      }
-    }
-    const cmdArgs = ["push", "-u", "origin", branch];
-    if (tags) {
-      cmdArgs.push("--follow-tags");
-    }
-    if (context.dryRun) {
-      cmdArgs.push("--dry-run");
-    }
-    yield exec.exec("git", cmdArgs);
-    return true;
-  });
-}
-function gitTag(tagName, message) {
-  return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("git", ["tag", "-l", tagName]);
-    if (cmdOutput.stdout.trim().length > 0) {
-      return false;
-    }
-    const cmdArgs = ["tag", tagName];
-    if (message != null) {
-      cmdArgs.push("-a", "-m", message);
-    }
-    yield exec.exec("git", cmdArgs);
-    return true;
-  });
-}
-
-// src/init.ts
-function init_default(context, _config) {
-  return __async(this, null, function* () {
-    if (context.env.GIT_COMMITTER_NAME == null) {
-      throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
-    }
-    if (context.env.GIT_COMMITTER_EMAIL == null) {
-      throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
-    }
-    yield gitConfig(context);
-  });
-}
-
-// src/version.ts
-function version_default(context, config) {
-  return __async(this, null, function* () {
-    const commitMessage = config.commitMessage || "Bump version to {{version}}";
-    let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
-    yield gitAdd(...new Set(context.changedFiles));
-    let shouldPush = false;
-    if (yield gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
-      shouldPush = true;
-    } else {
-      context.logger.warn("Nothing to commit");
-    }
-    tagMessage = tagMessage == null ? void 0 : tagMessage.replace("{{version}}", context.version.new);
-    if (yield gitTag(context.tagPrefix + context.version.new, tagMessage)) {
-      shouldPush = true;
-    } else {
-      context.logger.warn("Git tag already exists");
-    }
-    if (!shouldPush || !(yield gitPush(context, context.branch.name, true))) {
-      context.logger.warn("Nothing to push");
-    }
-  });
-}
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  init,
-  utils,
-  version
-});
+export {
+  require_exec
+};

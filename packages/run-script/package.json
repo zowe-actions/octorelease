@@ -10,7 +10,6 @@
   "scripts": {
     "build": "tsc -b && npm run lint",
     "lint": "eslint src",
-    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/run-script.js --platform=node",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w"
   },

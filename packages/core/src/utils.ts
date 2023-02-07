@@ -107,7 +107,12 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
         if (pluginName.startsWith("@octorelease/") && !fs.existsSync(pluginPath)) {
             pluginPath = pluginName.replace("@octorelease", __dirname);
         }
-        pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
+        pluginPath = path.resolve(pluginPath);
+        if (pluginPath.endsWith(".mjs")) {
+            pluginsLoaded[pluginName] = await import(path.resolve(pluginPath));
+        } else {
+            pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
+        }
     }
     return pluginsLoaded;
 }
