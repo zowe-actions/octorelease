@@ -19906,7 +19906,7 @@ var require_utils6 = __commonJS({
             return false;
           }
         }
-        const cmdArgs = ["commit", "-s", "-m", `${message} [ci skip]`];
+        const cmdArgs = ["commit", "-s", "-m", message.includes("[ci skip]") ? message : `${message} [ci skip]`];
         if (amend) {
           cmdArgs.push("--amend");
         }
@@ -23335,7 +23335,7 @@ function prepareRelease_default(context3) {
       yield (0, import_npm.version)(context3, {});
     }
     yield import_git2.utils.gitAdd(...context3.changedFiles);
-    yield import_git2.utils.gitCommit(`Bump version to ${context3.version.new} [ci skip]`);
+    yield import_git2.utils.gitCommit(`Bump version to ${context3.version.new}`);
     yield import_git2.utils.gitPush(context3, context3.branch.name);
   });
 }

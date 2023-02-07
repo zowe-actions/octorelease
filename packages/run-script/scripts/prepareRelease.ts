@@ -32,6 +32,6 @@ export default async function (context: IContext): Promise<void> {
     }
 
     await gitUtils.gitAdd(...context.changedFiles);
-    await gitUtils.gitCommit(`Bump version to ${context.version.new} [ci skip]`);
+    await gitUtils.gitCommit(`Bump version to ${context.version.new}`);
     await gitUtils.gitPush(context, context.branch.name);
 }
