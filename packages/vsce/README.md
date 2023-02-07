@@ -1,22 +1,20 @@
-# NPM plugin
+# VSCE plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to NPM.
+[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to VS Code extensions.
 
 [![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
-[![npm latest version](https://img.shields.io/npm/v/@octorelease/npm/latest.svg)](https://www.npmjs.com/package/@octorelease/npm)
-<!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/npm/next.svg)](https://www.npmjs.com/package/@octorelease/npm) -->
+[![npm latest version](https://img.shields.io/npm/v/@octorelease/vsce/latest.svg)](https://www.npmjs.com/package/@octorelease/vsce)
+<!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/vsce/next.svg)](https://www.npmjs.com/package/@octorelease/vsce) -->
 
 | Step | Description |
 |------|-------------|
-| `init` | Load version numbers from package.json and login to NPM registry. |
-| `version` | Bump the package version with npm CLI. |
-| `publish` | Publish the new package version to NPM registry. |
-| `success` | Verify that new package version can be installed successfully. |
+| `init` | Verify personal access tokens to publish to VSIX registry. |
+| `publish` | Publish the new extension to VS Code marketplace and/or OVSX registry. |
 
 ## Install
 
 ```bash
-$ npm install @octorelease/npm -D
+$ npm install @octorelease/vsce -D
 ```
 
 ## Usage
@@ -26,7 +24,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 ```json
 {
   "plugins": [
-    "@octorelease/npm"
+    "@octorelease/vsce"
   ]
 }
 ```
@@ -37,51 +35,44 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 | Variable | Description |
 | -------- | ----------- |
-| `NPM_TOKEN` | Access token of the NPM publisher. |
-| `NPM_USERNAME` | User name of the NPM publisher. |
-| `NPM_PASSWORD` | Password of the NPM publisher. |
-| `NPM_EMAIL` | Email address of the NPM publisher. |
-
-Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD`, and `NPM_EMAIL` for legacy authentication.
+| `OVSX_TOKEN` | Personal access token for the OVSX registry. |
+| `VSCE_TOKEN` | Personal access token for the VS Code marketplace. |
 
 ### Options
 
 | Options | Description | Default |
 | ------- | ----------- | ------- |
-| `aliasTags` | Key-value pairs of package tags that should be mirrored (see example below). | `{}` |
-| `npmPublish` | Specify false to skip publishing to the NPM registry. | `true` |
-| `pruneShrinkwrap` | Specify true to prune dev and extraneous dependencies from npm-shrinkwrap.json. | `false` |
-| `smokeTest` | Specify true to test installing the package from the NPM registry after it is published. | `false` |
-| `tarballDir` | Path to directory where package tarball (TGZ) should be generated, or `false` to skip creating a tarball. | `false` |
+| `ovsxPublish` | Specify true to publish to the OVSX registry. | `false` |
+| `vscePublish` | Specify false to skip publishing to the VS Code marketplace. | `true` |
+| `vsixDir` | Path to directory where extension bundle (VSIX) should be generated, or `false` to skip creating a VSIX. | `false` |
 
 ### Examples
 
-To mirror the `@latest` tag to `@lts`:
+To publish extension VSIX to both VS Code marketplace and OVSX registry:
 
 ```json
 {
   "plugins": [
-    ["@octorelease/npm", {
-      "aliasTags": {
-        "latest": "lts"
-      }
+    ["@octorelease/vsce", {
+      "ovsxPublish": true,
+      "vscePublish": true
     }]
   ]
 }
 ```
 
 ---
-To skip publishing to the NPM registry and release the package tarball with another plugin like [@octorelease/github](https://github.com/octorelease/octorelease/tree/master/packages/github):
+To skip publishing to any registry and release the extension VSIX with another plugin like [@octorelease/github](https://github.com/octorelease/octorelease/tree/master/packages/github):
 
 ```json
 {
   "plugins": [
-    ["@octorelease/npm", {
-      "npmPublish": false,
-      "tarballDir": "dist"
+    ["@octorelease/vsce", {
+      "vscePublish": false,
+      "vsixDir": "dist"
     }],
     ["@octorelease/github", {
-      "assets": "dist/*.tgz"
+      "assets": "dist/*.vsix"
     }]
   ]
 }

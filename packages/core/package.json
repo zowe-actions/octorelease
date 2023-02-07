@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/core",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "Octorelease core package containing the CLI and APIs for plugins.",
   "main": "lib/index.js",
   "bin": {
@@ -45,9 +45,9 @@
     "semver": "^6.3.0"
   },
   "optionalDependencies": {
-    "@octorelease/changelog": "^0.1.0",
-    "@octorelease/git": "^0.1.0",
-    "@octorelease/github": "^0.1.0",
-    "@octorelease/npm": "^0.1.0"
+    "@octorelease/changelog": "^0.2.0",
+    "@octorelease/git": "^0.2.0",
+    "@octorelease/github": "^0.2.0",
+    "@octorelease/npm": "^0.2.0"
   }
 }

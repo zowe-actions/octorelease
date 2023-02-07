@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/github",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Octorelease plugin to perform actions related to GitHub.",
   "main": "lib/index.js",
   "files": [
@@ -36,6 +36,6 @@
   },
   "peerDependencies": {
     "@octokit/request-error": "^2.1.0",
-    "@octorelease/core": "^0.1.0"
+    "@octorelease/core": "^0.2.0"
   }
 }
