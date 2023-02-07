@@ -66,7 +66,8 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
 
     if (fs.existsSync(changelogFile)) {
         const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
-        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine));
+        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine) ||
+            line.startsWith(`## \`${context.version.new}\``));
 
         if (lineNum !== -1) {
             while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {
