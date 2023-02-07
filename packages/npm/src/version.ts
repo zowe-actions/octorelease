@@ -21,9 +21,14 @@ import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
+    if (context.workspaces != null) {
+        context.logger.warn("Cannot run npm version in workspaces");
+        return;
+    }
+
     await utils.npmVersion(context.version.new);
     context.changedFiles.push("package.json");
-    const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
+    const lockfilePath = await findUp(["npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
         context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
     } else {

@@ -3675,16 +3675,15 @@ var require_stages = __commonJS({
     }
     exports.version = version2;
     function runStage(context, pluginsLoaded, stage) {
-      var _a;
       return __awaiter(this, void 0, void 0, function* () {
         if (shouldSkipStage(stage)) {
           return;
         }
         for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
+          if (pluginModule[stage.name] == null) {
+            continue;
+          }
           for (const pluginConfig of context.plugins[pluginName] || []) {
-            if (pluginModule[stage.name] == null || ((_a = pluginConfig.$skip) === null || _a === void 0 ? void 0 : _a.includes(stage.name))) {
-              continue;
-            }
             context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
             context.logger.pluginName = pluginName;
@@ -20769,9 +20768,13 @@ var require_version = __commonJS({
     var utils = __importStar(require_utils6());
     function default_1(context, _config) {
       return __awaiter(this, void 0, void 0, function* () {
+        if (context.workspaces != null) {
+          context.logger.warn("Cannot run npm version in workspaces");
+          return;
+        }
         yield utils.npmVersion(context.version.new);
         context.changedFiles.push("package.json");
-        const lockfilePath = yield (0, find_up_1.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
+        const lockfilePath = yield (0, find_up_1.default)(["npm-shrinkwrap.json", "package-lock.json"]);
         if (lockfilePath != null) {
           context.changedFiles.push(path2.relative(context.rootDir, lockfilePath));
         } else {

@@ -85,11 +85,11 @@ async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage:
     }
 
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-        for (const pluginConfig of (context.plugins[pluginName] || [])) {
-            if (pluginModule[stage.name] == null || pluginConfig.$skip?.includes(stage.name)) {
-                continue;
-            }
+        if (pluginModule[stage.name] == null) {
+            continue;
+        }
 
+        for (const pluginConfig of (context.plugins[pluginName] || [])) {
             context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
             context.logger.pluginName = pluginName;
