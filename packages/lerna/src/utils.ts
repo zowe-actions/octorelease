@@ -18,17 +18,15 @@ import * as fs from "fs";
 import * as exec from "@actions/exec";
 
 export async function lernaList(onlyChanged?: boolean): Promise<Record<string, any>[]> {
-    let cmdOutput = await exec.getExecOutput("npx", ["lerna", "list", "--json", "--toposort"]);
-    const packageInfo = JSON.parse(cmdOutput.stdout);
-
+    const cmdArgs = ["lerna"];
     if (onlyChanged) {
-        cmdOutput = await exec.getExecOutput("npx", ["lerna", "changed", "--include-merged-tags"],
-            { ignoreReturnCode: true });
-        const changedPackages = cmdOutput.stdout.split(/\r?\n/);
-        return packageInfo.filter((pkg: any) => changedPackages.includes(pkg.name));
+        cmdArgs.push("changed", "--include-merged-tags");
+    } else {
+        cmdArgs.push("list");
     }
-
-    return packageInfo;
+    cmdArgs.push("--all", "--json", "--toposort");
+    const cmdOutput = await exec.getExecOutput("npx", cmdArgs, { ignoreReturnCode: onlyChanged });
+    return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
 }
 
 export async function lernaVersion(newVersion: string): Promise<void> {

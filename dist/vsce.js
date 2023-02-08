@@ -1,12 +1,58 @@
-import { createRequire } from 'module'; const require = createRequire(import.meta.url);
-import {
-  __commonJS,
-  __require
-} from "./chunk-R3TGK222.mjs";
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve2, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve2(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 
-// node_modules/@actions/io/lib/io-util.js
+// ../../node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
-  "node_modules/@actions/io/lib/io-util.js"(exports) {
+  "../../node_modules/@actions/io/lib/io-util.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -38,11 +84,11 @@ var require_io_util = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -58,7 +104,7 @@ var require_io_util = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
@@ -66,9 +112,9 @@ var require_io_util = __commonJS({
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
-    var fs = __importStar(__require("fs"));
-    var path = __importStar(__require("path"));
-    _a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+    var fs4 = __importStar(require("fs"));
+    var path3 = __importStar(require("path"));
+    _a = fs4.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
     exports.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -114,7 +160,7 @@ var require_io_util = __commonJS({
         }
         if (stats && stats.isFile()) {
           if (exports.IS_WINDOWS) {
-            const upperExt = path.extname(filePath).toUpperCase();
+            const upperExt = path3.extname(filePath).toUpperCase();
             if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
               return filePath;
             }
@@ -138,11 +184,11 @@ var require_io_util = __commonJS({
           if (stats && stats.isFile()) {
             if (exports.IS_WINDOWS) {
               try {
-                const directory = path.dirname(filePath);
-                const upperName = path.basename(filePath).toUpperCase();
+                const directory = path3.dirname(filePath);
+                const upperName = path3.basename(filePath).toUpperCase();
                 for (const actualName of yield exports.readdir(directory)) {
                   if (upperName === actualName.toUpperCase()) {
-                    filePath = path.join(directory, actualName);
+                    filePath = path3.join(directory, actualName);
                     break;
                   }
                 }
@@ -180,9 +226,9 @@ var require_io_util = __commonJS({
   }
 });
 
-// node_modules/@actions/io/lib/io.js
+// ../../node_modules/@actions/io/lib/io.js
 var require_io = __commonJS({
-  "node_modules/@actions/io/lib/io.js"(exports) {
+  "../../node_modules/@actions/io/lib/io.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -214,11 +260,11 @@ var require_io = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -234,19 +280,19 @@ var require_io = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
-    var assert_1 = __require("assert");
-    var childProcess = __importStar(__require("child_process"));
-    var path = __importStar(__require("path"));
-    var util_1 = __require("util");
+    var assert_1 = require("assert");
+    var childProcess = __importStar(require("child_process"));
+    var path3 = __importStar(require("path"));
+    var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec = util_1.promisify(childProcess.exec);
+    var exec3 = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -255,7 +301,7 @@ var require_io = __commonJS({
         if (destStat && destStat.isFile() && !force) {
           return;
         }
-        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path.join(dest, path.basename(source)) : dest;
+        const newDest = destStat && destStat.isDirectory() && copySourceDirectory ? path3.join(dest, path3.basename(source)) : dest;
         if (!(yield ioUtil.exists(source))) {
           throw new Error(`no such file or directory: ${source}`);
         }
@@ -267,7 +313,7 @@ var require_io = __commonJS({
             yield cpDirRecursive(source, newDest, 0, force);
           }
         } else {
-          if (path.relative(source, newDest) === "") {
+          if (path3.relative(source, newDest) === "") {
             throw new Error(`'${newDest}' and '${source}' are the same file`);
           }
           yield copyFile(source, newDest, force);
@@ -280,7 +326,7 @@ var require_io = __commonJS({
         if (yield ioUtil.exists(dest)) {
           let destExists = true;
           if (yield ioUtil.isDirectory(dest)) {
-            dest = path.join(dest, path.basename(source));
+            dest = path3.join(dest, path3.basename(source));
             destExists = yield ioUtil.exists(dest);
           }
           if (destExists) {
@@ -291,7 +337,7 @@ var require_io = __commonJS({
             }
           }
         }
-        yield mkdirP(path.dirname(dest));
+        yield mkdirP(path3.dirname(dest));
         yield ioUtil.rename(source, dest);
       });
     }
@@ -305,11 +351,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath }
               });
             } else {
-              yield exec(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath }
               });
             }
@@ -379,7 +425,7 @@ var require_io = __commonJS({
         }
         const extensions = [];
         if (ioUtil.IS_WINDOWS && process.env["PATHEXT"]) {
-          for (const extension of process.env["PATHEXT"].split(path.delimiter)) {
+          for (const extension of process.env["PATHEXT"].split(path3.delimiter)) {
             if (extension) {
               extensions.push(extension);
             }
@@ -392,12 +438,12 @@ var require_io = __commonJS({
           }
           return [];
         }
-        if (tool.includes(path.sep)) {
+        if (tool.includes(path3.sep)) {
           return [];
         }
         const directories = [];
         if (process.env.PATH) {
-          for (const p of process.env.PATH.split(path.delimiter)) {
+          for (const p of process.env.PATH.split(path3.delimiter)) {
             if (p) {
               directories.push(p);
             }
@@ -405,7 +451,7 @@ var require_io = __commonJS({
         }
         const matches = [];
         for (const directory of directories) {
-          const filePath = yield ioUtil.tryGetExecutablePath(path.join(directory, tool), extensions);
+          const filePath = yield ioUtil.tryGetExecutablePath(path3.join(directory, tool), extensions);
           if (filePath) {
             matches.push(filePath);
           }
@@ -462,9 +508,9 @@ var require_io = __commonJS({
   }
 });
 
-// node_modules/@actions/exec/lib/toolrunner.js
+// ../../node_modules/@actions/exec/lib/toolrunner.js
 var require_toolrunner = __commonJS({
-  "node_modules/@actions/exec/lib/toolrunner.js"(exports) {
+  "../../node_modules/@actions/exec/lib/toolrunner.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -496,11 +542,11 @@ var require_toolrunner = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -516,20 +562,20 @@ var require_toolrunner = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.argStringToArray = exports.ToolRunner = void 0;
-    var os = __importStar(__require("os"));
-    var events = __importStar(__require("events"));
-    var child = __importStar(__require("child_process"));
-    var path = __importStar(__require("path"));
+    var os = __importStar(require("os"));
+    var events = __importStar(require("events"));
+    var child = __importStar(require("child_process"));
+    var path3 = __importStar(require("path"));
     var io = __importStar(require_io());
     var ioUtil = __importStar(require_io_util());
-    var timers_1 = __require("timers");
+    var timers_1 = require("timers");
     var IS_WINDOWS = process.platform === "win32";
     var ToolRunner = class extends events.EventEmitter {
       constructor(toolPath, args, options) {
@@ -741,10 +787,10 @@ var require_toolrunner = __commonJS({
       exec() {
         return __awaiter(this, void 0, void 0, function* () {
           if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) {
-            this.toolPath = path.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
+            this.toolPath = path3.resolve(process.cwd(), this.options.cwd || process.cwd(), this.toolPath);
           }
           this.toolPath = yield io.which(this.toolPath, true);
-          return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+          return new Promise((resolve2, reject) => __awaiter(this, void 0, void 0, function* () {
             this._debug(`exec tool: ${this.toolPath}`);
             this._debug("arguments:");
             for (const arg of this.args) {
@@ -827,7 +873,7 @@ var require_toolrunner = __commonJS({
               if (error) {
                 reject(error);
               } else {
-                resolve(exitCode);
+                resolve2(exitCode);
               }
             });
             if (this.options.input) {
@@ -951,9 +997,9 @@ var require_toolrunner = __commonJS({
   }
 });
 
-// node_modules/@actions/exec/lib/exec.js
+// ../../node_modules/@actions/exec/lib/exec.js
 var require_exec = __commonJS({
-  "node_modules/@actions/exec/lib/exec.js"(exports) {
+  "../../node_modules/@actions/exec/lib/exec.js"(exports) {
     "use strict";
     var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
@@ -985,11 +1031,11 @@ var require_exec = __commonJS({
     };
     var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-          resolve(value);
+        return value instanceof P ? value : new P(function(resolve2) {
+          resolve2(value);
         });
       }
-      return new (P || (P = Promise))(function(resolve, reject) {
+      return new (P || (P = Promise))(function(resolve2, reject) {
         function fulfilled(value) {
           try {
             step(generator.next(value));
@@ -1005,16 +1051,16 @@ var require_exec = __commonJS({
           }
         }
         function step(result) {
-          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
         }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getExecOutput = exports.exec = void 0;
-    var string_decoder_1 = __require("string_decoder");
+    var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec(commandLine, args, options) {
+    function exec3(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -1026,8 +1072,8 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec;
-    function getExecOutput(commandLine, args, options) {
+    exports.exec = exec3;
+    function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
         let stdout = "";
@@ -1049,7 +1095,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -1059,10 +1105,169 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput;
+    exports.getExecOutput = getExecOutput2;
   }
 });
 
-export {
-  require_exec
-};
+// src/index.ts
+var src_exports = {};
+__export(src_exports, {
+  init: () => init_default,
+  publish: () => publish_default,
+  utils: () => utils_exports
+});
+module.exports = __toCommonJS(src_exports);
+
+// src/init.ts
+var fs2 = __toESM(require("fs"));
+
+// src/utils.ts
+var utils_exports = {};
+__export(utils_exports, {
+  ovsxInfo: () => ovsxInfo,
+  ovsxPublish: () => ovsxPublish,
+  verifyToken: () => verifyToken,
+  vsceInfo: () => vsceInfo,
+  vscePackage: () => vscePackage,
+  vscePublish: () => vscePublish
+});
+var fs = __toESM(require("fs"));
+var path = __toESM(require("path"));
+var exec = __toESM(require_exec());
+var import_core = require("../index");
+function ovsxInfo(extensionName) {
+  return __async(this, null, function* () {
+    const cmdOutput = yield exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
+    return JSON.parse(cmdOutput.stdout);
+  });
+}
+function ovsxPublish(context, vsixPath) {
+  return __async(this, null, function* () {
+    const cmdArgs = ["ovsx", "publish"];
+    if (vsixPath != null) {
+      cmdArgs.push("--packagePath", vsixPath);
+    } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
+      cmdArgs.push("--yarn");
+    }
+    yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
+      yield exec.exec("npx", cmdArgs);
+    }));
+  });
+}
+function vsceInfo(extensionName) {
+  return __async(this, null, function* () {
+    const cmdOutput = yield exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
+    return JSON.parse(cmdOutput.stdout);
+  });
+}
+function vscePackage(context) {
+  return __async(this, null, function* () {
+    var _a;
+    const cmdArgs = ["vsce", "package"];
+    if (fs.existsSync(path.join((context == null ? void 0 : context.rootDir) || "", "yarn.lock"))) {
+      cmdArgs.push("--yarn");
+    }
+    const cmdOutput = yield exec.getExecOutput("npx", cmdArgs);
+    return (_a = cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)) == null ? void 0 : _a[1];
+  });
+}
+function vscePublish(context, vsixPath) {
+  return __async(this, null, function* () {
+    const cmdArgs = ["vsce", "publish"];
+    if (vsixPath != null) {
+      cmdArgs.push("--packagePath", vsixPath);
+    } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
+      cmdArgs.push("--yarn");
+    }
+    yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
+      yield exec.exec("npx", cmdArgs);
+    }));
+  });
+}
+function verifyToken(tool, publisher) {
+  return __async(this, null, function* () {
+    yield exec.exec("npx", [tool, "verify-pat", publisher]);
+  });
+}
+
+// src/init.ts
+function init_default(context, config) {
+  return __async(this, null, function* () {
+    let packageJson;
+    try {
+      packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
+      context.logger.info(`VS Code extension: ${packageJson.publisher}.${packageJson.name}`);
+    } catch (e) {
+      throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
+    }
+    if (config.vscePublish !== false && context.env.VSCE_PAT == null) {
+      throw new Error("Required environment variable VSCE_PAT is undefined");
+    }
+    if (config.ovsxPublish && context.env.OVSX_PAT == null) {
+      throw new Error("Required environment variable OVSX_PAT is undefined");
+    }
+    if (config.vscePublish !== false) {
+      yield verifyToken("vsce", packageJson.publisher);
+    }
+    if (config.ovsxPublish) {
+      yield verifyToken("ovsx", packageJson.publisher);
+    }
+  });
+}
+
+// src/publish.ts
+var fs3 = __toESM(require("fs"));
+var path2 = __toESM(require("path"));
+function publish_default(context, config) {
+  return __async(this, null, function* () {
+    const packageJson = JSON.parse(fs3.readFileSync("package.json", "utf-8"));
+    const extensionName = `${packageJson.publisher}.${packageJson.name}`;
+    let vsixPath;
+    if (config.vsixDir != null) {
+      const tempVsixPath = yield vscePackage(context);
+      vsixPath = path2.resolve(context.rootDir, config.vsixDir, path2.basename(tempVsixPath));
+      fs3.mkdirSync(config.vsixDir, { recursive: true });
+      fs3.renameSync(tempVsixPath, vsixPath);
+    }
+    if (packageJson.private) {
+      context.logger.info(`Skipping publish of private package ${packageJson.name}`);
+      return;
+    }
+    if (config.vscePublish !== false) {
+      const vsceMetadata = yield vsceInfo(extensionName);
+      if (!vsceMetadata.versions.find((obj) => obj.version === packageJson.version)) {
+        yield vscePublish(context, vsixPath);
+        context.releasedPackages.vsce = [
+          ...context.releasedPackages.vsce || [],
+          {
+            name: `${extensionName}@${packageJson.version}`,
+            url: `https://marketplace.visualstudio.com/items?itemName=${extensionName}`
+          }
+        ];
+      } else {
+        context.logger.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
+      }
+    }
+    if (config.ovsxPublish) {
+      const ovsxMetadata = yield ovsxInfo(extensionName);
+      if (!Object.keys(ovsxMetadata.allVersions).includes(packageJson.version)) {
+        yield ovsxPublish(context, vsixPath);
+        context.releasedPackages.vsce = [
+          ...context.releasedPackages.vsce || [],
+          {
+            name: `${extensionName}@${packageJson.version} (OVSX)`,
+            url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}`
+          }
+        ];
+      } else {
+        context.logger.error(`Version ${packageJson.version} has already been published to Open VSX Registry`);
+      }
+    }
+  });
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  init,
+  publish,
+  utils
+});

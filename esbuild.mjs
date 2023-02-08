@@ -1,27 +1,13 @@
-import * as fs from "fs";
+import * as path from "path";
 import * as esbuild from "esbuild";
 
-fs.rmSync("dist", { recursive: true, force: true });
-const entryPoints = {
-    index: "packages/core/src/main.ts"
-};
-fs.readdirSync("packages").forEach((name) => {
-    if (name !== "core") {
-        entryPoints[name] = `packages/${name}/src/index.ts`;
-    }
-});
+const pkgName = path.basename(process.cwd());
 await esbuild.build({
-    banner: {
-        js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`
-    },
+    alias: { "@octorelease/core": "../index" },
     bundle: true,
-    entryPoints,
-    format: "esm",
+    entryPoints: [pkgName === "core" ? "src/main.ts" : "src/index.ts"],
+    external: ["../index"],
     logLevel: "info",
-    outdir: "dist",
-    outExtension: {
-        ".js": ".mjs"
-    },
-    platform: "node",
-    splitting: true
+    outfile: `../../dist/${pkgName === "core" ? "index" : pkgName}.js`,
+    platform: "node"
 });

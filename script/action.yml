@@ -19,4 +19,4 @@ outputs:
     description: 'The output of the script for other steps to reference'
 runs:
   using: 'node16'
-  main: '../dist/run-script.mjs'
+  main: '../dist/run-script.js'
