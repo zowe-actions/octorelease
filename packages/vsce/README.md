@@ -44,7 +44,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | ------- | ----------- | ------- |
 | `ovsxPublish` | Specify true to publish to the OVSX registry. | `false` |
 | `vscePublish` | Specify false to skip publishing to the VS Code marketplace. | `true` |
-| `vsixDir` | Path to directory where extension bundle (VSIX) should be generated, or `false` to skip creating a VSIX. | `false` |
+| `vsixDir` | Path to directory where extension bundle (VSIX) should be generated, or `false` to skip creating a VSIX. If specified, the VSIX is packaged only once which guarantees that the same file is reused in later steps. | `false` |
 
 ### Examples
 

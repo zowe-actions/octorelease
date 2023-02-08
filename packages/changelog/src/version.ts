@@ -66,6 +66,8 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
 
     if (fs.existsSync(changelogFile)) {
         const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
+        // Look for changelog header before versioning ("## Recent Changes") or after versioning ("## `1.0.0`").
+        // We support either format to allow for a manual version bump or rerun of a failed build.
         let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine) ||
             line.startsWith(`## \`${context.version.new}\``));
 

@@ -10721,10 +10721,10 @@ var require_dist_node11 = __commonJS({
       return endpointsToMethods(octokit, Endpoints$1);
     }
     enterpriseServer34Admin.VERSION = VERSION;
-    function enterpriseServer342(octokit) {
+    function enterpriseServer34(octokit) {
       return endpointsToMethods(octokit, Endpoints);
     }
-    enterpriseServer342.VERSION = VERSION;
+    enterpriseServer34.VERSION = VERSION;
     function enterpriseServer35Admin(octokit) {
       return endpointsToMethods(octokit, Endpoints$3);
     }
@@ -10745,17 +10745,17 @@ var require_dist_node11 = __commonJS({
       return endpointsToMethods(octokit, Endpoints$7);
     }
     enterpriseServer37Admin.VERSION = VERSION;
-    function enterpriseServer37(octokit) {
+    function enterpriseServer372(octokit) {
       return endpointsToMethods(octokit, Endpoints$6);
     }
-    enterpriseServer37.VERSION = VERSION;
-    exports.enterpriseServer34 = enterpriseServer342;
+    enterpriseServer372.VERSION = VERSION;
+    exports.enterpriseServer34 = enterpriseServer34;
     exports.enterpriseServer34Admin = enterpriseServer34Admin;
     exports.enterpriseServer35 = enterpriseServer35;
     exports.enterpriseServer35Admin = enterpriseServer35Admin;
     exports.enterpriseServer36 = enterpriseServer36;
     exports.enterpriseServer36Admin = enterpriseServer36Admin;
-    exports.enterpriseServer37 = enterpriseServer37;
+    exports.enterpriseServer37 = enterpriseServer372;
     exports.enterpriseServer37Admin = enterpriseServer37Admin;
   }
 });
@@ -24123,7 +24123,7 @@ var import_utils = __toESM(require_utils3());
 var import_plugin_enterprise_server = __toESM(require_dist_node11());
 function getOctokit2(context, config) {
   if (config.githubUrl != null) {
-    const octokit = import_utils.GitHub.plugin(import_plugin_enterprise_server.enterpriseServer34);
+    const octokit = import_utils.GitHub.plugin(import_plugin_enterprise_server.enterpriseServer37);
     const githubUrl = config.githubUrl.endsWith("/") ? config.githubUrl : config.githubUrl + "/";
     return new octokit((0, import_utils.getOctokitOptions)(context.env.GITHUB_TOKEN, {
       baseUrl: githubUrl + "api/v3"

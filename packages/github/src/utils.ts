@@ -16,13 +16,13 @@
 
 import * as github from "@actions/github";
 import { GitHub, getOctokitOptions } from "@actions/github/lib/utils";
-import { enterpriseServer34 } from "@octokit/plugin-enterprise-server";
+import { enterpriseServer37 } from "@octokit/plugin-enterprise-server";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
 export function getOctokit(context: IContext, config: IPluginConfig): InstanceType<typeof GitHub> {
     if (config.githubUrl != null) {
-        const octokit = GitHub.plugin(enterpriseServer34);
+        const octokit = GitHub.plugin(enterpriseServer37);
         const githubUrl = config.githubUrl.endsWith("/") ? config.githubUrl : (config.githubUrl + "/");
         return new octokit(getOctokitOptions(context.env.GITHUB_TOKEN, {
             baseUrl: githubUrl + "api/v3"

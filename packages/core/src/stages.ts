@@ -139,6 +139,7 @@ function loadEnv(newEnv: Env): Env {
 
     oldEnv.env = {};
     for (const [k, v] of Object.entries(newEnv.env || {})) {
+        // Don't use spread operator on process.env - it breaks case insensitivity on Windows
         oldEnv.env[k] = process.env[k] as string;
         process.env[k] = v.toString();
     }
