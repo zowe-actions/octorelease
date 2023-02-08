@@ -1134,7 +1134,7 @@ __export(utils_exports, {
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
-var import_core = require("../index");
+var import_core = require("./index");
 function ovsxInfo(extensionName) {
   return __async(this, null, function* () {
     const cmdOutput = yield exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);

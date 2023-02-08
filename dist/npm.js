@@ -1520,7 +1520,7 @@ var fs = __toESM(require("fs"));
 var os = __toESM(require("os"));
 var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
-var import_core = require("../index");
+var import_core = require("./index");
 function npmAddTag(context, pkgSpec, tag, registry, inDir) {
   return __async(this, null, function* () {
     const cmdArgs = ["dist-tag", "add", pkgSpec, tag, "--registry", registry];
@@ -1702,7 +1702,7 @@ function pruneShrinkwrap(inDir) {
 var fs4 = __toESM(require("fs"));
 var os2 = __toESM(require("os"));
 var path3 = __toESM(require("path"));
-var import_core2 = require("../index");
+var import_core2 = require("./index");
 var import_delay = __toESM(require_delay());
 function success_default(context, config) {
   return __async(this, null, function* () {

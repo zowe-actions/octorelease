@@ -79,6 +79,14 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
     await runStage(context, pluginsLoaded, { name: "version" });
 }
 
+/**
+ * Run a stage for loaded plugins that have a registered handler.
+ * If the plugin config defines $cwd or $env, then cwd and env vars will be
+ * overridden in a temporary environment during the runtime of the handler.
+ * @param context Global context object for Octorelease
+ * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
+ * @param stage Stage to run
+ */
 async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage: Stage): Promise<void> {
     if (shouldSkipStage(stage)) {
         return;
@@ -117,6 +125,11 @@ function shouldSkipStage(stage: Stage): boolean {
     return false;
 }
 
+/**
+ * Load temporary cwd and env vars from an environment object.
+ * @param newEnv New environment to load
+ * @returns Old environment that can be restored later
+ */
 function loadEnv(newEnv: Env): Env {
     const oldEnv: Env = {};
     if (newEnv.cwd != null) {
@@ -133,6 +146,10 @@ function loadEnv(newEnv: Env): Env {
     return oldEnv;
 }
 
+/**
+ * Restore original cwd and env vars from an environment object.
+ * @param oldEnv Old environment to restore
+ */
 function unloadEnv(oldEnv: Env) {
     if (oldEnv.cwd != null) {
         process.chdir(oldEnv.cwd);

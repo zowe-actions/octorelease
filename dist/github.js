@@ -24108,7 +24108,7 @@ module.exports = __toCommonJS(src_exports);
 // src/init.ts
 var import_request_error = __toESM(require_dist_node2());
 var import_delay = __toESM(require_delay());
-var import_core = require("../index");
+var import_core = require("./index");
 
 // src/config.ts
 var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor", "release-major"];
@@ -24258,7 +24258,7 @@ var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var glob = __toESM(require_glob());
 var import_request_error2 = __toESM(require_dist_node2());
-var import_core2 = require("../index");
+var import_core2 = require("./index");
 function publish_default(context, config) {
   return __async(this, null, function* () {
     if (!config.publishRelease && !config.assets) {
@@ -24336,7 +24336,7 @@ function uploadAssets(context, octokit, release, assetPaths) {
 }
 
 // src/success.ts
-var import_core3 = require("../index");
+var import_core3 = require("./index");
 function success_default(context, config) {
   return __async(this, null, function* () {
     if (Object.keys(context.releasedPackages).length === 0) {
@@ -24377,7 +24377,7 @@ The following packages have been published:
 }
 
 // src/fail.ts
-var import_core4 = require("../index");
+var import_core4 = require("./index");
 function fail_default(context, config) {
   return __async(this, null, function* () {
     if (!config.checkPrLabels) {
