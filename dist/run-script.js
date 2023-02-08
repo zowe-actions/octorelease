@@ -12689,7 +12689,7 @@ var init_sonarConfig = __esm({
 // src/index.ts
 var path = __toESM(require("path"));
 var core3 = __toESM(require_core());
-var import_core = require("./index");
+var import_core = require("./core");
 
 // src/loader.ts
 var SCRIPTS = {

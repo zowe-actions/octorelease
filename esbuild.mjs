@@ -1,16 +1,27 @@
-import * as fs from "fs";
 import * as path from "path";
 import * as esbuild from "esbuild";
 
-const pkgName = path.basename(process.cwd());
-const pkgResolves = fs.readdirSync("..")
-    .reduce((acc, elem) => ({ ...acc, [`@octorelease/${elem}`]: "./" + (elem === "core" ? "index" : elem) }), {});
+const pkgName = process.argv[2] || path.basename(process.cwd());
+const onResolvePlugin = {
+    name: "onResolve",
+    setup(build) {
+        if (pkgName === "main") {
+            build.onResolve({ filter: /^.\/$/ }, () => {
+                return { path: "./core", external: true };
+            });
+        } else {
+            build.onResolve({ filter: /^@octorelease\// }, (args) => {
+                return { path: args.path.replace("@octorelease", "."), external: true };
+            });
+        }
+    },
+};
+
 await esbuild.build({
-    alias: pkgResolves,
     bundle: true,
-    entryPoints: [pkgName === "core" ? "src/main.ts" : "src/index.ts"],
-    external: Object.values(pkgResolves),
+    entryPoints: [pkgName === "main" ? "src/main.ts" : "src/index.ts"],
     logLevel: "info",
-    outfile: `../../dist/${pkgName === "core" ? "index" : pkgName}.js`,
-    platform: "node"
+    outfile: `../../dist/${pkgName === "main" ? "index" : pkgName}.js`,
+    platform: "node",
+    plugins: [onResolvePlugin]
 });
