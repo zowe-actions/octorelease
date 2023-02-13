@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/github",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Octorelease plugin to perform actions related to GitHub.",
   "main": "lib/index.js",
   "files": [
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -b && npm run lint",
     "lint": "eslint src",
-    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/github.js --platform=node",
+    "pack": "node ../../esbuild.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
@@ -27,15 +27,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/github": "^4.0.0",
-    "@actions/glob": "^0.1.0",
-    "@octokit/plugin-enterprise-server": "^10.6.4",
-    "@octokit/request-error": "^2.1.0",
+    "@actions/github": "^5.1.0",
+    "@actions/glob": "^0.4.0",
+    "@octokit/plugin-enterprise-server": "^12.1.0",
     "delay": "^5.0.0",
     "mime-types": "^2.1.27",
     "semver": "^6.3.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^0.1.0"
+    "@octokit/request-error": "^2.1.0",
+    "@octorelease/core": "^0.2.0"
   }
 }

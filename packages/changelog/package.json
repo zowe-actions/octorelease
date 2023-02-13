@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/changelog",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Octorelease plugin to read and update changelogs.",
   "main": "lib/index.js",
   "files": [
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -b && npm run lint",
     "lint": "eslint src",
-    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/changelog.js --platform=node",
+    "pack": "node ../../esbuild.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
@@ -27,9 +27,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/glob": "^0.1.0"
+    "@actions/glob": "^0.4.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^0.1.0"
+    "@octorelease/core": "^0.2.0"
   }
 }

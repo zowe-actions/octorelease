@@ -69,9 +69,9 @@ export interface IContext {
 
     /**
      * Key-value pairs of plugin names and configuration objects
-     * @example { "@octorelease/changelog": {}, "@octorelease/github": { assets: "*.tgz" } }
+     * @example { "@octorelease/changelog": [], "@octorelease/github": [ { assets: "*.tgz" } ] }
      */
-    plugins: { [key: string]: Record<string, any> };
+    plugins: { [key: string]: Record<string, any>[] };
 
     /**
      * Key-value pairs of release types and released package info
@@ -83,6 +83,11 @@ export interface IContext {
      * Multi-line string containing changelog
      */
     releaseNotes?: string;
+
+    /**
+     * Absolute path of project root directory
+     */
+    rootDir: string;
 
     /**
      * Git tag prefix that precedes version number (default is "v")

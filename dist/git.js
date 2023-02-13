@@ -1,10 +1,10 @@
+"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -12,22 +12,23 @@ var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __reExport = (target, module2, copyDefault, desc) => {
-  if (module2 && typeof module2 === "object" || typeof module2 === "function") {
-    for (let key of __getOwnPropNames(module2))
-      if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
-        __defProp(target, key, { get: () => module2[key], enumerable: !(desc = __getOwnPropDesc(module2, key)) || desc.enumerable });
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
   }
-  return target;
+  return to;
 };
-var __toESM = (module2, isNodeMode) => {
-  return __reExport(__markAsModule(__defProp(module2 != null ? __create(__getProtoOf(module2)) : {}, "default", !isNodeMode && module2 && module2.__esModule ? { get: () => module2.default, enumerable: true } : { value: module2, enumerable: true })), module2);
-};
-var __toCommonJS = /* @__PURE__ */ ((cache) => {
-  return (module2, temp) => {
-    return cache && cache.get(module2) || (temp = __reExport(__markAsModule({}), module2, 1), cache && cache.set(module2, temp), temp);
-  };
-})(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -774,6 +775,15 @@ var require_toolrunner = __commonJS({
         }
         return result;
       }
+      /**
+       * Exec a tool.
+       * Output will be streamed to the live console.
+       * Returns promise with return code
+       *
+       * @param     tool     path to tool to exec
+       * @param     options  optional exec options.  See ExecOptions
+       * @returns   number
+       */
       exec() {
         return __awaiter(this, void 0, void 0, function* () {
           if (!ioUtil.isRooted(this.toolPath) && (this.toolPath.includes("/") || IS_WINDOWS && this.toolPath.includes("\\"))) {
@@ -1106,6 +1116,7 @@ __export(src_exports, {
   utils: () => utils_exports,
   version: () => version_default
 });
+module.exports = __toCommonJS(src_exports);
 
 // src/utils.ts
 var utils_exports = {};
@@ -1134,7 +1145,7 @@ function gitCommit(message, amend) {
         return false;
       }
     }
-    const cmdArgs = ["commit", "-s", "-m", `${message} [ci skip]`];
+    const cmdArgs = ["commit", "-s", "-m", message.includes("[ci skip]") ? message : `${message} [ci skip]`];
     if (amend) {
       cmdArgs.push("--amend");
     }
@@ -1150,7 +1161,10 @@ function gitConfig(context) {
       yield exec.exec("git", ["config", "--global", "credential.helper", "store"]);
       const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
       const gitUrl = new url.URL(cmdOutput.stdout);
-      fs.appendFileSync(path.join(os.homedir(), ".git-credentials"), `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
+      fs.appendFileSync(
+        path.join(os.homedir(), ".git-credentials"),
+        `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`
+      );
     }
     yield exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);
   });
@@ -1207,7 +1221,7 @@ function version_default(context, config) {
   return __async(this, null, function* () {
     const commitMessage = config.commitMessage || "Bump version to {{version}}";
     let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
-    yield gitAdd(...context.changedFiles);
+    yield gitAdd(...new Set(context.changedFiles));
     let shouldPush = false;
     if (yield gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
       shouldPush = true;
@@ -1225,7 +1239,6 @@ function version_default(context, config) {
     }
   });
 }
-module.exports = __toCommonJS(src_exports);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   init,

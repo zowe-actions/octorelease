@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/npm",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Octorelease plugin to perform actions related to NPM.",
   "main": "lib/index.js",
   "files": [
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -b && npm run lint",
     "lint": "eslint src",
-    "pack": "esbuild src/index.ts --bundle --outfile=../../dist/npm.js --platform=node",
+    "pack": "node ../../esbuild.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
@@ -33,6 +33,6 @@
     "find-up": "^5.0.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^0.1.0"
+    "@octorelease/core": "^0.2.0"
   }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## `0.2.0`
+
+* Added support for more than one config object per plugin in release config
+* Added support for `$cwd` and `$env` in plugin config to override environment
+* Updated dependencies for technical currency
+
 ## `0.1.5`
 
 * Fixed CI skip may be detected in wrong commit message

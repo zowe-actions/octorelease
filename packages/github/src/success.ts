@@ -24,7 +24,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const octokit = utils.getOctokit(context, config);
-    const prs = await octokit.repos.listPullRequestsAssociatedWithCommit({
+    const prs = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
         ...context.ci.repo,
         commit_sha: context.ci.commit
     });
@@ -33,7 +33,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     await coreUtils.dryRunTask(context, "add released label to pull request", async () => {
-        await octokit.issues.addLabels({
+        await octokit.rest.issues.addLabels({
             ...context.ci.repo,
             issue_number: prs.data[0].number,
             labels: ["released"]
@@ -48,7 +48,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
     }
     await coreUtils.dryRunTask(context, "create success comment on pull request", async () => {
-        await octokit.issues.createComment({
+        await octokit.rest.issues.createComment({
             ...context.ci.repo,
             issue_number: prs.data[0].number,
             body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:\n\n` +

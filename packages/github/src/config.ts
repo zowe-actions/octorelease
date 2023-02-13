@@ -19,6 +19,6 @@ export const DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "rele
 export interface IPluginConfig {
     assets?: string | string[];
     checkPrLabels?: boolean | [string, string, string, string];
-    createRelease?: boolean;
     githubUrl?: string;
+    publishRelease?: boolean;
 }

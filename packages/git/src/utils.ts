@@ -34,7 +34,7 @@ export async function gitCommit(message: string, amend?: boolean): Promise<boole
         }
     }
 
-    const cmdArgs = ["commit", "-s", "-m", `${message} [ci skip]`];
+    const cmdArgs = ["commit", "-s", "-m", message.includes("[ci skip]") ? message : `${message} [ci skip]`];
     if (amend) {
         cmdArgs.push("--amend");
     }

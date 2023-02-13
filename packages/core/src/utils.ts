@@ -48,12 +48,12 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         branchInfo.channel = branchInfo.name;
     }
 
-    const pluginConfig: Record<string, Record<string, any>> = {};
+    const pluginConfig: Record<string, Record<string, any>[]> = {};
     for (const pc of (config.config.plugins || [])) {
         if (typeof pc === "string") {
-            pluginConfig[pc] = {};
+            pluginConfig[pc] = [{}];
         } else {
-            pluginConfig[pc[0]] = pc[1];
+            pluginConfig[pc[0]] = pc.slice(1);
         }
     }
 
@@ -69,6 +69,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         logger: new Logger(),
         plugins: pluginConfig,
         releasedPackages: {},
+        rootDir: process.cwd(),
         tagPrefix,
         version: versionInfo
     };

@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
+import * as path from "path";
 import * as core from "@actions/core";
 import { IContext, IPluginsLoaded } from "./doc";
 import { Inputs } from "./inputs";
+
+type Env = {
+    cwd?: string;
+    env?: Record<string, string>;
+}
+
+type Stage = {
+    name: "fail" | "init" | "publish" | "success" | "version",
+    canSkip?: boolean
+}
 
 /**
  * Run "fail" stage for loaded plugins that have a "fail" handler.
@@ -25,18 +36,7 @@ import { Inputs } from "./inputs";
  * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
  */
 export async function fail(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage("fail")) return;
-    for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-        if (pluginModule.fail != null) {
-            context.logger.info(`Running "fail" stage for plugin ${pluginName}`);
-            context.logger.pluginName = pluginName;
-            try {
-                await pluginModule.fail(context, context.plugins[pluginName] || {});
-            } finally {
-                context.logger.pluginName = undefined;
-            }
-        }
-    }
+    await runStage(context, pluginsLoaded, { name: "fail" });
 }
 
 /**
@@ -46,17 +46,7 @@ export async function fail(context: IContext, pluginsLoaded: IPluginsLoaded): Pr
  * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
  */
 export async function init(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-        if (pluginModule.init != null) {
-            context.logger.info(`Running "init" stage for plugin ${pluginName}`);
-            context.logger.pluginName = pluginName;
-            try {
-                await pluginModule.init(context, context.plugins[pluginName] || {});
-            } finally {
-                context.logger.pluginName = undefined;
-            }
-        }
-    }
+    await runStage(context, pluginsLoaded, { name: "init", canSkip: false });
 }
 
 /**
@@ -66,18 +56,7 @@ export async function init(context: IContext, pluginsLoaded: IPluginsLoaded): Pr
  * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
  */
 export async function publish(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage("publish")) return;
-    for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-        if (pluginModule.publish != null) {
-            context.logger.info(`Running "publish" stage for plugin ${pluginName}`);
-            context.logger.pluginName = pluginName;
-            try {
-                await pluginModule.publish(context, context.plugins[pluginName] || {});
-            } finally {
-                context.logger.pluginName = undefined;
-            }
-        }
-    }
+    await runStage(context, pluginsLoaded, { name: "publish" });
 }
 
 /**
@@ -87,18 +66,7 @@ export async function publish(context: IContext, pluginsLoaded: IPluginsLoaded):
  * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
  */
 export async function success(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage("success")) return;
-    for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-        if (pluginModule.success != null) {
-            context.logger.info(`Running "success" stage for plugin ${pluginName}`);
-            context.logger.pluginName = pluginName;
-            try {
-                await pluginModule.success(context, context.plugins[pluginName] || {});
-            } finally {
-                context.logger.pluginName = undefined;
-            }
-        }
-    }
+    await runStage(context, pluginsLoaded, { name: "success" });
 }
 
 /**
@@ -108,15 +76,37 @@ export async function success(context: IContext, pluginsLoaded: IPluginsLoaded):
  * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
  */
 export async function version(context: IContext, pluginsLoaded: IPluginsLoaded): Promise<void> {
-    if (shouldSkipStage("version")) return;
+    await runStage(context, pluginsLoaded, { name: "version" });
+}
+
+/**
+ * Run a stage for loaded plugins that have a registered handler.
+ * If the plugin config defines $cwd or $env, then cwd and env vars will be
+ * overridden in a temporary environment during the runtime of the handler.
+ * @param context Global context object for Octorelease
+ * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
+ * @param stage Stage to run
+ */
+async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage: Stage): Promise<void> {
+    if (shouldSkipStage(stage)) {
+        return;
+    }
+
     for (const [pluginName, pluginModule] of Object.entries(pluginsLoaded)) {
-        if (pluginModule.version != null) {
-            context.logger.info(`Running "version" stage for plugin ${pluginName}`);
+        if (pluginModule[stage.name] == null) {
+            continue;
+        }
+
+        for (const pluginConfig of (context.plugins[pluginName] || [])) {
+            context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
+            const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
             context.logger.pluginName = pluginName;
+
             try {
-                await pluginModule.version(context, context.plugins[pluginName] || {});
+                await (pluginModule[stage.name] as any)(context, pluginConfig);
             } finally {
                 context.logger.pluginName = undefined;
+                unloadEnv(oldEnv);
             }
         }
     }
@@ -124,13 +114,53 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
 
 /**
  * Check if stage should be skipped based on `Inputs.skipStages`.
- * @param name Name of stage to skip
+ * @param stage Stage to check
  * @returns True if stage should be skipped
  */
-function shouldSkipStage(name: "fail" | "publish" | "success" | "version"): boolean {
-    if (Inputs.skipStages.includes(name)) {
-        core.info(`Skipping "${name}" stage`);
+function shouldSkipStage(stage: Stage): boolean {
+    if (stage.canSkip !== false && Inputs.skipStages.includes(stage.name)) {
+        core.info(`Skipping "${stage.name}" stage`);
         return true;
     }
     return false;
+}
+
+/**
+ * Load temporary cwd and env vars from an environment object.
+ * @param newEnv New environment to load
+ * @returns Old environment that can be restored later
+ */
+function loadEnv(newEnv: Env): Env {
+    const oldEnv: Env = {};
+    if (newEnv.cwd != null) {
+        oldEnv.cwd = process.cwd();
+        process.chdir(path.resolve(newEnv.cwd));
+    }
+
+    oldEnv.env = {};
+    for (const [k, v] of Object.entries(newEnv.env || {})) {
+        // Don't use spread operator on process.env - it breaks case insensitivity on Windows
+        oldEnv.env[k] = process.env[k] as string;
+        process.env[k] = v.toString();
+    }
+
+    return oldEnv;
+}
+
+/**
+ * Restore original cwd and env vars from an environment object.
+ * @param oldEnv Old environment to restore
+ */
+function unloadEnv(oldEnv: Env) {
+    if (oldEnv.cwd != null) {
+        process.chdir(oldEnv.cwd);
+    }
+
+    for (const [k, v] of Object.entries(oldEnv.env || {})) {
+        if (v != null) {
+            process.env[k] = v.toString();
+        } else {
+            delete process.env[k];
+        }
+    }
 }

@@ -23,7 +23,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     let tagMessage = config.tagMessage || (context.branch.channel &&
         `Release {{version}} to ${context.branch.channel}`);
 
-    await utils.gitAdd(...context.changedFiles);
+    await utils.gitAdd(...new Set(context.changedFiles));
     let shouldPush = false;
 
     if (await utils.gitCommit(commitMessage.replace("{{version}}", context.version.new))) {

@@ -26,20 +26,32 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     if (context.workspaces != null) {
         const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
-        let releaseNotes = "";
+        const releaseNotes: Record<string, string> = {};
 
         for (const packageDir of await globber.glob()) {
-            const changelogPath = path.join(path.relative(process.cwd(), packageDir), changelogFile);
+            const changelogPath = path.join(path.relative(context.rootDir, packageDir), changelogFile);
             const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
             if (packageReleaseNotes != null) {
-                releaseNotes += `**${path.basename(packageDir)}**\n${packageReleaseNotes}\n\n`;
+                releaseNotes[path.basename(packageDir)] = packageReleaseNotes;
             }
             if (updatePackageChangelog(context, changelogPath, headerLine)) {
                 context.changedFiles.push(changelogPath);
             }
         }
 
-        context.releaseNotes = releaseNotes || undefined;
+        if (Object.keys(releaseNotes).length === 0) {
+            return;
+        } else if (config.displayNames == null) {
+            context.releaseNotes = Object.entries(releaseNotes).map(([k, v]) => `# ${k}\n${v}\n`).join("\n");
+        } else {
+            const orderedSections: string[] = [];
+            for (const [k, v] of Object.entries(config.displayNames)) {
+                if (k in releaseNotes) {
+                    orderedSections.push(`# ${v}\n${releaseNotes[k]}\n`);
+                }
+            }
+            context.releaseNotes = orderedSections.join("\n");
+        }
     } else {
         context.releaseNotes = getPackageChangelog(context, changelogFile, headerLine);
 
@@ -54,7 +66,10 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
 
     if (fs.existsSync(changelogFile)) {
         const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
-        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine));
+        // Look for changelog header before versioning ("## Recent Changes") or after versioning ("## `1.0.0`").
+        // We support either format to allow for a manual version bump or rerun of a failed build.
+        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine) ||
+            line.startsWith(`## \`${context.version.new}\``));
 
         if (lineNum !== -1) {
             while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {
