@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Octorelease Contributors
+ * Copyright 2020-2023 Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -15,6 +15,14 @@
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
     "watch": "tsc -w"
   },
+  "homepage": "https://github.com/zowe-actions/octorelease/tree/master/packages/git#readme",
+  "bugs": {
+    "url": "https://github.com/zowe-actions/octorelease/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zowe-actions/octorelease.git"
+  },
   "keywords": [
     "git",
     "octorelease",

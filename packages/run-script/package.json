@@ -14,6 +14,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w"
   },
+  "homepage": "https://github.com/zowe-actions/octorelease/tree/master/packages/run-script#readme",
+  "bugs": {
+    "url": "https://github.com/zowe-actions/octorelease/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zowe-actions/octorelease.git"
+  },
   "keywords": [
     "octorelease"
   ],
