@@ -19442,7 +19442,7 @@ function buildVersionInfo(branch, tagPrefix) {
   return __async(this, null, function* () {
     const cmdOutput = yield exec.getExecOutput(
       "git",
-      ["describe", "--abbrev=0", `--match=${tagPrefix}*`],
+      ["describe", "--tags", "--abbrev=0", `--match=${tagPrefix}*`],
       { ignoreReturnCode: true }
     );
     const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";

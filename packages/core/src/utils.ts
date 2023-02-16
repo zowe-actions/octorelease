@@ -139,7 +139,7 @@ export async function verifyConditions(context: IContext): Promise<void> {
  * @returns Version info for the `context.version` property
  */
 async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Promise<IVersionInfo> {
-    const cmdOutput = await exec.getExecOutput("git", ["describe", "--abbrev=0", `--match=${tagPrefix}*`],
+    const cmdOutput = await exec.getExecOutput("git", ["describe", "--tags", "--abbrev=0", `--match=${tagPrefix}*`],
         { ignoreReturnCode: true });
     const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
 
