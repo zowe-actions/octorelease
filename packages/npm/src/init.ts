@@ -23,8 +23,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     let publishConfig;
     try {
         const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        context.version.new = packageJson.version;
         publishConfig = packageJson.publishConfig;
+
+        if (context.workspaces == null) {
+            context.version.new = packageJson.version;
+        } else {
+            context.logger.warn("Ignoring package.json version in workspaces");
+        }
     } catch {
         throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }

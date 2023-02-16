@@ -1605,8 +1605,12 @@ function init_default(context, config) {
     let publishConfig;
     try {
       const packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
-      context.version.new = packageJson.version;
       publishConfig = packageJson.publishConfig;
+      if (context.workspaces == null) {
+        context.version.new = packageJson.version;
+      } else {
+        context.logger.warn("Ignoring package.json version in workspaces");
+      }
     } catch (e) {
       throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
