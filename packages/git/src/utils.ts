@@ -68,7 +68,7 @@ export async function gitPush(context: IContext, branch: string, tags?: boolean)
 
     const cmdArgs = ["push", "-u", "origin", branch];
     if (tags) {
-        cmdArgs.push("--follow-tags");
+        cmdArgs.push("--tags");
     }
     if (context.dryRun) {
         cmdArgs.push("--dry-run");

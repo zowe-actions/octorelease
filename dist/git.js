@@ -1179,7 +1179,7 @@ function gitPush(context, branch, tags) {
     }
     const cmdArgs = ["push", "-u", "origin", branch];
     if (tags) {
-      cmdArgs.push("--follow-tags");
+      cmdArgs.push("--tags");
     }
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
