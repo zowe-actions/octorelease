@@ -12590,7 +12590,7 @@ function findCurrentPr(state = "open") {
       const prs = (yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, github.context.repo), {
         commit_sha: github.context.sha
       }))).data.filter((pr) => !state || pr.state === state);
-      return prs.find((pr) => github.context.payload.ref === `refs/heads/${pr.head.ref}`) || prs[0];
+      return prs.find((pr) => github.context.payload.ref === `refs/heads/${pr.head.ref}`);
     } else {
       const [owner, repo] = github.context.payload.workflow_run.head_repository.full_name.split("/", 2);
       const prs = (yield octokit.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -12598,7 +12598,7 @@ function findCurrentPr(state = "open") {
         repo,
         commit_sha: github.context.payload.workflow_run.head_sha
       })).data.filter((pr) => (!state || pr.state === state) && pr.base.repo.full_name === github.context.payload.workflow_run.repository.full_name);
-      return prs.find((pr) => pr.head.ref === github.context.payload.workflow_run.head_branch) || prs[0];
+      return prs.find((pr) => pr.head.ref === github.context.payload.workflow_run.head_branch);
     }
   });
 }
