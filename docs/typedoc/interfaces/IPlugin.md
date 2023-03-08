@@ -6,7 +6,7 @@ Type for loaded plugin modules
 
 ## Table of contents
 
-### Methods
+### Properties
 
 - [fail](IPlugin.md#fail)
 - [init](IPlugin.md#init)
@@ -14,117 +14,137 @@ Type for loaded plugin modules
 - [success](IPlugin.md#success)
 - [version](IPlugin.md#version)
 
-## Methods
+## Properties
 
 ### fail
 
-▸ `Optional` **fail**(`context`, `config`): `Promise`<`void`\>
+• `Optional` **fail**: (`context`: [`IContext`](IContext.md), `config`: `Record`<`string`, `any`\>) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`context`, `config`): `Promise`<`void`\>
 
 Handler for "fail" stage
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `context` | [`IContext`](IContext.md) | Global context object for Octorelease |
 | `config` | `Record`<`string`, `any`\> | Plugin configuration object |
 
-#### Returns
+##### Returns
 
 `Promise`<`void`\>
 
 #### Defined in
 
-[doc/IPlugin.ts:28](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L28)
+[doc/IPlugin.ts:28](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L28)
 
 ___
 
 ### init
 
-▸ `Optional` **init**(`context`, `config`): `Promise`<`void`\>
+• `Optional` **init**: (`context`: [`IContext`](IContext.md), `config`: `Record`<`string`, `any`\>) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`context`, `config`): `Promise`<`void`\>
 
 Handler for "init" stage
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `context` | [`IContext`](IContext.md) | Global context object for Octorelease |
 | `config` | `Record`<`string`, `any`\> | Plugin configuration object |
 
-#### Returns
+##### Returns
 
 `Promise`<`void`\>
 
 #### Defined in
 
-[doc/IPlugin.ts:35](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L35)
+[doc/IPlugin.ts:35](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L35)
 
 ___
 
 ### publish
 
-▸ `Optional` **publish**(`context`, `config`): `Promise`<`void`\>
+• `Optional` **publish**: (`context`: [`IContext`](IContext.md), `config`: `Record`<`string`, `any`\>) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`context`, `config`): `Promise`<`void`\>
 
 Handler for "publish" stage
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `context` | [`IContext`](IContext.md) | Global context object for Octorelease |
 | `config` | `Record`<`string`, `any`\> | Plugin configuration object |
 
-#### Returns
+##### Returns
 
 `Promise`<`void`\>
 
 #### Defined in
 
-[doc/IPlugin.ts:42](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L42)
+[doc/IPlugin.ts:42](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L42)
 
 ___
 
 ### success
 
-▸ `Optional` **success**(`context`, `config`): `Promise`<`void`\>
+• `Optional` **success**: (`context`: [`IContext`](IContext.md), `config`: `Record`<`string`, `any`\>) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`context`, `config`): `Promise`<`void`\>
 
 Handler for "success" stage
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `context` | [`IContext`](IContext.md) | Global context object for Octorelease |
 | `config` | `Record`<`string`, `any`\> | Plugin configuration object |
 
-#### Returns
+##### Returns
 
 `Promise`<`void`\>
 
 #### Defined in
 
-[doc/IPlugin.ts:49](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L49)
+[doc/IPlugin.ts:49](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L49)
 
 ___
 
 ### version
 
-▸ `Optional` **version**(`context`, `config`): `Promise`<`void`\>
+• `Optional` **version**: (`context`: [`IContext`](IContext.md), `config`: `Record`<`string`, `any`\>) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`context`, `config`): `Promise`<`void`\>
 
 Handler for "version" stage
 
-#### Parameters
+##### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `context` | [`IContext`](IContext.md) | Global context object for Octorelease |
 | `config` | `Record`<`string`, `any`\> | Plugin configuration object |
 
-#### Returns
+##### Returns
 
 `Promise`<`void`\>
 
 #### Defined in
 
-[doc/IPlugin.ts:56](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IPlugin.ts#L56)
+[doc/IPlugin.ts:56](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L56)

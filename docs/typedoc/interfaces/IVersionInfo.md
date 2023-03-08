@@ -22,7 +22,7 @@ New version to be released
 
 #### Defined in
 
-[doc/IVersionInfo.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IVersionInfo.ts#L29)
+[doc/IVersionInfo.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IVersionInfo.ts#L29)
 
 ___
 
@@ -34,7 +34,7 @@ Old version found in Git history
 
 #### Defined in
 
-[doc/IVersionInfo.ts:24](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IVersionInfo.ts#L24)
+[doc/IVersionInfo.ts:24](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IVersionInfo.ts#L24)
 
 ___
 
@@ -46,4 +46,4 @@ Prerelease string if this is a prerelease branch
 
 #### Defined in
 
-[doc/IVersionInfo.ts:34](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IVersionInfo.ts#L34)
+[doc/IVersionInfo.ts:34](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IVersionInfo.ts#L34)

@@ -24,22 +24,24 @@ import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {
+        const scriptName = core.getInput("script");
         const workingDir = core.getInput("working-dir");
         if (workingDir) {
+            core.debug(`Changing working directory to '${workingDir}'`);
             process.chdir(path.resolve(workingDir));
         }
 
         const prBranch = (await utils.findCurrentPr())?.base.ref;
         const context = await coreUtils.buildContext({
             branch: prBranch,
-            force: !RELEASE_SCRIPTS.includes(core.getInput("script"))
+            force: !RELEASE_SCRIPTS.includes(scriptName)
         });
         if (context == null) {
-            core.info("Current branch is not targeting a release branch, exiting now");
+            core.warning("Current branch is not targeting a release branch, exiting now");
             process.exit();
         }
-
-        await loadScript(core.getInput("script"))(context);
+        context.logger.pluginName = scriptName;
+        await loadScript(scriptName)(context);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error.stack || error.message);

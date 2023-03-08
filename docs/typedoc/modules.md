@@ -24,12 +24,12 @@
 - [IReleasedPackage](interfaces/IReleasedPackage.md)
 - [IVersionInfo](interfaces/IVersionInfo.md)
 
-### Type aliases
+### Type Aliases
 
 - [BranchConfig](modules.md#branchconfig)
 - [PluginConfig](modules.md#pluginconfig)
 
-## Type aliases
+## Type Aliases
 
 ### BranchConfig
 
@@ -40,17 +40,17 @@ or object containing branch config.
 
 #### Defined in
 
-[doc/IConfig.ts:23](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IConfig.ts#L23)
+[doc/IConfig.ts:23](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L23)
 
 ___
 
 ### PluginConfig
 
-Ƭ **PluginConfig**: `string` \| [`string`, `Record`<`string`, `any`\>]
+Ƭ **PluginConfig**: `string` \| [`string`, ...Record<string, any\>[]]
 
 Union type for plugin configuration. Can be string specifying plugin name
-or tuple containing plugin name and configuration object.
+or array containing plugin name and one or more configuration objects.
 
 #### Defined in
 
-[doc/IConfig.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IConfig.ts#L29)
+[doc/IConfig.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L29)

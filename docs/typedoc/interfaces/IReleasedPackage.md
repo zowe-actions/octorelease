@@ -8,8 +8,6 @@ Info about successfully released package
 
 ▪ [key: `string`]: `any`
 
-Other plugin-specific properties
-
 ## Table of contents
 
 ### Properties
@@ -27,7 +25,7 @@ Package name
 
 #### Defined in
 
-[doc/IReleasedPackage.ts:24](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IReleasedPackage.ts#L24)
+[doc/IReleasedPackage.ts:24](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IReleasedPackage.ts#L24)
 
 ___
 
@@ -39,4 +37,4 @@ URL to download package
 
 #### Defined in
 
-[doc/IReleasedPackage.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IReleasedPackage.ts#L29)
+[doc/IReleasedPackage.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IReleasedPackage.ts#L29)

@@ -22,7 +22,12 @@ import * as utils from "../src/utils";
 
 async function downloadCoverageReports(context: IContext) {
     // For GHA workflows triggered by workflow_run event, download coverage artifact from the triggering workflow
-    if (context.ci.service as any !== "github" || process.env.COVERAGE_ARTIFACT == null) {
+    if (process.env.COVERAGE_ARTIFACT == null) {
+        context.logger.warn("Unable to download coverage reports without the COVERAGE_ARTIFACT environment variable");
+        return;
+    }
+    if (context.ci.service as any !== "github") {
+        context.logger.warn("Unable to download coverage reports for a CI Environment other than GitHub");
         return;
     }
     const [artifactName, extractPath] = process.env.COVERAGE_ARTIFACT.split(":", 2);
@@ -41,18 +46,23 @@ function getPrHeadRef(pr: any) {
 function rewriteCoverageReports(context: IContext) {
     // Workaround for https://community.sonarsource.com/t/code-coverage-doesnt-work-with-github-action/16747
     if (context.ci.service as any !== "github") {
+        context.logger.warn("Unable to rewrite coverage reports for a CI Environment other than GitHub");
         return;
     }
     const sonarProps = properties.of("sonar-project.properties");
     const reportPaths = sonarProps.get("sonar.javascript.lcov.reportPaths");
     if (typeof reportPaths !== "string") {
+        context.logger.warn("Unable to find the property: 'sonar.javascript.lcov.reportPaths'");
         return;
     }
     context.logger.info("Fixing coverage paths for SonarCloud");
     const pattern = new RegExp(context.env.GITHUB_WORKSPACE, "g");
     for (const reportPath of reportPaths.split(",")) {
+        context.logger.debug("Report file: " + reportPath);
         const reportText = fs.readFileSync(reportPath, "utf-8");
+        context.logger.debug("Contents before:\n" + reportText);
         fs.writeFileSync(reportPath, reportText.replace(pattern, "/github/workspace"));
+        context.logger.debug("Contents after:\n" + fs.readFileSync(reportPath, "utf-8"));
     }
 }
 
@@ -82,6 +92,7 @@ export default async function (context: IContext): Promise<void> {
     // Convert properties to argument string and store it in output
     context.logger.info("Sonar scan properties:\n" + JSON.stringify(sonarProps, null, 2));
     fs.appendFileSync("sonar-project.properties", Object.entries(sonarProps).map(([k, v]) => `${k}=${v}`).join("\n"));
+    context.logger.debug("All Sonar scan properties:\n" + fs.readFileSync("sonar-project.properties", "utf-8"));
     await downloadCoverageReports(context);
     rewriteCoverageReports(context);
 }
