@@ -12749,7 +12749,7 @@ function run() {
       const context3 = yield import_core.utils.buildContext({
         branch: prBranch,
         force: !RELEASE_SCRIPTS.includes(scriptName),
-        loggerPrefix: scriptName
+        logPrefix: scriptName
       });
       if (context3 == null) {
         core3.warning("Current branch is not targeting a release branch, exiting now");

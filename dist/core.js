@@ -19413,7 +19413,7 @@ function buildContext(opts) {
       ci: envCi,
       dryRun: Inputs.dryRun,
       env: process.env,
-      logger: new Logger(opts == null ? void 0 : opts.loggerPrefix),
+      logger: new Logger(opts == null ? void 0 : opts.logPrefix),
       plugins: pluginConfig,
       releasedPackages: {},
       rootDir: process.cwd(),
@@ -19444,7 +19444,7 @@ function loadPlugins(context) {
       }
       const fullPluginPath = path3.resolve(pluginPath);
       pluginsLoaded[pluginName] = require(fullPluginPath);
-      Logger.pluginPathMap[pluginName] = fullPluginPath;
+      Logger.pluginPathMap[pluginName] = require.resolve(fullPluginPath);
     }
     return pluginsLoaded;
   });

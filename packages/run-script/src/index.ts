@@ -35,7 +35,7 @@ async function run(): Promise<void> {
         const context = await coreUtils.buildContext({
             branch: prBranch,
             force: !RELEASE_SCRIPTS.includes(scriptName),
-            loggerPrefix: scriptName
+            logPrefix: scriptName
         });
         if (context == null) {
             core.warning("Current branch is not targeting a release branch, exiting now");
