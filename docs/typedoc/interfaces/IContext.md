@@ -18,6 +18,7 @@ Global context object for Octorelease
 - [plugins](IContext.md#plugins)
 - [releaseNotes](IContext.md#releasenotes)
 - [releasedPackages](IContext.md#releasedpackages)
+- [rootDir](IContext.md#rootdir)
 - [tagPrefix](IContext.md#tagprefix)
 - [version](IContext.md#version)
 - [workspaces](IContext.md#workspaces)
@@ -30,11 +31,15 @@ Global context object for Octorelease
 
 Properties for current Git branch
 
-**`example`** { name: "master", level: "minor" }
+**`Example`**
+
+```ts
+{ name: "master", level: "minor" }
+```
 
 #### Defined in
 
-[doc/IContext.ts:31](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L31)
+[doc/IContext.ts:31](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L31)
 
 ___
 
@@ -44,25 +49,33 @@ ___
 
 List of changed files to stage
 
-**`example`** ["package.json", "package-lock.json"]
+**`Example`**
+
+```ts
+["package.json", "package-lock.json"]
+```
 
 #### Defined in
 
-[doc/IContext.ts:37](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L37)
+[doc/IContext.ts:37](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L37)
 
 ___
 
 ### ci
 
-• **ci**: `AppveyorEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `BambooEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `BitbucketEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `BitriseEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `BuddyEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `BuildkiteEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `CircleCiEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `CirrusEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `CodeBuildEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `CodefreshEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `CodeshipEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `DroneEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `GitLabEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `JenkinsEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `SailEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `SemaphoreEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `ShippableEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `TeamCityEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `TravisEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `VstsEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  } & `WerckerEnv` & { `repo`: { `owner`: `string` ; `repo`: `string`  }  }
+• **ci**: `Object`
 
 Properties for current CI environment
 
-**`example`** { branch: "master", commit: "deadbeef", repo: { owner: "octorelease", repo: "octorelease" } }
+**`Example`**
+
+```ts
+{ branch: "master", commit: "deadbeef", repo: { owner: "octorelease", repo: "octorelease" } }
+```
 
 #### Defined in
 
-[doc/IContext.ts:43](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L43)
+[doc/IContext.ts:43](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L43)
 
 ___
 
@@ -74,7 +87,7 @@ If true, don't make any changes but report what would have been done
 
 #### Defined in
 
-[doc/IContext.ts:53](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L53)
+[doc/IContext.ts:53](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L53)
 
 ___
 
@@ -86,7 +99,7 @@ Environment variables
 
 #### Defined in
 
-[doc/IContext.ts:58](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L58)
+[doc/IContext.ts:58](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L58)
 
 ___
 
@@ -98,7 +111,7 @@ Error object defined for "fail" stage
 
 #### Defined in
 
-[doc/IContext.ts:63](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L63)
+[doc/IContext.ts:63](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L63)
 
 ___
 
@@ -110,7 +123,7 @@ Logger for writing to console
 
 #### Defined in
 
-[doc/IContext.ts:68](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L68)
+[doc/IContext.ts:68](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L68)
 
 ___
 
@@ -120,15 +133,19 @@ ___
 
 Key-value pairs of plugin names and configuration objects
 
-**`example`** { "@octorelease/changelog": {}, "@octorelease/github": { assets: "*.tgz" } }
+**`Example`**
+
+```ts
+{ "@octorelease/changelog": [], "@octorelease/github": [ { assets: "*.tgz" } ] }
+```
 
 #### Index signature
 
-▪ [key: `string`]: `Record`<`string`, `any`\>
+▪ [key: `string`]: `Record`<`string`, `any`\>[]
 
 #### Defined in
 
-[doc/IContext.ts:74](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L74)
+[doc/IContext.ts:74](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L74)
 
 ___
 
@@ -140,7 +157,7 @@ Multi-line string containing changelog
 
 #### Defined in
 
-[doc/IContext.ts:85](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L85)
+[doc/IContext.ts:85](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L85)
 
 ___
 
@@ -150,7 +167,11 @@ ___
 
 Key-value pairs of release types and released package info
 
-**`example`** { npm: [{ name: "@octorelease/core" }] }
+**`Example`**
+
+```ts
+{ npm: [{ name: "@octorelease/core" }] }
+```
 
 #### Index signature
 
@@ -158,7 +179,19 @@ Key-value pairs of release types and released package info
 
 #### Defined in
 
-[doc/IContext.ts:80](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L80)
+[doc/IContext.ts:80](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L80)
+
+___
+
+### rootDir
+
+• **rootDir**: `string`
+
+Absolute path of project root directory
+
+#### Defined in
+
+[doc/IContext.ts:90](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L90)
 
 ___
 
@@ -170,7 +203,7 @@ Git tag prefix that precedes version number (default is "v")
 
 #### Defined in
 
-[doc/IContext.ts:90](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L90)
+[doc/IContext.ts:95](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L95)
 
 ___
 
@@ -180,11 +213,15 @@ ___
 
 Version info including old and new project version
 
-**`example`** { old: "1.0.0", new: "1.0.1" }
+**`Example`**
+
+```ts
+{ old: "1.0.0", new: "1.0.1" }
+```
 
 #### Defined in
 
-[doc/IContext.ts:96](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L96)
+[doc/IContext.ts:101](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L101)
 
 ___
 
@@ -194,8 +231,12 @@ ___
 
 Subpackage paths or globs for monorepo
 
-**`example`** ["packages/*"]
+**`Example`**
+
+```ts
+["packages/*"]
+```
 
 #### Defined in
 
-[doc/IContext.ts:102](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/doc/IContext.ts#L102)
+[doc/IContext.ts:107](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L107)

@@ -8,6 +8,7 @@
 
 - [buildContext](utils.md#buildcontext)
 - [dryRunTask](utils.md#dryruntask)
+- [getLastCommitMessage](utils.md#getlastcommitmessage)
 - [loadPlugins](utils.md#loadplugins)
 - [verifyConditions](utils.md#verifyconditions)
 
@@ -15,9 +16,17 @@
 
 ### buildContext
 
-▸ **buildContext**(): `Promise`<[`IContext`](../interfaces/IContext.md) \| `undefined`\>
+▸ **buildContext**(`opts?`): `Promise`<[`IContext`](../interfaces/IContext.md) \| `undefined`\>
 
 Build global context object that is passed to all plugin handlers.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `opts?` | `Object` |
+| `opts.branch?` | `string` |
+| `opts.force?` | `boolean` |
 
 #### Returns
 
@@ -27,7 +36,7 @@ Global context object for Octorelease
 
 #### Defined in
 
-[utils.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L29)
+[utils.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L29)
 
 ___
 
@@ -57,7 +66,31 @@ In dry run mode skip the task, otherwise run it.
 
 #### Defined in
 
-[utils.ts:78](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L78)
+[utils.ts:84](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L84)
+
+___
+
+### getLastCommitMessage
+
+▸ **getLastCommitMessage**(`context`): `Promise`<`string` \| `undefined`\>
+
+Retrieve most recent Git commit message if there is one.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `context` | [`IContext`](../interfaces/IContext.md) |
+
+#### Returns
+
+`Promise`<`string` \| `undefined`\>
+
+Commit message or undefined if there is no Git history
+
+#### Defined in
+
+[utils.ts:160](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L160)
 
 ___
 
@@ -83,7 +116,7 @@ Key-value pairs of plugin names and loaded modules
 
 #### Defined in
 
-[utils.ts:94](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L94)
+[utils.ts:100](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L100)
 
 ___
 
@@ -108,4 +141,4 @@ branch rules.
 
 #### Defined in
 
-[utils.ts:116](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/utils.ts#L116)
+[utils.ts:122](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L122)

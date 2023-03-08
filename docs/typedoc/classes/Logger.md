@@ -10,6 +10,10 @@ Class for logging messages to the console.
 
 - [constructor](Logger.md#constructor)
 
+### Properties
+
+- [pluginName](Logger.md#pluginname)
+
 ### Methods
 
 - [debug](Logger.md#debug)
@@ -32,7 +36,19 @@ Class for logging messages to the console.
 
 #### Defined in
 
-[logger.ts:23](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/logger.ts#L23)
+[logger.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L29)
+
+## Properties
+
+### pluginName
+
+• `Optional` **pluginName**: `string`
+
+Plugin name to prepend to log messages.
+
+#### Defined in
+
+[logger.ts:27](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L27)
 
 ## Methods
 
@@ -54,7 +70,7 @@ Output debug level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:29](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/logger.ts#L29)
+[logger.ts:37](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L37)
 
 ___
 
@@ -76,7 +92,7 @@ Output error level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:37](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/logger.ts#L37)
+[logger.ts:45](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L45)
 
 ___
 
@@ -98,7 +114,7 @@ Output info level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:45](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/logger.ts#L45)
+[logger.ts:53](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L53)
 
 ___
 
@@ -122,7 +138,7 @@ Text with plugin name prepended
 
 #### Defined in
 
-[logger.ts:62](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/logger.ts#L62)
+[logger.ts:70](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L70)
 
 ___
 
@@ -144,4 +160,4 @@ Output warning level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:53](https://github.com/t1m0thyj/octorelease/blob/11f83ae/packages/core/src/logger.ts#L53)
+[logger.ts:61](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L61)

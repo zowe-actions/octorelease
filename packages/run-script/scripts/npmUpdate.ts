@@ -29,7 +29,8 @@ interface IProtectedBranchWithDeps extends IProtectedBranch {
     devDependencies: string[] | Record<string, string>;
 }
 
-function getDependencies(branch: IProtectedBranchWithDeps, dev: boolean) {
+function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, dev: boolean) {
+    context.logger.debug(`Gathering ${dev ? "devD" : "d"}ependency information for branch: ${branch.name}`);
     const dependencies = dev ? branch.devDependencies : branch.dependencies;
     if (!Array.isArray(dependencies)) {
         return dependencies || {};
@@ -43,11 +44,13 @@ function getDependencies(branch: IProtectedBranchWithDeps, dev: boolean) {
     return dependencyMap;
 }
 
-async function updateDependency(pkgName: string, pkgTag: string, dev: boolean): Promise<void> {
+async function updateDependency(context: IContext, pkgName: string, pkgTag: string, dev: boolean): Promise<void> {
+    context.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${pkgTag}`);
     const lockfile = JSON.parse(fs.readFileSync(lockfilePath, "utf-8"));
     const currentVersion = lockfile.dependencies[pkgName].version;
 
     if (resolutions[pkgName] == null) {
+        context.logger.debug(`Gathering version information for: ${pkgName}@${pkgTag}`);
         resolutions[pkgName] = (await exec.getExecOutput("npm",
             ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
     }
@@ -55,8 +58,10 @@ async function updateDependency(pkgName: string, pkgTag: string, dev: boolean): 
 
     if (currentVersion !== latestVersion) {
         const npmArgs = dev ? ["--save-dev"] : ["--save-prod", "--save-exact"];
+        const newUpdate = `${pkgName}: ${currentVersion} -> ${latestVersion}`;
+        context.logger.debug(`Updating ${newUpdate}`);
         await exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs]);
-        updateDetails.push(`${pkgName}: ${currentVersion} -> ${latestVersion}`);
+        updateDetails.push(newUpdate);
     }
 }
 
@@ -67,8 +72,8 @@ export default async function (context: IContext): Promise<void> {
     }
 
     const pluralize = require("pluralize");
-    const dependencies = getDependencies(branchConfig, false);
-    const devDependencies = getDependencies(branchConfig, true);
+    const dependencies = getDependencies(context, branchConfig, false);
+    const devDependencies = getDependencies(context, branchConfig, true);
     const changedFiles = ["package.json", lockfilePath];
     context.logger.info(`Checking for updates to ${pluralize("dependency", Object.keys(dependencies).length, true)} ` +
         `and ${pluralize("dev dependency", Object.keys(devDependencies).length, true)}`);
@@ -76,19 +81,20 @@ export default async function (context: IContext): Promise<void> {
     if (context.env.NPM_RESOLUTIONS) {
         resolutions = JSON.parse(context.env.NPM_RESOLUTIONS);
         if (Object.keys(resolutions).length === 0) {
+            context.logger.debug("No NPM resolutions found, exiting now");
             return;
         }
     }
 
     if (branchConfig.dependencies != null) {
         for (const [pkgName, pkgTag] of Object.entries(dependencies)) {
-            await updateDependency(pkgName, pkgTag, false);
+            await updateDependency(context, pkgName, pkgTag, false);
         }
     }
 
     if (branchConfig.devDependencies) {
         for (const [pkgName, pkgTag] of Object.entries(devDependencies)) {
-            await updateDependency(pkgName, pkgTag, true);
+            await updateDependency(context, pkgName, pkgTag, true);
         }
     }
 
