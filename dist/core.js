@@ -19210,47 +19210,70 @@ Inputs.rootDir = process.cwd();
 
 // src/logger.ts
 var core2 = __toESM(require_core());
-var Logger = class {
-  constructor(pluginName) {
-    this.pluginName = pluginName;
+var _Logger = class {
+  constructor(prefix) {
+    this.prefix = prefix;
   }
   /**
    * Output debug level message with plugin name prepended.
    * @param message Text to output
    */
   debug(message) {
-    core2.debug(this.prependPluginName(message));
+    core2.debug(this.addPrefix(message));
   }
   /**
    * Output error level message with plugin name prepended.
    * @param message Text to output
    */
   error(message) {
-    core2.error(this.prependPluginName(message));
+    core2.error(this.addPrefix(message));
   }
   /**
    * Output info level message with plugin name prepended.
    * @param message Text to output
    */
   info(message) {
-    core2.info(this.prependPluginName(message));
+    core2.info(this.addPrefix(message));
   }
   /**
    * Output warning level message with plugin name prepended.
    * @param message Text to output
    */
   warn(message) {
-    core2.warning(this.prependPluginName(message));
+    core2.warning(this.addPrefix(message));
   }
   /**
-   * If plugin name is defined for this logger, prepend it to message.
+   * If prefix is defined for this logger, prepend it to message.
    * @param message Text to output
-   * @returns Text with plugin name prepended
+   * @returns Text with prefix prepended
    */
-  prependPluginName(message) {
-    return this.pluginName ? `[${this.pluginName}] ${message}` : message;
+  addPrefix(message) {
+    var _a;
+    const tempPrefix = (_a = this.prefix) != null ? _a : this.getPluginName();
+    return tempPrefix ? `[${tempPrefix}] ${message}` : message;
+  }
+  /**
+   * Searches the call stack for file paths associated with a plugin.
+   * @returns Name of active plugin if one is found
+   */
+  getPluginName() {
+    var _a;
+    const stackMatches = (_a = new Error().stack) == null ? void 0 : _a.matchAll(/\s\((.+?):\d+:\d+\)$/gm);
+    for (const match of stackMatches || []) {
+      const callStackPath = match[1];
+      const activePluginName = Object.keys(_Logger.pluginPathMap).find((pluginName) => callStackPath === _Logger.pluginPathMap[pluginName]);
+      if (activePluginName != null) {
+        return activePluginName;
+      }
+    }
   }
 };
+var Logger = _Logger;
+/**
+ * Mapping of plugin names to their file paths
+ * @internal
+ */
+Logger.pluginPathMap = {};
 
 // src/stages.ts
 var stages_exports = {};
@@ -19300,11 +19323,9 @@ function runStage(context, pluginsLoaded, stage) {
       for (const pluginConfig of context.plugins[pluginName] || []) {
         context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
         const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-        context.logger.pluginName = pluginName;
         try {
           yield pluginModule[stage.name](context, pluginConfig);
         } finally {
-          context.logger.pluginName = void 0;
           unloadEnv(oldEnv);
         }
       }
@@ -19392,7 +19413,7 @@ function buildContext(opts) {
       ci: envCi,
       dryRun: Inputs.dryRun,
       env: process.env,
-      logger: new Logger(),
+      logger: new Logger(opts == null ? void 0 : opts.loggerPrefix),
       plugins: pluginConfig,
       releasedPackages: {},
       rootDir: process.cwd(),
@@ -19421,7 +19442,9 @@ function loadPlugins(context) {
       if (pluginName.startsWith("@octorelease/") && !fs.existsSync(pluginPath)) {
         pluginPath = pluginName.replace("@octorelease", __dirname);
       }
-      pluginsLoaded[pluginName] = require(path3.resolve(pluginPath));
+      const fullPluginPath = path3.resolve(pluginPath);
+      pluginsLoaded[pluginName] = require(fullPluginPath);
+      Logger.pluginPathMap[pluginName] = fullPluginPath;
     }
     return pluginsLoaded;
   });

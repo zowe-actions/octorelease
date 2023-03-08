@@ -26,7 +26,7 @@ import { Logger } from "./logger";
  * Build global context object that is passed to all plugin handlers.
  * @returns Global context object for Octorelease
  */
-export async function buildContext(opts?: { branch?: string, force?: boolean }):
+export async function buildContext(opts?: { branch?: string, force?: boolean, loggerPrefix?: string }):
     Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
     const config = await cosmiconfig("release").search(Inputs.configDir);
@@ -66,7 +66,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         ci: envCi,
         dryRun: Inputs.dryRun,
         env: process.env as any,
-        logger: new Logger(),
+        logger: new Logger(opts?.loggerPrefix),
         plugins: pluginConfig,
         releasedPackages: {},
         rootDir: process.cwd(),
@@ -107,7 +107,9 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
         if (pluginName.startsWith("@octorelease/") && !fs.existsSync(pluginPath)) {
             pluginPath = pluginName.replace("@octorelease", __dirname);
         }
-        pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
+        const fullPluginPath = path.resolve(pluginPath);
+        pluginsLoaded[pluginName] = require(fullPluginPath);
+        Logger.pluginPathMap[pluginName] = fullPluginPath;
     }
     return pluginsLoaded;
 }
