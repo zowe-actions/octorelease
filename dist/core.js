@@ -19382,12 +19382,12 @@ function buildContext(opts) {
   return __async(this, null, function* () {
     var _a;
     const envCi = yield loadCiEnv();
-    const config = yield (0, import_cosmiconfig.cosmiconfig)("release").search(Inputs.configDir);
-    if (config == null || config.isEmpty) {
+    const rc = yield (0, import_cosmiconfig.cosmiconfig)("release").search(Inputs.configDir);
+    if (rc == null || rc.isEmpty) {
       throw new Error("Failed to load config because file does not exist or is empty");
     }
     const micromatch = require_micromatch();
-    const branches = config.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
+    const branches = rc.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
     const branchIndex = branches.findIndex((branch) => micromatch.isMatch((opts == null ? void 0 : opts.branch) || envCi.branch, branch.name));
     if (branchIndex == -1 && !(opts == null ? void 0 : opts.force)) {
       return;
@@ -19398,14 +19398,14 @@ function buildContext(opts) {
       branchInfo.channel = branchInfo.name;
     }
     const pluginConfig = {};
-    for (const pc of config.config.plugins || []) {
+    for (const pc of rc.config.plugins || []) {
       if (typeof pc === "string") {
         pluginConfig[pc] = [{}];
       } else {
         pluginConfig[pc[0]] = pc.slice(1);
       }
     }
-    const tagPrefix = config.config.tagPrefix || "v";
+    const tagPrefix = rc.config.tagPrefix || "v";
     const versionInfo = yield buildVersionInfo(branchInfo, tagPrefix);
     return {
       branch: branchInfo,
