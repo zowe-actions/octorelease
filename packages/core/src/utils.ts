@@ -18,24 +18,25 @@ import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IPluginsLoaded, IProtectedBranch, IVersionInfo } from "./doc";
+import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
 /**
  * Build global context object that is passed to all plugin handlers.
+ * @param opts Options for building the context object
  * @returns Global context object for Octorelease
  */
-export async function buildContext(opts?: { branch?: string, force?: boolean }):
+export async function buildContext(opts?: IContextOpts):
     Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
-    const config = await cosmiconfig("release").search(Inputs.configDir);
-    if (config == null || config.isEmpty) {
+    const rc = await cosmiconfig("release").search(Inputs.configDir);
+    if (rc == null || rc.isEmpty) {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
     const micromatch = require("micromatch");
-    const branches = config.config.branches.map((branch: any) => typeof branch === "string" ?
+    const branches = rc.config.branches.map((branch: any) => typeof branch === "string" ?
         { name: branch } : branch);
     const branchIndex = branches.findIndex((branch: any) =>
         micromatch.isMatch(opts?.branch || envCi.branch, branch.name));
@@ -49,7 +50,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
     }
 
     const pluginConfig: Record<string, Record<string, any>[]> = {};
-    for (const pc of (config.config.plugins || [])) {
+    for (const pc of (rc.config.plugins || [])) {
         if (typeof pc === "string") {
             pluginConfig[pc] = [{}];
         } else {
@@ -57,7 +58,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         }
     }
 
-    const tagPrefix = config.config.tagPrefix || "v";
+    const tagPrefix = rc.config.tagPrefix || "v";
     const versionInfo = await buildVersionInfo(branchInfo, tagPrefix);
 
     return {
@@ -66,7 +67,7 @@ export async function buildContext(opts?: { branch?: string, force?: boolean }):
         ci: envCi,
         dryRun: Inputs.dryRun,
         env: process.env as any,
-        logger: new Logger(),
+        logger: new Logger(opts?.logPrefix),
         plugins: pluginConfig,
         releasedPackages: {},
         rootDir: process.cwd(),
@@ -107,7 +108,9 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
         if (pluginName.startsWith("@octorelease/") && !fs.existsSync(pluginPath)) {
             pluginPath = pluginName.replace("@octorelease", __dirname);
         }
-        pluginsLoaded[pluginName] = require(path.resolve(pluginPath));
+        const fullPluginPath = path.resolve(pluginPath);
+        pluginsLoaded[pluginName] = require(fullPluginPath);
+        Logger.pluginPathMap[pluginName] = require.resolve(fullPluginPath);
     }
     return pluginsLoaded;
 }

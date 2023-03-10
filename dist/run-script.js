@@ -12748,13 +12748,13 @@ function run() {
       const prBranch = (_a = yield findCurrentPr()) == null ? void 0 : _a.base.ref;
       const context3 = yield import_core.utils.buildContext({
         branch: prBranch,
-        force: !RELEASE_SCRIPTS.includes(scriptName)
+        force: !RELEASE_SCRIPTS.includes(scriptName),
+        logPrefix: scriptName
       });
       if (context3 == null) {
         core3.warning("Current branch is not targeting a release branch, exiting now");
         process.exit();
       }
-      context3.logger.pluginName = scriptName;
       yield loadScript(scriptName)(context3);
     } catch (error2) {
       if (error2 instanceof Error) {

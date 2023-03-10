@@ -100,12 +100,10 @@ async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage:
         for (const pluginConfig of (context.plugins[pluginName] || [])) {
             context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
-            context.logger.pluginName = pluginName;
 
             try {
                 await (pluginModule[stage.name] as any)(context, pluginConfig);
             } finally {
-                context.logger.pluginName = undefined;
                 unloadEnv(oldEnv);
             }
         }

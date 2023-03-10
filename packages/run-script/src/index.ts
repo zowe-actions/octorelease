@@ -34,13 +34,14 @@ async function run(): Promise<void> {
         const prBranch = (await utils.findCurrentPr())?.base.ref;
         const context = await coreUtils.buildContext({
             branch: prBranch,
-            force: !RELEASE_SCRIPTS.includes(scriptName)
+            force: !RELEASE_SCRIPTS.includes(scriptName),
+            logPrefix: scriptName
         });
         if (context == null) {
             core.warning("Current branch is not targeting a release branch, exiting now");
             process.exit();
         }
-        context.logger.pluginName = scriptName;
+
         await loadScript(scriptName)(context);
     } catch (error) {
         if (error instanceof Error) {

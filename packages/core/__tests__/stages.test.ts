@@ -42,6 +42,7 @@ describe("Core stages", () => {
     beforeAll(() => {
         oldProcessEnv = process.env;
         jest.spyOn(core, "info").mockImplementation();
+        Logger.pluginPathMap = { [testPlugin]: __filename };
     });
 
     afterAll(() => {

@@ -21,21 +21,19 @@ import * as core from "@actions/core";
  */
 export class Logger {
     /**
-     * Plugin name to prepend to log messages.
+     * Mapping of plugin names to their file paths
      * @internal
      */
-    public pluginName?: string;
+    public static pluginPathMap: Record<string, string> = {};
 
-    constructor(pluginName?: string) {
-        this.pluginName = pluginName;
-    }
+    constructor(private prefix?: string) {}
 
     /**
      * Output debug level message with plugin name prepended.
      * @param message Text to output
      */
     public debug(message: string): void {
-        core.debug(this.prependPluginName(message));
+        core.debug(this.addPrefix(message));
     }
 
     /**
@@ -43,7 +41,7 @@ export class Logger {
      * @param message Text to output
      */
     public error(message: string): void {
-        core.error(this.prependPluginName(message));
+        core.error(this.addPrefix(message));
     }
 
     /**
@@ -51,7 +49,7 @@ export class Logger {
      * @param message Text to output
      */
     public info(message: string): void {
-        core.info(this.prependPluginName(message));
+        core.info(this.addPrefix(message));
     }
 
     /**
@@ -59,15 +57,32 @@ export class Logger {
      * @param message Text to output
      */
     public warn(message: string): void {
-        core.warning(this.prependPluginName(message));
+        core.warning(this.addPrefix(message));
     }
 
     /**
-     * If plugin name is defined for this logger, prepend it to message.
+     * If prefix is defined for this logger, prepend it to message.
      * @param message Text to output
-     * @returns Text with plugin name prepended
+     * @returns Text with prefix prepended
      */
-    private prependPluginName(message: string) {
-        return this.pluginName ? `[${this.pluginName}] ${message}` : message;
+    private addPrefix(message: string): string {
+        const tempPrefix = this.prefix ?? this.getPluginName();
+        return tempPrefix ? `[${tempPrefix}] ${message}` : message;
+    }
+
+    /**
+     * Searches the call stack for file paths associated with a plugin.
+     * @returns Name of active plugin if one is found
+     */
+    private getPluginName(): string | undefined {
+        const stackMatches = new Error().stack?.matchAll(/\s\((.+?):\d+:\d+\)$/gm);
+        for (const match of (stackMatches || [])) {
+            const callStackPath = match[1];
+            const activePluginName = Object.keys(Logger.pluginPathMap)
+                .find((pluginName) => callStackPath === Logger.pluginPathMap[pluginName]);
+            if (activePluginName != null) {
+                return activePluginName;
+            }
+        }
     }
 }

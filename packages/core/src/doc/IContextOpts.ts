@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-export * from "./IConfig";
-export * from "./IContext";
-export * from "./IContextOpts";
-export * from "./IPlugin";
-export * from "./IPluginsLoaded";
-export * from "./IProtectedBranch";
-export * from "./IReleasedPackage";
-export * from "./IVersionInfo";
+/**
+ * Options for building the global context object
+ */
+export interface IContextOpts {
+    /**
+     * Overrides the branch name automatically detected in the CI environment.
+     */
+    branch?: string;
+
+    /**
+     * Forces context to be built even if branch is not a release branch.
+     */
+    force?: boolean;
+
+    /**
+     * Sets custom prefix for log messages.
+     */
+    logPrefix?: string;
+}
