@@ -149,7 +149,7 @@ async function findApprovedLabelEvents(context: IContext, octokit: utils.Octokit
      *  - Labels that were temporarily added and later removed
      *  - Labels that were added by user without admin privileges
      */
-    return utils.asyncFilter(events.data, async (current: any, index: number) => {
+    return utils.filterAsync(events.data, async (current: any, index: number) => {
         const futureEvents: any[] = events.data.slice(index + 1);
 
         if (current.event !== "labeled") {

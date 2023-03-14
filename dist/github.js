@@ -24116,16 +24116,17 @@ var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor
 // src/utils.ts
 var utils_exports = {};
 __export(utils_exports, {
-  asyncFilter: () => asyncFilter,
+  filterAsync: () => filterAsync,
   getOctokit: () => getOctokit2
 });
 var github = __toESM(require_github());
 var import_utils = __toESM(require_utils3());
 var import_plugin_enterprise_server = __toESM(require_dist_node11());
-function asyncFilter(array, predicate) {
-  return array.reduce((result, current, index) => __async(this, null, function* () {
-    return (yield predicate(current, index)) ? [...yield result, current] : result;
-  }), Promise.resolve([]));
+function filterAsync(array, predicate) {
+  return __async(this, null, function* () {
+    const filterMap = yield Promise.all(array.map(predicate));
+    return array.filter((_value, index) => filterMap[index]);
+  });
 }
 function getOctokit2(context, config) {
   if (config.githubUrl != null) {
@@ -24236,7 +24237,7 @@ function findApprovedLabelEvents(context, octokit, prNumber, releaseLabels) {
       headers: lastEtag ? { "if-none-match": lastEtag } : void 0
     }));
     lastEtag = events.headers.etag;
-    return asyncFilter(events.data, (current, index) => __async(this, null, function* () {
+    return filterAsync(events.data, (current, index) => __async(this, null, function* () {
       const futureEvents = events.data.slice(index + 1);
       if (current.event !== "labeled") {
         return false;

@@ -22,10 +22,11 @@ import { IPluginConfig } from "./config";
 
 export type Octokit = ReturnType<typeof github.getOctokit>;
 
-export function asyncFilter<T>(array: T[], predicate: (value: T, index: number) => Promise<boolean>): Promise<T[]> {
-    return array.reduce(async (result: Promise<T[]>, current: T, index: number) => {
-        return (await predicate(current, index)) ? [...await result, current] : result;
-    }, Promise.resolve([]));
+export async function filterAsync<T>(array: T[],
+    predicate: (value: T, index: number, array: T[]) => Promise<boolean>): Promise<T[]> {
+    // https://stackoverflow.com/questions/33355528
+    const filterMap = await Promise.all(array.map(predicate));
+    return array.filter((_value, index) => filterMap[index]);
 }
 
 export function getOctokit(context: IContext, config: IPluginConfig): Octokit {
