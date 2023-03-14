@@ -22,8 +22,6 @@ import { IContext, utils as coreUtils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
-type Octokit = ReturnType<typeof utils.getOctokit>;
-
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (!config.publishRelease && !config.assets) {
         return;
@@ -47,7 +45,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 }
 
-async function createRelease(context: IContext, octokit: Octokit): Promise<any> {
+async function createRelease(context: IContext, octokit: utils.Octokit): Promise<Record<string, any>> {
     const tagName = context.tagPrefix + context.version.new;
     let release: any;
 
@@ -79,7 +77,8 @@ async function createRelease(context: IContext, octokit: Octokit): Promise<any> 
     return release;
 }
 
-async function uploadAssets(context: IContext, octokit: Octokit, release: any, assetPaths: string[]): Promise<void> {
+async function uploadAssets(context: IContext, octokit: utils.Octokit, release: Record<string, any>,
+    assetPaths: string[]): Promise<void> {
     const globber = await glob.create(assetPaths.join("\n"));
     const artifactPaths: string[] = await globber.glob();
     const mime = require("mime-types");
@@ -88,7 +87,7 @@ async function uploadAssets(context: IContext, octokit: Octokit, release: any, a
         const assetName = path.basename(artifactPath);
 
         // Skip uploading asset if one with same name was uploaded previously
-        if (release.data.assets && release.data.assets.findIndex((asset: any) => asset.name === assetName) !== -1) {
+        if (release.data.assets && release.data.assets.some((asset: any) => asset.name === assetName)) {
             context.logger.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
             continue;
         }

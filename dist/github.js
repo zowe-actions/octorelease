@@ -24116,11 +24116,17 @@ var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor
 // src/utils.ts
 var utils_exports = {};
 __export(utils_exports, {
+  asyncFilter: () => asyncFilter,
   getOctokit: () => getOctokit2
 });
 var github = __toESM(require_github());
 var import_utils = __toESM(require_utils3());
 var import_plugin_enterprise_server = __toESM(require_dist_node11());
+function asyncFilter(array, predicate) {
+  return array.reduce((result, current, index) => __async(this, null, function* () {
+    return (yield predicate(current, index)) ? [...yield result, current] : result;
+  }), Promise.resolve([]));
+}
 function getOctokit2(context, config) {
   if (config.githubUrl != null) {
     const octokit = import_utils.GitHub.plugin(import_plugin_enterprise_server.enterpriseServer37);
@@ -24133,6 +24139,7 @@ function getOctokit2(context, config) {
 }
 
 // src/init.ts
+var lastEtag;
 function init_default(context, config) {
   return __async(this, null, function* () {
     if (context.env.GITHUB_TOKEN == null) {
@@ -24159,17 +24166,12 @@ function getPrReleaseType(context, config) {
     const labels = yield octokit.rest.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
       issue_number: prNumber
     }));
-    if (labels.data.findIndex((label) => label.name === "released") !== -1) {
+    if (labels.data.some((label) => label.name === "released")) {
       context.logger.warn("Pull request already released, no new version detected");
       return null;
     }
-    const events = yield octokit.rest.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
-      issue_number: prNumber,
-      per_page: 100
-    }));
-    const collaborators = yield octokit.rest.repos.listCollaborators(context.ci.repo);
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-    let approvedLabelEvents = findApprovedLabelEvents(events.data, collaborators.data, releaseLabels);
+    let approvedLabelEvents = yield findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
     if (approvedLabelEvents.length !== 1 && !context.dryRun) {
       const timeoutInMinutes = 30;
       for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
@@ -24200,17 +24202,10 @@ function getPrReleaseType(context, config) {
       context.logger.info("Waiting for repo admin to add release label to pull request...");
       const startTime = (/* @__PURE__ */ new Date()).getTime();
       const timeoutInMsec = timeoutInMinutes * 6e4;
-      let lastEtag = events.headers.etag;
       while (approvedLabelEvents.length !== 1 && (/* @__PURE__ */ new Date()).getTime() - startTime < timeoutInMsec) {
         yield (0, import_delay.default)(1e3);
         try {
-          const response = yield octokit.rest.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
-            issue_number: prNumber,
-            per_page: 100,
-            headers: { "if-none-match": lastEtag }
-          }));
-          approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
-          lastEtag = response.headers.etag;
+          approvedLabelEvents = yield findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
         } catch (error) {
           if (!(error instanceof import_request_error.RequestError && error.status === 304)) {
             throw error;
@@ -24232,24 +24227,30 @@ function getPrReleaseType(context, config) {
     return null;
   });
 }
-function findApprovedLabelEvents(events, collaborators, releaseLabels) {
-  return events.filter((event, idx) => {
-    const futureEvents = events.slice(idx + 1);
-    if (event.event !== "labeled") {
-      return false;
-    } else if (futureEvents.findIndex((e) => e.event === "merged") !== -1) {
-      return false;
-    } else if (futureEvents.findIndex((e) => e.event === "unlabeled" && e.label.name === event.label.name) !== -1) {
-      return false;
-    } else if (collaborators.findIndex((user) => {
-      var _a;
-      return user.id === event.actor.id && ((_a = user.permissions) == null ? void 0 : _a.admin);
-    }) === -1) {
-      return false;
-    } else if (!releaseLabels.includes(event.label.name)) {
-      return false;
-    }
-    return true;
+function findApprovedLabelEvents(context, octokit, prNumber, releaseLabels) {
+  return __async(this, null, function* () {
+    const getCollaboratorPermissionLevel = (username) => octokit.rest.repos.getCollaboratorPermissionLevel(__spreadProps(__spreadValues({}, context.ci.repo), { username }));
+    const events = yield octokit.rest.issues.listEvents(__spreadProps(__spreadValues({}, context.ci.repo), {
+      issue_number: prNumber,
+      per_page: 100,
+      headers: lastEtag ? { "if-none-match": lastEtag } : void 0
+    }));
+    lastEtag = events.headers.etag;
+    return asyncFilter(events.data, (current, index) => __async(this, null, function* () {
+      const futureEvents = events.data.slice(index + 1);
+      if (current.event !== "labeled") {
+        return false;
+      } else if (!releaseLabels.includes(current.label.name)) {
+        return false;
+      } else if (futureEvents.some((e) => e.event === "merged")) {
+        return false;
+      } else if (futureEvents.some((e) => e.event === "unlabeled" && e.label.name === current.label.name)) {
+        return false;
+      } else if ((yield getCollaboratorPermissionLevel(current.actor.login)).data.permission !== "admin") {
+        return false;
+      }
+      return true;
+    }));
   });
 }
 
@@ -24313,7 +24314,7 @@ function uploadAssets(context, octokit, release, assetPaths) {
     const mime = require_mime_types();
     for (const artifactPath of artifactPaths) {
       const assetName = path.basename(artifactPath);
-      if (release.data.assets && release.data.assets.findIndex((asset) => asset.name === assetName) !== -1) {
+      if (release.data.assets && release.data.assets.some((asset) => asset.name === assetName)) {
         context.logger.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
         continue;
       }

@@ -20,7 +20,15 @@ import { enterpriseServer37 } from "@octokit/plugin-enterprise-server";
 import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
-export function getOctokit(context: IContext, config: IPluginConfig): InstanceType<typeof GitHub> {
+export type Octokit = ReturnType<typeof github.getOctokit>;
+
+export function asyncFilter<T>(array: T[], predicate: (value: T, index: number) => Promise<boolean>): Promise<T[]> {
+    return array.reduce(async (result: Promise<T[]>, current: T, index: number) => {
+        return (await predicate(current, index)) ? [...await result, current] : result;
+    }, Promise.resolve([]));
+}
+
+export function getOctokit(context: IContext, config: IPluginConfig): Octokit {
     if (config.githubUrl != null) {
         const octokit = GitHub.plugin(enterpriseServer37);
         const githubUrl = config.githubUrl.endsWith("/") ? config.githubUrl : (config.githubUrl + "/");
