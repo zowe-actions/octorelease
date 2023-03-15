@@ -20,6 +20,8 @@ import { IContext, Inputs } from "@octorelease/core";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
 import * as utils from "./utils";
 
+let lastEtag: string | undefined;
+
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (context.env.GITHUB_TOKEN == null) {
         throw new Error("Required environment variable GITHUB_TOKEN is undefined");
@@ -50,19 +52,13 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         issue_number: prNumber
     });
 
-    if (labels.data.findIndex(label => label.name === "released") !== -1) {
+    if (labels.data.some(label => label.name === "released")) {
         context.logger.warn("Pull request already released, no new version detected");
         return null;
     }
 
-    const events = await octokit.rest.issues.listEvents({
-        ...context.ci.repo,
-        issue_number: prNumber,
-        per_page: 100
-    });
-    const collaborators = await octokit.rest.repos.listCollaborators(context.ci.repo);
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-    let approvedLabelEvents = findApprovedLabelEvents(events.data, collaborators.data, releaseLabels);
+    let approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
 
     if (approvedLabelEvents.length !== 1 && !context.dryRun) {
         const timeoutInMinutes = 30;
@@ -100,19 +96,11 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         context.logger.info("Waiting for repo admin to add release label to pull request...");
         const startTime = new Date().getTime();
         const timeoutInMsec = timeoutInMinutes * 60000;
-        let lastEtag = events.headers.etag;
         while (approvedLabelEvents.length !== 1 && (new Date().getTime() - startTime) < timeoutInMsec) {
             await delay(1000);
 
             try {
-                const response = await octokit.rest.issues.listEvents({
-                    ...context.ci.repo,
-                    issue_number: prNumber,
-                    per_page: 100,
-                    headers: { "if-none-match": lastEtag }
-                });
-                approvedLabelEvents = findApprovedLabelEvents(response.data, collaborators.data, releaseLabels);
-                lastEtag = response.headers.etag;
+                approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
             } catch (error) {
                 if (!(error instanceof RequestError && error.status === 304)) {
                     throw error;
@@ -141,27 +129,38 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     return null;
 }
 
-function findApprovedLabelEvents(events: any[], collaborators: any[], releaseLabels: string[]): any[] {
+async function findApprovedLabelEvents(context: IContext, octokit: utils.Octokit, prNumber: number,
+    releaseLabels: string[]): Promise<Record<string, any>[]> {
+    const getCollaboratorPermissionLevel = (username: string) =>
+        octokit.rest.repos.getCollaboratorPermissionLevel({ ...context.ci.repo, username });
+    const events = await octokit.rest.issues.listEvents({
+        ...context.ci.repo,
+        issue_number: prNumber,
+        per_page: 100,
+        headers: lastEtag ? { "if-none-match": lastEtag } : undefined
+    });
+    lastEtag = events.headers.etag;
+
     /**
      * Filter to remove the following:
      *  - Other kinds of events besides label creation
+     *  - Non-release labels with names we don't care about
      *  - Labels that were added before the PR was merged
      *  - Labels that were temporarily added and later removed
      *  - Labels that were added by user without admin privileges
-     *  - Non-release labels with names we don't care about
      */
-    return events.filter((event, idx) => {
-        const futureEvents = events.slice(idx + 1);
+    return utils.filterAsync(events.data, async (current: any, index: number) => {
+        const futureEvents: any[] = events.data.slice(index + 1);
 
-        if (event.event !== "labeled") {
+        if (current.event !== "labeled") {
             return false;
-        } else if (futureEvents.findIndex(e => e.event === "merged") !== -1) {
+        } else if (!releaseLabels.includes(current.label.name)) {
             return false;
-        } else if (futureEvents.findIndex(e => e.event === "unlabeled" && e.label.name === event.label.name) !== -1) {
+        } else if (futureEvents.some(e => e.event === "merged")) {
             return false;
-        } else if (collaborators.findIndex(user => user.id === event.actor.id && user.permissions?.admin) === -1) {
+        } else if (futureEvents.some(e => e.event === "unlabeled" && e.label.name === current.label.name)) {
             return false;
-        } else if (!releaseLabels.includes(event.label.name)) {
+        } else if ((await getCollaboratorPermissionLevel(current.actor.login)).data.permission !== "admin") {
             return false;
         }
 
