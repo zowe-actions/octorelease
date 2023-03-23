@@ -15,8 +15,6 @@
  */
 
 import * as fs from "fs";
-import { pipeline, Readable } from "stream";
-import { promisify } from "util";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
@@ -41,8 +39,7 @@ export async function downloadArtifact(runId: number, artifactName: string, extr
         fs.mkdirSync(extractPath, { recursive: true });
     }
     core.debug("Downloading artifact...");
-    await promisify(pipeline)(Readable.from(artifactRaw),
-        require("unzip-stream").Extract({ path: extractPath ?? process.cwd() }));
+    new (require("adm-zip"))(artifactRaw).extractAllTo(extractPath ?? process.cwd());
 }
 
 export async function findCurrentPr(state = "open"): Promise<any | undefined> {

@@ -36,22 +36,15 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
 async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<string | null> {
     const octokit = utils.getOctokit(context, config);
-    const prs = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
-        ...context.ci.repo,
-        commit_sha: context.ci.commit
-    });
-
-    if (prs.data.length === 0) {
-        context.logger.warn(`Could not find pull request associated with commit ${context.ci.commit}`);
+    const prNumber = await utils.findPrNumber(context, octokit);
+    if (prNumber == null) {
         return null;
     }
 
-    const prNumber = prs.data[0].number;
     const labels = await octokit.rest.issues.listLabelsOnIssue({
         ...context.ci.repo,
         issue_number: prNumber
     });
-
     if (labels.data.some(label => label.name === "released")) {
         context.logger.warn("Pull request already released, no new version detected");
         return null;

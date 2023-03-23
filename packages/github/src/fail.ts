@@ -14,38 +14,45 @@
  * limitations under the License.
  */
 
-import { IContext, utils } from "@octorelease/core";
+import { IContext, utils as coreUtils } from "@octorelease/core";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
-import { getOctokit } from "./utils";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    if (!config.checkPrLabels) {
+    const octokit = utils.getOctokit(context, config);
+    const prNumber = await utils.findPrNumber(context, octokit);
+    if (prNumber == null) {
         return;
     }
 
-    const octokit = getOctokit(context, config);
-    const prs = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
-        ...context.ci.repo,
-        commit_sha: context.ci.commit
-    });
-    if (prs.data.length === 0) {
-        return;
-    }
-
-    const prNumber = prs.data[0].number;
-    const labels = await octokit.rest.issues.listLabelsOnIssue({
-        ...context.ci.repo,
-        issue_number: prNumber
-    });
-    const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-
-    for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
-        await utils.dryRunTask(context, `remove pull request label "${name}"`, async () => {
-            await octokit.rest.issues.removeLabel({
-                ...context.ci.repo,
-                issue_number: prNumber,
-                name
-            });
+    if (config.checkPrLabels) {
+        const labels = await octokit.rest.issues.listLabelsOnIssue({
+            ...context.ci.repo,
+            issue_number: prNumber
         });
+        const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
+
+        for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
+            await coreUtils.dryRunTask(context, `remove pull request label "${name}"`, async () => {
+                await octokit.rest.issues.removeLabel({
+                    ...context.ci.repo,
+                    issue_number: prNumber,
+                    name
+                });
+            });
+        }
     }
+
+    const workflowRunUrl = `${config.githubUrl || "https://github.com"}/${(context.ci as any).slug}/actions/runs/` +
+        (context.ci as any).build;
+    await coreUtils.dryRunTask(context, "create failure comment on pull request", async () => {
+        await octokit.rest.issues.createComment({
+            ...context.ci.repo,
+            issue_number: prNumber,
+            body: `Release failed for the \`${context.branch.name}\` branch. :cry:\n\n` +
+                "```\n" + context.failError?.stack + "```\n" +
+                `Check the [workflow run](${workflowRunUrl}) for more error details.\n\n` +
+                `<sub>Powered by Octorelease :rocket:</sub>`
+        });
+    });
 }
