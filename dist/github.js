@@ -3335,9 +3335,9 @@ var require_URL = __commonJS({
   "../../node_modules/whatwg-url/lib/URL.js"(exports, module2) {
     "use strict";
     var conversions = require_lib2();
-    var utils2 = require_utils2();
+    var utils = require_utils2();
     var Impl = require_URL_impl();
-    var impl = utils2.implSymbol;
+    var impl = utils.implSymbol;
     function URL3(url) {
       if (!this || this[impl] || !(this instanceof URL3)) {
         throw new TypeError("Failed to construct 'URL': Please use the 'new' operator, this DOM object constructor cannot be called as a function.");
@@ -3502,7 +3502,7 @@ var require_URL = __commonJS({
           privateData = {};
         privateData.wrapper = obj;
         obj[impl] = new Impl.implementation(constructorArgs, privateData);
-        obj[impl][utils2.wrapperSymbol] = obj;
+        obj[impl][utils.wrapperSymbol] = obj;
       },
       interface: URL3,
       expose: {
@@ -24117,6 +24117,7 @@ var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor
 var utils_exports = {};
 __export(utils_exports, {
   filterAsync: () => filterAsync,
+  findPrNumber: () => findPrNumber,
   getOctokit: () => getOctokit2
 });
 var github = __toESM(require_github());
@@ -24126,6 +24127,18 @@ function filterAsync(array, predicate) {
   return __async(this, null, function* () {
     const filterMap = yield Promise.all(array.map(predicate));
     return array.filter((_value, index) => filterMap[index]);
+  });
+}
+function findPrNumber(context, octokit) {
+  return __async(this, null, function* () {
+    var _a;
+    const prs = (yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
+      commit_sha: context.ci.commit
+    }))).data.filter((pr) => pr.merged_at != null);
+    if (prs.length === 0) {
+      context.logger.warn(`Could not find merged pull request associated with commit ${context.ci.commit}`);
+    }
+    return (_a = prs[0]) == null ? void 0 : _a.number;
   });
 }
 function getOctokit2(context, config) {
@@ -24156,14 +24169,10 @@ function init_default(context, config) {
 function getPrReleaseType(context, config) {
   return __async(this, null, function* () {
     const octokit = getOctokit2(context, config);
-    const prs = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-      commit_sha: context.ci.commit
-    }));
-    if (prs.data.length === 0) {
-      context.logger.warn(`Could not find pull request associated with commit ${context.ci.commit}`);
+    const prNumber = yield findPrNumber(context, octokit);
+    if (prNumber == null) {
       return null;
     }
-    const prNumber = prs.data[0].number;
     const labels = yield octokit.rest.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
       issue_number: prNumber
     }));
@@ -24345,15 +24354,13 @@ function success_default(context, config) {
       return;
     }
     const octokit = getOctokit2(context, config);
-    const prs = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-      commit_sha: context.ci.commit
-    }));
-    if (prs.data.length === 0) {
+    const prNumber = yield findPrNumber(context, octokit);
+    if (prNumber == null) {
       return;
     }
     yield import_core3.utils.dryRunTask(context, "add released label to pull request", () => __async(this, null, function* () {
       yield octokit.rest.issues.addLabels(__spreadProps(__spreadValues({}, context.ci.repo), {
-        issue_number: prs.data[0].number,
+        issue_number: prNumber,
         labels: ["released"]
       }));
     }));
@@ -24366,7 +24373,7 @@ function success_default(context, config) {
     }
     yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
       yield octokit.rest.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
-        issue_number: prs.data[0].number,
+        issue_number: prNumber,
         body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
 
 The following packages have been published:
@@ -24382,29 +24389,39 @@ The following packages have been published:
 var import_core4 = require("./core");
 function fail_default(context, config) {
   return __async(this, null, function* () {
-    if (!config.checkPrLabels) {
-      return;
-    }
     const octokit = getOctokit2(context, config);
-    const prs = yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, context.ci.repo), {
-      commit_sha: context.ci.commit
-    }));
-    if (prs.data.length === 0) {
+    const prNumber = yield findPrNumber(context, octokit);
+    if (prNumber == null) {
       return;
     }
-    const prNumber = prs.data[0].number;
-    const labels = yield octokit.rest.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
-      issue_number: prNumber
-    }));
-    const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
-    for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
-      yield import_core4.utils.dryRunTask(context, `remove pull request label "${name}"`, () => __async(this, null, function* () {
-        yield octokit.rest.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
-          issue_number: prNumber,
-          name
-        }));
+    if (config.checkPrLabels) {
+      const labels = yield octokit.rest.issues.listLabelsOnIssue(__spreadProps(__spreadValues({}, context.ci.repo), {
+        issue_number: prNumber
       }));
+      const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
+      for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
+        yield import_core4.utils.dryRunTask(context, `remove pull request label "${name}"`, () => __async(this, null, function* () {
+          yield octokit.rest.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
+            issue_number: prNumber,
+            name
+          }));
+        }));
+      }
     }
+    const workflowRunUrl = `${config.githubUrl || "https://github.com"}/${context.ci.slug}/actions/runs/` + context.ci.build;
+    yield import_core4.utils.dryRunTask(context, "create failure comment on pull request", () => __async(this, null, function* () {
+      var _a;
+      yield octokit.rest.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
+        issue_number: prNumber,
+        body: `Release failed for the \`${context.branch.name}\` branch. :cry:
+
+\`\`\`
+` + ((_a = context.failError) == null ? void 0 : _a.stack) + `\`\`\`
+Check the [workflow run](${workflowRunUrl}) for more error details.
+
+<sub>Powered by Octorelease :rocket:</sub>`
+      }));
+    }));
   });
 }
 // Annotate the CommonJS export names for ESM import in node:

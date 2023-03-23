@@ -29,6 +29,19 @@ export async function filterAsync<T>(array: T[],
     return array.filter((_value, index) => filterMap[index]);
 }
 
+export async function findPrNumber(context: IContext, octokit: Octokit): Promise<number | undefined> {
+    const prs = (await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+        ...context.ci.repo,
+        commit_sha: context.ci.commit
+    })).data.filter(pr => pr.merged_at != null);
+
+    if (prs.length === 0) {
+        context.logger.warn(`Could not find merged pull request associated with commit ${context.ci.commit}`);
+    }
+
+    return prs[0]?.number;
+}
+
 export function getOctokit(context: IContext, config: IPluginConfig): Octokit {
     if (config.githubUrl != null) {
         const octokit = GitHub.plugin(enterpriseServer37);
