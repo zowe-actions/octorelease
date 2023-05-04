@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/changelog",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Octorelease plugin to read and update changelogs.",
   "main": "lib/index.js",
   "files": [
@@ -38,6 +38,6 @@
     "@actions/glob": "^0.4.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^0.2.0"
+    "@octorelease/core": "^1.0.0"
   }
 }

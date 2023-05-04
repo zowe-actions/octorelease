@@ -1,5 +1,9 @@
 # Changelog
 
+## `1.0.0`
+
+* First stable release
+
 ## `0.2.0`
 
 * Support `displayNames` option that defines display names for packages in a monorepo (e.g., "zowe-explorer-ftp-extension" -> "Zowe Explorer Extension for FTP")

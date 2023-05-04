@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/npm",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Octorelease plugin to perform actions related to NPM.",
   "main": "lib/index.js",
   "files": [
@@ -41,6 +41,6 @@
     "find-up": "^5.0.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^0.2.0"
+    "@octorelease/core": "^1.0.0"
   }
 }
