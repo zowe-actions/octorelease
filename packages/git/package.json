@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/git",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Octorelease plugin to perform actions on a Git repository.",
   "main": "lib/index.js",
   "files": [
@@ -38,6 +38,6 @@
     "@actions/exec": "^1.1.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^0.2.0"
+    "@octorelease/core": "^1.0.0"
   }
 }

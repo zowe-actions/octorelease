@@ -1,5 +1,10 @@
 # Changelog
 
+## `1.0.0`
+
+* Fix release labels not detected on PRs
+* Look for release labels only on merged PRs
+
 ## `0.2.0`
 
 * [BREAKING] Create new releases in draft status

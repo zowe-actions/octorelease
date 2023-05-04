@@ -1,5 +1,11 @@
 # Changelog
 
+## `1.0.0`
+
+* Include unannotated tags in check for old version
+* Automatically detect log prefix from call stack
+* Create `IContextOpts` interface for options passed to `buildContext` method
+
 ## `0.2.0`
 
 * Added support for more than one config object per plugin in release config

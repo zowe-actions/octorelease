@@ -1,6 +1,6 @@
 {
   "name": "@octorelease/run-script",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "GitHub action to run scripts in Octorelease context.",
   "main": "lib/index.js",
   "files": [
@@ -32,10 +32,10 @@
     "@actions/core": "^1.8.2",
     "@actions/exec": "^1.1.0",
     "@actions/github": "^5.0.3",
-    "@octorelease/core": "^0.2.0",
-    "@octorelease/git": "^0.2.0",
-    "@octorelease/lerna": "^0.2.0",
-    "@octorelease/npm": "^0.2.0",
+    "@octorelease/core": "^1.0.0",
+    "@octorelease/git": "^1.0.0",
+    "@octorelease/lerna": "^1.0.0",
+    "@octorelease/npm": "^1.0.0",
     "adm-zip": "^0.5.10",
     "java-properties": "^1.0.2",
     "pluralize": "^8.0.0",
