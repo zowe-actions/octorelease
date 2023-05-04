@@ -38,7 +38,7 @@ async function run(): Promise<void> {
             logPrefix: scriptName
         });
         if (context == null) {
-            core.warning("Current branch is not targeting a release branch, exiting now");
+            core.info("Current branch is not targeting a release branch, exiting now");
             process.exit();
         }
 
