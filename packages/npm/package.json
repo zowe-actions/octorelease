@@ -4,7 +4,7 @@
   "description": "Octorelease plugin to perform actions related to NPM.",
   "main": "lib/index.js",
   "files": [
-    "lib",
+    "lib/*",
     "CHANGELOG.md"
   ],
   "scripts": {

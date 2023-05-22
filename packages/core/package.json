@@ -7,7 +7,7 @@
     "octorelease": "lib/main.js"
   },
   "files": [
-    "lib",
+    "lib/*",
     "CHANGELOG.md"
   ],
   "scripts": {
