@@ -2234,10 +2234,10 @@ function run() {
       const context = yield import__.utils.buildContext();
       if (context == null) {
         core.info("Current branch is not a release branch, exiting now");
-        process.exit();
+        return;
       } else if (import__.Inputs.ciSkip && ((_a = yield import__.utils.getLastCommitMessage(context)) == null ? void 0 : _a.includes("[ci skip]"))) {
         core.info("Commit message contains CI skip phrase, exiting now");
-        process.exit();
+        return;
       }
       const pluginsLoaded = yield import__.utils.loadPlugins(context);
       try {

@@ -13200,7 +13200,7 @@ function run() {
       });
       if (context3 == null) {
         core3.info("Current branch is not targeting a release branch, exiting now");
-        process.exit();
+        return;
       }
       yield loadScript(scriptName)(context3);
     } catch (error2) {
