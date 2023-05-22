@@ -44,7 +44,7 @@ jobs:
 
     - name: Create Release Config
       run: |
-        echo '{"branches":["master","next"],"tagPrefix":"v?."}' > .releaserc
+        echo '{"branches":["master","next"]}' > .releaserc
 
     - uses: ./
       with:

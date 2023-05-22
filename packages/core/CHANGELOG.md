@@ -1,5 +1,9 @@
 # Changelog
 
+## `1.0.1`
+
+* Fixed Git tags being matched that do not conform to semver
+
 ## `1.0.0`
 
 * Include unannotated tags in check for old version
