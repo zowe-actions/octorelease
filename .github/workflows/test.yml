@@ -26,7 +26,7 @@ jobs:
       run: npm run all
 
     - name: Fail if Build Outdated
-      run: test -n "$(git status --porcelain)"
+      run: test -z "$(git status --porcelain)"
 
   test:
     runs-on: ${{ matrix.os }}
