@@ -44,6 +44,9 @@ export async function downloadArtifact(runId: number, artifactName: string, extr
 
 export async function findCurrentPr(state = "open"): Promise<any | undefined> {
     core.debug("Gather information about current pull request");
+    if (github.context.payload.pull_request?.state === state) {
+        return github.context.payload.pull_request;
+    }
     const octokit = github.getOctokit(core.getInput("github-token") || process.env.GITHUB_TOKEN as string);
     core.debug(`Looking through ${state?.toUpperCase() ?? ""} pull requests`);
     if (github.context.payload.workflow_run == null) {

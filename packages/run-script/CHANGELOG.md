@@ -1,5 +1,9 @@
 # Changelog
 
+## `1.0.1`
+
+* Fixed wrong branch detected for GitHub Actions `pull_request` builds
+
 ## `1.0.0`
 
 * Add prepareRelease script

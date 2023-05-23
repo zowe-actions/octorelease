@@ -13045,15 +13045,18 @@ ${JSON.stringify(artifactInfo)}`);
 }
 function findCurrentPr(state = "open") {
   return __async(this, null, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     core2.debug("Gather information about current pull request");
+    if (((_a = github.context.payload.pull_request) == null ? void 0 : _a.state) === state) {
+      return github.context.payload.pull_request;
+    }
     const octokit = github.getOctokit(core2.getInput("github-token") || process.env.GITHUB_TOKEN);
-    core2.debug(`Looking through ${(_a = state == null ? void 0 : state.toUpperCase()) != null ? _a : ""} pull requests`);
+    core2.debug(`Looking through ${(_b = state == null ? void 0 : state.toUpperCase()) != null ? _b : ""} pull requests`);
     if (github.context.payload.workflow_run == null) {
       const prs = (yield octokit.rest.repos.listPullRequestsAssociatedWithCommit(__spreadProps(__spreadValues({}, github.context.repo), {
         commit_sha: github.context.sha
       }))).data.filter((pr) => !state || pr.state === state);
-      core2.debug(`Found ${prs.length} ${(_b = state == null ? void 0 : state.toUpperCase()) != null ? _b : ""} pull request(s)`);
+      core2.debug(`Found ${prs.length} ${(_c = state == null ? void 0 : state.toUpperCase()) != null ? _c : ""} pull request(s)`);
       return prs.find((pr) => github.context.payload.ref === `refs/heads/${pr.head.ref}`);
     } else {
       const [owner, repo] = github.context.payload.workflow_run.head_repository.full_name.split("/", 2);
@@ -13063,7 +13066,7 @@ function findCurrentPr(state = "open") {
         repo,
         commit_sha: github.context.payload.workflow_run.head_sha
       })).data.filter((pr) => (!state || pr.state === state) && pr.base.repo.full_name === repoName);
-      core2.debug(`Found ${prs.length} ${(_c = state == null ? void 0 : state.toUpperCase()) != null ? _c : ""} pull request(s) in: ${repoName}`);
+      core2.debug(`Found ${prs.length} ${(_d = state == null ? void 0 : state.toUpperCase()) != null ? _d : ""} pull request(s) in: ${repoName}`);
       return prs.find((pr) => pr.head.ref === github.context.payload.workflow_run.head_branch);
     }
   });
