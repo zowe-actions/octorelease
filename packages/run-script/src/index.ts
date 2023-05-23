@@ -39,7 +39,7 @@ async function run(): Promise<void> {
         });
         if (context == null) {
             core.info("Current branch is not targeting a release branch, exiting now");
-            process.exit();
+            return;
         }
 
         await loadScript(scriptName)(context);

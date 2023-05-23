@@ -29,10 +29,10 @@ async function run(): Promise<void> {
         const context = await utils.buildContext();
         if (context == null) {
             core.info("Current branch is not a release branch, exiting now");
-            process.exit();
+            return;
         } else if (Inputs.ciSkip && (await utils.getLastCommitMessage(context))?.includes("[ci skip]")) {
             core.info("Commit message contains CI skip phrase, exiting now");
-            process.exit();
+            return;
         }
 
         const pluginsLoaded = await utils.loadPlugins(context);

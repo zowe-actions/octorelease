@@ -142,8 +142,8 @@ export async function verifyConditions(context: IContext): Promise<void> {
  * @returns Version info for the `context.version` property
  */
 async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Promise<IVersionInfo> {
-    const cmdOutput = await exec.getExecOutput("git", ["describe", "--tags", "--abbrev=0", `--match=${tagPrefix}*`],
-        { ignoreReturnCode: true });
+    const cmdOutput = await exec.getExecOutput("git",
+        ["describe", "--tags", "--abbrev=0", `--match=${tagPrefix}[0-9]*.[0-9]*.[0-9]*`], { ignoreReturnCode: true });
     const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
 
     let prerelease: string | undefined = undefined;
@@ -171,11 +171,15 @@ export async function getLastCommitMessage(context: IContext): Promise<string | 
  * @returns CI environment for the `context.ci` property
  */
 async function loadCiEnv(): Promise<any> {
-    const envCi = require("env-ci")();
+    let envCi = require("env-ci")();
     if (envCi.service == null) {
         throw new Error(`Unsupported CI service detected: ${envCi.service}`);
     }
 
+    if (envCi.isPr) {
+        // For PR builds, map `branch` (base) to `baseBranch` and `prBranch` (head) to `branch`
+        envCi = { ...envCi, baseBranch: envCi.branch, branch: envCi.prBranch, prBranch: undefined };
+    }
     if (envCi.branch == null) {
         const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
         envCi.branch = cmdOutput.stdout.trim();

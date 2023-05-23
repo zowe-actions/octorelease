@@ -1,5 +1,10 @@
 # Changelog
 
+## `1.0.1`
+
+* Fixed wrong branch detected for GitHub Actions `pull_request` builds
+* Fixed Git tags being matched that do not conform to semver
+
 ## `1.0.0`
 
 * Include unannotated tags in check for old version
