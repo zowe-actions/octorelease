@@ -19490,9 +19490,12 @@ function getLastCommitMessage(context) {
 }
 function loadCiEnv() {
   return __async(this, null, function* () {
-    const envCi = require_env_ci()();
+    let envCi = require_env_ci()();
     if (envCi.service == null) {
       throw new Error(`Unsupported CI service detected: ${envCi.service}`);
+    }
+    if (envCi.isPr) {
+      envCi = __spreadProps(__spreadValues({}, envCi), { baseBranch: envCi.branch, branch: envCi.prBranch, prBranch: void 0 });
     }
     if (envCi.branch == null) {
       const cmdOutput = yield exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
