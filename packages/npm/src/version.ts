@@ -24,6 +24,9 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
     if (context.workspaces != null) {
         context.logger.warn("Cannot run npm version in workspaces");
         return;
+    } else if (context.version.old === context.version.new) {
+        context.logger.info("Version in package.json is already up to date");
+        return;
     }
 
     await utils.npmVersion(context.version.new);

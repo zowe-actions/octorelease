@@ -1737,6 +1737,9 @@ function version_default(context, _config) {
     if (context.workspaces != null) {
       context.logger.warn("Cannot run npm version in workspaces");
       return;
+    } else if (context.version.old === context.version.new) {
+      context.logger.info("Version in package.json is already up to date");
+      return;
     }
     yield npmVersion(context.version.new);
     context.changedFiles.push("package.json");
