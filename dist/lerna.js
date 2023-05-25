@@ -1548,6 +1548,10 @@ var path = __toESM(require("path"));
 var import_find_up = __toESM(require_find_up());
 function version_default(context, _config) {
   return __async(this, null, function* () {
+    if (context.version.old === context.version.new) {
+      context.logger.info("Version in lerna.json is already up to date");
+      return;
+    }
     const packageInfo = yield lernaList(true);
     yield lernaVersion(context.version.new);
     context.changedFiles.push("lerna.json", "package.json");

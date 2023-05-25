@@ -1,5 +1,9 @@
 # Changelog
 
+## `1.0.2`
+
+* Fixed `npm version` being run when version is already deployed
+
 ## `1.0.0`
 
 * Move project .npmrc out of the way for publish

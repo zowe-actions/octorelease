@@ -21,6 +21,11 @@ import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
+    if (context.version.old === context.version.new) {
+        context.logger.info("Version in lerna.json is already up to date");
+        return;
+    }
+
     const packageInfo = await utils.lernaList(true);
     await utils.lernaVersion(context.version.new);
     context.changedFiles.push("lerna.json", "package.json");

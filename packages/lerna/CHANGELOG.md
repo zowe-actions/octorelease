@@ -1,5 +1,9 @@
 # Changelog
 
+## `1.0.2`
+
+* Fixed `lerna version` being run when version is already deployed
+
 ## `1.0.0`
 
 * First stable release
