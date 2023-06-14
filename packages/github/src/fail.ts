@@ -50,7 +50,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             ...context.ci.repo,
             issue_number: prNumber,
             body: `Release failed for the \`${context.branch.name}\` branch. :cry:\n\n` +
-                "```\n" + context.failError?.stack + "```\n" +
+                "```\n" + context.failError?.stack + "\n```\n\n" +
                 `Check the [workflow run](${workflowRunUrl}) for more error details.\n\n` +
                 `<sub>Powered by Octorelease :rocket:</sub>`
         });
