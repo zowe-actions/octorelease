@@ -24416,7 +24416,9 @@ function fail_default(context, config) {
         body: `Release failed for the \`${context.branch.name}\` branch. :cry:
 
 \`\`\`
-` + ((_a = context.failError) == null ? void 0 : _a.stack) + `\`\`\`
+` + ((_a = context.failError) == null ? void 0 : _a.stack) + `
+\`\`\`
+
 Check the [workflow run](${workflowRunUrl}) for more error details.
 
 <sub>Powered by Octorelease :rocket:</sub>`
