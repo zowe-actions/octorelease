@@ -25221,7 +25221,8 @@ function createRelease(context, octokit) {
         return octokit.rest.repos.createRelease(__spreadProps(__spreadValues({}, context.ci.repo), {
           tag_name: tagName,
           body: context.releaseNotes,
-          draft: true
+          draft: true,
+          prerelease: context.version.prerelease != null
         }));
       }))) || { data: {} };
     }
