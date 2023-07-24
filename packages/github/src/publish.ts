@@ -69,7 +69,8 @@ async function createRelease(context: IContext, octokit: utils.Octokit): Promise
                 ...context.ci.repo,
                 tag_name: tagName,
                 body: context.releaseNotes,
-                draft: true
+                draft: true,
+                prerelease: context.version.prerelease != null
             });
         }) || { data: {} };
     }
