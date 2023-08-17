@@ -1149,6 +1149,9 @@ function ovsxPublish(context, vsixPath) {
     } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
     }
+    if (context.version.prerelease != null) {
+      cmdArgs.push("--pre-release");
+    }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npx", cmdArgs);
     }));
@@ -1178,6 +1181,9 @@ function vscePublish(context, vsixPath) {
       cmdArgs.push("--packagePath", vsixPath);
     } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
+    }
+    if (context.version.prerelease != null) {
+      cmdArgs.push("--pre-release");
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npx", cmdArgs);
