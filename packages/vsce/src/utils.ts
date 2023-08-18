@@ -31,6 +31,9 @@ export async function ovsxPublish(context: IContext, vsixPath?: string): Promise
     } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
+    if (context.version.prerelease != null) {
+        cmdArgs.push("--pre-release");
+    }
     await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npx", cmdArgs);
     });
@@ -56,6 +59,9 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
         cmdArgs.push("--packagePath", vsixPath);
     } else if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
+    }
+    if (context.version.prerelease != null) {
+        cmdArgs.push("--pre-release");
     }
     await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npx", cmdArgs);

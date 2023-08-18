@@ -3673,8 +3673,8 @@ function getDependencies(context3, branch, dev) {
 function updateDependency(context3, pkgName, pkgTag, dev) {
   return __async(this, null, function* () {
     context3.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${pkgTag}`);
-    const lockfile = JSON.parse(fs.readFileSync(lockfilePath, "utf-8"));
-    const currentVersion = lockfile.dependencies[pkgName].version;
+    const cmdOutput = (yield exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"])).stdout;
+    const currentVersion = JSON.parse(cmdOutput).dependencies[pkgName].version;
     if (resolutions[pkgName] == null) {
       context3.logger.debug(`Gathering version information for: ${pkgName}@${pkgTag}`);
       resolutions[pkgName] = (yield exec.getExecOutput(

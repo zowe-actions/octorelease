@@ -46,8 +46,8 @@ function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, de
 
 async function updateDependency(context: IContext, pkgName: string, pkgTag: string, dev: boolean): Promise<void> {
     context.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${pkgTag}`);
-    const lockfile = JSON.parse(fs.readFileSync(lockfilePath, "utf-8"));
-    const currentVersion = lockfile.dependencies[pkgName].version;
+    const cmdOutput = (await exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"])).stdout;
+    const currentVersion = JSON.parse(cmdOutput).dependencies[pkgName].version;
 
     if (resolutions[pkgName] == null) {
         context.logger.debug(`Gathering version information for: ${pkgName}@${pkgTag}`);
