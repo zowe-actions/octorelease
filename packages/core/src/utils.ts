@@ -148,7 +148,7 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
 
     let prerelease: string | undefined = undefined;
     if (branch.prerelease) {
-        const prereleaseName = (typeof branch.prerelease === "string") ? branch.prerelease : branch.name;
+        const prereleaseName = (typeof branch.prerelease === "string") ? branch.prerelease : branch.channel;
         const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
         prerelease = `${prereleaseName}.${timestamp}`;
     }
