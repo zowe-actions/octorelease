@@ -20754,7 +20754,7 @@ function buildVersionInfo(branch, tagPrefix) {
     const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
     let prerelease = void 0;
     if (branch.prerelease) {
-      const prereleaseName = typeof branch.prerelease === "string" ? branch.prerelease : branch.name;
+      const prereleaseName = typeof branch.prerelease === "string" ? branch.prerelease : branch.channel;
       const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
       prerelease = `${prereleaseName}.${timestamp}`;
     }
