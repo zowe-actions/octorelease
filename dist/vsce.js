@@ -1137,8 +1137,11 @@ var exec = __toESM(require_exec());
 var import_core = require("./core");
 function ovsxInfo(extensionName) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
-    return JSON.parse(cmdOutput.stdout);
+    try {
+      const cmdOutput = yield exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
+      return JSON.parse(cmdOutput.stdout);
+    } catch (e) {
+    }
   });
 }
 function ovsxPublish(context, vsixPath) {
@@ -1159,8 +1162,11 @@ function ovsxPublish(context, vsixPath) {
 }
 function vsceInfo(extensionName) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
-    return JSON.parse(cmdOutput.stdout);
+    try {
+      const cmdOutput = yield exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
+      return JSON.parse(cmdOutput.stdout);
+    } catch (e) {
+    }
   });
 }
 function vscePackage(context) {
@@ -1226,6 +1232,7 @@ var fs3 = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
 function publish_default(context, config) {
   return __async(this, null, function* () {
+    var _a;
     const packageJson = JSON.parse(fs3.readFileSync("package.json", "utf-8"));
     const extensionName = `${packageJson.publisher}.${packageJson.name}`;
     let vsixPath;
@@ -1240,8 +1247,8 @@ function publish_default(context, config) {
       return;
     }
     if (config.vscePublish !== false) {
-      const vsceMetadata = yield vsceInfo(extensionName);
-      if (!vsceMetadata.versions.find((obj) => obj.version === packageJson.version)) {
+      const vsceMetadata = (yield vsceInfo(extensionName)) || {};
+      if (!((_a = vsceMetadata.versions) == null ? void 0 : _a.find((obj) => obj.version === packageJson.version))) {
         yield vscePublish(context, vsixPath);
         context.releasedPackages.vsce = [
           ...context.releasedPackages.vsce || [],
@@ -1255,8 +1262,8 @@ function publish_default(context, config) {
       }
     }
     if (config.ovsxPublish) {
-      const ovsxMetadata = yield ovsxInfo(extensionName);
-      if (!Object.keys(ovsxMetadata.allVersions).includes(packageJson.version)) {
+      const ovsxMetadata = (yield ovsxInfo(extensionName)) || {};
+      if (!Object.keys(ovsxMetadata.allVersions || {}).includes(packageJson.version)) {
         yield ovsxPublish(context, vsixPath);
         context.releasedPackages.vsce = [
           ...context.releasedPackages.vsce || [],
