@@ -48,10 +48,13 @@ export async function vsceInfo(extensionName: string): Promise<Record<string, an
     } catch { /* Do nothing */ }
 }
 
-export async function vscePackage(context?: IContext): Promise<string> {
+export async function vscePackage(context: IContext): Promise<string> {
     const cmdArgs = ["vsce", "package"];
-    if (fs.existsSync(path.join(context?.rootDir || "", "yarn.lock"))) {
+    if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
+    }
+    if (context.version.prerelease != null) {
+        cmdArgs.push("--pre-release");
     }
     const cmdOutput = await exec.getExecOutput("npx", cmdArgs);
     return cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)?.[1] as string;

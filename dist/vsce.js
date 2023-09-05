@@ -1173,8 +1173,11 @@ function vscePackage(context) {
   return __async(this, null, function* () {
     var _a;
     const cmdArgs = ["vsce", "package"];
-    if (fs.existsSync(path.join((context == null ? void 0 : context.rootDir) || "", "yarn.lock"))) {
+    if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
       cmdArgs.push("--yarn");
+    }
+    if (context.version.prerelease != null) {
+      cmdArgs.push("--pre-release");
     }
     const cmdOutput = yield exec.getExecOutput("npx", cmdArgs);
     return (_a = cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)) == null ? void 0 : _a[1];
