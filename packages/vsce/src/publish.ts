@@ -38,8 +38,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     if (config.vscePublish !== false) {
-        const vsceMetadata = await utils.vsceInfo(extensionName);
-        if (!vsceMetadata.versions.find((obj: any) => obj.version === packageJson.version)) {
+        const vsceMetadata = await utils.vsceInfo(extensionName) || {};
+        if (!vsceMetadata.versions?.find((obj: any) => obj.version === packageJson.version)) {
             await utils.vscePublish(context, vsixPath);
 
             context.releasedPackages.vsce = [
@@ -55,8 +55,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     if (config.ovsxPublish) {
-        const ovsxMetadata = await utils.ovsxInfo(extensionName);
-        if (!Object.keys(ovsxMetadata.allVersions).includes(packageJson.version)) {
+        const ovsxMetadata = await utils.ovsxInfo(extensionName) || {};
+        if (!Object.keys(ovsxMetadata.allVersions || {}).includes(packageJson.version)) {
             await utils.ovsxPublish(context, vsixPath);
 
             context.releasedPackages.vsce = [

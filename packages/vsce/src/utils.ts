@@ -19,9 +19,11 @@ import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
-export async function ovsxInfo(extensionName: string): Promise<any> {
-    const cmdOutput = await exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
-    return JSON.parse(cmdOutput.stdout);
+export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
+    try {
+        const cmdOutput = await exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
+        return JSON.parse(cmdOutput.stdout);
+    } catch { /* Do nothing */ }
 }
 
 export async function ovsxPublish(context: IContext, vsixPath?: string): Promise<void> {
@@ -39,9 +41,11 @@ export async function ovsxPublish(context: IContext, vsixPath?: string): Promise
     });
 }
 
-export async function vsceInfo(extensionName: string): Promise<any> {
-    const cmdOutput = await exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
-    return JSON.parse(cmdOutput.stdout);
+export async function vsceInfo(extensionName: string): Promise<Record<string, any> | undefined> {
+    try {
+        const cmdOutput = await exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
+        return JSON.parse(cmdOutput.stdout);
+    } catch { /* Do nothing */ }
 }
 
 export async function vscePackage(context?: IContext): Promise<string> {
