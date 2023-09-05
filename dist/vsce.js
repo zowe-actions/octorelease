@@ -1192,7 +1192,8 @@ function vscePublish(context, vsixPath) {
       cmdArgs.push("--yarn");
     }
     if (context.version.prerelease != null) {
-      cmdArgs.push("--pre-release");
+      context.logger.warn("Cannot publish version with prerelease tag to VS Code Marketplace");
+      return;
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npx", cmdArgs);
