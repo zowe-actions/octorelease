@@ -1192,8 +1192,7 @@ function vscePublish(context, vsixPath) {
       cmdArgs.push("--yarn");
     }
     if (context.version.prerelease != null) {
-      context.logger.warn("Cannot publish version with prerelease tag to VS Code Marketplace");
-      return;
+      cmdArgs.push("--pre-release");
     }
     yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npx", cmdArgs);
@@ -1252,7 +1251,9 @@ function publish_default(context, config) {
     }
     if (config.vscePublish !== false) {
       const vsceMetadata = (yield vsceInfo(extensionName)) || {};
-      if (!((_a = vsceMetadata.versions) == null ? void 0 : _a.find((obj) => obj.version === packageJson.version))) {
+      if (context.version.prerelease != null) {
+        context.logger.warn("Cannot publish version with prerelease tag to VS Code Marketplace");
+      } else if (!((_a = vsceMetadata.versions) == null ? void 0 : _a.find((obj) => obj.version === packageJson.version))) {
         yield vscePublish(context, vsixPath);
         context.releasedPackages.vsce = [
           ...context.releasedPackages.vsce || [],

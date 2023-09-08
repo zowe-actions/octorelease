@@ -39,7 +39,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     if (config.vscePublish !== false) {
         const vsceMetadata = await utils.vsceInfo(extensionName) || {};
-        if (!vsceMetadata.versions?.find((obj: any) => obj.version === packageJson.version)) {
+        if (context.version.prerelease != null) {
+            // VSCE Marketplace doesn't support prerelease tags: https://github.com/microsoft/vsmarketplace/issues/50
+            context.logger.warn("Cannot publish version with prerelease tag to VS Code Marketplace");
+        } else if (!vsceMetadata.versions?.find((obj: any) => obj.version === packageJson.version)) {
             await utils.vscePublish(context, vsixPath);
 
             context.releasedPackages.vsce = [

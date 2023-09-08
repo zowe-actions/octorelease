@@ -68,9 +68,7 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
         cmdArgs.push("--yarn");
     }
     if (context.version.prerelease != null) {
-        // VS Code Marketplace doesn't support prerelease tags: https://github.com/microsoft/vsmarketplace/issues/50
-        context.logger.warn("Cannot publish version with prerelease tag to VS Code Marketplace");
-        return;
+        cmdArgs.push("--pre-release");
     }
     await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npx", cmdArgs);
