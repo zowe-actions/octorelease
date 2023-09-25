@@ -1565,9 +1565,9 @@ function npmPublish(context, tag, registry, inDir) {
     yield exec.exec("npm", cmdArgs, { cwd: inDir });
   });
 }
-function npmVersion(newVersion) {
+function npmVersion(newVersion, inDir) {
   return __async(this, null, function* () {
-    yield exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
+    yield exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"], { cwd: inDir });
   });
 }
 function npmView(pkgSpec, registry, property) {

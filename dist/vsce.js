@@ -1274,7 +1274,7 @@ function publish_default(context, config) {
           ...context.releasedPackages.vsce || [],
           {
             name: `${extensionName}@${packageJson.version} (OVSX)`,
-            url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}`
+            url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}/${packageJson.version}`
           }
         ];
       } else {

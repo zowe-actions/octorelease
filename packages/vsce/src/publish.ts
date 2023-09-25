@@ -66,7 +66,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 ...(context.releasedPackages.vsce || []),
                 {
                     name: `${extensionName}@${packageJson.version} (OVSX)`,
-                    url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}`
+                    url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}/${packageJson.version}`
                 }
             ];
         } else {
