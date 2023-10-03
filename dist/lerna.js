@@ -1567,7 +1567,7 @@ function version_default(context, config) {
           if (changedPackageInfo.find((pkgInfo) => pkgInfo.name === name) != null) {
             yield updateIndependentVersion(context, location, packageInfo);
           }
-          excludeDirs.push(location);
+          excludeDirs.push(path.relative(context.rootDir, location));
         }
       } finally {
         fs3.renameSync(lernaJsonPath + ".bak", lernaJsonPath);
@@ -1594,7 +1594,7 @@ function updateIndependentVersion(context, pkgDir, pkgInfo) {
       context.logger.info(`Version did not change for ${path.relative(context.rootDir, pkgDir)}`);
       return;
     }
-    const excludeDirs = pkgInfo.map((pkgInfo2) => pkgInfo2.location).filter((dir) => dir != pkgDir);
+    const excludeDirs = pkgInfo.filter((pkgInfo2) => pkgInfo2.location != pkgDir).map((pkgInfo2) => path.relative(context.rootDir, pkgInfo2.location));
     yield lernaVersion(semverDiff, excludeDirs, false);
   });
 }

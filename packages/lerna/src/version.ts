@@ -17,6 +17,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import findUp from "find-up";
+import * as exec from "@actions/exec";
 import { IContext, utils as coreUtils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
@@ -44,7 +45,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 if (changedPackageInfo.find(pkgInfo => pkgInfo.name === name) != null) {
                     await updateIndependentVersion(context, location, packageInfo);
                 }
-                excludeDirs.push(location);
+                excludeDirs.push(path.relative(context.rootDir, location));
             }
         } finally {
             fs.renameSync(lernaJsonPath + ".bak", lernaJsonPath);
@@ -70,6 +71,7 @@ async function updateIndependentVersion(context: IContext, pkgDir: string, pkgIn
         context.logger.info(`Version did not change for ${path.relative(context.rootDir, pkgDir)}`);
         return;
     }
-    const excludeDirs = pkgInfo.map(pkgInfo => pkgInfo.location).filter(dir => dir != pkgDir);
+    const excludeDirs = pkgInfo.filter(pkgInfo => pkgInfo.location != pkgDir)
+        .map(pkgInfo => path.relative(context.rootDir, pkgInfo.location));
     await utils.lernaVersion(semverDiff, excludeDirs, false);
 }
