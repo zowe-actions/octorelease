@@ -66,9 +66,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
 async function updateIndependentVersion(context: IContext, pkgDir: string, pkgInfo: Record<string, any>[]) {
     const semverDiff = coreUtils.getSemverDiff(context);
-    const packageJson = JSON.parse(fs.readFileSync(path.join(pkgDir, "package.json"), "utf-8"));
-    const oldVersion = packageJson.version.split("-")[0];
-    const newVersion = semverDiff != null ? require("semver").inc(oldVersion, semverDiff) : oldVersion;
+    if (semverDiff == null) {
+        context.logger.info(`Version did not change for ${path.relative(context.rootDir, pkgDir)}`);
+        return;
+    }
     const excludeDirs = pkgInfo.map(pkgInfo => pkgInfo.location).filter(dir => dir != pkgDir);
-    await utils.lernaVersion(newVersion, excludeDirs, false);
+    await utils.lernaVersion(semverDiff, excludeDirs, false);
 }
