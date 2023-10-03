@@ -3966,8 +3966,8 @@ function version_default(context, config) {
     const excludeDirs = [];
     if (config.versionIndependent != null) {
       const lernaJsonPath = path.join(context.rootDir, "lerna.json");
-      fs3.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
       const lernaJson = JSON.parse(fs3.readFileSync(lernaJsonPath, "utf-8"));
+      fs3.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
       lernaJson.version = "independent";
       fs3.writeFileSync(lernaJsonPath, JSON.stringify(lernaJson, null, 2));
       try {

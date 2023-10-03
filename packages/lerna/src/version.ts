@@ -18,7 +18,6 @@ import * as fs from "fs";
 import * as path from "path";
 import findUp from "find-up";
 import { IContext, utils as coreUtils } from "@octorelease/core";
-import { utils as npmUtils } from "@octorelease/npm";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
@@ -32,8 +31,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     const excludeDirs: string[] = [];
     if (config.versionIndependent != null) {
         const lernaJsonPath = path.join(context.rootDir, "lerna.json");
-        fs.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
         const lernaJson = JSON.parse(fs.readFileSync(lernaJsonPath, "utf-8"));
+        fs.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
         lernaJson.version = "independent";
         fs.writeFileSync(lernaJsonPath, JSON.stringify(lernaJson, null, 2));
         try {
