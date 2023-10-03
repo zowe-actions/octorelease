@@ -3917,14 +3917,14 @@ function lernaList(onlyChanged) {
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
   });
 }
-function lernaVersion(newVersion, excludeDirs) {
+function lernaVersion(newVersion, excludeDirs, updateLockfile = true) {
   return __async(this, null, function* () {
     const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
     if (excludeDirs) {
-      cmdArgs.push("--ignore-changes", ...excludeDirs);
+      cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
     }
     yield exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
-    if (!fs2.existsSync("yarn.lock")) {
+    if (updateLockfile && !fs2.existsSync("yarn.lock")) {
       yield exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
     }
   });
@@ -3956,22 +3956,33 @@ var fs3 = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var import_find_up = __toESM(require_find_up());
 var import_core = require("./core");
-var import_npm4 = require("./npm");
 function version_default(context, config) {
   return __async(this, null, function* () {
-    var _a;
     if (context.version.old === context.version.new) {
       context.logger.info("Version in lerna.json is already up to date");
       return;
     }
-    const packageInfo = yield lernaList(true);
+    const changedPackageInfo = yield lernaList(true);
     const excludeDirs = [];
-    for (const { name, location } of yield lernaList()) {
-      if ((_a = config.versionIndependent) == null ? void 0 : _a.includes(name)) {
-        if (packageInfo.find((pkgInfo) => pkgInfo.name === name) != null) {
-          yield updateIndependentVersion(context, location);
+    if (config.versionIndependent != null) {
+      const lernaJsonPath = path.join(context.rootDir, "lerna.json");
+      fs3.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
+      const lernaJson = JSON.parse(fs3.readFileSync(lernaJsonPath, "utf-8"));
+      lernaJson.version = "independent";
+      fs3.writeFileSync(lernaJsonPath, JSON.stringify(lernaJson, null, 2));
+      try {
+        const packageInfo = yield lernaList();
+        for (const { name, location } of packageInfo) {
+          if (!config.versionIndependent.includes(name)) {
+            continue;
+          }
+          if (changedPackageInfo.find((pkgInfo) => pkgInfo.name === name) != null) {
+            yield updateIndependentVersion(context, location, packageInfo);
+          }
+          excludeDirs.push(location);
         }
-        excludeDirs.push(location);
+      } finally {
+        fs3.renameSync(lernaJsonPath + ".bak", lernaJsonPath);
       }
     }
     yield lernaVersion(context.version.new, excludeDirs);
@@ -3982,19 +3993,20 @@ function version_default(context, config) {
     } else {
       context.logger.warn("Could not find lockfile to update version in");
     }
-    for (const { location } of packageInfo) {
+    for (const { location } of changedPackageInfo) {
       const relLocation = path.relative(context.rootDir, location);
       context.changedFiles.push(path.join(relLocation, "package.json"));
     }
   });
 }
-function updateIndependentVersion(context, pkgDir) {
+function updateIndependentVersion(context, pkgDir, pkgInfo) {
   return __async(this, null, function* () {
     const semverDiff = import_core.utils.getSemverDiff(context);
     const packageJson = JSON.parse(fs3.readFileSync(path.join(pkgDir, "package.json"), "utf-8"));
     const oldVersion = packageJson.version.split("-")[0];
     const newVersion = semverDiff != null ? require_semver2().inc(oldVersion, semverDiff) : oldVersion;
-    yield import_npm4.utils.npmVersion(newVersion, pkgDir);
+    const excludeDirs = pkgInfo.map((pkgInfo2) => pkgInfo2.location).filter((dir) => dir != pkgDir);
+    yield lernaVersion(newVersion, excludeDirs, false);
   });
 }
 // Annotate the CommonJS export names for ESM import in node:

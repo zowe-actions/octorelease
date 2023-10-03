@@ -29,13 +29,13 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
 }
 
-export async function lernaVersion(newVersion: string, excludeDirs?: string[]): Promise<void> {
+export async function lernaVersion(newVersion: string, excludeDirs?: string[], updateLockfile=true): Promise<void> {
     const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
     if (excludeDirs) {
-        cmdArgs.push("--ignore-changes", ...excludeDirs);
+        cmdArgs.push("--ignore-changes", ...excludeDirs.map(dir => dir + "/**"));
     }
     await exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
-    if (!fs.existsSync("yarn.lock")) {
+    if (updateLockfile && !fs.existsSync("yarn.lock")) {
         // Update subpackage versions in lockfile (requires npm@8.5 or newer)
         await exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
     }

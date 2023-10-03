@@ -28,14 +28,27 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         return;
     }
 
-    const packageInfo = await utils.lernaList(true);
+    const changedPackageInfo = await utils.lernaList(true);
     const excludeDirs: string[] = [];
-    for (const { name, location } of await utils.lernaList()) {
-        if (config.versionIndependent?.includes(name)) {
-            if (packageInfo.find(pkgInfo => pkgInfo.name === name) != null) {
-                await updateIndependentVersion(context, location);
+    if (config.versionIndependent != null) {
+        const lernaJsonPath = path.join(context.rootDir, "lerna.json");
+        fs.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
+        const lernaJson = JSON.parse(fs.readFileSync(lernaJsonPath, "utf-8"));
+        lernaJson.version = "independent";
+        fs.writeFileSync(lernaJsonPath, JSON.stringify(lernaJson, null, 2));
+        try {
+            const packageInfo = await utils.lernaList();
+            for (const { name, location } of packageInfo) {
+                if (!config.versionIndependent.includes(name)) {
+                    continue;
+                }
+                if (changedPackageInfo.find(pkgInfo => pkgInfo.name === name) != null) {
+                    await updateIndependentVersion(context, location, packageInfo);
+                }
+                excludeDirs.push(location);
             }
-            excludeDirs.push(location);
+        } finally {
+            fs.renameSync(lernaJsonPath + ".bak", lernaJsonPath);
         }
     }
     await utils.lernaVersion(context.version.new, excludeDirs);
@@ -46,16 +59,17 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         context.logger.warn("Could not find lockfile to update version in");
     }
-    for (const { location } of packageInfo) {
+    for (const { location } of changedPackageInfo) {
         const relLocation = path.relative(context.rootDir, location);
         context.changedFiles.push(path.join(relLocation, "package.json"));
     }
 }
 
-async function updateIndependentVersion(context: IContext, pkgDir: string) {
+async function updateIndependentVersion(context: IContext, pkgDir: string, pkgInfo: Record<string, any>[]) {
     const semverDiff = coreUtils.getSemverDiff(context);
     const packageJson = JSON.parse(fs.readFileSync(path.join(pkgDir, "package.json"), "utf-8"));
     const oldVersion = packageJson.version.split("-")[0];
     const newVersion = semverDiff != null ? require("semver").inc(oldVersion, semverDiff) : oldVersion;
-    await npmUtils.npmVersion(newVersion, pkgDir);
+    const excludeDirs = pkgInfo.map(pkgInfo => pkgInfo.location).filter(dir => dir != pkgDir);
+    await utils.lernaVersion(newVersion, excludeDirs, false);
 }
