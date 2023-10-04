@@ -20740,6 +20740,12 @@ function verifyConditions(context) {
       context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
     const semverDiff = getSemverDiff(context);
+    for (const versionInfo of Object.values(context.version.overrides)) {
+      versionInfo.new = require_semver2().inc(versionInfo.old.split("-")[0], semverDiff);
+      if (versionInfo.prerelease != null) {
+        versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
+      }
+    }
     if (semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch") || semverDiff === "minor" && context.branch.level === "patch") {
       throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
     }
@@ -20772,7 +20778,7 @@ function buildVersionInfo(branch, tagPrefix) {
       const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
       prerelease = `${prereleaseName}.${timestamp}`;
     }
-    return { old: oldVersion, new: oldVersion, prerelease };
+    return { old: oldVersion, new: oldVersion, prerelease, overrides: {} };
   });
 }
 function loadCiEnv() {

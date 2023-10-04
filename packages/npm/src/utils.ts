@@ -61,8 +61,9 @@ export async function npmPublish(context: IContext, tag: string, registry: strin
     await exec.exec("npm", cmdArgs, { cwd: inDir });
 }
 
-export async function npmVersion(newVersion: string): Promise<void> {
-    await exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version"]);
+export async function npmVersion(newVersion: string, inDir?: string): Promise<void> {
+    await exec.exec("npm", ["version", newVersion, "--allow-same-version", "--no-git-tag-version",
+        "--no-workspaces-update"], { cwd: inDir });
 }
 
 export async function npmView(pkgSpec: string, registry: string, property?: string): Promise<any> {

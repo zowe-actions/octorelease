@@ -17,8 +17,9 @@
 import * as fs from "fs";
 import * as path from "path";
 import findUp from "find-up";
-import * as exec from "@actions/exec";
-import { IContext, utils as coreUtils } from "@octorelease/core";
+import * as glob from "@actions/glob";
+import { IContext } from "@octorelease/core";
+import { utils as npmUtils } from "@octorelease/npm";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
@@ -29,29 +30,16 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const changedPackageInfo = await utils.lernaList(true);
-    const excludeDirs: string[] = [];
     if (config.versionIndependent != null) {
-        const lernaJsonPath = path.join(context.rootDir, "lerna.json");
-        const lernaJson = JSON.parse(fs.readFileSync(lernaJsonPath, "utf-8"));
-        fs.renameSync(lernaJsonPath, lernaJsonPath + ".bak");
-        lernaJson.version = "independent";
-        fs.writeFileSync(lernaJsonPath, JSON.stringify(lernaJson, null, 2));
-        try {
-            const packageInfo = await utils.lernaList();
-            for (const { name, location } of packageInfo) {
-                if (!config.versionIndependent.includes(name)) {
-                    continue;
-                }
-                if (changedPackageInfo.find(pkgInfo => pkgInfo.name === name) != null) {
-                    await updateIndependentVersion(context, location, packageInfo);
-                }
-                excludeDirs.push(path.relative(context.rootDir, location));
+        for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
+            const pkgInfo = changedPackageInfo
+                .find(pkgInfo => path.relative(context.rootDir, pkgInfo.location) === packageDir);
+            if (pkgInfo != null) {
+                await updateIndependentVersion(context, pkgInfo as any, versionInfo.new);
             }
-        } finally {
-            fs.renameSync(lernaJsonPath + ".bak", lernaJsonPath);
         }
     }
-    await utils.lernaVersion(context.version.new, excludeDirs);
+    await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
     context.changedFiles.push("lerna.json", "package.json");
     const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
@@ -65,13 +53,25 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 }
 
-async function updateIndependentVersion(context: IContext, pkgDir: string, pkgInfo: Record<string, any>[]) {
-    const semverDiff = coreUtils.getSemverDiff(context);
-    if (semverDiff == null) {
-        context.logger.info(`Version did not change for ${path.relative(context.rootDir, pkgDir)}`);
-        return;
+async function updateIndependentVersion(context: IContext, pkgInfo: { name: string, location: string },
+    newVersion: string) {
+    await npmUtils.npmVersion(newVersion, pkgInfo.location);
+    if (context.workspaces != null) {
+        const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
+        for (const packageDir of [context.rootDir, ...await globber.glob()]) {
+            const packageJsonPath = path.join(packageDir, "package.json");
+            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+            let depsObj: Record<string, string> | undefined = undefined;
+            if (packageJson.dependencies?.[pkgInfo.name] != null) {
+                depsObj = packageJson.dependencies;
+            } else if (packageJson.devDependencies?.[pkgInfo.name] != null) {
+                depsObj = packageJson.devDependencies;
+            }
+            if (depsObj != null) {
+                const firstSemverChar = depsObj[pkgInfo.name].charAt(0);
+                depsObj[pkgInfo.name] = (/\d/.test(firstSemverChar) ? "" : firstSemverChar) + newVersion;
+                fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 4) + "\n");
+            }
+        }
     }
-    const excludeDirs = pkgInfo.filter(pkgInfo => pkgInfo.location != pkgDir)
-        .map(pkgInfo => path.relative(context.rootDir, pkgInfo.location));
-    await utils.lernaVersion(semverDiff, excludeDirs, false);
 }

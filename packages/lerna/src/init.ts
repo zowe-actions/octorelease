@@ -15,9 +15,11 @@
  */
 
 import * as fs from "fs";
+import * as path from "path";
 import { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
 import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     let publishConfig;
@@ -37,6 +39,23 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
     } catch {
         throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
+    }
+
+    if (config.versionIndependent != null) {
+        for (const { name, location } of await utils.lernaList()) {
+            if (!config.versionIndependent.includes(name)) {
+                continue;
+            }
+            const packageJson = JSON.parse(fs.readFileSync(path.join(location, "package.json"), "utf-8"));
+            if (!packageJson.private) {
+                const relPackageDir = path.relative(context.rootDir, location);
+                context.version.overrides[relPackageDir] = {
+                    old: packageJson.version,
+                    new: packageJson.version,
+                    prerelease: context.version.prerelease
+                };
+            }
+        }
     }
 
     context.branch.channel = context.branch.channel || "latest";

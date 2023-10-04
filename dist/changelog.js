@@ -2325,7 +2325,7 @@ var require_internal_path_helper = __commonJS({
     var path2 = __importStar(require("path"));
     var assert_1 = __importDefault(require("assert"));
     var IS_WINDOWS = process.platform === "win32";
-    function dirname(p) {
+    function dirname2(p) {
       p = safeTrimTrailingSeparator(p);
       if (IS_WINDOWS && /^\\\\[^\\]+(\\[^\\]+)?$/.test(p)) {
         return p;
@@ -2336,7 +2336,7 @@ var require_internal_path_helper = __commonJS({
       }
       return result;
     }
-    exports.dirname = dirname;
+    exports.dirname = dirname2;
     function ensureAbsoluteRoot(root, itemPath) {
       assert_1.default(root, `ensureAbsoluteRoot parameter 'root' must not be empty`);
       assert_1.default(itemPath, `ensureAbsoluteRoot parameter 'itemPath' must not be empty`);
@@ -4208,9 +4208,11 @@ function getPackageChangelog(context, changelogFile, headerLine) {
   return releaseNotes.trim() || void 0;
 }
 function updatePackageChangelog(context, changelogFile, headerLine) {
+  var _a;
   if (context.version.new !== context.version.old && fs.existsSync(changelogFile)) {
     const oldContents = fs.readFileSync(changelogFile, "utf-8");
-    const newContents = oldContents.replace(headerLine, `## \`${context.version.new}\``);
+    const newVersion = ((_a = context.version.overrides[path.dirname(changelogFile)]) == null ? void 0 : _a.new) || context.version.new;
+    const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
     if (newContents !== oldContents) {
       fs.writeFileSync(changelogFile, newContents);
       context.logger.info(`Updated version header in ${changelogFile}`);
