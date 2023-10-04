@@ -39,6 +39,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             }
         }
     }
+
     await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
     context.changedFiles.push("lerna.json", "package.json");
     const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
@@ -70,7 +71,7 @@ async function updateIndependentVersion(context: IContext, pkgInfo: { name: stri
             if (depsObj != null) {
                 const firstSemverChar = depsObj[pkgInfo.name].charAt(0);
                 depsObj[pkgInfo.name] = (/\d/.test(firstSemverChar) ? "" : firstSemverChar) + newVersion;
-                fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 4) + "\n");
+                fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
             }
         }
     }

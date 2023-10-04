@@ -20654,7 +20654,6 @@ __export(utils_exports, {
   buildContext: () => buildContext,
   dryRunTask: () => dryRunTask,
   getLastCommitMessage: () => getLastCommitMessage,
-  getSemverDiff: () => getSemverDiff,
   loadPlugins: () => loadPlugins,
   verifyConditions: () => verifyConditions
 });
@@ -20739,7 +20738,7 @@ function verifyConditions(context) {
     if (context.version.prerelease != null) {
       context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
-    const semverDiff = getSemverDiff(context);
+    const semverDiff = require_semver2().diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
     for (const versionInfo of Object.values(context.version.overrides)) {
       versionInfo.new = require_semver2().inc(versionInfo.old.split("-")[0], semverDiff);
       if (versionInfo.prerelease != null) {
@@ -20750,19 +20749,6 @@ function verifyConditions(context) {
       throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
     }
   });
-}
-function getLastCommitMessage(context) {
-  return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput(
-      "git",
-      ["log", "-1", "--pretty=format:%s", context.ci.commit],
-      { ignoreReturnCode: true }
-    );
-    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
-  });
-}
-function getSemverDiff(context) {
-  return require_semver2().diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
 }
 function buildVersionInfo(branch, tagPrefix) {
   return __async(this, null, function* () {
@@ -20779,6 +20765,16 @@ function buildVersionInfo(branch, tagPrefix) {
       prerelease = `${prereleaseName}.${timestamp}`;
     }
     return { old: oldVersion, new: oldVersion, prerelease, overrides: {} };
+  });
+}
+function getLastCommitMessage(context) {
+  return __async(this, null, function* () {
+    const cmdOutput = yield exec.getExecOutput(
+      "git",
+      ["log", "-1", "--pretty=format:%s", context.ci.commit],
+      { ignoreReturnCode: true }
+    );
+    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || void 0;
   });
 }
 function loadCiEnv() {

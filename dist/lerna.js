@@ -5560,14 +5560,14 @@ function lernaList(onlyChanged) {
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
   });
 }
-function lernaVersion(newVersion, excludeDirs, updateLockfile = true) {
+function lernaVersion(newVersion, excludeDirs) {
   return __async(this, null, function* () {
     const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
     if (excludeDirs) {
       cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
     }
     yield exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
-    if (updateLockfile && !fs.existsSync("yarn.lock")) {
+    if (!fs.existsSync("yarn.lock")) {
       yield exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
     }
   });
@@ -5694,7 +5694,7 @@ function updateIndependentVersion(context, pkgInfo, newVersion) {
         if (depsObj != null) {
           const firstSemverChar = depsObj[pkgInfo.name].charAt(0);
           depsObj[pkgInfo.name] = (/\d/.test(firstSemverChar) ? "" : firstSemverChar) + newVersion;
-          fs3.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 4) + "\n");
+          fs3.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
         }
       }
     }

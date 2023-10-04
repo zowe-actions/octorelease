@@ -22,8 +22,6 @@ import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo 
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
-type SemverDiff = "major" | "premajor" | "minor" | "preminor" | "patch" | "prepatch" | "prerelease";
-
 /**
  * Build global context object that is passed to all plugin handlers.
  * @param opts Options for building the context object
@@ -130,7 +128,7 @@ export async function verifyConditions(context: IContext): Promise<void> {
         context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
 
-    const semverDiff = getSemverDiff(context);
+    const semverDiff = require("semver").diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
     for (const versionInfo of Object.values(context.version.overrides)) {
         versionInfo.new = require("semver").inc(versionInfo.old.split("-")[0], semverDiff);
         if (versionInfo.prerelease != null) {
@@ -142,24 +140,6 @@ export async function verifyConditions(context: IContext): Promise<void> {
             (semverDiff === "minor" && context.branch.level === "patch")) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
     }
-}
-
-/**
- * Retrieve most recent Git commit message if there is one.
- * @returns Commit message or undefined if there is no Git history
- */
-export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
-    const cmdOutput = await exec.getExecOutput("git",
-        ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
-    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
-}
-
-/**
- * Get semver difference between old and new versions.
- * @param context Global context object for Octorelease
- */
-export function getSemverDiff(context: IContext): SemverDiff | null {
-    return require("semver").diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
 }
 
 /**
@@ -181,6 +161,16 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
     }
 
     return { old: oldVersion, new: oldVersion, prerelease, overrides: {} };
+}
+
+/**
+ * Retrieve most recent Git commit message if there is one.
+ * @returns Commit message or undefined if there is no Git history
+ */
+export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
+    const cmdOutput = await exec.getExecOutput("git",
+        ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
+    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
 }
 
 /**
