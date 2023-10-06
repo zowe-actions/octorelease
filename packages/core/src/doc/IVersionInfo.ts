@@ -32,4 +32,9 @@ export interface IVersionInfo {
      * Prerelease string if this is a prerelease branch
      */
     prerelease?: string;
+
+    /**
+     * Version overrides for directories in workspace
+     */
+    overrides: Record<string, Omit<IVersionInfo, "overrides">>;
 }

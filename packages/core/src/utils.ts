@@ -129,6 +129,13 @@ export async function verifyConditions(context: IContext): Promise<void> {
     }
 
     const semverDiff = require("semver").diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
+    for (const versionInfo of Object.values(context.version.overrides)) {
+        versionInfo.new = require("semver").inc(versionInfo.old.split("-")[0], semverDiff);
+        if (versionInfo.prerelease != null) {
+            versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
+        }
+    }
+
     if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
             (semverDiff === "minor" && context.branch.level === "patch")) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
@@ -153,7 +160,7 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
         prerelease = `${prereleaseName}.${timestamp}`;
     }
 
-    return { old: oldVersion, new: oldVersion, prerelease };
+    return { old: oldVersion, new: oldVersion, prerelease, overrides: {} };
 }
 
 /**

@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@actions/exec": "^1.1.0",
+    "@actions/glob": "^0.4.0",
     "@octorelease/npm": "^1.0.0",
     "find-up": "^5.0.0"
   },

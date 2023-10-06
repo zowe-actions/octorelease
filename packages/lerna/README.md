@@ -33,6 +33,11 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 ## Configuration
 
-See the documentation for [@octorelease/npm](https://github.com/octorelease/octorelease/tree/master/packages/npm#configuration).
+See the documentation for [@octorelease/npm](https://github.com/octorelease/octorelease/tree/master/packages/npm#configuration). In addition the following options are supported.
+
+| Options | Description | Default |
+| ------- | ----------- | ------- |
+| `pruneShrinkwrap` | List of packages in the workspace that should be published with a pruned npm-shrinkwrap.json. | `[]` |
+| `versionIndependent` | List of packages in the workspace that should be versioned independently of the fixed version in lerna.json. | `[]` |
 
 <!-- TODO Mention npm@7 or newer requirement for workspaces -->
