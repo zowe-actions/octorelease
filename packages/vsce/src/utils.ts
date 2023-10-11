@@ -20,8 +20,7 @@ import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
 let usePnpm: boolean;
-
-export async function npxCmd(): Promise<string> {
+async function npxCmd(): Promise<string> {
     if (usePnpm == null) {
         try {
             usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
