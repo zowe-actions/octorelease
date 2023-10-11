@@ -35,7 +35,7 @@ export async function lernaVersion(newVersion: string, excludeDirs?: string[]): 
         cmdArgs.push("--ignore-changes", ...excludeDirs.map(dir => dir + "/**"));
     }
     await exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
-    if (!fs.existsSync("yarn.lock")) {
+    if (!fs.existsSync("yarn.lock") || !fs.existsSync("pnpm-lock.yaml")) {
         // Update subpackage versions in lockfile (requires npm@8.5 or newer)
         await exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
     }

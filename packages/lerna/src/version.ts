@@ -42,7 +42,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
     context.changedFiles.push("lerna.json", "package.json");
-    const lockfilePath = await findUp(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
+    const lockfilePath = await findUp(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
         context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
     } else {
