@@ -1135,10 +1135,23 @@ var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_core = require("./core");
+var usePnpm;
+function npxCmd() {
+  return __async(this, null, function* () {
+    if (usePnpm == null) {
+      try {
+        usePnpm = (yield exec.exec("pnpm", ["--version"], { silent: true })) === 0 ? true : false;
+      } catch (error) {
+        usePnpm = false;
+      }
+    }
+    return usePnpm ? "pnpm dlx" : "npx";
+  });
+}
 function ovsxInfo(extensionName) {
   return __async(this, null, function* () {
     try {
-      const cmdOutput = yield exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
+      const cmdOutput = yield exec.getExecOutput(yield npxCmd(), ["ovsx", "get", extensionName, "--metadata"]);
       return JSON.parse(cmdOutput.stdout);
     } catch (e) {
     }
@@ -1155,15 +1168,15 @@ function ovsxPublish(context, vsixPath) {
     if (context.version.prerelease != null) {
       cmdArgs.push("--pre-release");
     }
-    yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
-      yield exec.exec("npx", cmdArgs);
+    yield import_core.utils.dryRunTask(context, `${yield npxCmd()} ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
+      yield exec.exec(yield npxCmd(), cmdArgs);
     }));
   });
 }
 function vsceInfo(extensionName) {
   return __async(this, null, function* () {
     try {
-      const cmdOutput = yield exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
+      const cmdOutput = yield exec.getExecOutput(yield npxCmd(), ["vsce", "show", extensionName, "--json"]);
       return JSON.parse(cmdOutput.stdout);
     } catch (e) {
     }
@@ -1179,7 +1192,7 @@ function vscePackage(context) {
     if (context.version.prerelease != null) {
       cmdArgs.push("--pre-release");
     }
-    const cmdOutput = yield exec.getExecOutput("npx", cmdArgs);
+    const cmdOutput = yield exec.getExecOutput(yield npxCmd(), cmdArgs);
     return (_a = cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)) == null ? void 0 : _a[1];
   });
 }
@@ -1194,14 +1207,14 @@ function vscePublish(context, vsixPath) {
     if (context.version.prerelease != null) {
       cmdArgs.push("--pre-release");
     }
-    yield import_core.utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
-      yield exec.exec("npx", cmdArgs);
+    yield import_core.utils.dryRunTask(context, `${yield npxCmd()} ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
+      yield exec.exec(yield npxCmd(), cmdArgs);
     }));
   });
 }
 function verifyToken(tool, publisher) {
   return __async(this, null, function* () {
-    yield exec.exec("npx", [tool, "verify-pat", publisher]);
+    yield exec.exec(yield npxCmd(), [tool, "verify-pat", publisher]);
   });
 }
 

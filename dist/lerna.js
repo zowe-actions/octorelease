@@ -5547,6 +5547,19 @@ __export(utils_exports, {
 });
 var fs = __toESM(require("fs"));
 var exec = __toESM(require_exec());
+var usePnpm;
+function npxCmd() {
+  return __async(this, null, function* () {
+    if (usePnpm == null) {
+      try {
+        usePnpm = (yield exec.exec("pnpm", ["--version"], { silent: true })) === 0 ? true : false;
+      } catch (error) {
+        usePnpm = false;
+      }
+    }
+    return usePnpm ? "pnpm dlx" : "npx";
+  });
+}
 function lernaList(onlyChanged) {
   return __async(this, null, function* () {
     const cmdArgs = ["lerna"];
@@ -5566,9 +5579,11 @@ function lernaVersion(newVersion, excludeDirs) {
     if (excludeDirs) {
       cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
     }
-    yield exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
-    if (!fs.existsSync("yarn.lock")) {
+    yield exec.exec(yield npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
+    if (!fs.existsSync("yarn.lock") && !usePnpm) {
       yield exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
+    } else if (usePnpm) {
+      yield exec.exec("pnpm", ["install", "--lockfile-only", "--ignore-scripts"]);
     }
   });
 }
@@ -5664,7 +5679,7 @@ function version_default2(context, config) {
     }
     yield lernaVersion(context.version.new, Object.keys(context.version.overrides));
     context.changedFiles.push("lerna.json", "package.json");
-    const lockfilePath = yield (0, import_find_up.default)(["yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
+    const lockfilePath = yield (0, import_find_up.default)(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
       context.changedFiles.push(path2.relative(context.rootDir, lockfilePath));
     } else {
