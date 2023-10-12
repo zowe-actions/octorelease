@@ -29,7 +29,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         if (packageJson.scripts.preshrinkwrap != null) {
             await exec.exec("npm", ["run", "preshrinkwrap"], { cwd });
         }
-        pruneShrinkwrap(inDir);
+        pruneShrinkwrap(context, inDir);
     }
 
     if (config.tarballDir != null) {
@@ -87,10 +87,18 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     }
 }
 
-function pruneShrinkwrap(inDir?: string): void {
+function pruneShrinkwrap(context: IContext, inDir?: string): void {
     const shrinkwrapPath = inDir != null ? path.join(inDir, "npm-shrinkwrap.json") : "npm-shrinkwrap.json";
     const lockfile = JSON.parse(fs.readFileSync(shrinkwrapPath, "utf-8"));
     const filterPkgs = (obj: Record<string, any>, key: string) => {
+        if (obj[key] == null) {
+            // lockfileVersion 3 does not contain a `dependencies`
+            if (key === "dependencies" && lockfile.lockfileVersion === 3) {
+                context.logger.info("'Dependencies' is not supported in lockfileVersion 3.");
+            }
+            context.logger.info(`Property '${key}' does not exist. Skipping prune operation!`);
+            return;
+        }
         for (const [pkgName, pkgData] of Object.entries(obj[key]) as any) {
             if (["dev", "extraneous"].some(prop => pkgData[prop])) {
                 delete obj[key][pkgName];
