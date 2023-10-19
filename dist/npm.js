@@ -1645,7 +1645,7 @@ function publish_default(context, config, inDir) {
       if (packageJson.scripts.preshrinkwrap != null) {
         yield exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
       }
-      pruneShrinkwrap(inDir);
+      pruneShrinkwrap(context, inDir);
     }
     if (config.tarballDir != null) {
       const tgzFile = yield npmPack(inDir);
@@ -1693,10 +1693,17 @@ function publish_default(context, config, inDir) {
     }
   });
 }
-function pruneShrinkwrap(inDir) {
+function pruneShrinkwrap(context, inDir) {
   const shrinkwrapPath = inDir != null ? path2.join(inDir, "npm-shrinkwrap.json") : "npm-shrinkwrap.json";
   const lockfile = JSON.parse(fs3.readFileSync(shrinkwrapPath, "utf-8"));
   const filterPkgs = (obj, key) => {
+    if (obj[key] == null) {
+      if (key === "dependencies" && lockfile.lockfileVersion === 3) {
+        context.logger.info("'Dependencies' is not supported in lockfileVersion 3.");
+      }
+      context.logger.info(`Property '${key}' does not exist. Skipping prune operation!`);
+      return;
+    }
     for (const [pkgName, pkgData] of Object.entries(obj[key])) {
       if (["dev", "extraneous"].some((prop) => pkgData[prop])) {
         delete obj[key][pkgName];
