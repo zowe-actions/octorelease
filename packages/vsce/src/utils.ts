@@ -19,9 +19,21 @@ import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
+let usePnpm: boolean;
+async function npxCmd(): Promise<string> {
+    if (usePnpm == null) {
+        try {
+            usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
+        } catch (error) {
+            usePnpm = false;
+        }
+    }
+    return usePnpm ? "pnpm exec" : "npx";
+}
+
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
     try {
-        const cmdOutput = await exec.getExecOutput("npx", ["ovsx", "get", extensionName, "--metadata"]);
+        const cmdOutput = await exec.getExecOutput(await npxCmd(), ["ovsx", "get", extensionName, "--metadata"]);
         return JSON.parse(cmdOutput.stdout);
     } catch { /* Do nothing */ }
 }
@@ -36,27 +48,39 @@ export async function ovsxPublish(context: IContext, vsixPath?: string): Promise
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec("npx", cmdArgs);
+    await utils.dryRunTask(context, `${await npxCmd()} ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec(await npxCmd(), cmdArgs);
     });
 }
 
 export async function vsceInfo(extensionName: string): Promise<Record<string, any> | undefined> {
     try {
-        const cmdOutput = await exec.getExecOutput("npx", ["vsce", "show", extensionName, "--json"]);
+        const cmdOutput = await exec.getExecOutput(await npxCmd(), ["vsce", "show", extensionName, "--json"]);
         return JSON.parse(cmdOutput.stdout);
     } catch { /* Do nothing */ }
 }
 
 export async function vscePackage(context: IContext): Promise<string> {
     const cmdArgs = ["vsce", "package"];
+    const npx_cmd = await npxCmd();
     if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    const cmdOutput = await exec.getExecOutput("npx", cmdArgs);
+    if (usePnpm) {
+        // Skip dependency analysis since we webpack as part of our build process
+        //      Source: https://github.com/microsoft/vscode-vsce/issues/758#issuecomment-1282081038
+        // This prevents the common **/json5 issue when the vsce process runs an `npm list` command
+        /**
+         *  ERROR  Command failed: npm list --production --parseable --depth=99999 --loglevel=error
+         *  npm ERR! Override without name: **\/json5
+         *  npm ERR! A complete log of this run can be found in: /path/to/npm/log
+         */
+        cmdArgs.push("--no-dependencies");
+    }
+    const cmdOutput = await exec.getExecOutput(npx_cmd, cmdArgs);
     return cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)?.[1] as string;
 }
 
@@ -70,11 +94,11 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    await utils.dryRunTask(context, `npx ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec("npx", cmdArgs);
+    await utils.dryRunTask(context, `${await npxCmd()} ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec(await npxCmd(), cmdArgs);
     });
 }
 
 export async function verifyToken(tool: "ovsx" | "vsce", publisher: string): Promise<void> {
-    await exec.exec("npx", [tool, "verify-pat", publisher]);
+    await exec.exec(await npxCmd(), [tool, "verify-pat", publisher]);
 }
