@@ -17,6 +17,18 @@
 import * as fs from "fs";
 import * as exec from "@actions/exec";
 
+let usePnpm: boolean;
+async function npxCmd(): Promise<string> {
+    if (usePnpm == null) {
+        try {
+            usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
+        } catch (error) {
+            usePnpm = false;
+        }
+    }
+    return usePnpm ? "pnpm exec" : "npx";
+}
+
 export async function lernaList(onlyChanged?: boolean): Promise<Record<string, any>[]> {
     const cmdArgs = ["lerna"];
     if (onlyChanged) {
@@ -34,9 +46,12 @@ export async function lernaVersion(newVersion: string, excludeDirs?: string[]): 
     if (excludeDirs) {
         cmdArgs.push("--ignore-changes", ...excludeDirs.map(dir => dir + "/**"));
     }
-    await exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
-    if (!fs.existsSync("yarn.lock")) {
+    await exec.exec(await npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
+    // await exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
+    if (!fs.existsSync("yarn.lock") && !usePnpm) {
         // Update subpackage versions in lockfile (requires npm@8.5 or newer)
         await exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
+    } else if (usePnpm) {
+        await exec.exec("pnpm", ["install", "--lockfile-only", "--ignore-scripts"]);
     }
 }
