@@ -5575,9 +5575,15 @@ function lernaList(onlyChanged) {
 }
 function lernaVersion(newVersion, excludeDirs) {
   return __async(this, null, function* () {
+    var _a, _b;
     const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
     if (excludeDirs) {
-      cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
+      const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
+      const ignorePatterns = [
+        ...((_b = (_a = lernaJson.command) == null ? void 0 : _a.publish) == null ? void 0 : _b.ignoreChanges) || [],
+        ...excludeDirs.map((dir) => dir + "/**")
+      ];
+      cmdArgs.push("--ignore-changes", ...ignorePatterns);
     }
     yield exec.exec(yield npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
     if (!fs.existsSync("yarn.lock") && !usePnpm) {

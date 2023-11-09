@@ -44,7 +44,12 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
 export async function lernaVersion(newVersion: string, excludeDirs?: string[]): Promise<void> {
     const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
     if (excludeDirs) {
-        cmdArgs.push("--ignore-changes", ...excludeDirs.map(dir => dir + "/**"));
+        const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
+        const ignorePatterns = [
+            ...(lernaJson.command?.publish?.ignoreChanges || []),
+            ...excludeDirs.map(dir => dir + "/**")
+        ];
+        cmdArgs.push("--ignore-changes", ...ignorePatterns);
     }
     await exec.exec(await npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
     // await exec.exec("npx", ["lerna", "version", newVersion, ...cmdArgs]);
