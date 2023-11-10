@@ -30,7 +30,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const changedPackageInfo = await utils.lernaList(true);
+    await utils.lernaVersion(context.version.new);
     if (config.versionIndependent != null) {
+        // Lerna's ignoreChanges option doesn't behave the way we want. Even if
+        // we tell it to ignore a package directory, it will still bump that
+        // package's version if a dependency of that package has changed. For
+        // independent versioning, we let Lerna bump all the versions it wants
+        // first and correct the versions of independent packages afterwards.
         for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
             const pkgInfo = changedPackageInfo
                 .find(pkgInfo => path.relative(context.rootDir, pkgInfo.location) === packageDir);
@@ -40,7 +46,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
     }
 
-    await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
+    await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
     context.changedFiles.push("lerna.json", "package.json");
     const lockfilePath = await findUp(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {

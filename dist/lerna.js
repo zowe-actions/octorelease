@@ -5543,6 +5543,7 @@ var import_npm = require("./npm");
 var utils_exports = {};
 __export(utils_exports, {
   lernaList: () => lernaList,
+  lernaPostVersion: () => lernaPostVersion,
   lernaVersion: () => lernaVersion
 });
 var fs = __toESM(require("fs"));
@@ -5573,13 +5574,21 @@ function lernaList(onlyChanged) {
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
   });
 }
-function lernaVersion(newVersion, excludeDirs) {
+function lernaVersion(newVersion) {
   return __async(this, null, function* () {
-    const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
-    if (excludeDirs) {
-      cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
-    }
-    yield exec.exec(yield npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
+    yield exec.exec(yield npxCmd(), [
+      "lerna",
+      "version",
+      newVersion,
+      "--exact",
+      "--include-merged-tags",
+      "--no-git-tag-version",
+      "--yes"
+    ]);
+  });
+}
+function lernaPostVersion() {
+  return __async(this, null, function* () {
     if (!fs.existsSync("yarn.lock") && !usePnpm) {
       yield exec.exec("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit"]);
     } else if (usePnpm) {
@@ -5669,6 +5678,7 @@ function version_default2(context, config) {
       return;
     }
     const changedPackageInfo = yield lernaList(true);
+    yield lernaVersion(context.version.new);
     if (config.versionIndependent != null) {
       for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
         const pkgInfo = changedPackageInfo.find((pkgInfo2) => path2.relative(context.rootDir, pkgInfo2.location) === packageDir);
@@ -5677,7 +5687,7 @@ function version_default2(context, config) {
         }
       }
     }
-    yield lernaVersion(context.version.new, Object.keys(context.version.overrides));
+    yield lernaPostVersion();
     context.changedFiles.push("lerna.json", "package.json");
     const lockfilePath = yield (0, import_find_up.default)(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
