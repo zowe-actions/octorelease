@@ -8,7 +8,7 @@ on:
         required: true
         type: choice
         default: core
-        options: [changelog, core, git, github, lerna, npm, vsce]
+        options: [changelog, core, git, github, lerna, npm, pypi, vsce]
       version:
         description: Version number to publish (e.g., 1.0.0)
         required: false
