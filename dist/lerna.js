@@ -5695,7 +5695,7 @@ function version_default2(context, config) {
     } else {
       context.logger.warn("Could not find lockfile to update version in");
     }
-    for (const { location } of changedPackageInfo) {
+    for (const { location } of yield lernaList(false)) {
       const relLocation = path2.relative(context.rootDir, location);
       context.changedFiles.push(path2.join(relLocation, "package.json"));
     }
