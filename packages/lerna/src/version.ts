@@ -54,7 +54,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         context.logger.warn("Could not find lockfile to update version in");
     }
-    for (const { location } of changedPackageInfo) {
+    for (const { location } of await utils.lernaList(false)) {
         const relLocation = path.relative(context.rootDir, location);
         context.changedFiles.push(path.join(relLocation, "package.json"));
     }
