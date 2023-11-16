@@ -22,17 +22,17 @@
   - `version`: Bump the package version with npm CLI
   - `publish`: Publish the new package version to NPM registry
   - `success`: Verify that new package version can be installed successfully
-- [@octorelease/lerna](https://github.com/octorelease/lerna)
+- [@octorelease/lerna](https://github.com/octorelease/octorelease/tree/master/packages/lerna)
   - `init`: Load version numbers from lerna.json and login to NPM registry
   - `version`: Bump changed package versions with lerna CLI
   - `publish`: Publish the new package versions to NPM registry
   - `success`: Verify that new package versions can be installed successfully
-- [@octorelease/prune-shrinkwrap](https://github.com/octorelease/prune-shrinkwrap)
-  - `init`: Validate plugin configuration
-  - `version`: Prune unwanted dependencies from npm shrinkwrap file
-<!-- - [@octorelease/vsce](https://github.com/octorelease/vsce)
-  - `init`: TODO
-  - `publish`: TODO -->
+- [@octorelease/pypi](https://github.com/octorelease/octorelease/tree/master/packages/pypi)
+  - `init`: Verify that `twine` is installed and configured
+  - `publish`: Publish packages in dist folder to PyPI registry
+- [@octorelease/vsce](https://github.com/octorelease/octorelease/tree/master/packages/vsce)
+  - `init`: Verify personal access tokens to publish to VSIX registry
+  - `publish`: Publish the new extension to VS Code marketplace and/or OVSX registry
 
 ## Community plugins
 
