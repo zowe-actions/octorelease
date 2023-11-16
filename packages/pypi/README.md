@@ -38,7 +38,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | `TWINE_USERNAME` | User name of the PyPI publisher. |
 | `TWINE_PASSWORD` | Password of the PyPI publisher. |
 
-To log in to PyPI with a token, set `TWINE_USERNAME=_token_` and `TWINE_PASSWORD` to the token value.
+To log in to PyPI with a token, set `TWINE_USERNAME=__token__` and `TWINE_PASSWORD` to the token value.
 
 ### Options
 
