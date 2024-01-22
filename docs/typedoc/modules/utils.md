@@ -22,11 +22,9 @@ Build global context object that is passed to all plugin handlers.
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `opts?` | `Object` |
-| `opts.branch?` | `string` |
-| `opts.force?` | `boolean` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `opts?` | [`IContextOpts`](../interfaces/IContextOpts.md) | Options for building the context object |
 
 #### Returns
 
@@ -36,7 +34,7 @@ Global context object for Octorelease
 
 #### Defined in
 
-[utils.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L29)
+[utils.ts:30](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/utils.ts#L30)
 
 ___
 
@@ -66,7 +64,7 @@ In dry run mode skip the task, otherwise run it.
 
 #### Defined in
 
-[utils.ts:84](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L84)
+[utils.ts:85](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/utils.ts#L85)
 
 ___
 
@@ -90,7 +88,7 @@ Commit message or undefined if there is no Git history
 
 #### Defined in
 
-[utils.ts:160](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L160)
+[utils.ts:171](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/utils.ts#L171)
 
 ___
 
@@ -116,7 +114,7 @@ Key-value pairs of plugin names and loaded modules
 
 #### Defined in
 
-[utils.ts:100](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L100)
+[utils.ts:101](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/utils.ts#L101)
 
 ___
 
@@ -141,4 +139,4 @@ branch rules.
 
 #### Defined in
 
-[utils.ts:122](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/utils.ts#L122)
+[utils.ts:125](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/utils.ts#L125)

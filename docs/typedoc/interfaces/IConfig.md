@@ -22,7 +22,7 @@ Array of protected branch configurations
 
 #### Defined in
 
-[doc/IConfig.ts:38](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L38)
+[doc/IConfig.ts:38](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IConfig.ts#L38)
 
 ___
 
@@ -34,7 +34,7 @@ Array of Octorelease plugin configurations
 
 #### Defined in
 
-[doc/IConfig.ts:43](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L43)
+[doc/IConfig.ts:43](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IConfig.ts#L43)
 
 ___
 
@@ -46,4 +46,4 @@ Git tag prefix that precedes version number (default is "v")
 
 #### Defined in
 
-[doc/IConfig.ts:48](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L48)
+[doc/IConfig.ts:48](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IConfig.ts#L48)

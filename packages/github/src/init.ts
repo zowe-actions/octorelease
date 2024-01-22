@@ -16,7 +16,7 @@
 
 import { RequestError } from "@octokit/request-error";
 import delay from "delay";
-import { IContext, Inputs } from "@octorelease/core";
+import { IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
 import * as utils from "./utils";
 
@@ -51,11 +51,11 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     }
 
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
+    const timeoutInMinutes = 30;
     let approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
+    let semverDiffLevel: typeof SemverDiffLevels[number] = "none";
 
-    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== "none") {
-        const timeoutInMinutes = 30;
-
+    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== semverDiffLevel) {
         // Remove unapproved release labels
         for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
             await octokit.rest.issues.removeLabel({
@@ -71,13 +71,12 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         const semverInc = require("semver/functions/inc");
         let commentBody = `Version info from a repo admin is required to publish a new version. ` +
             `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
-            `* **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)\n` +
-            `* **${releaseLabels[1]}**: \`${semverInc(oldVersion, "patch")}${prereleaseSuffix}\`\n`;
-        if (context.branch.level !== "patch") {
-            commentBody += `* **${releaseLabels[2]}**: \`${semverInc(oldVersion, "minor")}${prereleaseSuffix}\`\n`;
-        }
-        if (context.branch.level !== "patch" && context.branch.level !== "minor") {
-            commentBody += `* **${releaseLabels[3]}**: \`${semverInc(oldVersion, "major")}${prereleaseSuffix}\`\n`;
+            `* **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)\n`;
+        for (const [i, level] of SemverDiffLevels.slice(1).entries()) {
+            if (context.branch.level != null && i >= SemverDiffLevels.indexOf(context.branch.level)) {
+                break;
+            }
+            commentBody += `* **${releaseLabels[i + 1]}**: \`${semverInc(oldVersion, level)}${prereleaseSuffix}\`\n`;
         }
         const comment = await octokit.rest.issues.createComment({
             ...context.ci.repo,
@@ -116,10 +115,9 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     }
 
     if (approvedLabelEvents.length === 1) {
-        return [null, "patch", "minor", "major"][releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
+        semverDiffLevel = SemverDiffLevels[releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
     }
-
-    return null;
+    return semverDiffLevel !== "none" ? semverDiffLevel : null;
 }
 
 async function findApprovedLabelEvents(context: IContext, octokit: utils.Octokit, prNumber: number,

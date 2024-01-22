@@ -40,7 +40,7 @@ associated with the "INPUT_DRY-RUN" environment variable.
 
 #### Defined in
 
-[inputs.ts:27](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L27)
+[inputs.ts:27](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L27)
 
 ## Accessors
 
@@ -56,7 +56,7 @@ Specify whether to detect [ci skip] in last commit message
 
 #### Defined in
 
-[inputs.ts:32](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L32)
+[inputs.ts:32](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L32)
 
 ___
 
@@ -72,7 +72,7 @@ Custom directory to search for release configuration.
 
 #### Defined in
 
-[inputs.ts:46](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L46)
+[inputs.ts:46](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L46)
 
 ___
 
@@ -88,7 +88,7 @@ Don't make any changes but report what would have been done.
 
 #### Defined in
 
-[inputs.ts:54](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L54)
+[inputs.ts:54](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L54)
 
 ___
 
@@ -104,7 +104,7 @@ New version number that should be released.
 
 #### Defined in
 
-[inputs.ts:68](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L68)
+[inputs.ts:68](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L68)
 
 ___
 
@@ -120,7 +120,7 @@ Comma-separated list of stages that should be skipped.
 
 #### Defined in
 
-[inputs.ts:75](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L75)
+[inputs.ts:75](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L75)
 
 ___
 
@@ -136,4 +136,4 @@ Custom working directory to use instead of the project root.
 
 #### Defined in
 
-[inputs.ts:83](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/inputs.ts#L83)
+[inputs.ts:83](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L83)

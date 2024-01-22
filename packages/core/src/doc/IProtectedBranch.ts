@@ -17,7 +17,7 @@
 /**
  * List of semver diff levels supported by Octorelease
  */
-export const SemverDiffLevels = ["none", "patch", "minor", "major"];
+export const SemverDiffLevels = ["none", "patch", "minor", "major"] as const;
 
 /**
  * Protected branch configuration object

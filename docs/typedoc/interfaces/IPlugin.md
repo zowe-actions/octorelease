@@ -39,7 +39,7 @@ Handler for "fail" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:28](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L28)
+[doc/IPlugin.ts:28](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IPlugin.ts#L28)
 
 ___
 
@@ -66,7 +66,7 @@ Handler for "init" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:35](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L35)
+[doc/IPlugin.ts:35](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IPlugin.ts#L35)
 
 ___
 
@@ -93,7 +93,7 @@ Handler for "publish" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:42](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L42)
+[doc/IPlugin.ts:42](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IPlugin.ts#L42)
 
 ___
 
@@ -120,7 +120,7 @@ Handler for "success" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:49](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L49)
+[doc/IPlugin.ts:49](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IPlugin.ts#L49)
 
 ___
 
@@ -147,4 +147,4 @@ Handler for "version" stage
 
 #### Defined in
 
-[doc/IPlugin.ts:56](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IPlugin.ts#L56)
+[doc/IPlugin.ts:56](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IPlugin.ts#L56)

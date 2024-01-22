@@ -25092,9 +25092,10 @@ function getPrReleaseType(context, config) {
       return null;
     }
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
+    const timeoutInMinutes = 30;
     let approvedLabelEvents = yield findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
-    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== "none") {
-      const timeoutInMinutes = 30;
+    let semverDiffLevel = "none";
+    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== semverDiffLevel) {
       for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
         yield octokit.rest.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {
           issue_number: prNumber,
@@ -25106,14 +25107,12 @@ function getPrReleaseType(context, config) {
       const semverInc = require_inc();
       let commentBody = `Version info from a repo admin is required to publish a new version. Please add one of the following labels within ${timeoutInMinutes} minutes:
 * **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)
-* **${releaseLabels[1]}**: \`${semverInc(oldVersion, "patch")}${prereleaseSuffix}\`
 `;
-      if (context.branch.level !== "patch") {
-        commentBody += `* **${releaseLabels[2]}**: \`${semverInc(oldVersion, "minor")}${prereleaseSuffix}\`
-`;
-      }
-      if (context.branch.level !== "patch" && context.branch.level !== "minor") {
-        commentBody += `* **${releaseLabels[3]}**: \`${semverInc(oldVersion, "major")}${prereleaseSuffix}\`
+      for (const [i, level] of import_core.SemverDiffLevels.slice(1).entries()) {
+        if (context.branch.level != null && i >= import_core.SemverDiffLevels.indexOf(context.branch.level)) {
+          break;
+        }
+        commentBody += `* **${releaseLabels[i + 1]}**: \`${semverInc(oldVersion, level)}${prereleaseSuffix}\`
 `;
       }
       const comment = yield octokit.rest.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
@@ -25143,9 +25142,9 @@ function getPrReleaseType(context, config) {
       }));
     }
     if (approvedLabelEvents.length === 1) {
-      return [null, "patch", "minor", "major"][releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
+      semverDiffLevel = import_core.SemverDiffLevels[releaseLabels.indexOf(approvedLabelEvents[0].label.name)];
     }
-    return null;
+    return semverDiffLevel !== "none" ? semverDiffLevel : null;
   });
 }
 function findApprovedLabelEvents(context, octokit, prNumber, releaseLabels) {
