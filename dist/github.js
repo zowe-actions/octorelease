@@ -25093,7 +25093,7 @@ function getPrReleaseType(context, config) {
     }
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
     let approvedLabelEvents = yield findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
-    if (approvedLabelEvents.length !== 1 && !context.dryRun) {
+    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== "none") {
       const timeoutInMinutes = 30;
       for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
         yield octokit.rest.issues.removeLabel(__spreadProps(__spreadValues({}, context.ci.repo), {

@@ -15,6 +15,11 @@
  */
 
 /**
+ * List of semver diff levels supported by Octorelease
+ */
+export const SemverDiffLevels = ["none", "patch", "minor", "major"];
+
+/**
  * Protected branch configuration object
  */
 export interface IProtectedBranch {
@@ -31,7 +36,7 @@ export interface IProtectedBranch {
     /**
      * Maximum semver bump level allowed
      */
-    level?: "major" | "minor" | "patch";
+    level?: typeof SemverDiffLevels[number];
 
     /**
      * Prerelease name (defaults to branch name if `true`)

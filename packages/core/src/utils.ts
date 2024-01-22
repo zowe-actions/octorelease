@@ -18,7 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo } from "./doc";
+import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo, SemverDiffLevels } from "./doc";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
@@ -128,17 +128,18 @@ export async function verifyConditions(context: IContext): Promise<void> {
         context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
 
-    const semverDiff = require("semver").diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
+    const semver = require("semver");
+    const semverLevel = semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
     for (const versionInfo of Object.values(context.version.overrides)) {
-        versionInfo.new = require("semver").inc(versionInfo.old.split("-")[0], semverDiff);
+        versionInfo.new = semver.inc(versionInfo.old.split("-")[0], semverLevel);
         if (versionInfo.prerelease != null) {
             versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
         }
     }
 
-    if ((semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch")) ||
-            (semverDiff === "minor" && context.branch.level === "patch")) {
-        throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
+    if (semverLevel != null && context.branch.level != null &&
+        SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
+        throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }
 }
 

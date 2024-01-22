@@ -53,7 +53,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
     let approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
 
-    if (approvedLabelEvents.length !== 1 && !context.dryRun) {
+    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== "none") {
         const timeoutInMinutes = 30;
 
         // Remove unapproved release labels
