@@ -22066,10 +22066,14 @@ var src_exports = {};
 __export(src_exports, {
   Inputs: () => Inputs,
   Logger: () => Logger,
+  SemverDiffLevels: () => SemverDiffLevels,
   stages: () => stages_exports,
   utils: () => utils_exports
 });
 module.exports = __toCommonJS(src_exports);
+
+// src/doc/IProtectedBranch.ts
+var SemverDiffLevels = ["none", "patch", "minor", "major"];
 
 // src/inputs.ts
 var path = __toESM(require("path"));
@@ -22377,15 +22381,16 @@ function verifyConditions(context) {
     if (context.version.prerelease != null) {
       context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
-    const semverDiff = require_semver2().diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
+    const semver = require_semver2();
+    const semverLevel = semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
     for (const versionInfo of Object.values(context.version.overrides)) {
-      versionInfo.new = require_semver2().inc(versionInfo.old.split("-")[0], semverDiff);
+      versionInfo.new = semver.inc(versionInfo.old.split("-")[0], semverLevel);
       if (versionInfo.prerelease != null) {
         versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
       }
     }
-    if (semverDiff === "major" && (context.branch.level === "minor" || context.branch.level === "patch") || semverDiff === "minor" && context.branch.level === "patch") {
-      throw new Error(`Protected branch ${context.branch.name} does not allow ${semverDiff} version changes`);
+    if (semverLevel != null && context.branch.level != null && SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
+      throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }
   });
 }
@@ -22445,6 +22450,7 @@ function loadCiEnv() {
 0 && (module.exports = {
   Inputs,
   Logger,
+  SemverDiffLevels,
   stages,
   utils
 });

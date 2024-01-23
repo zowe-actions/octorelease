@@ -23,19 +23,19 @@ Release channel (e.g., NPM tag)
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IProtectedBranch.ts#L29)
+[doc/IProtectedBranch.ts:34](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L34)
 
 ___
 
 ### level
 
-• `Optional` **level**: ``"major"`` \| ``"minor"`` \| ``"patch"``
+• `Optional` **level**: ``"none"`` \| ``"patch"`` \| ``"minor"`` \| ``"major"``
 
 Maximum semver bump level allowed
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:34](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IProtectedBranch.ts#L34)
+[doc/IProtectedBranch.ts:39](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L39)
 
 ___
 
@@ -47,7 +47,7 @@ Branch name
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:24](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IProtectedBranch.ts#L24)
+[doc/IProtectedBranch.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L29)
 
 ___
 
@@ -59,4 +59,4 @@ Prerelease name (defaults to branch name if `true`)
 
 #### Defined in
 
-[doc/IProtectedBranch.ts:39](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IProtectedBranch.ts#L39)
+[doc/IProtectedBranch.ts:44](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L44)

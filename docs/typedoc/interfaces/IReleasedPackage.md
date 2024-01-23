@@ -25,7 +25,7 @@ Package name
 
 #### Defined in
 
-[doc/IReleasedPackage.ts:24](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IReleasedPackage.ts#L24)
+[doc/IReleasedPackage.ts:24](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IReleasedPackage.ts#L24)
 
 ___
 
@@ -37,4 +37,4 @@ URL to download package
 
 #### Defined in
 
-[doc/IReleasedPackage.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IReleasedPackage.ts#L29)
+[doc/IReleasedPackage.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IReleasedPackage.ts#L29)

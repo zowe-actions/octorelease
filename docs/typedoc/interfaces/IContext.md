@@ -39,7 +39,7 @@ Properties for current Git branch
 
 #### Defined in
 
-[doc/IContext.ts:31](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L31)
+[doc/IContext.ts:31](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L31)
 
 ___
 
@@ -57,7 +57,7 @@ List of changed files to stage
 
 #### Defined in
 
-[doc/IContext.ts:37](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L37)
+[doc/IContext.ts:37](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L37)
 
 ___
 
@@ -75,7 +75,7 @@ Properties for current CI environment
 
 #### Defined in
 
-[doc/IContext.ts:43](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L43)
+[doc/IContext.ts:43](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L43)
 
 ___
 
@@ -87,7 +87,7 @@ If true, don't make any changes but report what would have been done
 
 #### Defined in
 
-[doc/IContext.ts:53](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L53)
+[doc/IContext.ts:53](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L53)
 
 ___
 
@@ -99,7 +99,7 @@ Environment variables
 
 #### Defined in
 
-[doc/IContext.ts:58](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L58)
+[doc/IContext.ts:58](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L58)
 
 ___
 
@@ -111,7 +111,7 @@ Error object defined for "fail" stage
 
 #### Defined in
 
-[doc/IContext.ts:63](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L63)
+[doc/IContext.ts:63](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L63)
 
 ___
 
@@ -123,7 +123,7 @@ Logger for writing to console
 
 #### Defined in
 
-[doc/IContext.ts:68](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L68)
+[doc/IContext.ts:68](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L68)
 
 ___
 
@@ -145,7 +145,7 @@ Key-value pairs of plugin names and configuration objects
 
 #### Defined in
 
-[doc/IContext.ts:74](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L74)
+[doc/IContext.ts:74](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L74)
 
 ___
 
@@ -157,7 +157,7 @@ Multi-line string containing changelog
 
 #### Defined in
 
-[doc/IContext.ts:85](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L85)
+[doc/IContext.ts:85](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L85)
 
 ___
 
@@ -179,7 +179,7 @@ Key-value pairs of release types and released package info
 
 #### Defined in
 
-[doc/IContext.ts:80](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L80)
+[doc/IContext.ts:80](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L80)
 
 ___
 
@@ -191,7 +191,7 @@ Absolute path of project root directory
 
 #### Defined in
 
-[doc/IContext.ts:90](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L90)
+[doc/IContext.ts:90](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L90)
 
 ___
 
@@ -203,7 +203,7 @@ Git tag prefix that precedes version number (default is "v")
 
 #### Defined in
 
-[doc/IContext.ts:95](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L95)
+[doc/IContext.ts:95](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L95)
 
 ___
 
@@ -221,7 +221,7 @@ Version info including old and new project version
 
 #### Defined in
 
-[doc/IContext.ts:101](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L101)
+[doc/IContext.ts:101](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L101)
 
 ___
 
@@ -239,4 +239,4 @@ Subpackage paths or globs for monorepo
 
 #### Defined in
 
-[doc/IContext.ts:107](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IContext.ts#L107)
+[doc/IContext.ts:107](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContext.ts#L107)

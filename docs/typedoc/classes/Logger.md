@@ -12,45 +12,81 @@ Class for logging messages to the console.
 
 ### Properties
 
-- [pluginName](Logger.md#pluginname)
+- [prefix](Logger.md#prefix)
+- [pluginPathMap](Logger.md#pluginpathmap)
 
 ### Methods
 
+- [addPrefix](Logger.md#addprefix)
 - [debug](Logger.md#debug)
 - [error](Logger.md#error)
+- [getPluginName](Logger.md#getpluginname)
 - [info](Logger.md#info)
-- [prependPluginName](Logger.md#prependpluginname)
 - [warn](Logger.md#warn)
 
 ## Constructors
 
 ### constructor
 
-• **new Logger**(`pluginName?`)
+• **new Logger**(`prefix?`)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `pluginName?` | `string` |
+| `prefix?` | `string` |
 
 #### Defined in
 
-[logger.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L29)
+[logger.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L29)
 
 ## Properties
 
-### pluginName
+### prefix
 
-• `Optional` **pluginName**: `string`
-
-Plugin name to prepend to log messages.
+• `Private` `Optional` **prefix**: `string`
 
 #### Defined in
 
-[logger.ts:27](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L27)
+[logger.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L29)
+
+___
+
+### pluginPathMap
+
+▪ `Static` **pluginPathMap**: `Record`<`string`, `string`\> = `{}`
+
+Mapping of plugin names to their file paths
+
+#### Defined in
+
+[logger.ts:27](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L27)
 
 ## Methods
+
+### addPrefix
+
+▸ `Private` **addPrefix**(`message`): `string`
+
+If prefix is defined for this logger, prepend it to message.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `message` | `string` | Text to output |
+
+#### Returns
+
+`string`
+
+Text with prefix prepended
+
+#### Defined in
+
+[logger.ts:68](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L68)
+
+___
 
 ### debug
 
@@ -70,7 +106,7 @@ Output debug level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:37](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L37)
+[logger.ts:35](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L35)
 
 ___
 
@@ -92,7 +128,25 @@ Output error level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:45](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L45)
+[logger.ts:43](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L43)
+
+___
+
+### getPluginName
+
+▸ `Private` **getPluginName**(): `undefined` \| `string`
+
+Searches the call stack for file paths associated with a plugin.
+
+#### Returns
+
+`undefined` \| `string`
+
+Name of active plugin if one is found
+
+#### Defined in
+
+[logger.ts:77](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L77)
 
 ___
 
@@ -114,31 +168,7 @@ Output info level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:53](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L53)
-
-___
-
-### prependPluginName
-
-▸ `Private` **prependPluginName**(`message`): `string`
-
-If plugin name is defined for this logger, prepend it to message.
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `message` | `string` | Text to output |
-
-#### Returns
-
-`string`
-
-Text with plugin name prepended
-
-#### Defined in
-
-[logger.ts:70](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L70)
+[logger.ts:51](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L51)
 
 ___
 
@@ -160,4 +190,4 @@ Output warning level message with plugin name prepended.
 
 #### Defined in
 
-[logger.ts:61](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/logger.ts#L61)
+[logger.ts:59](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/logger.ts#L59)

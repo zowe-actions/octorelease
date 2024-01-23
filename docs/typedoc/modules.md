@@ -18,6 +18,7 @@
 
 - [IConfig](interfaces/IConfig.md)
 - [IContext](interfaces/IContext.md)
+- [IContextOpts](interfaces/IContextOpts.md)
 - [IPlugin](interfaces/IPlugin.md)
 - [IPluginsLoaded](interfaces/IPluginsLoaded.md)
 - [IProtectedBranch](interfaces/IProtectedBranch.md)
@@ -28,6 +29,10 @@
 
 - [BranchConfig](modules.md#branchconfig)
 - [PluginConfig](modules.md#pluginconfig)
+
+### Variables
+
+- [SemverDiffLevels](modules.md#semverdifflevels)
 
 ## Type Aliases
 
@@ -40,7 +45,7 @@ or object containing branch config.
 
 #### Defined in
 
-[doc/IConfig.ts:23](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L23)
+[doc/IConfig.ts:23](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IConfig.ts#L23)
 
 ___
 
@@ -53,4 +58,16 @@ or array containing plugin name and one or more configuration objects.
 
 #### Defined in
 
-[doc/IConfig.ts:29](https://github.com/zowe-actions/octorelease/blob/0333bce/packages/core/src/doc/IConfig.ts#L29)
+[doc/IConfig.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IConfig.ts#L29)
+
+## Variables
+
+### SemverDiffLevels
+
+• `Const` **SemverDiffLevels**: readonly [``"none"``, ``"patch"``, ``"minor"``, ``"major"``]
+
+List of semver diff levels supported by Octorelease
+
+#### Defined in
+
+[doc/IProtectedBranch.ts:20](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L20)
