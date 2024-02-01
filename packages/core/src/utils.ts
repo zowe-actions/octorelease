@@ -137,7 +137,7 @@ export async function verifyConditions(context: IContext): Promise<void> {
         }
     }
 
-    if (semverLevel != null && context.branch.level != null &&
+    if (semverLevel != null && context.branch.level != null && context.version.old != "0.0.0" &&
         SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }

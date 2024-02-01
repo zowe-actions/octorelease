@@ -22389,7 +22389,7 @@ function verifyConditions(context) {
         versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
       }
     }
-    if (semverLevel != null && context.branch.level != null && SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
+    if (semverLevel != null && context.branch.level != null && context.version.old != "0.0.0" && SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
       throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }
   });
