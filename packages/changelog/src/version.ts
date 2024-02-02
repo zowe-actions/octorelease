@@ -88,11 +88,14 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
 }
 
 function updatePackageChangelog(context: IContext, changelogFile: string, headerLine: string): boolean {
-    if (context.version.new !== context.version.old && fs.existsSync(changelogFile)) {
+    if (fs.existsSync(changelogFile)) {
         const oldContents = fs.readFileSync(changelogFile, "utf-8");
         const newVersion = context.version.overrides[path.dirname(changelogFile)]?.new || context.version.new;
-        const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
+        if (oldContents.includes(`## \`${newVersion}\``)) {
+            return false;
+        }
 
+        const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
         if (newContents !== oldContents) {
             fs.writeFileSync(changelogFile, newContents);
             context.logger.info(`Updated version header in ${changelogFile}`)

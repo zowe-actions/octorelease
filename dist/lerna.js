@@ -5526,6 +5526,7 @@ var require_glob = __commonJS({
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  IS_LERNA_JSON_TEMP: () => IS_LERNA_JSON_TEMP,
   init: () => init_default,
   publish: () => publish_default,
   success: () => success_default,
@@ -5538,6 +5539,9 @@ module.exports = __toCommonJS(src_exports);
 var fs2 = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var import_npm = require("./npm");
+
+// src/config.ts
+var IS_LERNA_JSON_TEMP = Symbol();
 
 // src/utils.ts
 var utils_exports = {};
@@ -5602,18 +5606,28 @@ function init_default(context, config) {
   return __async(this, null, function* () {
     var _a;
     let publishConfig;
-    try {
-      const lernaJson = JSON.parse(fs2.readFileSync("lerna.json", "utf-8"));
-      context.version.new = lernaJson.version;
-      publishConfig = (_a = lernaJson.command) == null ? void 0 : _a.publish;
-    } catch (e) {
-      throw new Error(`Missing or invalid lerna.json in branch ${context.branch.name}`);
+    config[IS_LERNA_JSON_TEMP] = !fs2.existsSync("lerna.json");
+    if (!config[IS_LERNA_JSON_TEMP]) {
+      try {
+        const lernaJson = JSON.parse(fs2.readFileSync("lerna.json", "utf-8"));
+        context.version.new = lernaJson.version;
+        publishConfig = (_a = lernaJson.command) == null ? void 0 : _a.publish;
+      } catch (e) {
+        throw new Error(`Missing or invalid lerna.json in branch ${context.branch.name}`);
+      }
     }
     try {
       const packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
       context.workspaces = packageJson.workspaces;
       if (publishConfig == null) {
         publishConfig = packageJson.publishConfig;
+      }
+      if (config[IS_LERNA_JSON_TEMP]) {
+        context.version.new = packageJson.version;
+        fs2.writeFileSync("lerna.json", JSON.stringify({
+          version: packageJson.version,
+          useWorkspaces: true
+        }, null, 2));
       }
     } catch (e) {
       throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
@@ -5688,7 +5702,10 @@ function version_default2(context, config) {
       }
     }
     yield lernaPostVersion();
-    context.changedFiles.push("lerna.json", "package.json");
+    context.changedFiles.push("package.json");
+    if (!config[IS_LERNA_JSON_TEMP]) {
+      context.changedFiles.push("lerna.json");
+    }
     const lockfilePath = yield (0, import_find_up.default)(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
       context.changedFiles.push(path2.relative(context.rootDir, lockfilePath));
@@ -5727,6 +5744,7 @@ function updateIndependentVersion(context, pkgInfo, newVersion) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  IS_LERNA_JSON_TEMP,
   init,
   publish,
   success,
