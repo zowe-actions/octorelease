@@ -129,15 +129,17 @@ export async function verifyConditions(context: IContext): Promise<void> {
     }
 
     const semver = require("semver");
-    const semverLevel = semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]);
+    const semverLevel = context.version.old !== "0.0.0" ?
+        semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]) : null;
     for (const versionInfo of Object.values(context.version.overrides)) {
-        versionInfo.new = semver.inc(versionInfo.old.split("-")[0], semverLevel);
+        versionInfo.new = semverLevel != null ?
+            semver.inc(versionInfo.old.split("-")[0], semverLevel) : versionInfo.old;
         if (versionInfo.prerelease != null) {
             versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
         }
     }
 
-    if (semverLevel != null && context.branch.level != null && context.version.old != "0.0.0" &&
+    if (semverLevel != null && context.branch.level != null &&
         SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }
