@@ -22,5 +22,5 @@ outputs:
   result:
     description: 'The output of the script for other steps to reference'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: '../dist/run-script.js'
