@@ -3675,7 +3675,7 @@ function updateDependency(context3, pkgName, pkgTag, dev) {
     var _a;
     let tempPkgTag = "";
     let moreRgs = [];
-    const env = {};
+    const env = __spreadValues({}, process.env);
     if (!Array.isArray(pkgTag)) {
       tempPkgTag = pkgTag;
     } else {

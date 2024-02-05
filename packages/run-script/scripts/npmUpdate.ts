@@ -47,7 +47,7 @@ function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, de
 async function updateDependency(context: IContext, pkgName: string, pkgTag: string | string[], dev: boolean): Promise<void> {
     let tempPkgTag = "";
     let moreRgs: string[] = [];
-    const env: { [key: string]: string } = {}; // { ... process.env } // ?
+    const env: { [key: string]: string } = { ...process.env as any } // ?
     if (!Array.isArray(pkgTag)) {
         tempPkgTag = pkgTag;
     } else {
