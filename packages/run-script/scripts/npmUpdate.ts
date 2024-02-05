@@ -44,16 +44,21 @@ function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, de
     return dependencyMap;
 }
 
-async function updateDependency(context: IContext, pkgName: string, pkgTag: string | string[], dev: boolean): Promise<void> {
+async function updateDependency(
+    context: IContext,
+    pkgName: string,
+    pkgTag: string | string[],
+    dev: boolean
+): Promise<void> {
     let tempPkgTag = "";
-    let moreRgs: string[] = [];
+    let moreArgs: string[] = [];
     const env: { [key: string]: string } = { ...process.env as any } // ?
     if (!Array.isArray(pkgTag)) {
         tempPkgTag = pkgTag;
     } else {
         tempPkgTag = pkgTag.shift() ?? "";
-        moreRgs = pkgTag;
-        for (const reg of moreRgs) {
+        moreArgs = pkgTag;
+        for (const reg of moreArgs) {
             const propKey = "NPM_CONFIG_" + reg.split("=")[0].toUpperCase();
             env[propKey] = reg.split("=")[1];
         }

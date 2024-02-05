@@ -3674,14 +3674,14 @@ function updateDependency(context3, pkgName, pkgTag, dev) {
   return __async(this, null, function* () {
     var _a;
     let tempPkgTag = "";
-    let moreRgs = [];
+    let moreArgs = [];
     const env = __spreadValues({}, process.env);
     if (!Array.isArray(pkgTag)) {
       tempPkgTag = pkgTag;
     } else {
       tempPkgTag = (_a = pkgTag.shift()) != null ? _a : "";
-      moreRgs = pkgTag;
-      for (const reg of moreRgs) {
+      moreArgs = pkgTag;
+      for (const reg of moreArgs) {
         const propKey = "NPM_CONFIG_" + reg.split("=")[0].toUpperCase();
         env[propKey] = reg.split("=")[1];
       }
