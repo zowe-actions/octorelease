@@ -4209,9 +4209,12 @@ function getPackageChangelog(context, changelogFile, headerLine) {
 }
 function updatePackageChangelog(context, changelogFile, headerLine) {
   var _a;
-  if (context.version.new !== context.version.old && fs.existsSync(changelogFile)) {
+  if (fs.existsSync(changelogFile)) {
     const oldContents = fs.readFileSync(changelogFile, "utf-8");
     const newVersion = ((_a = context.version.overrides[path.dirname(changelogFile)]) == null ? void 0 : _a.new) || context.version.new;
+    if (oldContents.includes(`## \`${newVersion}\``)) {
+      return false;
+    }
     const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
     if (newContents !== oldContents) {
       fs.writeFileSync(changelogFile, newContents);

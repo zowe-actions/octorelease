@@ -20,7 +20,7 @@ import findUp from "find-up";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
-import { IPluginConfig } from "./config";
+import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -47,7 +47,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
-    context.changedFiles.push("lerna.json", "package.json");
+    context.changedFiles.push("package.json");
+    if (!config[IS_LERNA_JSON_TEMP]) {
+        context.changedFiles.push("lerna.json");
+    }
     const lockfilePath = await findUp(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
         context.changedFiles.push(path.relative(context.rootDir, lockfilePath));

@@ -25072,7 +25072,8 @@ function init_default(context, config) {
     }
     if (config.checkPrLabels && import_core.Inputs.newVersion == null) {
       const releaseType = yield getPrReleaseType(context, config);
-      const oldVersion = (context.version.new || context.version.old).split("-")[0];
+      context.version.old = context.version.new || context.version.old;
+      const oldVersion = context.version.old.split("-")[0];
       context.version.new = releaseType != null ? require_semver2().inc(oldVersion, releaseType) : oldVersion;
     }
   });
