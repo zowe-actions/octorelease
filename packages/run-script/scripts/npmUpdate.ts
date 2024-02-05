@@ -25,8 +25,8 @@ const updateDetails: string[] = [];
 let resolutions: Record<string, string> = {};
 
 interface IProtectedBranchWithDeps extends IProtectedBranch {
-    dependencies: string[] | Record<string, string>;
-    devDependencies: string[] | Record<string, string>;
+    dependencies: string[] | Record<string, string | string[]>;
+    devDependencies: string[] | Record<string, string | string[]>;
 }
 
 function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, dev: boolean) {
@@ -47,8 +47,8 @@ function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, de
 async function updateDependency(context: IContext, pkgName: string, pkgTag: string | string[], dev: boolean): Promise<void> {
     let tempPkgTag = "";
     let moreRgs: string[] = [];
-    const env: {[key: string]: string} = {}; // { ... process.env } // ?
-    if( typeof pkgTag === "string") {
+    const env: { [key: string]: string } = {}; // { ... process.env } // ?
+    if (typeof pkgTag === "string") {
         tempPkgTag = pkgTag;
     } else {
         tempPkgTag = pkgTag.shift() ?? "";
