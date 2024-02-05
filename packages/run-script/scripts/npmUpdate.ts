@@ -44,15 +44,26 @@ function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, de
     return dependencyMap;
 }
 
-async function updateDependency(context: IContext, pkgName: string, pkgTag: string, dev: boolean): Promise<void> {
-    context.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${pkgTag}`);
-    const cmdOutput = (await exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"])).stdout;
+async function updateDependency(context: IContext, pkgName: string, pkgTag: string | string[], dev: boolean): Promise<void> {
+    let tempPkgTag = "";
+    let moreRgs: string[] = [];
+    let env = {...process.env};
+    if( typeof pkgTag === "string") {
+        tempPkgTag = pkgTag;
+    } else {
+        tempPkgTag = pkgTag.shift() ?? "";
+        moreRgs = pkgTag;
+
+    }
+
+    context.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${tempPkgTag}`);
+    const cmdOutput = (await exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"].concat(moreRgs))).stdout;
     const currentVersion = JSON.parse(cmdOutput).dependencies[pkgName].version;
 
     if (resolutions[pkgName] == null) {
-        context.logger.debug(`Gathering version information for: ${pkgName}@${pkgTag}`);
+        context.logger.debug(`Gathering version information for: ${pkgName}@${tempPkgTag}`);
         resolutions[pkgName] = (await exec.getExecOutput("npm",
-            ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
+            ["view", `${pkgName}@${tempPkgTag}`, "version"].concat(moreRgs))).stdout.trim();
     }
     const latestVersion = resolutions[pkgName];
 
@@ -60,7 +71,7 @@ async function updateDependency(context: IContext, pkgName: string, pkgTag: stri
         const npmArgs = dev ? ["--save-dev"] : ["--save-prod", "--save-exact"];
         const newUpdate = `${pkgName}: ${currentVersion} -> ${latestVersion}`;
         context.logger.debug(`Updating ${newUpdate}`);
-        await exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs]);
+        await exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs].concat(moreRgs));
         updateDetails.push(newUpdate);
     }
 }
