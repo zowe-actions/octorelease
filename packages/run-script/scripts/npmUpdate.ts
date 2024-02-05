@@ -48,7 +48,7 @@ async function updateDependency(context: IContext, pkgName: string, pkgTag: stri
     let tempPkgTag = "";
     let moreRgs: string[] = [];
     const env: { [key: string]: string } = {}; // { ... process.env } // ?
-    if (typeof pkgTag === "string") {
+    if (!Array.isArray(pkgTag)) {
         tempPkgTag = pkgTag;
     } else {
         tempPkgTag = pkgTag.shift() ?? "";
