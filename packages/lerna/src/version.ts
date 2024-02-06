@@ -52,9 +52,9 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         const oldPkgRaw = fs.readFileSync("package.json").toString();
         // Detect indentation here :yum:
-        const oldPkgJson = JSON.parse(oldPkgRaw);
-        const newPkgJson = {...oldPkgJson, version: context.version.new};
-        fs.writeFileSync("package.json", JSON.stringify(newPkgJson, null, 2) + "\n");
+        const pkgJson = JSON.parse(oldPkgRaw);
+        pkgJson.version = context.version.new;
+        fs.writeFileSync("package.json", JSON.stringify(pkgJson, null, 2) + "\n");
     }
 
     await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
