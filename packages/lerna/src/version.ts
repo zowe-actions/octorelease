@@ -46,11 +46,20 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
     }
 
-    await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
     context.changedFiles.push("package.json");
     if (!config[IS_LERNA_JSON_TEMP]) {
         context.changedFiles.push("lerna.json");
+    } else {
+        const oldPkgRaw = fs.readFileSync("package.json").toString();
+        // Detect indentation here :yum:
+        const oldPkgJson = JSON.parse(oldPkgRaw);
+        const newPkgJson = {...oldPkgJson, version: context.version.new};
+        fs.writeFileSync("package.json", JSON.stringify(newPkgJson, null, 2) + "\n");
     }
+
+    await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
+
+
     const lockfilePath = await findUp(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
         context.changedFiles.push(path.relative(context.rootDir, lockfilePath));
