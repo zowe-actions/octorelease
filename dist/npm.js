@@ -1550,15 +1550,19 @@ function npmInstall(pkgSpec, registry, inDir) {
     yield exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
   });
 }
-function npmPack(inDir) {
+function npmPack(pkgSpec, registry, inDir) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["pack", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
+    const cmdOutput = yield exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
     return cmdOutput.stdout.trim().split(/\s+/).pop();
   });
 }
 function npmPublish(context, options) {
   return __async(this, null, function* () {
-    const cmdArgs = ["publish", "--tag", options.tag].concat(options.registry ? ["--registry", options.registry] : []);
+    const registryPrefix = options.pkgSpec.startsWith("@") ? `${options.pkgSpec.split("/")[0]}:` : "";
+    const registryArgs = [`${options.pkgSpec}`, "--json", `--${registryPrefix}registry=${options.registry}`];
+    const cmdArgs = ["publish", "--tag", options.tag, ...registryArgs];
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
@@ -1638,9 +1642,10 @@ var path2 = __toESM(require("path"));
 var exec3 = __toESM(require_exec());
 function publish_default(context, config, inDir) {
   return __async(this, null, function* () {
-    var _a, _b, _c;
+    var _a, _b;
     const cwd = inDir || process.cwd();
     const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+    const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
     if (config.pruneShrinkwrap) {
       if (packageJson.scripts.preshrinkwrap != null) {
         yield exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
@@ -1648,7 +1653,7 @@ function publish_default(context, config, inDir) {
       pruneShrinkwrap(context, inDir);
     }
     if (config.tarballDir != null) {
-      const tgzFile = yield npmPack(inDir);
+      const tgzFile = yield npmPack(packageJson.name, npmRegistry, inDir);
       fs3.mkdirSync(config.tarballDir, { recursive: true });
       fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
     }
@@ -1662,15 +1667,15 @@ function publish_default(context, config, inDir) {
       return;
     }
     try {
-      const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
       const packageTag = context.branch.channel;
       const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
       if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
-        if ((_b = packageJson.publishConfig) == null ? void 0 : _b.scope) {
-          yield npmPublish(context, { tag: packageTag, inDir });
-        } else {
-          yield npmPublish(context, { tag: packageTag, registry: npmRegistry, inDir });
-        }
+        yield npmPublish(context, {
+          tag: packageTag,
+          pkgSpec: packageJson.name,
+          registry: npmRegistry,
+          inDir
+        });
         context.releasedPackages.npm = [
           ...context.releasedPackages.npm || [],
           {
@@ -1683,7 +1688,7 @@ function publish_default(context, config, inDir) {
         context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
       }
       const aliasTags = [];
-      if (((_c = config.aliasTags) == null ? void 0 : _c[packageTag]) != null) {
+      if (((_b = config.aliasTags) == null ? void 0 : _b[packageTag]) != null) {
         const aliasTagOrTags = config.aliasTags[packageTag];
         aliasTags.push(...typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags);
       }

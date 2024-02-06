@@ -48,19 +48,23 @@ export async function npmInstall(pkgSpec: string, registry: string, inDir?: stri
     await exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
 }
 
-export async function npmPack(inDir?: string): Promise<string> {
-    const cmdOutput = await exec.getExecOutput("npm", ["pack"], { cwd: inDir });
+export async function npmPack(pkgSpec: string, registry: string, inDir?: string): Promise<string> {
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["pack", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
+    const cmdOutput = await exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
     return cmdOutput.stdout.trim().split(/\s+/).pop() as string;
 }
 
 export interface INpmPublishOptions {
     tag: string;
-    registry?: string;
+    pkgSpec: string;
+    registry: string;
     inDir?: string;
 }
 export async function npmPublish(context: IContext, options: INpmPublishOptions): Promise<void> {
-    const cmdArgs = ["publish", "--tag", options.tag]
-        .concat(options.registry ? ["--registry", options.registry] : []);
+    const registryPrefix = options.pkgSpec.startsWith("@") ? `${options.pkgSpec.split("/")[0]}:` : "";
+    const registryArgs = [`${options.pkgSpec}`, "--json", `--${registryPrefix}registry=${options.registry}`];
+    const cmdArgs = ["publish", "--tag", options.tag, ...registryArgs];
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }

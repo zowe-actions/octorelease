@@ -24,6 +24,7 @@ import * as utils from "./utils";
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
     const cwd = inDir || process.cwd();
     const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+    const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
 
     if (config.pruneShrinkwrap) {
         if (packageJson.scripts.preshrinkwrap != null) {
@@ -33,7 +34,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     }
 
     if (config.tarballDir != null) {
-        const tgzFile = await utils.npmPack(inDir);
+        const tgzFile = await utils.npmPack(packageJson.name, npmRegistry, inDir);
         fs.mkdirSync(config.tarballDir, { recursive: true });
         fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.rootDir, config.tarballDir, tgzFile));
     }
@@ -50,17 +51,17 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
     }
 
     try {
-        const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
         const packageTag = context.branch.channel as string;
 
         // Publish package
         const publishedVersions = await utils.npmView(packageJson.name, npmRegistry, "versions");
         if (!publishedVersions?.includes(packageJson.version)) {
-            if (packageJson.publishConfig?.scope) {
-                await utils.npmPublish(context, { tag: packageTag, inDir });
-            } else {
-                await utils.npmPublish(context, { tag: packageTag, registry: npmRegistry, inDir });
-            }
+            await utils.npmPublish(context, {
+                tag: packageTag,
+                pkgSpec: packageJson.name,
+                registry: npmRegistry,
+                inDir
+            });
 
             context.releasedPackages.npm = [
                 ...(context.releasedPackages.npm || []),
