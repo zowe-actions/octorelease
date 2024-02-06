@@ -50,7 +50,7 @@ export async function npmInstall(pkgSpec: string, registry: string, inDir?: stri
 
 export async function npmPack(pkgSpec: string, registry: string, inDir?: string): Promise<string> {
     const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    const cmdArgs = ["pack", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
+    const cmdArgs = ["pack", `--${registryPrefix}registry=${registry}`];
     const cmdOutput = await exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
     return cmdOutput.stdout.trim().split(/\s+/).pop() as string;
 }

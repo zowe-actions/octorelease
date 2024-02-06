@@ -1553,7 +1553,7 @@ function npmInstall(pkgSpec, registry, inDir) {
 function npmPack(pkgSpec, registry, inDir) {
   return __async(this, null, function* () {
     const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    const cmdArgs = ["pack", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
+    const cmdArgs = ["pack", `--${registryPrefix}registry=${registry}`];
     const cmdOutput = yield exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
     return cmdOutput.stdout.trim().split(/\s+/).pop();
   });
