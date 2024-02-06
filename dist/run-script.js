@@ -3672,14 +3672,29 @@ function getDependencies(context3, branch, dev) {
 }
 function updateDependency(context3, pkgName, pkgTag, dev) {
   return __async(this, null, function* () {
-    context3.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${pkgTag}`);
-    const cmdOutput = (yield exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"])).stdout;
+    var _a;
+    let tempPkgTag = "";
+    let moreArgs = [];
+    const env = __spreadValues({}, process.env);
+    if (!Array.isArray(pkgTag)) {
+      tempPkgTag = pkgTag;
+    } else {
+      tempPkgTag = (_a = pkgTag.shift()) != null ? _a : "";
+      moreArgs = pkgTag;
+      for (const reg of moreArgs) {
+        const propKey = "NPM_CONFIG_" + reg.split("=")[0].toUpperCase();
+        env[propKey] = reg.split("=")[1];
+      }
+    }
+    context3.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${tempPkgTag}`);
+    const cmdOutput = (yield exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"], { env })).stdout;
     const currentVersion = JSON.parse(cmdOutput).dependencies[pkgName].version;
     if (resolutions[pkgName] == null) {
-      context3.logger.debug(`Gathering version information for: ${pkgName}@${pkgTag}`);
+      context3.logger.debug(`Gathering version information for: ${pkgName}@${tempPkgTag}`);
       resolutions[pkgName] = (yield exec.getExecOutput(
         "npm",
-        ["view", `${pkgName}@${pkgTag}`, "version"]
+        ["view", `${pkgName}@${tempPkgTag}`, "version"],
+        { env }
       )).stdout.trim();
     }
     const latestVersion = resolutions[pkgName];
@@ -3687,7 +3702,7 @@ function updateDependency(context3, pkgName, pkgTag, dev) {
       const npmArgs = dev ? ["--save-dev"] : ["--save-prod", "--save-exact"];
       const newUpdate = `${pkgName}: ${currentVersion} -> ${latestVersion}`;
       context3.logger.debug(`Updating ${newUpdate}`);
-      yield exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs]);
+      yield exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs], { env });
       updateDetails.push(newUpdate);
     }
   });

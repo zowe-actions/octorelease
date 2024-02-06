@@ -1550,19 +1550,22 @@ function npmInstall(pkgSpec, registry, inDir) {
     yield exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
   });
 }
-function npmPack(inDir) {
+function npmPack(pkgSpec, registry, inDir) {
   return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("npm", ["pack"], { cwd: inDir });
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["pack", `--${registryPrefix}registry=${registry}`];
+    const cmdOutput = yield exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
     return cmdOutput.stdout.trim().split(/\s+/).pop();
   });
 }
-function npmPublish(context, tag, registry, inDir) {
+function npmPublish(context, options) {
   return __async(this, null, function* () {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
+    const registryPrefix = options.pkgSpec.startsWith("@") ? `${options.pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["publish", "--tag", options.tag, `--${registryPrefix}registry=${options.registry}`];
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
-    yield exec.exec("npm", cmdArgs, { cwd: inDir });
+    yield exec.exec("npm", cmdArgs, { cwd: options.inDir });
   });
 }
 function npmVersion(newVersion, inDir) {
@@ -1641,6 +1644,7 @@ function publish_default(context, config, inDir) {
     var _a, _b;
     const cwd = inDir || process.cwd();
     const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+    const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
     if (config.pruneShrinkwrap) {
       if (packageJson.scripts.preshrinkwrap != null) {
         yield exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
@@ -1648,7 +1652,7 @@ function publish_default(context, config, inDir) {
       pruneShrinkwrap(context, inDir);
     }
     if (config.tarballDir != null) {
-      const tgzFile = yield npmPack(inDir);
+      const tgzFile = yield npmPack(packageJson.name, npmRegistry, inDir);
       fs3.mkdirSync(config.tarballDir, { recursive: true });
       fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
     }
@@ -1662,11 +1666,15 @@ function publish_default(context, config, inDir) {
       return;
     }
     try {
-      const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
       const packageTag = context.branch.channel;
       const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
       if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
-        yield npmPublish(context, packageTag, npmRegistry, inDir);
+        yield npmPublish(context, {
+          tag: packageTag,
+          pkgSpec: packageJson.name,
+          registry: npmRegistry,
+          inDir
+        });
         context.releasedPackages.npm = [
           ...context.releasedPackages.npm || [],
           {

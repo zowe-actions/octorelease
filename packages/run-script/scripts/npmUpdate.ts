@@ -25,8 +25,8 @@ const updateDetails: string[] = [];
 let resolutions: Record<string, string> = {};
 
 interface IProtectedBranchWithDeps extends IProtectedBranch {
-    dependencies: string[] | Record<string, string>;
-    devDependencies: string[] | Record<string, string>;
+    dependencies: string[] | Record<string, string | string[]>;
+    devDependencies: string[] | Record<string, string | string[]>;
 }
 
 function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, dev: boolean) {
@@ -44,15 +44,34 @@ function getDependencies(context: IContext, branch: IProtectedBranchWithDeps, de
     return dependencyMap;
 }
 
-async function updateDependency(context: IContext, pkgName: string, pkgTag: string, dev: boolean): Promise<void> {
-    context.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${pkgTag}`);
-    const cmdOutput = (await exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"])).stdout;
+async function updateDependency(
+    context: IContext,
+    pkgName: string,
+    pkgTag: string | string[],
+    dev: boolean
+): Promise<void> {
+    let tempPkgTag = "";
+    let moreArgs: string[] = [];
+    const env: { [key: string]: string } = { ...process.env as any } // ?
+    if (!Array.isArray(pkgTag)) {
+        tempPkgTag = pkgTag;
+    } else {
+        tempPkgTag = pkgTag.shift() ?? "";
+        moreArgs = pkgTag;
+        for (const reg of moreArgs) {
+            const propKey = "NPM_CONFIG_" + reg.split("=")[0].toUpperCase();
+            env[propKey] = reg.split("=")[1];
+        }
+    }
+
+    context.logger.debug(`Updating ${dev ? "devD" : "d"}ependency for: ${pkgName}@${tempPkgTag}`);
+    const cmdOutput = (await exec.getExecOutput("npm", ["list", pkgName, "--json", "--depth", "0"], { env })).stdout;
     const currentVersion = JSON.parse(cmdOutput).dependencies[pkgName].version;
 
     if (resolutions[pkgName] == null) {
-        context.logger.debug(`Gathering version information for: ${pkgName}@${pkgTag}`);
+        context.logger.debug(`Gathering version information for: ${pkgName}@${tempPkgTag}`);
         resolutions[pkgName] = (await exec.getExecOutput("npm",
-            ["view", `${pkgName}@${pkgTag}`, "version"])).stdout.trim();
+            ["view", `${pkgName}@${tempPkgTag}`, "version"], { env })).stdout.trim();
     }
     const latestVersion = resolutions[pkgName];
 
@@ -60,7 +79,7 @@ async function updateDependency(context: IContext, pkgName: string, pkgTag: stri
         const npmArgs = dev ? ["--save-dev"] : ["--save-prod", "--save-exact"];
         const newUpdate = `${pkgName}: ${currentVersion} -> ${latestVersion}`;
         context.logger.debug(`Updating ${newUpdate}`);
-        await exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs]);
+        await exec.exec("npm", ["install", `${pkgName}@${latestVersion}`, ...npmArgs], { env });
         updateDetails.push(newUpdate);
     }
 }
