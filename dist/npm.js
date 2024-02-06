@@ -1556,13 +1556,13 @@ function npmPack(inDir) {
     return cmdOutput.stdout.trim().split(/\s+/).pop();
   });
 }
-function npmPublish(context, tag, registry, inDir) {
+function npmPublish(context, options) {
   return __async(this, null, function* () {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
+    const cmdArgs = ["publish", "--tag", options.tag].concat(options.registry ? ["--registry", options.registry] : []);
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
-    yield exec.exec("npm", cmdArgs, { cwd: inDir });
+    yield exec.exec("npm", cmdArgs, { cwd: options.inDir });
   });
 }
 function npmVersion(newVersion, inDir) {
@@ -1638,7 +1638,7 @@ var path2 = __toESM(require("path"));
 var exec3 = __toESM(require_exec());
 function publish_default(context, config, inDir) {
   return __async(this, null, function* () {
-    var _a, _b;
+    var _a, _b, _c;
     const cwd = inDir || process.cwd();
     const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
     if (config.pruneShrinkwrap) {
@@ -1666,7 +1666,11 @@ function publish_default(context, config, inDir) {
       const packageTag = context.branch.channel;
       const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
       if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
-        yield npmPublish(context, packageTag, npmRegistry, inDir);
+        if ((_b = packageJson.publishConfig) == null ? void 0 : _b.scope) {
+          yield npmPublish(context, { tag: packageTag, inDir });
+        } else {
+          yield npmPublish(context, { tag: packageTag, registry: npmRegistry, inDir });
+        }
         context.releasedPackages.npm = [
           ...context.releasedPackages.npm || [],
           {
@@ -1679,7 +1683,7 @@ function publish_default(context, config, inDir) {
         context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
       }
       const aliasTags = [];
-      if (((_b = config.aliasTags) == null ? void 0 : _b[packageTag]) != null) {
+      if (((_c = config.aliasTags) == null ? void 0 : _c[packageTag]) != null) {
         const aliasTagOrTags = config.aliasTags[packageTag];
         aliasTags.push(...typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags);
       }

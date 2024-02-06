@@ -53,12 +53,18 @@ export async function npmPack(inDir?: string): Promise<string> {
     return cmdOutput.stdout.trim().split(/\s+/).pop() as string;
 }
 
-export async function npmPublish(context: IContext, tag: string, registry: string, inDir?: string): Promise<void> {
-    const cmdArgs = ["publish", "--tag", tag, "--registry", registry];
+export interface INpmPublishOptions {
+    tag: string;
+    registry?: string;
+    inDir?: string;
+}
+export async function npmPublish(context: IContext, options: INpmPublishOptions): Promise<void> {
+    const cmdArgs = ["publish", "--tag", options.tag]
+        .concat(options.registry ? ["--registry", options.registry] : []);
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
     }
-    await exec.exec("npm", cmdArgs, { cwd: inDir });
+    await exec.exec("npm", cmdArgs, { cwd: options.inDir });
 }
 
 export async function npmVersion(newVersion: string, inDir?: string): Promise<void> {

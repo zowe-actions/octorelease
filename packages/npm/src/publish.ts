@@ -56,7 +56,11 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         // Publish package
         const publishedVersions = await utils.npmView(packageJson.name, npmRegistry, "versions");
         if (!publishedVersions?.includes(packageJson.version)) {
-            await utils.npmPublish(context, packageTag, npmRegistry, inDir);
+            if (packageJson.publishConfig?.scope) {
+                await utils.npmPublish(context, { tag: packageTag, inDir });
+            } else {
+                await utils.npmPublish(context, { tag: packageTag, registry: npmRegistry, inDir });
+            }
 
             context.releasedPackages.npm = [
                 ...(context.releasedPackages.npm || []),
