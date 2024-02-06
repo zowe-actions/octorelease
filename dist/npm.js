@@ -1561,8 +1561,7 @@ function npmPack(pkgSpec, registry, inDir) {
 function npmPublish(context, options) {
   return __async(this, null, function* () {
     const registryPrefix = options.pkgSpec.startsWith("@") ? `${options.pkgSpec.split("/")[0]}:` : "";
-    const registryArgs = [`${options.pkgSpec}`, "--json", `--${registryPrefix}registry=${options.registry}`];
-    const cmdArgs = ["publish", "--tag", options.tag, ...registryArgs];
+    const cmdArgs = ["publish", "--tag", options.tag, `--${registryPrefix}registry=${options.registry}`];
     if (context.dryRun) {
       cmdArgs.push("--dry-run");
     }
