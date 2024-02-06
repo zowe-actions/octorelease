@@ -22,7 +22,8 @@ import { IContext, utils } from "@octorelease/core";
 
 export async function npmAddTag(context: IContext, pkgSpec: string, tag: string, registry: string,
         inDir?: string): Promise<void> {
-    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, "--registry", registry];
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, `--${registryPrefix}registry=${registry}`];
     await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
         await exec.exec("npm", cmdArgs, { cwd: inDir });
     });
