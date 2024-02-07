@@ -5701,11 +5701,16 @@ function version_default2(context, config) {
         }
       }
     }
-    yield lernaPostVersion();
     context.changedFiles.push("package.json");
     if (!config[IS_LERNA_JSON_TEMP]) {
       context.changedFiles.push("lerna.json");
+    } else {
+      const oldPkgRaw = fs3.readFileSync("package.json").toString();
+      const pkgJson = JSON.parse(oldPkgRaw);
+      pkgJson.version = context.version.new;
+      fs3.writeFileSync("package.json", JSON.stringify(pkgJson, null, 2) + "\n");
     }
+    yield lernaPostVersion();
     const lockfilePath = yield (0, import_find_up.default)(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
       context.changedFiles.push(path2.relative(context.rootDir, lockfilePath));

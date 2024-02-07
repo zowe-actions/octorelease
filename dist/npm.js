@@ -1523,7 +1523,8 @@ var exec = __toESM(require_exec());
 var import_core = require("./core");
 function npmAddTag(context, pkgSpec, tag, registry, inDir) {
   return __async(this, null, function* () {
-    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, "--registry", registry];
+    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, `--${registryPrefix}registry=${registry}`];
     yield import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
       yield exec.exec("npm", cmdArgs, { cwd: inDir });
     }));
