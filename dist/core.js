@@ -22384,7 +22384,7 @@ function verifyConditions(context) {
     const semver = require_semver2();
     const semverLevel = context.version.old !== "0.0.0" ? semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]) : null;
     for (const versionInfo of Object.values(context.version.overrides)) {
-      versionInfo.new = semverLevel != null ? semver.inc(versionInfo.old.split("-")[0], semverLevel) : versionInfo.old;
+      versionInfo.new = semverLevel != null ? semver.inc(versionInfo.old.split("-")[0], semverLevel) : versionInfo.old.split("-")[0];
       if (versionInfo.prerelease != null) {
         versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
       }
