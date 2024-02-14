@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -b && npm run lint",
     "lint": "eslint src",
-    "pack": "node ../esbuild.mjs",
+    "pack": "node ../esbuild.mjs run-script",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w"
   },

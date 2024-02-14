@@ -1,6 +1,8 @@
 import * as path from "path";
+import { fileURLToPath } from "url";
 import * as esbuild from "esbuild";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgName = process.argv[2] || path.basename(process.cwd());
 const onResolvePlugin = {
     name: "onResolve",
@@ -21,7 +23,7 @@ await esbuild.build({
     bundle: true,
     entryPoints: [pkgName === "main" ? "src/main.ts" : "src/index.ts"],
     logLevel: "info",
-    outfile: `../../dist/${pkgName === "main" ? "index" : pkgName}.js`,
+    outfile: `${__dirname}/dist/${pkgName === "main" ? "index" : pkgName}.js`,
     platform: "node",
     plugins: [onResolvePlugin]
 });
