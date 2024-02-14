@@ -21,8 +21,11 @@ import { version as lernaVersion } from "@octorelease/lerna";
 import { version as npmVersion } from "@octorelease/npm";
 
 export default async function (context: IContext): Promise<void> {
-    context.version.new = (context.env.VERSION_STRING || "%s").replace("%s",
-        require("semver").inc(context.version.old, context.branch.level));
+    context.version.new = context.version.old.split("-")[0];
+    if (!context.branch.prerelease && context.branch.level !== "none") {
+        context.version.new = require("semver").inc(context.version.new, context.branch.level);
+    }
+    context.version.new = (context.env.VERSION_STRING || "%s").replace("%s", context.version.new);
 
     const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
     if (packageJson.workspaces != null) {

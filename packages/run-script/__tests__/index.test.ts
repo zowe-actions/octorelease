@@ -18,7 +18,7 @@ import * as fs from "fs";
 import { loadScript } from "../src/loader";
 
 describe("Run Script action", () => {
-    const scriptNames = fs.readdirSync(__dirname + "/../scripts").map(s => s.slice(0, s.lastIndexOf(".")));
+    const scriptNames = fs.readdirSync(__dirname + "/../../../script/src").map(s => s.slice(0, s.lastIndexOf(".")));
 
     for (const scriptName of scriptNames) {
         it("should load script " + scriptName, () => {

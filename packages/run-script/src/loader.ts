@@ -17,9 +17,9 @@
 import { IContext } from "@octorelease/core";
 
 const SCRIPTS: { [key: string]: any } = {
-    npmUpdate: require("../scripts/npmUpdate"),
-    prepareRelease: require("../scripts/prepareRelease"),
-    sonarConfig: require("../scripts/sonarConfig")
+    npmUpdate: require("../../../script/src/npmUpdate"),
+    prepareRelease: require("../../../script/src/prepareRelease"),
+    sonarConfig: require("../../../script/src/sonarConfig")
 };
 
 // List of scripts that should only run in release branches

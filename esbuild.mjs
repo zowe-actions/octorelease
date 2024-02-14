@@ -10,7 +10,7 @@ const onResolvePlugin = {
                 return { path: "./core", external: true };
             });
         } else {
-            build.onResolve({ filter: /^@octorelease\// }, (args) => {
+            build.onResolve({ filter: /^@octorelease\/[^\/]+$/ }, (args) => {
                 return { path: args.path.replace("@octorelease", "."), external: true };
             });
         }

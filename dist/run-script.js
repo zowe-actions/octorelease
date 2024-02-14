@@ -3653,7 +3653,7 @@ var require_pluralize = __commonJS({
   }
 });
 
-// scripts/npmUpdate.ts
+// ../../script/src/npmUpdate.ts
 var npmUpdate_exports = {};
 __export(npmUpdate_exports, {
   default: () => npmUpdate_default
@@ -3766,7 +3766,7 @@ function npmUpdate_default(context3) {
 }
 var fs, core, exec, import_git, lockfilePath, updateDetails, resolutions;
 var init_npmUpdate = __esm({
-  "scripts/npmUpdate.ts"() {
+  "../../script/src/npmUpdate.ts"() {
     "use strict";
     fs = __toESM(require("fs"));
     core = __toESM(require_core());
@@ -6190,17 +6190,18 @@ var require_semver2 = __commonJS({
   }
 });
 
-// scripts/prepareRelease.ts
+// ../../script/src/prepareRelease.ts
 var prepareRelease_exports = {};
 __export(prepareRelease_exports, {
   default: () => prepareRelease_default
 });
 function prepareRelease_default(context3) {
   return __async(this, null, function* () {
-    context3.version.new = (context3.env.VERSION_STRING || "%s").replace(
-      "%s",
-      require_semver2().inc(context3.version.old, context3.branch.level)
-    );
+    context3.version.new = context3.version.old.split("-")[0];
+    if (!context3.branch.prerelease && context3.branch.level !== "none") {
+      context3.version.new = require_semver2().inc(context3.version.new, context3.branch.level);
+    }
+    context3.version.new = (context3.env.VERSION_STRING || "%s").replace("%s", context3.version.new);
     const packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
     if (packageJson.workspaces != null) {
       yield (0, import_lerna.version)(context3, {});
@@ -6214,7 +6215,7 @@ function prepareRelease_default(context3) {
 }
 var fs2, import_git2, import_lerna, import_npm;
 var init_prepareRelease = __esm({
-  "scripts/prepareRelease.ts"() {
+  "../../script/src/prepareRelease.ts"() {
     "use strict";
     fs2 = __toESM(require("fs"));
     import_git2 = require("./git");
@@ -14379,7 +14380,7 @@ var init_utils = __esm({
   }
 });
 
-// scripts/sonarConfig.ts
+// ../../script/src/sonarConfig.ts
 var sonarConfig_exports = {};
 __export(sonarConfig_exports, {
   default: () => sonarConfig_default
@@ -14453,7 +14454,7 @@ function sonarConfig_default(context3) {
 }
 var fs4, github2, properties;
 var init_sonarConfig = __esm({
-  "scripts/sonarConfig.ts"() {
+  "../../script/src/sonarConfig.ts"() {
     "use strict";
     fs4 = __toESM(require("fs"));
     github2 = __toESM(require_github());
