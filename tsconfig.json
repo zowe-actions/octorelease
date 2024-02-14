@@ -32,10 +32,10 @@
       "path": "packages/npm"
     },
     {
-      "path": "packages/run-script"
+      "path": "packages/vsce"
     },
     {
-      "path": "packages/vsce"
-    }
+      "path": "script"
+    },
   ]
 }

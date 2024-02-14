@@ -27,7 +27,7 @@ Custom working directory to use instead of the project root.
 ## Example usage
 
 ```yaml
-- uses: octorelease/run-script@master
+- uses: octorelease/script@v1
   with:
     script: npmUpdate
 ```
