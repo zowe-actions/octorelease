@@ -28,7 +28,7 @@ $ npx octorelease
 **Note:** For projects that use GitHub workflows, you don't need to install Octorelease or run it with `npx`. It can be invoked as an action in your workflow instead:
 
 ```yaml
-- uses: octorelease/octorelease@master
+- uses: zowe-actions/octorelease@v1
 ```
 
 ## CI Configuration
