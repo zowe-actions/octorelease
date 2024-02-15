@@ -21,7 +21,8 @@
   "author": "t1m0thyj",
   "license": "Apache-2.0",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "script"
   ],
   "devDependencies": {
     "@types/jest": "^29.4.0",
