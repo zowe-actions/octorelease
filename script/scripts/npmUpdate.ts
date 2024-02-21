@@ -127,7 +127,7 @@ export default async function (context: IContext): Promise<void> {
             changedFiles.push("**/package.json");
             const dependencyList = [...Object.keys(dependencies), ...Object.keys(devDependencies)];
 
-            await exec.exec("npx", ["-y", "--", "syncpack", "fix-mismatches", "--dev", "--prod", "--filter",
+            await exec.exec("npx", ["-y", "--", "syncpack@8", "fix-mismatches", "--dev", "--prod", "--filter",
                 dependencyList.join("|")]);
             await exec.exec("git", ["checkout", lockfilePath]);
             await exec.exec("npm", ["install"]);

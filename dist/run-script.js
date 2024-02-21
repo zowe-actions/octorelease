@@ -3746,7 +3746,7 @@ function npmUpdate_default(context3) {
         yield exec.exec("npx", [
           "-y",
           "--",
-          "syncpack",
+          "syncpack@8",
           "fix-mismatches",
           "--dev",
           "--prod",
