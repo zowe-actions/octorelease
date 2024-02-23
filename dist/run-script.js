@@ -3751,7 +3751,7 @@ function npmUpdate_default(context3) {
           "--dev",
           "--prod",
           "--filter",
-          dependencyList.join("|")
+          dependencyList.join(process.platform === "win32" ? "^|" : "|")
         ]);
         yield exec.exec("git", ["checkout", lockfilePath]);
         yield exec.exec("npm", ["install"]);
