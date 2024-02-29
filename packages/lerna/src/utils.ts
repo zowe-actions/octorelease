@@ -29,6 +29,12 @@ async function npxCmd(): Promise<string> {
     return usePnpm ? "pnpm exec" : "npx";
 }
 
+export async function getLernaMajorVersion(): Promise<number> {
+    // If using lerna lite, the version is "unknown" so this function will return NaN
+    const cmdOutput = await exec.getExecOutput(await npxCmd(), ["lerna", "--version"]);
+    return parseInt(cmdOutput.stdout.split(".", 1)[0]);
+}
+
 export async function lernaList(onlyChanged?: boolean): Promise<Record<string, any>[]> {
     const cmdArgs = ["lerna"];
     if (onlyChanged) {

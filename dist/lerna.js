@@ -5546,6 +5546,7 @@ var IS_LERNA_JSON_TEMP = Symbol();
 // src/utils.ts
 var utils_exports = {};
 __export(utils_exports, {
+  getLernaMajorVersion: () => getLernaMajorVersion,
   lernaList: () => lernaList,
   lernaPostVersion: () => lernaPostVersion,
   lernaVersion: () => lernaVersion
@@ -5563,6 +5564,12 @@ function npxCmd() {
       }
     }
     return usePnpm ? "pnpm exec" : "npx";
+  });
+}
+function getLernaMajorVersion() {
+  return __async(this, null, function* () {
+    const cmdOutput = yield exec.getExecOutput(yield npxCmd(), ["lerna", "--version"]);
+    return parseInt(cmdOutput.stdout.split(".", 1)[0]);
   });
 }
 function lernaList(onlyChanged) {
@@ -5624,10 +5631,14 @@ function init_default(context, config) {
       }
       if (config[IS_LERNA_JSON_TEMP]) {
         context.version.new = packageJson.version;
-        fs2.writeFileSync("lerna.json", JSON.stringify({
-          version: packageJson.version,
-          useWorkspaces: true
-        }, null, 2));
+        const lernaConfig = { version: packageJson.version };
+        if (fs2.existsSync("pnpm-workspaces.yaml")) {
+          lernaConfig.npmClient = "pnpm";
+        }
+        if (((yield getLernaMajorVersion()) || 0) < 7) {
+          lernaConfig.useWorkspaces = true;
+        }
+        fs2.writeFileSync("lerna.json", JSON.stringify(lernaConfig, null, 2));
       }
     } catch (e) {
       throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
