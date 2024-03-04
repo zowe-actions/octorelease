@@ -42,10 +42,14 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
         if (config[IS_LERNA_JSON_TEMP]) {
             context.version.new = packageJson.version;
-            fs.writeFileSync("lerna.json", JSON.stringify({
-                version: packageJson.version,
-                useWorkspaces: true
-            }, null, 2));
+            const lernaConfig: Record<string, any> = { version: packageJson.version };
+            if (fs.existsSync("pnpm-workspaces.yaml")) {
+                lernaConfig.npmClient = "pnpm";
+            }
+            if ((await utils.getLernaMajorVersion() || 0) < 7) {
+                lernaConfig.useWorkspaces = true;
+            }
+            fs.writeFileSync("lerna.json", JSON.stringify(lernaConfig, null, 2));
         }
     } catch {
         throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
