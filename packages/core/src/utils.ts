@@ -123,8 +123,9 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
  * @param context Global context object for Octorelease
  */
 export async function verifyConditions(context: IContext): Promise<void> {
-    context.version.new = Inputs.newVersion || context.version.new;
-    if (context.version.prerelease != null) {
+    if (Inputs.newVersion != null) {
+        context.version.new = Inputs.newVersion;
+    } else if (context.version.prerelease != null) {
         context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
 
