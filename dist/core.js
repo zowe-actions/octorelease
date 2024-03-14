@@ -22377,8 +22377,9 @@ function loadPlugins(context) {
 }
 function verifyConditions(context) {
   return __async(this, null, function* () {
-    context.version.new = Inputs.newVersion || context.version.new;
-    if (context.version.prerelease != null) {
+    if (Inputs.newVersion != null) {
+      context.version.new = Inputs.newVersion;
+    } else if (context.version.prerelease != null) {
       context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
     const semver = require_semver2();
