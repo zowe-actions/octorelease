@@ -5585,17 +5585,13 @@ function lernaList(onlyChanged) {
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
   });
 }
-function lernaVersion(newVersion) {
+function lernaVersion(newVersion, excludeDirs) {
   return __async(this, null, function* () {
-    yield exec.exec(yield npxCmd(), [
-      "lerna",
-      "version",
-      newVersion,
-      "--exact",
-      "--include-merged-tags",
-      "--no-git-tag-version",
-      "--yes"
-    ]);
+    const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
+    if (excludeDirs) {
+      cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
+    }
+    yield exec.exec(yield npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
   });
 }
 function lernaPostVersion() {
@@ -5703,7 +5699,7 @@ function version_default2(context, config) {
       return;
     }
     const changedPackageInfo = yield lernaList(true);
-    yield lernaVersion(context.version.new);
+    yield lernaVersion(context.version.new, Object.keys(context.version.overrides));
     if (config.versionIndependent != null) {
       for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
         const pkgInfo = changedPackageInfo.find((pkgInfo2) => path2.relative(context.rootDir, pkgInfo2.location) === packageDir);

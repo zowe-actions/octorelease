@@ -30,7 +30,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const changedPackageInfo = await utils.lernaList(true);
-    await utils.lernaVersion(context.version.new);
+    await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
     if (config.versionIndependent != null) {
         // Lerna's ignoreChanges option doesn't behave the way we want. Even if
         // we tell it to ignore a package directory, it will still bump that
