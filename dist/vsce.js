@@ -1289,7 +1289,8 @@ function publish_default(context, config) {
         let success = true;
         try {
           yield ovsxPublish(context, vsixPath);
-        } catch (e) {
+        } catch (err) {
+          context.logger.error(err.toString());
           success = false;
         }
         context.releasedPackages.vsce = [

@@ -63,7 +63,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             let success = true;
             try {
                 await utils.ovsxPublish(context, vsixPath);
-            } catch {
+            } catch (err) {
+                context.logger.error((err as any).toString());
                 success = false;
             }
 
