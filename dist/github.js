@@ -25283,10 +25283,11 @@ function success_default(context, config) {
         packageList.push(`**${pkgType}**: ${pkgName}`);
       }
     }
+    const releaseMessage = packageList.some((line) => line.includes("\u274C")) ? `Release succeeded for the \`${context.branch.name}\` branch with some errors. :warning:` : `Release succeeded for the \`${context.branch.name}\` branch. :tada:`;
     yield import_core3.utils.dryRunTask(context, "create success comment on pull request", () => __async(this, null, function* () {
       yield octokit.rest.issues.createComment(__spreadProps(__spreadValues({}, context.ci.repo), {
         issue_number: prNumber,
-        body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:
+        body: `${releaseMessage}
 
 The following packages have been published:
 ` + packageList.map((line) => `* ${line}`).join("\n") + `

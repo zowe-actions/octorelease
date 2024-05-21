@@ -60,14 +60,19 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (config.ovsxPublish) {
         const ovsxMetadata = await utils.ovsxInfo(extensionName) || {};
         if (!Object.keys(ovsxMetadata.allVersions || {}).includes(packageJson.version)) {
-            await utils.ovsxPublish(context, vsixPath);
+            let success = true;
+            try {
+                await utils.ovsxPublish(context, vsixPath);
+            } catch {
+                success = false;
+            }
 
             context.releasedPackages.vsce = [
                 ...(context.releasedPackages.vsce || []),
-                {
+                success ? {
                     name: `${extensionName}@${packageJson.version} (OVSX)`,
                     url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}/${packageJson.version}`
-                }
+                } : { name: `❌ ${extensionName}@${packageJson.version} (OVSX)` }
             ];
         } else {
             context.logger.error(`Version ${packageJson.version} has already been published to Open VSX Registry`);
