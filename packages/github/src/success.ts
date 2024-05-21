@@ -44,11 +44,14 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             packageList.push(`**${pkgType}**: ${pkgName}`);
         }
     }
+    const releaseMessage = packageList.some(line => line.includes("❌")) ?
+        `Release succeeded for the \`${context.branch.name}\` branch with some errors. :warning:` :
+        `Release succeeded for the \`${context.branch.name}\` branch. :tada:`;
     await coreUtils.dryRunTask(context, "create success comment on pull request", async () => {
         await octokit.rest.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
-            body: `Release succeeded for the \`${context.branch.name}\` branch. :tada:\n\n` +
+            body: `${releaseMessage}\n\n` +
                 `The following packages have been published:\n` +
                 packageList.map(line => `* ${line}`).join("\n") + `\n\n` +
                 `<sub>Powered by Octorelease :rocket:</sub>`

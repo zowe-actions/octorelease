@@ -1286,13 +1286,19 @@ function publish_default(context, config) {
     if (config.ovsxPublish) {
       const ovsxMetadata = (yield ovsxInfo(extensionName)) || {};
       if (!Object.keys(ovsxMetadata.allVersions || {}).includes(packageJson.version)) {
-        yield ovsxPublish(context, vsixPath);
+        let success = true;
+        try {
+          yield ovsxPublish(context, vsixPath);
+        } catch (err) {
+          context.logger.error(err.toString());
+          success = false;
+        }
         context.releasedPackages.vsce = [
           ...context.releasedPackages.vsce || [],
-          {
+          success ? {
             name: `${extensionName}@${packageJson.version} (OVSX)`,
             url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}/${packageJson.version}`
-          }
+          } : { name: `\u274C ${extensionName}@${packageJson.version} (OVSX)` }
         ];
       } else {
         context.logger.error(`Version ${packageJson.version} has already been published to Open VSX Registry`);
