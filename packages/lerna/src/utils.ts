@@ -47,12 +47,9 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
 }
 
-export async function lernaVersion(newVersion: string, excludeDirs?: string[]): Promise<void> {
-    const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
-    if (excludeDirs) {
-        cmdArgs.push("--ignore-changes", ...excludeDirs.map(dir => dir + "/**"));
-    }
-    await exec.exec(await npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
+export async function lernaVersion(newVersion: string): Promise<void> {
+    await exec.exec(await npxCmd(), ["lerna", "version", newVersion,
+        "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
 }
 
 export async function lernaPostVersion(): Promise<void> {

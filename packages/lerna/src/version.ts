@@ -30,20 +30,20 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const changedPackageInfo = await utils.lernaList(true);
-    await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
     if (config.versionIndependent != null) {
-        // Lerna's ignoreChanges option doesn't behave the way we want. Even if
-        // we tell it to ignore a package directory, it will still bump that
-        // package's version if a dependency of that package has changed. For
-        // independent versioning, we let Lerna bump all the versions it wants
-        // first and correct the versions of independent packages afterwards.
-        for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
-            const pkgInfo = changedPackageInfo
-                .find(pkgInfo => path.relative(context.rootDir, pkgInfo.location) === packageDir);
-            if (pkgInfo != null) {
-                await updateIndependentVersion(context, pkgInfo as any, versionInfo.new);
+        // Lerna doesn't support hybrid fixed/independent versioning so we handle it ourselves
+        for (const pkgInfo of changedPackageInfo) {
+            let versionOverride = null;
+            for (const packageDir of Object.keys(context.version.overrides)) {
+                if (packageDir === path.relative(context.rootDir, pkgInfo.location)) {
+                    versionOverride = context.version.overrides[packageDir];
+                    break;
+                }
             }
+            await updateIndependentVersion(context, pkgInfo as any, (versionOverride ?? context.version).new);
         }
+    } else {
+        await utils.lernaVersion(context.version.new);
     }
 
     context.changedFiles.push("package.json");
