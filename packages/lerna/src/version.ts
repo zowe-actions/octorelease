@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-2024 Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,20 +30,23 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     const changedPackageInfo = await utils.lernaList(true);
-    await utils.lernaVersion(context.version.new, Object.keys(context.version.overrides));
     if (config.versionIndependent != null) {
-        // Lerna's ignoreChanges option doesn't behave the way we want. Even if
-        // we tell it to ignore a package directory, it will still bump that
-        // package's version if a dependency of that package has changed. For
-        // independent versioning, we let Lerna bump all the versions it wants
-        // first and correct the versions of independent packages afterwards.
-        for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
-            const pkgInfo = changedPackageInfo
-                .find(pkgInfo => path.relative(context.rootDir, pkgInfo.location) === packageDir);
-            if (pkgInfo != null) {
-                await updateIndependentVersion(context, pkgInfo as any, versionInfo.new);
+        // Lerna doesn't support hybrid fixed/independent versioning so we handle it ourselves
+        const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
+        lernaJson.version = context.version.new;
+        fs.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
+        for (const pkgInfo of changedPackageInfo) {
+            let versionOverride = null;
+            for (const packageDir of Object.keys(context.version.overrides)) {
+                if (packageDir === path.relative(context.rootDir, pkgInfo.location)) {
+                    versionOverride = context.version.overrides[packageDir];
+                    break;
+                }
             }
+            await updateIndependentVersion(context, pkgInfo as any, (versionOverride ?? context.version).new);
         }
+    } else {
+        await utils.lernaVersion(context.version.new);
     }
 
     context.changedFiles.push("package.json");
@@ -58,7 +61,6 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
-
 
     const lockfilePath = await findUp(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {

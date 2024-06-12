@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-2024 Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,9 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
 }
 
-export async function lernaVersion(newVersion: string, excludeDirs?: string[]): Promise<void> {
-    const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
-    if (excludeDirs) {
-        cmdArgs.push("--ignore-changes", ...excludeDirs.map(dir => dir + "/**"));
-    }
-    await exec.exec(await npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
+export async function lernaVersion(newVersion: string): Promise<void> {
+    await exec.exec(await npxCmd(), ["lerna", "version", newVersion,
+        "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
 }
 
 export async function lernaPostVersion(): Promise<void> {

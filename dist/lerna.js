@@ -5585,13 +5585,17 @@ function lernaList(onlyChanged) {
     return cmdOutput.exitCode === 0 ? JSON.parse(cmdOutput.stdout) : [];
   });
 }
-function lernaVersion(newVersion, excludeDirs) {
+function lernaVersion(newVersion) {
   return __async(this, null, function* () {
-    const cmdArgs = ["--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"];
-    if (excludeDirs) {
-      cmdArgs.push("--ignore-changes", ...excludeDirs.map((dir) => dir + "/**"));
-    }
-    yield exec.exec(yield npxCmd(), ["lerna", "version", newVersion, ...cmdArgs]);
+    yield exec.exec(yield npxCmd(), [
+      "lerna",
+      "version",
+      newVersion,
+      "--exact",
+      "--include-merged-tags",
+      "--no-git-tag-version",
+      "--yes"
+    ]);
   });
 }
 function lernaPostVersion() {
@@ -5699,14 +5703,22 @@ function version_default2(context, config) {
       return;
     }
     const changedPackageInfo = yield lernaList(true);
-    yield lernaVersion(context.version.new, Object.keys(context.version.overrides));
     if (config.versionIndependent != null) {
-      for (const [packageDir, versionInfo] of Object.entries(context.version.overrides)) {
-        const pkgInfo = changedPackageInfo.find((pkgInfo2) => path2.relative(context.rootDir, pkgInfo2.location) === packageDir);
-        if (pkgInfo != null) {
-          yield updateIndependentVersion(context, pkgInfo, versionInfo.new);
+      const lernaJson = JSON.parse(fs3.readFileSync("lerna.json", "utf-8"));
+      lernaJson.version = context.version.new;
+      fs3.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
+      for (const pkgInfo of changedPackageInfo) {
+        let versionOverride = null;
+        for (const packageDir of Object.keys(context.version.overrides)) {
+          if (packageDir === path2.relative(context.rootDir, pkgInfo.location)) {
+            versionOverride = context.version.overrides[packageDir];
+            break;
+          }
         }
+        yield updateIndependentVersion(context, pkgInfo, (versionOverride != null ? versionOverride : context.version).new);
       }
+    } else {
+      yield lernaVersion(context.version.new);
     }
     context.changedFiles.push("package.json");
     if (!config[IS_LERNA_JSON_TEMP]) {
