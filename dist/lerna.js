@@ -5704,6 +5704,9 @@ function version_default2(context, config) {
     }
     const changedPackageInfo = yield lernaList(true);
     if (config.versionIndependent != null) {
+      const lernaJson = JSON.parse(fs3.readFileSync("lerna.json", "utf-8"));
+      lernaJson.version = context.version.new;
+      fs3.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
       for (const pkgInfo of changedPackageInfo) {
         let versionOverride = null;
         for (const packageDir of Object.keys(context.version.overrides)) {

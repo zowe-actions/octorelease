@@ -32,6 +32,9 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     const changedPackageInfo = await utils.lernaList(true);
     if (config.versionIndependent != null) {
         // Lerna doesn't support hybrid fixed/independent versioning so we handle it ourselves
+        const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
+        lernaJson.version = context.version.new;
+        fs.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
         for (const pkgInfo of changedPackageInfo) {
             let versionOverride = null;
             for (const packageDir of Object.keys(context.version.overrides)) {
@@ -58,7 +61,6 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
-
 
     const lockfilePath = await findUp(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
     if (lockfilePath != null) {
