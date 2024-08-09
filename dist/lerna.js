@@ -5702,12 +5702,12 @@ function version_default2(context, config) {
       context.logger.info("Version in lerna.json is already up to date");
       return;
     }
-    const changedPackageInfo = yield lernaList(true);
     if (config.versionIndependent != null) {
+      const changedPackageInfo = yield lernaList(true);
       const lernaJson = JSON.parse(fs3.readFileSync("lerna.json", "utf-8"));
       lernaJson.version = context.version.new;
       fs3.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
-      for (const pkgInfo of changedPackageInfo) {
+      for (const pkgInfo of changedPackageInfo.filter((pkgInfo2) => !pkgInfo2.private)) {
         let versionOverride = null;
         for (const packageDir of Object.keys(context.version.overrides)) {
           if (packageDir === path2.relative(context.rootDir, pkgInfo.location)) {
