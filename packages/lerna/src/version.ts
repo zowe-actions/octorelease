@@ -29,13 +29,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         return;
     }
 
-    const changedPackageInfo = await utils.lernaList(true);
     if (config.versionIndependent != null) {
         // Lerna doesn't support hybrid fixed/independent versioning so we handle it ourselves
+        const changedPackageInfo = await utils.lernaList(true);
         const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
         lernaJson.version = context.version.new;
         fs.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
-        for (const pkgInfo of changedPackageInfo) {
+        for (const pkgInfo of changedPackageInfo.filter(pkgInfo => !pkgInfo.private)) {
             let versionOverride = null;
             for (const packageDir of Object.keys(context.version.overrides)) {
                 if (packageDir === path.relative(context.rootDir, pkgInfo.location)) {
@@ -83,10 +83,11 @@ async function updateIndependentVersion(context: IContext, pkgInfo: { name: stri
             const packageJsonPath = path.join(packageDir, "package.json");
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
             let depsObj: Record<string, string> | undefined = undefined;
-            if (packageJson.dependencies?.[pkgInfo.name] != null) {
-                depsObj = packageJson.dependencies;
-            } else if (packageJson.devDependencies?.[pkgInfo.name] != null) {
-                depsObj = packageJson.devDependencies;
+            for (const depsKey of ["dependencies", "devDependencies", "optionalDependencies"]) {
+                if (packageJson[depsKey]?.[pkgInfo.name] != null) {
+                    depsObj = packageJson[depsKey];
+                    break;
+                }
             }
             if (depsObj != null) {
                 const firstSemverChar = depsObj[pkgInfo.name].charAt(0);

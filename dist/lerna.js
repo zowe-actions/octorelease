@@ -5702,12 +5702,12 @@ function version_default2(context, config) {
       context.logger.info("Version in lerna.json is already up to date");
       return;
     }
-    const changedPackageInfo = yield lernaList(true);
     if (config.versionIndependent != null) {
+      const changedPackageInfo = yield lernaList(true);
       const lernaJson = JSON.parse(fs3.readFileSync("lerna.json", "utf-8"));
       lernaJson.version = context.version.new;
       fs3.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
-      for (const pkgInfo of changedPackageInfo) {
+      for (const pkgInfo of changedPackageInfo.filter((pkgInfo2) => !pkgInfo2.private)) {
         let versionOverride = null;
         for (const packageDir of Object.keys(context.version.overrides)) {
           if (packageDir === path2.relative(context.rootDir, pkgInfo.location)) {
@@ -5744,7 +5744,7 @@ function version_default2(context, config) {
 }
 function updateIndependentVersion(context, pkgInfo, newVersion) {
   return __async(this, null, function* () {
-    var _a, _b;
+    var _a;
     yield import_npm4.utils.npmVersion(newVersion, pkgInfo.location);
     if (context.workspaces != null) {
       const globber = yield glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
@@ -5752,10 +5752,11 @@ function updateIndependentVersion(context, pkgInfo, newVersion) {
         const packageJsonPath = path2.join(packageDir, "package.json");
         const packageJson = JSON.parse(fs3.readFileSync(packageJsonPath, "utf-8"));
         let depsObj = void 0;
-        if (((_a = packageJson.dependencies) == null ? void 0 : _a[pkgInfo.name]) != null) {
-          depsObj = packageJson.dependencies;
-        } else if (((_b = packageJson.devDependencies) == null ? void 0 : _b[pkgInfo.name]) != null) {
-          depsObj = packageJson.devDependencies;
+        for (const depsKey of ["dependencies", "devDependencies", "optionalDependencies"]) {
+          if (((_a = packageJson[depsKey]) == null ? void 0 : _a[pkgInfo.name]) != null) {
+            depsObj = packageJson[depsKey];
+            break;
+          }
         }
         if (depsObj != null) {
           const firstSemverChar = depsObj[pkgInfo.name].charAt(0);
