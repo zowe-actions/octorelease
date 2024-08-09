@@ -83,10 +83,11 @@ async function updateIndependentVersion(context: IContext, pkgInfo: { name: stri
             const packageJsonPath = path.join(packageDir, "package.json");
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
             let depsObj: Record<string, string> | undefined = undefined;
-            if (packageJson.dependencies?.[pkgInfo.name] != null) {
-                depsObj = packageJson.dependencies;
-            } else if (packageJson.devDependencies?.[pkgInfo.name] != null) {
-                depsObj = packageJson.devDependencies;
+            for (const depsKey of ["dependencies", "devDependencies", "optionalDependencies"]) {
+                if (packageJson[depsKey]?.[pkgInfo.name] != null) {
+                    depsObj = packageJson[depsKey];
+                    break;
+                }
             }
             if (depsObj != null) {
                 const firstSemverChar = depsObj[pkgInfo.name].charAt(0);
