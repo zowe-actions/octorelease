@@ -4212,7 +4212,7 @@ function updatePackageChangelog(context, changelogFile, headerLine) {
   if (fs.existsSync(changelogFile)) {
     const oldContents = fs.readFileSync(changelogFile, "utf-8");
     const newVersion = ((_a = context.version.overrides[path.dirname(changelogFile)]) == null ? void 0 : _a.new) || context.version.new;
-    if (oldContents.includes(`## \`${newVersion}\``)) {
+    if (oldContents.includes(`## \`${newVersion}\``) || context.version.old === newVersion) {
       return false;
     }
     const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
