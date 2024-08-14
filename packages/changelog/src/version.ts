@@ -91,7 +91,7 @@ function updatePackageChangelog(context: IContext, changelogFile: string, header
     if (fs.existsSync(changelogFile)) {
         const oldContents = fs.readFileSync(changelogFile, "utf-8");
         const newVersion = context.version.overrides[path.dirname(changelogFile)]?.new || context.version.new;
-        if (oldContents.includes(`## \`${newVersion}\``)) {
+        if (oldContents.includes(`## \`${newVersion}\``) || context.version.old === newVersion) {
             return false;
         }
 
