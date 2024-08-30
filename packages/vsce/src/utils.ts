@@ -28,7 +28,7 @@ async function npxCmd(): Promise<string> {
             usePnpm = false;
         }
     }
-    return usePnpm ? "pnpm exec" : "npx";
+    return usePnpm ? "pnpm dlx" : "npx";
 }
 
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
