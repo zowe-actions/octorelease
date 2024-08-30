@@ -1145,7 +1145,7 @@ function npxCmd() {
         usePnpm = false;
       }
     }
-    return usePnpm ? "pnpm exec" : "npx";
+    return usePnpm ? "pnpm dlx" : "npx";
   });
 }
 function ovsxInfo(extensionName) {
