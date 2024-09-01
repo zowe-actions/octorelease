@@ -49,7 +49,7 @@
     "@types/env-ci": "^3.1.1",
     "cosmiconfig": "^7.0.0",
     "env-ci": "^5.4.0",
-    "micromatch": "^4.0.4",
+    "micromatch": "^4.0.8",
     "semver": "^7.5.2"
   },
   "optionalDependencies": {
