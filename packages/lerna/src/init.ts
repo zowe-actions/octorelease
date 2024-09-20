@@ -49,14 +49,19 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             if ((await utils.getLernaMajorVersion() || 0) < 7) {
                 lernaConfig.useWorkspaces = true;
             }
+            context.logger.debug("Writing lerna.json with contents: " + JSON.stringify(lernaConfig));
             fs.writeFileSync("lerna.json", JSON.stringify(lernaConfig, null, 2));
         }
     } catch {
         throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
 
+    const pkgInfo = await utils.lernaList();
+    if (pkgInfo.length === 0) {
+        throw new Error("No packages found in workspace, check the 'workspaces' configuration in package.json");
+    }
     if (config.versionIndependent != null) {
-        for (const { name, location } of await utils.lernaList()) {
+        for (const { name, location } of pkgInfo) {
             if (!config.versionIndependent.includes(name)) {
                 continue;
             }
