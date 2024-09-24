@@ -5638,13 +5638,18 @@ function init_default(context, config) {
         if (((yield getLernaMajorVersion()) || 0) < 7) {
           lernaConfig.useWorkspaces = true;
         }
+        context.logger.debug("Writing lerna.json with contents: " + JSON.stringify(lernaConfig));
         fs2.writeFileSync("lerna.json", JSON.stringify(lernaConfig, null, 2));
       }
     } catch (e) {
       throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
     }
+    const pkgInfo = yield lernaList();
+    if (pkgInfo.length === 0) {
+      throw new Error("No packages found in workspace, check the 'workspaces' configuration in package.json");
+    }
     if (config.versionIndependent != null) {
-      for (const { name, location } of yield lernaList()) {
+      for (const { name, location } of pkgInfo) {
         if (!config.versionIndependent.includes(name)) {
           continue;
         }

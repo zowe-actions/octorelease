@@ -16472,7 +16472,11 @@ var require_micromatch = __commonJS({
     var braces = require_braces();
     var picomatch = require_picomatch2();
     var utils = require_utils3();
-    var isEmptyString = (val) => val === "" || val === "./";
+    var isEmptyString = (v) => v === "" || v === "./";
+    var hasBraces = (v) => {
+      const index = v.indexOf("{");
+      return index > -1 && v.indexOf("}", index) > -1;
+    };
     var micromatch = (list, patterns, options) => {
       patterns = [].concat(patterns);
       list = [].concat(list);
@@ -16612,7 +16616,7 @@ var require_micromatch = __commonJS({
     micromatch.braces = (pattern, options) => {
       if (typeof pattern !== "string")
         throw new TypeError("Expected a string");
-      if (options && options.nobrace === true || !/\{.*\}/.test(pattern)) {
+      if (options && options.nobrace === true || !hasBraces(pattern)) {
         return [pattern];
       }
       return braces(pattern, options);
@@ -16622,6 +16626,7 @@ var require_micromatch = __commonJS({
         throw new TypeError("Expected a string");
       return micromatch.braces(pattern, { ...options, expand: true });
     };
+    micromatch.hasBraces = hasBraces;
     module2.exports = micromatch;
   }
 });
