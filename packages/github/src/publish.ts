@@ -39,7 +39,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             await octokit.rest.repos.updateRelease({
                 ...context.ci.repo,
                 release_id: release.data.id,
-                draft: false
+                draft: false,
+                make_latest: "legacy"
             });
         });
     }

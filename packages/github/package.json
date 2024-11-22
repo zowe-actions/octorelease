@@ -35,15 +35,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/github": "^5.1.0",
+    "@actions/github": "^6.0.0",
     "@actions/glob": "^0.4.0",
-    "@octokit/plugin-enterprise-server": "^12.1.0",
+    "@octokit/plugin-enterprise-server": "^15.0.0",
     "delay": "^5.0.0",
     "mime-types": "^2.1.27",
     "semver": "^7.5.2"
   },
   "peerDependencies": {
-    "@octokit/request-error": "^2.1.0",
+    "@octokit/request-error": "^5.0.1",
     "@octorelease/core": "^1.0.0"
   }
 }
