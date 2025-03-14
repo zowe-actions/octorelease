@@ -38,6 +38,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 | Options | Description | Default |
 | ------- | ----------- | ------- |
+| `dryRunAllow` | List of stages for which command should be executed in dry run mode. | `[]` |
 | `failCmd`<br>`initCmd`<br>`publishCmd`<br>`successCmd`<br>`versionCmd` | Shell command to execute during the associated stage. | `null` |
 
 ### Examples

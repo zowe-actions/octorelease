@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import * as exec from "@actions/exec";
-import { IContext, utils } from "@octorelease/core";
+import { IContext } from "@octorelease/core";
 import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (config.initCmd != null) {
-        await utils.dryRunTask(context, config.initCmd, async () => {
-            const exitCode = await exec.exec(config.initCmd as string);
-            context.logger.debug(`Process finished with exit code ${exitCode}`);
-        });
+        await utils.runCmd(context, config.initCmd, config.dryRunAllow?.includes("init"));
     }
 }

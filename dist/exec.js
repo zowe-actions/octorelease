@@ -262,7 +262,7 @@ var require_io = __commonJS({
     var path = __importStar(require("path"));
     var util_1 = require("util");
     var ioUtil = __importStar(require_io_util());
-    var exec9 = util_1.promisify(childProcess.exec);
+    var exec3 = util_1.promisify(childProcess.exec);
     var execFile = util_1.promisify(childProcess.execFile);
     function cp(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -321,11 +321,11 @@ var require_io = __commonJS({
           try {
             const cmdPath = ioUtil.getCmdPath();
             if (yield ioUtil.isDirectory(inputPath, true)) {
-              yield exec9(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "rd /s /q "%inputPath%""`, {
                 env: { inputPath }
               });
             } else {
-              yield exec9(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
+              yield exec3(`${cmdPath} /s /c "del /f /a "%inputPath%""`, {
                 env: { inputPath }
               });
             }
@@ -1020,7 +1020,7 @@ var require_exec = __commonJS({
     exports2.getExecOutput = exports2.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
-    function exec9(commandLine, args, options) {
+    function exec3(commandLine, args, options) {
       return __awaiter(this, void 0, void 0, function* () {
         const commandArgs = tr.argStringToArray(commandLine);
         if (commandArgs.length === 0) {
@@ -1032,7 +1032,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports2.exec = exec9;
+    exports2.exec = exec3;
     function getExecOutput(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -1055,7 +1055,7 @@ var require_exec = __commonJS({
           }
         };
         const listeners = Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.listeners), { stdout: stdOutListener, stderr: stdErrListener });
-        const exitCode = yield exec9(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
+        const exitCode = yield exec3(commandLine, args, Object.assign(Object.assign({}, options), { listeners }));
         stdout += stdoutDecoder.end();
         stderr += stderrDecoder.end();
         return {
@@ -1080,51 +1080,46 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/init.ts
+// src/utils.ts
 var exec = __toESM(require_exec());
 var import_core = require("./core");
+async function runCmd(context, command, dryRunAllow = false) {
+  const task = async () => {
+    const exitCode = await exec.exec(command);
+    context.logger.debug(`Process finished with exit code ${exitCode}`);
+  };
+  if (!dryRunAllow) {
+    await import_core.utils.dryRunTask(context, command, task);
+  } else {
+    await task();
+  }
+}
+
+// src/init.ts
 async function init_default(context, config) {
   if (config.initCmd != null) {
-    await import_core.utils.dryRunTask(context, config.initCmd, async () => {
-      const exitCode = await exec.exec(config.initCmd);
-      context.logger.debug(`Process finished with exit code ${exitCode}`);
-    });
+    await runCmd(context, config.initCmd, config.dryRunAllow?.includes("init"));
   }
 }
 
 // src/publish.ts
-var exec3 = __toESM(require_exec());
-var import_core2 = require("./core");
 async function publish_default(context, config) {
   if (config.publishCmd != null) {
-    await import_core2.utils.dryRunTask(context, config.publishCmd, async () => {
-      const exitCode = await exec3.exec(config.publishCmd);
-      context.logger.debug(`Process finished with exit code ${exitCode}`);
-    });
+    await runCmd(context, config.publishCmd, config.dryRunAllow?.includes("publish"));
   }
 }
 
 // src/success.ts
-var exec5 = __toESM(require_exec());
-var import_core3 = require("./core");
 async function success_default(context, config) {
   if (config.successCmd != null) {
-    await import_core3.utils.dryRunTask(context, config.successCmd, async () => {
-      const exitCode = await exec5.exec(config.successCmd);
-      context.logger.debug(`Process finished with exit code ${exitCode}`);
-    });
+    await runCmd(context, config.successCmd, config.dryRunAllow?.includes("success"));
   }
 }
 
 // src/version.ts
-var exec7 = __toESM(require_exec());
-var import_core4 = require("./core");
 async function version_default(context, config) {
   if (config.versionCmd != null) {
-    await import_core4.utils.dryRunTask(context, config.versionCmd, async () => {
-      const exitCode = await exec7.exec(config.versionCmd);
-      context.logger.debug(`Process finished with exit code ${exitCode}`);
-    });
+    await runCmd(context, config.versionCmd, config.dryRunAllow?.includes("version"));
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

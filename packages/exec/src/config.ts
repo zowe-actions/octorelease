@@ -15,6 +15,7 @@
  */
 
 export interface IPluginConfig {
+    dryRunAllow?: string[];
     failCmd?: string;
     initCmd?: string;
     publishCmd?: string;
