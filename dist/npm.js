@@ -29,60 +29,35 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve2, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve2(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
 
 // ../../node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
-  "../../node_modules/@actions/io/lib/io-util.js"(exports) {
+  "../../node_modules/@actions/io/lib/io-util.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve2) {
           resolve2(value);
@@ -110,16 +85,16 @@ var require_io_util = __commonJS({
       });
     };
     var _a;
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getCmdPath = exports2.tryGetExecutablePath = exports2.isRooted = exports2.isDirectory = exports2.exists = exports2.IS_WINDOWS = exports2.unlink = exports2.symlink = exports2.stat = exports2.rmdir = exports2.rename = exports2.readlink = exports2.readdir = exports2.mkdir = exports2.lstat = exports2.copyFile = exports2.chmod = void 0;
     var fs5 = __importStar(require("fs"));
     var path5 = __importStar(require("path"));
-    _a = fs5.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
-    exports.IS_WINDOWS = process.platform === "win32";
+    _a = fs5.promises, exports2.chmod = _a.chmod, exports2.copyFile = _a.copyFile, exports2.lstat = _a.lstat, exports2.mkdir = _a.mkdir, exports2.readdir = _a.readdir, exports2.readlink = _a.readlink, exports2.rename = _a.rename, exports2.rmdir = _a.rmdir, exports2.stat = _a.stat, exports2.symlink = _a.symlink, exports2.unlink = _a.unlink;
+    exports2.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
         try {
-          yield exports.stat(fsPath);
+          yield exports2.stat(fsPath);
         } catch (err) {
           if (err.code === "ENOENT") {
             return false;
@@ -129,37 +104,37 @@ var require_io_util = __commonJS({
         return true;
       });
     }
-    exports.exists = exists;
+    exports2.exists = exists;
     function isDirectory(fsPath, useStat = false) {
       return __awaiter(this, void 0, void 0, function* () {
-        const stats = useStat ? yield exports.stat(fsPath) : yield exports.lstat(fsPath);
+        const stats = useStat ? yield exports2.stat(fsPath) : yield exports2.lstat(fsPath);
         return stats.isDirectory();
       });
     }
-    exports.isDirectory = isDirectory;
+    exports2.isDirectory = isDirectory;
     function isRooted(p) {
       p = normalizeSeparators(p);
       if (!p) {
         throw new Error('isRooted() parameter "p" cannot be empty');
       }
-      if (exports.IS_WINDOWS) {
+      if (exports2.IS_WINDOWS) {
         return p.startsWith("\\") || /^[A-Z]:/i.test(p);
       }
       return p.startsWith("/");
     }
-    exports.isRooted = isRooted;
+    exports2.isRooted = isRooted;
     function tryGetExecutablePath(filePath, extensions) {
       return __awaiter(this, void 0, void 0, function* () {
         let stats = void 0;
         try {
-          stats = yield exports.stat(filePath);
+          stats = yield exports2.stat(filePath);
         } catch (err) {
           if (err.code !== "ENOENT") {
             console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
           }
         }
         if (stats && stats.isFile()) {
-          if (exports.IS_WINDOWS) {
+          if (exports2.IS_WINDOWS) {
             const upperExt = path5.extname(filePath).toUpperCase();
             if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
               return filePath;
@@ -175,18 +150,18 @@ var require_io_util = __commonJS({
           filePath = originalFilePath + extension;
           stats = void 0;
           try {
-            stats = yield exports.stat(filePath);
+            stats = yield exports2.stat(filePath);
           } catch (err) {
             if (err.code !== "ENOENT") {
               console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
             }
           }
           if (stats && stats.isFile()) {
-            if (exports.IS_WINDOWS) {
+            if (exports2.IS_WINDOWS) {
               try {
                 const directory = path5.dirname(filePath);
                 const upperName = path5.basename(filePath).toUpperCase();
-                for (const actualName of yield exports.readdir(directory)) {
+                for (const actualName of yield exports2.readdir(directory)) {
                   if (upperName === actualName.toUpperCase()) {
                     filePath = path5.join(directory, actualName);
                     break;
@@ -206,10 +181,10 @@ var require_io_util = __commonJS({
         return "";
       });
     }
-    exports.tryGetExecutablePath = tryGetExecutablePath;
+    exports2.tryGetExecutablePath = tryGetExecutablePath;
     function normalizeSeparators(p) {
       p = p || "";
-      if (exports.IS_WINDOWS) {
+      if (exports2.IS_WINDOWS) {
         p = p.replace(/\//g, "\\");
         return p.replace(/\\\\+/g, "\\");
       }
@@ -222,43 +197,38 @@ var require_io_util = __commonJS({
       var _a2;
       return (_a2 = process.env["COMSPEC"]) !== null && _a2 !== void 0 ? _a2 : `cmd.exe`;
     }
-    exports.getCmdPath = getCmdPath;
+    exports2.getCmdPath = getCmdPath;
   }
 });
 
 // ../../node_modules/@actions/io/lib/io.js
 var require_io = __commonJS({
-  "../../node_modules/@actions/io/lib/io.js"(exports) {
+  "../../node_modules/@actions/io/lib/io.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve2) {
           resolve2(value);
@@ -285,8 +255,8 @@ var require_io = __commonJS({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.findInPath = exports2.which = exports2.mkdirP = exports2.rmRF = exports2.mv = exports2.cp = void 0;
     var assert_1 = require("assert");
     var childProcess = __importStar(require("child_process"));
     var path5 = __importStar(require("path"));
@@ -320,7 +290,7 @@ var require_io = __commonJS({
         }
       });
     }
-    exports.cp = cp;
+    exports2.cp = cp;
     function mv(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
         if (yield ioUtil.exists(dest)) {
@@ -341,7 +311,7 @@ var require_io = __commonJS({
         yield ioUtil.rename(source, dest);
       });
     }
-    exports.mv = mv;
+    exports2.mv = mv;
     function rmRF(inputPath) {
       return __awaiter(this, void 0, void 0, function* () {
         if (ioUtil.IS_WINDOWS) {
@@ -386,14 +356,14 @@ var require_io = __commonJS({
         }
       });
     }
-    exports.rmRF = rmRF;
+    exports2.rmRF = rmRF;
     function mkdirP(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
         assert_1.ok(fsPath, "a path argument must be provided");
         yield ioUtil.mkdir(fsPath, { recursive: true });
       });
     }
-    exports.mkdirP = mkdirP;
+    exports2.mkdirP = mkdirP;
     function which(tool, check) {
       return __awaiter(this, void 0, void 0, function* () {
         if (!tool) {
@@ -417,7 +387,7 @@ var require_io = __commonJS({
         return "";
       });
     }
-    exports.which = which;
+    exports2.which = which;
     function findInPath(tool) {
       return __awaiter(this, void 0, void 0, function* () {
         if (!tool) {
@@ -459,7 +429,7 @@ var require_io = __commonJS({
         return matches;
       });
     }
-    exports.findInPath = findInPath;
+    exports2.findInPath = findInPath;
     function readCopyOptions(options) {
       const force = options.force == null ? true : options.force;
       const recursive = Boolean(options.recursive);
@@ -510,37 +480,32 @@ var require_io = __commonJS({
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
 var require_toolrunner = __commonJS({
-  "../../node_modules/@actions/exec/lib/toolrunner.js"(exports) {
+  "../../node_modules/@actions/exec/lib/toolrunner.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve2) {
           resolve2(value);
@@ -567,8 +532,8 @@ var require_toolrunner = __commonJS({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.argStringToArray = exports.ToolRunner = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.argStringToArray = exports2.ToolRunner = void 0;
     var os3 = __importStar(require("os"));
     var events = __importStar(require("events"));
     var child = __importStar(require("child_process"));
@@ -886,7 +851,7 @@ var require_toolrunner = __commonJS({
         });
       }
     };
-    exports.ToolRunner = ToolRunner;
+    exports2.ToolRunner = ToolRunner;
     function argStringToArray(argString) {
       const args = [];
       let inQuotes = false;
@@ -931,8 +896,8 @@ var require_toolrunner = __commonJS({
       }
       return args;
     }
-    exports.argStringToArray = argStringToArray;
-    var ExecState = class extends events.EventEmitter {
+    exports2.argStringToArray = argStringToArray;
+    var ExecState = class _ExecState extends events.EventEmitter {
       constructor(options, toolPath) {
         super();
         this.processClosed = false;
@@ -959,7 +924,7 @@ var require_toolrunner = __commonJS({
         if (this.processClosed) {
           this._setResult();
         } else if (this.processExited) {
-          this.timeout = timers_1.setTimeout(ExecState.HandleTimeout, this.delay, this);
+          this.timeout = timers_1.setTimeout(_ExecState.HandleTimeout, this.delay, this);
         }
       }
       _debug(message) {
@@ -999,37 +964,32 @@ var require_toolrunner = __commonJS({
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var require_exec = __commonJS({
-  "../../node_modules/@actions/exec/lib/exec.js"(exports) {
+  "../../node_modules/@actions/exec/lib/exec.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve2) {
           resolve2(value);
@@ -1056,8 +1016,8 @@ var require_exec = __commonJS({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getExecOutput = exports.exec = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getExecOutput = exports2.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
     function exec5(commandLine, args, options) {
@@ -1072,7 +1032,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec5;
+    exports2.exec = exec5;
     function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -1105,13 +1065,13 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput2;
+    exports2.getExecOutput = getExecOutput2;
   }
 });
 
 // ../../node_modules/delay/index.js
 var require_delay = __commonJS({
-  "../../node_modules/delay/index.js"(exports, module2) {
+  "../../node_modules/delay/index.js"(exports2, module2) {
     "use strict";
     var randomInteger = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
     var createAbortError = () => {
@@ -1173,7 +1133,7 @@ var require_delay = __commonJS({
 
 // ../../node_modules/yocto-queue/index.js
 var require_yocto_queue = __commonJS({
-  "../../node_modules/yocto-queue/index.js"(exports, module2) {
+  "../../node_modules/yocto-queue/index.js"(exports2, module2) {
     var Node = class {
       /// value;
       /// next;
@@ -1232,7 +1192,7 @@ var require_yocto_queue = __commonJS({
 
 // ../../node_modules/p-limit/index.js
 var require_p_limit = __commonJS({
-  "../../node_modules/p-limit/index.js"(exports, module2) {
+  "../../node_modules/p-limit/index.js"(exports2, module2) {
     "use strict";
     var Queue = require_yocto_queue();
     var pLimit = (concurrency) => {
@@ -1290,7 +1250,7 @@ var require_p_limit = __commonJS({
 
 // ../../node_modules/p-locate/index.js
 var require_p_locate = __commonJS({
-  "../../node_modules/p-locate/index.js"(exports, module2) {
+  "../../node_modules/p-locate/index.js"(exports2, module2) {
     "use strict";
     var pLimit = require_p_limit();
     var EndError = class extends Error {
@@ -1331,7 +1291,7 @@ var require_p_locate = __commonJS({
 
 // ../../node_modules/locate-path/index.js
 var require_locate_path = __commonJS({
-  "../../node_modules/locate-path/index.js"(exports, module2) {
+  "../../node_modules/locate-path/index.js"(exports2, module2) {
     "use strict";
     var path5 = require("path");
     var fs5 = require("fs");
@@ -1392,7 +1352,7 @@ var require_locate_path = __commonJS({
 
 // ../../node_modules/path-exists/index.js
 var require_path_exists = __commonJS({
-  "../../node_modules/path-exists/index.js"(exports, module2) {
+  "../../node_modules/path-exists/index.js"(exports2, module2) {
     "use strict";
     var fs5 = require("fs");
     var { promisify } = require("util");
@@ -1418,7 +1378,7 @@ var require_path_exists = __commonJS({
 
 // ../../node_modules/find-up/index.js
 var require_find_up = __commonJS({
-  "../../node_modules/find-up/index.js"(exports, module2) {
+  "../../node_modules/find-up/index.js"(exports2, module2) {
     "use strict";
     var path5 = require("path");
     var locatePath = require_locate_path();
@@ -1487,8 +1447,8 @@ var require_find_up = __commonJS({
 });
 
 // src/index.ts
-var src_exports = {};
-__export(src_exports, {
+var index_exports = {};
+__export(index_exports, {
   DEFAULT_NPM_REGISTRY: () => DEFAULT_NPM_REGISTRY,
   init: () => init_default,
   publish: () => publish_default,
@@ -1496,7 +1456,7 @@ __export(src_exports, {
   utils: () => utils_exports,
   version: () => version_default
 });
-module.exports = __toCommonJS(src_exports);
+module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
 var fs2 = __toESM(require("fs"));
@@ -1521,78 +1481,64 @@ var os = __toESM(require("os"));
 var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_core = require("./core");
-function npmAddTag(context, pkgSpec, tag, registry, inDir) {
-  return __async(this, null, function* () {
-    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    const cmdArgs = ["dist-tag", "add", pkgSpec, tag, `--${registryPrefix}registry=${registry}`];
-    yield import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, () => __async(this, null, function* () {
-      yield exec.exec("npm", cmdArgs, { cwd: inDir });
-    }));
+async function npmAddTag(context, pkgSpec, tag, registry, inDir) {
+  const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+  const cmdArgs = ["dist-tag", "add", pkgSpec, tag, `--${registryPrefix}registry=${registry}`];
+  await import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
+    await exec.exec("npm", cmdArgs, { cwd: inDir });
   });
 }
-function npmConfig(context, registry, useTokenAuth = true) {
-  return __async(this, null, function* () {
-    const npmrcLines = [];
-    const registrySpec = (registry.endsWith("/") ? registry : registry + "/").replace(/^\w+:/, "");
-    if (useTokenAuth) {
-      npmrcLines.push(`${registrySpec}:_authToken=${context.env.NPM_TOKEN}`);
-    } else {
-      const b64Auth = Buffer.from(`${context.env.NPM_USERNAME}:${context.env.NPM_PASSWORD}`).toString("base64");
-      npmrcLines.push(`${registrySpec}:_auth=${b64Auth}`);
-      npmrcLines.push(`${registrySpec}:email=${context.env.NPM_EMAIL}`);
-    }
-    fs.appendFileSync(path.join(os.homedir(), ".npmrc"), npmrcLines.join("\n"));
-    yield exec.exec("npm", ["whoami", "--registry", registry]);
-  });
+async function npmConfig(context, registry, useTokenAuth = true) {
+  const npmrcLines = [];
+  const registrySpec = (registry.endsWith("/") ? registry : registry + "/").replace(/^\w+:/, "");
+  if (useTokenAuth) {
+    npmrcLines.push(`${registrySpec}:_authToken=${context.env.NPM_TOKEN}`);
+  } else {
+    const b64Auth = Buffer.from(`${context.env.NPM_USERNAME}:${context.env.NPM_PASSWORD}`).toString("base64");
+    npmrcLines.push(`${registrySpec}:_auth=${b64Auth}`);
+    npmrcLines.push(`${registrySpec}:email=${context.env.NPM_EMAIL}`);
+  }
+  fs.appendFileSync(path.join(os.homedir(), ".npmrc"), npmrcLines.join("\n"));
+  await exec.exec("npm", ["whoami", "--registry", registry]);
 }
-function npmInstall(pkgSpec, registry, inDir) {
-  return __async(this, null, function* () {
-    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    yield exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
-  });
+async function npmInstall(pkgSpec, registry, inDir) {
+  const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+  await exec.exec("npm", ["install", pkgSpec, `--${registryPrefix}registry=${registry}`], { cwd: inDir });
 }
-function npmPack(pkgSpec, registry, inDir) {
-  return __async(this, null, function* () {
-    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    const cmdArgs = ["pack", `--${registryPrefix}registry=${registry}`];
-    const cmdOutput = yield exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
-    return cmdOutput.stdout.trim().split(/\s+/).pop();
-  });
+async function npmPack(pkgSpec, registry, inDir) {
+  const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+  const cmdArgs = ["pack", `--${registryPrefix}registry=${registry}`];
+  const cmdOutput = await exec.getExecOutput("npm", cmdArgs, { cwd: inDir });
+  return cmdOutput.stdout.trim().split(/\s+/).pop();
 }
-function npmPublish(context, options) {
-  return __async(this, null, function* () {
-    const registryPrefix = options.pkgSpec.startsWith("@") ? `${options.pkgSpec.split("/")[0]}:` : "";
-    const cmdArgs = ["publish", "--tag", options.tag, `--${registryPrefix}registry=${options.registry}`];
-    if (context.dryRun) {
-      cmdArgs.push("--dry-run");
-    }
-    yield exec.exec("npm", cmdArgs, { cwd: options.inDir });
-  });
+async function npmPublish(context, options) {
+  const registryPrefix = options.pkgSpec.startsWith("@") ? `${options.pkgSpec.split("/")[0]}:` : "";
+  const cmdArgs = ["publish", "--tag", options.tag, `--${registryPrefix}registry=${options.registry}`];
+  if (context.dryRun) {
+    cmdArgs.push("--dry-run");
+  }
+  await exec.exec("npm", cmdArgs, { cwd: options.inDir });
 }
-function npmVersion(newVersion, inDir) {
-  return __async(this, null, function* () {
-    yield exec.exec("npm", [
-      "version",
-      newVersion,
-      "--allow-same-version",
-      "--no-git-tag-version",
-      "--no-workspaces-update"
-    ], { cwd: inDir });
-  });
+async function npmVersion(newVersion, inDir) {
+  await exec.exec("npm", [
+    "version",
+    newVersion,
+    "--allow-same-version",
+    "--no-git-tag-version",
+    "--no-workspaces-update"
+  ], { cwd: inDir });
 }
-function npmView(pkgSpec, registry, property) {
-  return __async(this, null, function* () {
-    const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
-    const cmdArgs = ["view", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
-    if (property != null) {
-      cmdArgs.push(property);
-    }
-    try {
-      const cmdOutput = yield exec.getExecOutput("npm", cmdArgs);
-      return JSON.parse(cmdOutput.stdout.trim());
-    } catch (e) {
-    }
-  });
+async function npmView(pkgSpec, registry, property) {
+  const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
+  const cmdArgs = ["view", `${pkgSpec}`, "--json", `--${registryPrefix}registry=${registry}`];
+  if (property != null) {
+    cmdArgs.push(property);
+  }
+  try {
+    const cmdOutput = await exec.getExecOutput("npm", cmdArgs);
+    return JSON.parse(cmdOutput.stdout.trim());
+  } catch {
+  }
 }
 function verifyConditions(context) {
   const useTokenAuth = context.env.NPM_USERNAME == null && context.env.NPM_PASSWORD == null && context.env.NPM_EMAIL == null;
@@ -1610,97 +1556,92 @@ function verifyConditions(context) {
 }
 
 // src/init.ts
-function init_default(context, config) {
-  return __async(this, null, function* () {
-    let publishConfig;
-    try {
-      const packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
-      publishConfig = packageJson.publishConfig;
-      if (context.workspaces == null) {
-        context.version.new = packageJson.version;
-      } else {
-        context.logger.warn("Ignoring package.json version in workspaces");
-      }
-    } catch (e) {
-      throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
+async function init_default(context, config) {
+  let publishConfig;
+  try {
+    const packageJson = JSON.parse(fs2.readFileSync("package.json", "utf-8"));
+    publishConfig = packageJson.publishConfig;
+    if (context.workspaces == null) {
+      context.version.new = packageJson.version;
+    } else {
+      context.logger.warn("Ignoring package.json version in workspaces");
     }
-    if (config.pruneShrinkwrap && !fs2.existsSync("npm-shrinkwrap.json")) {
-      throw new Error("Could not find npm-shrinkwrap.json but the pruneShrinkwrap option was specified");
-    }
-    context.branch.channel = context.branch.channel || "latest";
-    if (config.npmPublish === false) {
-      return;
-    }
-    const useTokenAuth = verifyConditions(context);
-    yield npmConfig(context, (publishConfig == null ? void 0 : publishConfig.registry) || DEFAULT_NPM_REGISTRY, useTokenAuth);
-  });
+  } catch {
+    throw new Error(`Missing or invalid package.json in branch ${context.branch.name}`);
+  }
+  if (config.pruneShrinkwrap && !fs2.existsSync("npm-shrinkwrap.json")) {
+    throw new Error("Could not find npm-shrinkwrap.json but the pruneShrinkwrap option was specified");
+  }
+  context.branch.channel = context.branch.channel || "latest";
+  if (config.npmPublish === false) {
+    return;
+  }
+  const useTokenAuth = verifyConditions(context);
+  await npmConfig(context, publishConfig?.registry || DEFAULT_NPM_REGISTRY, useTokenAuth);
 }
 
 // src/publish.ts
 var fs3 = __toESM(require("fs"));
 var path2 = __toESM(require("path"));
 var exec3 = __toESM(require_exec());
-function publish_default(context, config, inDir) {
-  return __async(this, null, function* () {
-    var _a, _b;
-    const cwd = inDir || process.cwd();
-    const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
-    const npmRegistry = ((_a = packageJson.publishConfig) == null ? void 0 : _a.registry) || DEFAULT_NPM_REGISTRY;
-    if (config.pruneShrinkwrap) {
-      if (packageJson.scripts.preshrinkwrap != null) {
-        yield exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
-      }
-      pruneShrinkwrap(context, inDir);
+async function publish_default(context, config, inDir) {
+  const cwd = inDir || process.cwd();
+  const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+  const npmRegistry = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
+  if (config.pruneShrinkwrap) {
+    if (packageJson.scripts.preshrinkwrap != null) {
+      await exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
     }
-    if (config.tarballDir != null) {
-      const tgzFile = yield npmPack(packageJson.name, npmRegistry, inDir);
-      fs3.mkdirSync(config.tarballDir, { recursive: true });
-      fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
+    pruneShrinkwrap(context, inDir);
+  }
+  if (config.tarballDir != null) {
+    const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
+    fs3.mkdirSync(config.tarballDir, { recursive: true });
+    fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
+  }
+  if (config.npmPublish === false) {
+    return;
+  } else if (fs3.existsSync(".npmrc")) {
+    fs3.renameSync(".npmrc", ".npmrc.bak");
+  }
+  if (packageJson.private) {
+    context.logger.info(`Skipping publish of private package ${packageJson.name}`);
+    return;
+  }
+  try {
+    const packageTag = context.branch.channel;
+    const publishedVersions = await npmView(packageJson.name, npmRegistry, "versions");
+    if (!publishedVersions?.includes(packageJson.version)) {
+      await npmPublish(context, {
+        tag: packageTag,
+        pkgSpec: packageJson.name,
+        registry: npmRegistry,
+        inDir
+      });
+      context.releasedPackages.npm = [
+        ...context.releasedPackages.npm || [],
+        {
+          name: `${packageJson.name}@${packageJson.version}`,
+          url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
+          registry: npmRegistry
+        }
+      ];
+    } else {
+      context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
     }
-    if (config.npmPublish === false) {
-      return;
-    } else if (fs3.existsSync(".npmrc")) {
-      fs3.renameSync(".npmrc", ".npmrc.bak");
+    const aliasTags = [];
+    if (config.aliasTags?.[packageTag] != null) {
+      const aliasTagOrTags = config.aliasTags[packageTag];
+      aliasTags.push(...typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags);
     }
-    if (packageJson.private) {
-      context.logger.info(`Skipping publish of private package ${packageJson.name}`);
-      return;
+    for (const tag of [packageTag, ...aliasTags]) {
+      await npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
     }
-    try {
-      const packageTag = context.branch.channel;
-      const publishedVersions = yield npmView(packageJson.name, npmRegistry, "versions");
-      if (!(publishedVersions == null ? void 0 : publishedVersions.includes(packageJson.version))) {
-        yield npmPublish(context, {
-          tag: packageTag,
-          pkgSpec: packageJson.name,
-          registry: npmRegistry,
-          inDir
-        });
-        context.releasedPackages.npm = [
-          ...context.releasedPackages.npm || [],
-          {
-            name: `${packageJson.name}@${packageJson.version}`,
-            url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
-            registry: npmRegistry
-          }
-        ];
-      } else {
-        context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
-      }
-      const aliasTags = [];
-      if (((_b = config.aliasTags) == null ? void 0 : _b[packageTag]) != null) {
-        const aliasTagOrTags = config.aliasTags[packageTag];
-        aliasTags.push(...typeof aliasTagOrTags === "string" ? [aliasTagOrTags] : aliasTagOrTags);
-      }
-      for (const tag of [packageTag, ...aliasTags]) {
-        yield npmAddTag(context, `${packageJson.name}@${packageJson.version}`, tag, npmRegistry, inDir);
-      }
-    } finally {
-      if (fs3.existsSync(".npmrc.bak")) {
-        fs3.renameSync(".npmrc.bak", ".npmrc");
-      }
+  } finally {
+    if (fs3.existsSync(".npmrc.bak")) {
+      fs3.renameSync(".npmrc.bak", ".npmrc");
     }
-  });
+  }
 }
 function pruneShrinkwrap(context, inDir) {
   const shrinkwrapPath = inDir != null ? path2.join(inDir, "npm-shrinkwrap.json") : "npm-shrinkwrap.json";
@@ -1730,48 +1671,44 @@ var os2 = __toESM(require("os"));
 var path3 = __toESM(require("path"));
 var import_core2 = require("./core");
 var import_delay = __toESM(require_delay());
-function success_default(context, config) {
-  return __async(this, null, function* () {
-    if (config.smokeTest && context.releasedPackages.npm != null) {
-      context.logger.info("Performing smoke test, installing released package(s)");
-      for (const { name, registry } of context.releasedPackages.npm) {
-        const tmpDir = path3.join(os2.tmpdir(), context.ci.build, name);
-        fs4.mkdirSync(tmpDir, { recursive: true });
-        let tries = 0;
-        while ((yield npmView(name, registry)) == null && tries < 60) {
-          yield (0, import_delay.default)(1e3);
-          tries += 1;
-        }
-        yield import_core2.utils.dryRunTask(context, `install ${name} from ${registry}`, () => __async(this, null, function* () {
-          yield npmInstall(name, registry, tmpDir);
-        }));
-        fs4.rmdirSync(tmpDir, { recursive: true });
+async function success_default(context, config) {
+  if (config.smokeTest && context.releasedPackages.npm != null) {
+    context.logger.info("Performing smoke test, installing released package(s)");
+    for (const { name, registry } of context.releasedPackages.npm) {
+      const tmpDir = path3.join(os2.tmpdir(), context.ci.build, name);
+      fs4.mkdirSync(tmpDir, { recursive: true });
+      let tries = 0;
+      while (await npmView(name, registry) == null && tries < 60) {
+        await (0, import_delay.default)(1e3);
+        tries += 1;
       }
+      await import_core2.utils.dryRunTask(context, `install ${name} from ${registry}`, async () => {
+        await npmInstall(name, registry, tmpDir);
+      });
+      fs4.rmdirSync(tmpDir, { recursive: true });
     }
-  });
+  }
 }
 
 // src/version.ts
 var path4 = __toESM(require("path"));
 var import_find_up = __toESM(require_find_up());
-function version_default(context, _config) {
-  return __async(this, null, function* () {
-    if (context.workspaces != null) {
-      context.logger.warn("Cannot run npm version in workspaces");
-      return;
-    } else if (context.version.old === context.version.new) {
-      context.logger.info("Version in package.json is already up to date");
-      return;
-    }
-    yield npmVersion(context.version.new);
-    context.changedFiles.push("package.json");
-    const lockfilePath = yield (0, import_find_up.default)(["npm-shrinkwrap.json", "package-lock.json"]);
-    if (lockfilePath != null) {
-      context.changedFiles.push(path4.relative(context.rootDir, lockfilePath));
-    } else {
-      context.logger.warn("Could not find lockfile to update version in");
-    }
-  });
+async function version_default(context, _config) {
+  if (context.workspaces != null) {
+    context.logger.warn("Cannot run npm version in workspaces");
+    return;
+  } else if (context.version.old === context.version.new) {
+    context.logger.info("Version in package.json is already up to date");
+    return;
+  }
+  await npmVersion(context.version.new);
+  context.changedFiles.push("package.json");
+  const lockfilePath = await (0, import_find_up.default)(["npm-shrinkwrap.json", "package-lock.json"]);
+  if (lockfilePath != null) {
+    context.changedFiles.push(path4.relative(context.rootDir, lockfilePath));
+  } else {
+    context.logger.warn("Could not find lockfile to update version in");
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

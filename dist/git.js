@@ -29,60 +29,35 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
 
 // ../../node_modules/@actions/io/lib/io-util.js
 var require_io_util = __commonJS({
-  "../../node_modules/@actions/io/lib/io-util.js"(exports) {
+  "../../node_modules/@actions/io/lib/io-util.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve) {
           resolve(value);
@@ -110,16 +85,16 @@ var require_io_util = __commonJS({
       });
     };
     var _a;
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getCmdPath = exports.tryGetExecutablePath = exports.isRooted = exports.isDirectory = exports.exists = exports.IS_WINDOWS = exports.unlink = exports.symlink = exports.stat = exports.rmdir = exports.rename = exports.readlink = exports.readdir = exports.mkdir = exports.lstat = exports.copyFile = exports.chmod = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getCmdPath = exports2.tryGetExecutablePath = exports2.isRooted = exports2.isDirectory = exports2.exists = exports2.IS_WINDOWS = exports2.unlink = exports2.symlink = exports2.stat = exports2.rmdir = exports2.rename = exports2.readlink = exports2.readdir = exports2.mkdir = exports2.lstat = exports2.copyFile = exports2.chmod = void 0;
     var fs2 = __importStar(require("fs"));
     var path2 = __importStar(require("path"));
-    _a = fs2.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
-    exports.IS_WINDOWS = process.platform === "win32";
+    _a = fs2.promises, exports2.chmod = _a.chmod, exports2.copyFile = _a.copyFile, exports2.lstat = _a.lstat, exports2.mkdir = _a.mkdir, exports2.readdir = _a.readdir, exports2.readlink = _a.readlink, exports2.rename = _a.rename, exports2.rmdir = _a.rmdir, exports2.stat = _a.stat, exports2.symlink = _a.symlink, exports2.unlink = _a.unlink;
+    exports2.IS_WINDOWS = process.platform === "win32";
     function exists(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
         try {
-          yield exports.stat(fsPath);
+          yield exports2.stat(fsPath);
         } catch (err) {
           if (err.code === "ENOENT") {
             return false;
@@ -129,37 +104,37 @@ var require_io_util = __commonJS({
         return true;
       });
     }
-    exports.exists = exists;
+    exports2.exists = exists;
     function isDirectory(fsPath, useStat = false) {
       return __awaiter(this, void 0, void 0, function* () {
-        const stats = useStat ? yield exports.stat(fsPath) : yield exports.lstat(fsPath);
+        const stats = useStat ? yield exports2.stat(fsPath) : yield exports2.lstat(fsPath);
         return stats.isDirectory();
       });
     }
-    exports.isDirectory = isDirectory;
+    exports2.isDirectory = isDirectory;
     function isRooted(p) {
       p = normalizeSeparators(p);
       if (!p) {
         throw new Error('isRooted() parameter "p" cannot be empty');
       }
-      if (exports.IS_WINDOWS) {
+      if (exports2.IS_WINDOWS) {
         return p.startsWith("\\") || /^[A-Z]:/i.test(p);
       }
       return p.startsWith("/");
     }
-    exports.isRooted = isRooted;
+    exports2.isRooted = isRooted;
     function tryGetExecutablePath(filePath, extensions) {
       return __awaiter(this, void 0, void 0, function* () {
         let stats = void 0;
         try {
-          stats = yield exports.stat(filePath);
+          stats = yield exports2.stat(filePath);
         } catch (err) {
           if (err.code !== "ENOENT") {
             console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
           }
         }
         if (stats && stats.isFile()) {
-          if (exports.IS_WINDOWS) {
+          if (exports2.IS_WINDOWS) {
             const upperExt = path2.extname(filePath).toUpperCase();
             if (extensions.some((validExt) => validExt.toUpperCase() === upperExt)) {
               return filePath;
@@ -175,18 +150,18 @@ var require_io_util = __commonJS({
           filePath = originalFilePath + extension;
           stats = void 0;
           try {
-            stats = yield exports.stat(filePath);
+            stats = yield exports2.stat(filePath);
           } catch (err) {
             if (err.code !== "ENOENT") {
               console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
             }
           }
           if (stats && stats.isFile()) {
-            if (exports.IS_WINDOWS) {
+            if (exports2.IS_WINDOWS) {
               try {
                 const directory = path2.dirname(filePath);
                 const upperName = path2.basename(filePath).toUpperCase();
-                for (const actualName of yield exports.readdir(directory)) {
+                for (const actualName of yield exports2.readdir(directory)) {
                   if (upperName === actualName.toUpperCase()) {
                     filePath = path2.join(directory, actualName);
                     break;
@@ -206,10 +181,10 @@ var require_io_util = __commonJS({
         return "";
       });
     }
-    exports.tryGetExecutablePath = tryGetExecutablePath;
+    exports2.tryGetExecutablePath = tryGetExecutablePath;
     function normalizeSeparators(p) {
       p = p || "";
-      if (exports.IS_WINDOWS) {
+      if (exports2.IS_WINDOWS) {
         p = p.replace(/\//g, "\\");
         return p.replace(/\\\\+/g, "\\");
       }
@@ -222,43 +197,38 @@ var require_io_util = __commonJS({
       var _a2;
       return (_a2 = process.env["COMSPEC"]) !== null && _a2 !== void 0 ? _a2 : `cmd.exe`;
     }
-    exports.getCmdPath = getCmdPath;
+    exports2.getCmdPath = getCmdPath;
   }
 });
 
 // ../../node_modules/@actions/io/lib/io.js
 var require_io = __commonJS({
-  "../../node_modules/@actions/io/lib/io.js"(exports) {
+  "../../node_modules/@actions/io/lib/io.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve) {
           resolve(value);
@@ -285,8 +255,8 @@ var require_io = __commonJS({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.findInPath = exports.which = exports.mkdirP = exports.rmRF = exports.mv = exports.cp = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.findInPath = exports2.which = exports2.mkdirP = exports2.rmRF = exports2.mv = exports2.cp = void 0;
     var assert_1 = require("assert");
     var childProcess = __importStar(require("child_process"));
     var path2 = __importStar(require("path"));
@@ -320,7 +290,7 @@ var require_io = __commonJS({
         }
       });
     }
-    exports.cp = cp;
+    exports2.cp = cp;
     function mv(source, dest, options = {}) {
       return __awaiter(this, void 0, void 0, function* () {
         if (yield ioUtil.exists(dest)) {
@@ -341,7 +311,7 @@ var require_io = __commonJS({
         yield ioUtil.rename(source, dest);
       });
     }
-    exports.mv = mv;
+    exports2.mv = mv;
     function rmRF(inputPath) {
       return __awaiter(this, void 0, void 0, function* () {
         if (ioUtil.IS_WINDOWS) {
@@ -386,14 +356,14 @@ var require_io = __commonJS({
         }
       });
     }
-    exports.rmRF = rmRF;
+    exports2.rmRF = rmRF;
     function mkdirP(fsPath) {
       return __awaiter(this, void 0, void 0, function* () {
         assert_1.ok(fsPath, "a path argument must be provided");
         yield ioUtil.mkdir(fsPath, { recursive: true });
       });
     }
-    exports.mkdirP = mkdirP;
+    exports2.mkdirP = mkdirP;
     function which(tool, check) {
       return __awaiter(this, void 0, void 0, function* () {
         if (!tool) {
@@ -417,7 +387,7 @@ var require_io = __commonJS({
         return "";
       });
     }
-    exports.which = which;
+    exports2.which = which;
     function findInPath(tool) {
       return __awaiter(this, void 0, void 0, function* () {
         if (!tool) {
@@ -459,7 +429,7 @@ var require_io = __commonJS({
         return matches;
       });
     }
-    exports.findInPath = findInPath;
+    exports2.findInPath = findInPath;
     function readCopyOptions(options) {
       const force = options.force == null ? true : options.force;
       const recursive = Boolean(options.recursive);
@@ -510,37 +480,32 @@ var require_io = __commonJS({
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
 var require_toolrunner = __commonJS({
-  "../../node_modules/@actions/exec/lib/toolrunner.js"(exports) {
+  "../../node_modules/@actions/exec/lib/toolrunner.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve) {
           resolve(value);
@@ -567,8 +532,8 @@ var require_toolrunner = __commonJS({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.argStringToArray = exports.ToolRunner = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.argStringToArray = exports2.ToolRunner = void 0;
     var os2 = __importStar(require("os"));
     var events = __importStar(require("events"));
     var child = __importStar(require("child_process"));
@@ -886,7 +851,7 @@ var require_toolrunner = __commonJS({
         });
       }
     };
-    exports.ToolRunner = ToolRunner;
+    exports2.ToolRunner = ToolRunner;
     function argStringToArray(argString) {
       const args = [];
       let inQuotes = false;
@@ -931,8 +896,8 @@ var require_toolrunner = __commonJS({
       }
       return args;
     }
-    exports.argStringToArray = argStringToArray;
-    var ExecState = class extends events.EventEmitter {
+    exports2.argStringToArray = argStringToArray;
+    var ExecState = class _ExecState extends events.EventEmitter {
       constructor(options, toolPath) {
         super();
         this.processClosed = false;
@@ -959,7 +924,7 @@ var require_toolrunner = __commonJS({
         if (this.processClosed) {
           this._setResult();
         } else if (this.processExited) {
-          this.timeout = timers_1.setTimeout(ExecState.HandleTimeout, this.delay, this);
+          this.timeout = timers_1.setTimeout(_ExecState.HandleTimeout, this.delay, this);
         }
       }
       _debug(message) {
@@ -999,37 +964,32 @@ var require_toolrunner = __commonJS({
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var require_exec = __commonJS({
-  "../../node_modules/@actions/exec/lib/exec.js"(exports) {
+  "../../node_modules/@actions/exec/lib/exec.js"(exports2) {
     "use strict";
-    var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+      if (k2 === void 0) k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
         return m[k];
       } });
     } : function(o, m, k, k2) {
-      if (k2 === void 0)
-        k2 = k;
+      if (k2 === void 0) k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports && exports.__importStar || function(mod) {
-      if (mod && mod.__esModule)
-        return mod;
+    var __importStar = exports2 && exports2.__importStar || function(mod) {
+      if (mod && mod.__esModule) return mod;
       var result = {};
       if (mod != null) {
-        for (var k in mod)
-          if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+        for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
       }
       __setModuleDefault(result, mod);
       return result;
     };
-    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
       function adopt(value) {
         return value instanceof P ? value : new P(function(resolve) {
           resolve(value);
@@ -1056,8 +1016,8 @@ var require_exec = __commonJS({
         step((generator = generator.apply(thisArg, _arguments || [])).next());
       });
     };
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getExecOutput = exports.exec = void 0;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getExecOutput = exports2.exec = void 0;
     var string_decoder_1 = require("string_decoder");
     var tr = __importStar(require_toolrunner());
     function exec3(commandLine, args, options) {
@@ -1072,7 +1032,7 @@ var require_exec = __commonJS({
         return runner.exec();
       });
     }
-    exports.exec = exec3;
+    exports2.exec = exec3;
     function getExecOutput2(commandLine, args, options) {
       var _a, _b;
       return __awaiter(this, void 0, void 0, function* () {
@@ -1105,18 +1065,18 @@ var require_exec = __commonJS({
         };
       });
     }
-    exports.getExecOutput = getExecOutput2;
+    exports2.getExecOutput = getExecOutput2;
   }
 });
 
 // src/index.ts
-var src_exports = {};
-__export(src_exports, {
+var index_exports = {};
+__export(index_exports, {
   init: () => init_default,
   utils: () => utils_exports,
   version: () => version_default
 });
-module.exports = __toCommonJS(src_exports);
+module.exports = __toCommonJS(index_exports);
 
 // src/utils.ts
 var utils_exports = {};
@@ -1132,112 +1092,98 @@ var os = __toESM(require("os"));
 var path = __toESM(require("path"));
 var url = __toESM(require("url"));
 var exec = __toESM(require_exec());
-function gitAdd(...files) {
-  return __async(this, null, function* () {
-    yield exec.exec("git", ["add", ...files]);
-  });
+async function gitAdd(...files) {
+  await exec.exec("git", ["add", ...files]);
 }
-function gitCommit(message, amend) {
-  return __async(this, null, function* () {
-    if (!amend) {
-      const cmdOutput = yield exec.getExecOutput("git", ["diff", "--name-only", "--cached"]);
-      if (cmdOutput.stdout.trim().length == 0) {
-        return false;
-      }
-    }
-    const cmdArgs = ["commit", "-s", "-m", message.includes("[ci skip]") ? message : `${message} [ci skip]`];
-    if (amend) {
-      cmdArgs.push("--amend");
-    }
-    yield exec.exec("git", cmdArgs);
-    return true;
-  });
-}
-function gitConfig(context) {
-  return __async(this, null, function* () {
-    yield exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
-    yield exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
-    if (context.env.GIT_CREDENTIALS != null) {
-      yield exec.exec("git", ["config", "--global", "credential.helper", "store"]);
-      const cmdOutput = yield exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
-      const gitUrl = new url.URL(cmdOutput.stdout);
-      fs.appendFileSync(
-        path.join(os.homedir(), ".git-credentials"),
-        `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`
-      );
-    }
-    yield exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);
-  });
-}
-function gitPush(context, branch, tags) {
-  return __async(this, null, function* () {
-    if (!tags) {
-      const cmdOutput = yield exec.getExecOutput("git", ["cherry"]);
-      if (cmdOutput.stdout.trim().length == 0) {
-        return false;
-      }
-    }
-    const cmdArgs = ["push", "-u", "origin", branch];
-    if (tags) {
-      cmdArgs.push("--tags");
-    }
-    if (context.dryRun) {
-      cmdArgs.push("--dry-run");
-    }
-    yield exec.exec("git", cmdArgs);
-    return true;
-  });
-}
-function gitTag(tagName, message) {
-  return __async(this, null, function* () {
-    const cmdOutput = yield exec.getExecOutput("git", ["tag", "-l", tagName]);
-    if (cmdOutput.stdout.trim().length > 0) {
+async function gitCommit(message, amend) {
+  if (!amend) {
+    const cmdOutput = await exec.getExecOutput("git", ["diff", "--name-only", "--cached"]);
+    if (cmdOutput.stdout.trim().length == 0) {
       return false;
     }
-    const cmdArgs = ["tag", tagName];
-    if (message != null) {
-      cmdArgs.push("-a", "-m", message);
+  }
+  const cmdArgs = ["commit", "-s", "-m", message.includes("[ci skip]") ? message : `${message} [ci skip]`];
+  if (amend) {
+    cmdArgs.push("--amend");
+  }
+  await exec.exec("git", cmdArgs);
+  return true;
+}
+async function gitConfig(context) {
+  await exec.exec("git", ["config", "--global", "user.name", context.env.GIT_COMMITTER_NAME]);
+  await exec.exec("git", ["config", "--global", "user.email", context.env.GIT_COMMITTER_EMAIL]);
+  if (context.env.GIT_CREDENTIALS != null) {
+    await exec.exec("git", ["config", "--global", "credential.helper", "store"]);
+    const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
+    const gitUrl = new url.URL(cmdOutput.stdout);
+    fs.appendFileSync(
+      path.join(os.homedir(), ".git-credentials"),
+      `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`
+    );
+  }
+  await exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);
+}
+async function gitPush(context, branch, tags) {
+  if (!tags) {
+    const cmdOutput = await exec.getExecOutput("git", ["cherry"]);
+    if (cmdOutput.stdout.trim().length == 0) {
+      return false;
     }
-    yield exec.exec("git", cmdArgs);
-    return true;
-  });
+  }
+  const cmdArgs = ["push", "-u", "origin", branch];
+  if (tags) {
+    cmdArgs.push("--tags");
+  }
+  if (context.dryRun) {
+    cmdArgs.push("--dry-run");
+  }
+  await exec.exec("git", cmdArgs);
+  return true;
+}
+async function gitTag(tagName, message) {
+  const cmdOutput = await exec.getExecOutput("git", ["tag", "-l", tagName]);
+  if (cmdOutput.stdout.trim().length > 0) {
+    return false;
+  }
+  const cmdArgs = ["tag", tagName];
+  if (message != null) {
+    cmdArgs.push("-a", "-m", message);
+  }
+  await exec.exec("git", cmdArgs);
+  return true;
 }
 
 // src/init.ts
-function init_default(context, _config) {
-  return __async(this, null, function* () {
-    if (context.env.GIT_COMMITTER_NAME == null) {
-      throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
-    }
-    if (context.env.GIT_COMMITTER_EMAIL == null) {
-      throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
-    }
-    yield gitConfig(context);
-  });
+async function init_default(context, _config) {
+  if (context.env.GIT_COMMITTER_NAME == null) {
+    throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
+  }
+  if (context.env.GIT_COMMITTER_EMAIL == null) {
+    throw new Error("Required environment variable GIT_COMMITTER_EMAIL is undefined");
+  }
+  await gitConfig(context);
 }
 
 // src/version.ts
-function version_default(context, config) {
-  return __async(this, null, function* () {
-    const commitMessage = config.commitMessage || "Bump version to {{version}}";
-    let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
-    yield gitAdd(...new Set(context.changedFiles));
-    let shouldPush = false;
-    if (yield gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
-      shouldPush = true;
-    } else {
-      context.logger.warn("Nothing to commit");
-    }
-    tagMessage = tagMessage == null ? void 0 : tagMessage.replace("{{version}}", context.version.new);
-    if (yield gitTag(context.tagPrefix + context.version.new, tagMessage)) {
-      shouldPush = true;
-    } else {
-      context.logger.warn("Git tag already exists");
-    }
-    if (!shouldPush || !(yield gitPush(context, context.branch.name, true))) {
-      context.logger.warn("Nothing to push");
-    }
-  });
+async function version_default(context, config) {
+  const commitMessage = config.commitMessage || "Bump version to {{version}}";
+  let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
+  await gitAdd(...new Set(context.changedFiles));
+  let shouldPush = false;
+  if (await gitCommit(commitMessage.replace("{{version}}", context.version.new))) {
+    shouldPush = true;
+  } else {
+    context.logger.warn("Nothing to commit");
+  }
+  tagMessage = tagMessage?.replace("{{version}}", context.version.new);
+  if (await gitTag(context.tagPrefix + context.version.new, tagMessage)) {
+    shouldPush = true;
+  } else {
+    context.logger.warn("Git tag already exists");
+  }
+  if (!shouldPush || !await gitPush(context, context.branch.name, true)) {
+    context.logger.warn("Nothing to push");
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
