@@ -1,0 +1,44 @@
+{
+  "name": "@octorelease/exec",
+  "version": "0.1.0",
+  "description": "Octorelease plugin to execute shell commands.",
+  "main": "lib/index.js",
+  "files": [
+    "lib/*",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -b && npm run lint",
+    "lint": "eslint src",
+    "pack": "node ../../esbuild.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
+    "watch": "tsc -w"
+  },
+  "homepage": "https://github.com/zowe-actions/octorelease/tree/master/packages/exec#readme",
+  "bugs": {
+    "url": "https://github.com/zowe-actions/octorelease/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zowe-actions/octorelease.git"
+  },
+  "keywords": [
+    "octorelease",
+    "exec",
+    "plugin",
+    "publish",
+    "version"
+  ],
+  "author": "t1m0thyj",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@actions/exec": "^1.1.0"
+  },
+  "peerDependencies": {
+    "@octorelease/core": "^1.0.0"
+  }
+}

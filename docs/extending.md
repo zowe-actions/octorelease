@@ -22,6 +22,8 @@
   - `version`: Bump the package version with npm CLI
   - `publish`: Publish the new package version to NPM registry
   - `success`: Verify that new package version can be installed successfully
+- [@octorelease/exec](https://github.com/octorelease/octorelease/tree/master/packages/exec)
+  - For All Stages: Execute a shell command during this stage
 - [@octorelease/lerna](https://github.com/octorelease/octorelease/tree/master/packages/lerna)
   - `init`: Load version numbers from lerna.json and login to NPM registry
   - `version`: Bump changed package versions with lerna CLI
