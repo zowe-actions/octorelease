@@ -1082,37 +1082,49 @@ module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
 var exec = __toESM(require_exec());
+var import_core = require("./core");
 async function init_default(context, config) {
   if (config.initCmd != null) {
-    const exitCode = await exec.exec(config.initCmd);
-    context.logger.debug(`Process finished with exit code ${exitCode}`);
+    await import_core.utils.dryRunTask(context, config.initCmd, async () => {
+      const exitCode = await exec.exec(config.initCmd);
+      context.logger.debug(`Process finished with exit code ${exitCode}`);
+    });
   }
 }
 
 // src/publish.ts
 var exec3 = __toESM(require_exec());
+var import_core2 = require("./core");
 async function publish_default(context, config) {
   if (config.publishCmd != null) {
-    const exitCode = await exec3.exec(config.publishCmd);
-    context.logger.debug(`Process finished with exit code ${exitCode}`);
+    await import_core2.utils.dryRunTask(context, config.publishCmd, async () => {
+      const exitCode = await exec3.exec(config.publishCmd);
+      context.logger.debug(`Process finished with exit code ${exitCode}`);
+    });
   }
 }
 
 // src/success.ts
 var exec5 = __toESM(require_exec());
+var import_core3 = require("./core");
 async function success_default(context, config) {
   if (config.successCmd != null) {
-    const exitCode = await exec5.exec(config.successCmd);
-    context.logger.debug(`Process finished with exit code ${exitCode}`);
+    await import_core3.utils.dryRunTask(context, config.successCmd, async () => {
+      const exitCode = await exec5.exec(config.successCmd);
+      context.logger.debug(`Process finished with exit code ${exitCode}`);
+    });
   }
 }
 
 // src/version.ts
 var exec7 = __toESM(require_exec());
+var import_core4 = require("./core");
 async function version_default(context, config) {
   if (config.versionCmd != null) {
-    const exitCode = await exec7.exec(config.versionCmd);
-    context.logger.debug(`Process finished with exit code ${exitCode}`);
+    await import_core4.utils.dryRunTask(context, config.versionCmd, async () => {
+      const exitCode = await exec7.exec(config.versionCmd);
+      context.logger.debug(`Process finished with exit code ${exitCode}`);
+    });
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

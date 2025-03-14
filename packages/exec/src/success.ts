@@ -15,12 +15,14 @@
  */
 
 import * as exec from "@actions/exec";
-import { IContext } from "@octorelease/core";
+import { IContext, utils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (config.successCmd != null) {
-        const exitCode = await exec.exec(config.successCmd);
-        context.logger.debug(`Process finished with exit code ${exitCode}`);
+        await utils.dryRunTask(context, config.successCmd, async () => {
+            const exitCode = await exec.exec(config.successCmd as string);
+            context.logger.debug(`Process finished with exit code ${exitCode}`);
+        });
     }
 }
