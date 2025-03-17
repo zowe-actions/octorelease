@@ -1,5 +1,9 @@
 # Changelog
 
+## Recent Changes
+
+* Added `extraDirs` option to support multiple changelog files outside of monorepos
+
 ## `1.0.0`
 
 * First stable release

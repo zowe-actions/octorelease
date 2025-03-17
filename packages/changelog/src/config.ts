@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2024 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,5 +17,6 @@
 export interface IPluginConfig {
     changelogFile?: string;
     displayNames?: Record<string, string>;
+    extraDirs?: string[];
     headerLine?: string;
 }
