@@ -36,6 +36,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | ------- | ----------- | ------- |
 | `changelogFile` | Path to changelog file to update. | `"CHANGELOG.md"` |
 | `displayNames` | For a monorepo, define mapping of package directory names to display names that should be used in release notes (see example below). | `{}` |
+| `extraDirs` | Additional directories to scan for changelog files. | `[]` |
 | `headerLine` | Header for new release that will be replaced with version number. | `"## Recent Changes"` |
 
 ## Examples

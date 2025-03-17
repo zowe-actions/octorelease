@@ -20867,41 +20867,44 @@ var glob = __toESM(require_glob());
 async function version_default2(context, config) {
   const changelogFile = config.changelogFile || "CHANGELOG.md";
   const headerLine = config.headerLine || "## Recent Changes";
-  if (context.workspaces != null) {
-    const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
-    const releaseNotes = {};
-    for (const packageDir of await globber.glob()) {
-      const changelogPath = path.join(path.relative(context.rootDir, packageDir), changelogFile);
-      const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
-      if (packageReleaseNotes != null) {
-        releaseNotes[path.basename(packageDir)] = packageReleaseNotes;
-      }
-      if (updatePackageChangelog(context, changelogPath, headerLine)) {
-        context.changedFiles.push(changelogPath);
-      }
-    }
-    if (Object.keys(releaseNotes).length === 0) {
-      return;
-    } else if (config.displayNames == null) {
-      context.releaseNotes = Object.entries(releaseNotes).map(([k, v]) => `# ${k}
-${v}
-`).join("\n");
-    } else {
-      const orderedSections = [];
-      for (const [k, v] of Object.entries(config.displayNames)) {
-        if (k in releaseNotes) {
-          orderedSections.push(`# ${v}
-${releaseNotes[k]}
-`);
-        }
-      }
-      context.releaseNotes = orderedSections.join("\n");
-    }
-  } else {
+  const changelogDirs = config.extraDirs || [];
+  const releaseNotes = {};
+  if (context.workspaces == null) {
     context.releaseNotes = getPackageChangelog(context, changelogFile, headerLine);
     if (updatePackageChangelog(context, changelogFile, headerLine)) {
       context.changedFiles.push(changelogFile);
     }
+  } else {
+    const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
+    changelogDirs.unshift(...await globber.glob());
+  }
+  for (const relPath of changelogDirs) {
+    const changelogPath = path.join(path.relative(context.rootDir, relPath), changelogFile);
+    const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
+    if (packageReleaseNotes != null) {
+      releaseNotes[path.basename(relPath)] = packageReleaseNotes;
+    }
+    if (updatePackageChangelog(context, changelogPath, headerLine)) {
+      context.changedFiles.push(changelogPath);
+    }
+  }
+  const tempReleaseNotes = context.releaseNotes ? context.releaseNotes + "\n\n" : "";
+  if (Object.keys(releaseNotes).length === 0) {
+    return;
+  } else if (config.displayNames == null) {
+    context.releaseNotes = tempReleaseNotes + Object.entries(releaseNotes).map(([k, v]) => `# ${k}
+${v}
+`).join("\n");
+  } else {
+    const orderedSections = [];
+    for (const [k, v] of Object.entries(config.displayNames)) {
+      if (k in releaseNotes) {
+        orderedSections.push(`# ${v}
+${releaseNotes[k]}
+`);
+      }
+    }
+    context.releaseNotes = tempReleaseNotes + orderedSections.join("\n");
   }
 }
 function getPackageChangelog(context, changelogFile, headerLine) {

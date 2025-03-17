@@ -17,5 +17,6 @@
 export interface IPluginConfig {
     changelogFile?: string;
     displayNames?: Record<string, string>;
+    extraDirs?: string[];
     headerLine?: string;
 }

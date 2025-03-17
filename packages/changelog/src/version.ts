@@ -23,41 +23,46 @@ import { IPluginConfig } from "./config";
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
+    const changelogDirs = config.extraDirs || [];
+    const releaseNotes: Record<string, string> = {};
 
-    if (context.workspaces != null) {
-        const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
-        const releaseNotes: Record<string, string> = {};
-
-        for (const packageDir of await globber.glob()) {
-            const changelogPath = path.join(path.relative(context.rootDir, packageDir), changelogFile);
-            const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
-            if (packageReleaseNotes != null) {
-                releaseNotes[path.basename(packageDir)] = packageReleaseNotes;
-            }
-            if (updatePackageChangelog(context, changelogPath, headerLine)) {
-                context.changedFiles.push(changelogPath);
-            }
-        }
-
-        if (Object.keys(releaseNotes).length === 0) {
-            return;
-        } else if (config.displayNames == null) {
-            context.releaseNotes = Object.entries(releaseNotes).map(([k, v]) => `# ${k}\n${v}\n`).join("\n");
-        } else {
-            const orderedSections: string[] = [];
-            for (const [k, v] of Object.entries(config.displayNames)) {
-                if (k in releaseNotes) {
-                    orderedSections.push(`# ${v}\n${releaseNotes[k]}\n`);
-                }
-            }
-            context.releaseNotes = orderedSections.join("\n");
-        }
-    } else {
+    if (context.workspaces == null) {
         context.releaseNotes = getPackageChangelog(context, changelogFile, headerLine);
 
         if (updatePackageChangelog(context, changelogFile, headerLine)) {
             context.changedFiles.push(changelogFile);
         }
+    } else {
+        const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
+        changelogDirs.unshift(...await globber.glob());
+    }
+
+    for (const relPath of changelogDirs) {
+        const changelogPath = path.join(path.relative(context.rootDir, relPath), changelogFile);
+        const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
+
+        if (packageReleaseNotes != null) {
+            releaseNotes[path.basename(relPath)] = packageReleaseNotes;
+        }
+        if (updatePackageChangelog(context, changelogPath, headerLine)) {
+            context.changedFiles.push(changelogPath);
+        }
+    }
+
+    const tempReleaseNotes = context.releaseNotes ? context.releaseNotes + "\n\n" : "";
+    if (Object.keys(releaseNotes).length === 0) {
+        return;
+    } else if (config.displayNames == null) {
+        context.releaseNotes = tempReleaseNotes +
+            Object.entries(releaseNotes).map(([k, v]) => `# ${k}\n${v}\n`).join("\n");
+    } else {
+        const orderedSections: string[] = [];
+        for (const [k, v] of Object.entries(config.displayNames)) {
+            if (k in releaseNotes) {
+                orderedSections.push(`# ${v}\n${releaseNotes[k]}\n`);
+            }
+        }
+        context.releaseNotes = tempReleaseNotes + orderedSections.join("\n");
     }
 }
 
