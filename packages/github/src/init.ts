@@ -68,7 +68,8 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
 
         // Comment on PR to request version approval
         const oldVersion = (context.version.new || context.version.old).split("-")[0];
-        const prereleaseSuffix = (context.version.prerelease != null) ? `-${context.version.prerelease}` : "";
+        // Check if prerelease is truthy to handle case of empty string
+        const prereleaseSuffix = context.version.prerelease ? `-${context.version.prerelease}` : "";
         const semverInc = require("semver/functions/inc");
         let commentBody = `Version info from a repo admin is required to publish a new version. ` +
             `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +

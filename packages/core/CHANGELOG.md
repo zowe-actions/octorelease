@@ -1,5 +1,9 @@
 # Changelog
 
+## Recent Changes
+
+* Added support for defining `prerelease` on branch config as an empty string, to allow prereleases without a version suffix
+
 ## `1.0.1`
 
 * Fixed wrong branch detected for GitHub Actions `pull_request` builds

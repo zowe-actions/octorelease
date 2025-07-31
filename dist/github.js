@@ -43101,7 +43101,7 @@ async function getPrReleaseType(context, config) {
       });
     }
     const oldVersion = (context.version.new || context.version.old).split("-")[0];
-    const prereleaseSuffix = context.version.prerelease != null ? `-${context.version.prerelease}` : "";
+    const prereleaseSuffix = context.version.prerelease ? `-${context.version.prerelease}` : "";
     const semverInc = require_inc();
     let commentBody = `Version info from a repo admin is required to publish a new version. Please add one of the following labels within ${timeoutInMinutes} minutes:
 * **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)

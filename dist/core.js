@@ -34937,14 +34937,14 @@ async function loadPlugins(context) {
 async function verifyConditions(context) {
   if (Inputs.newVersion != null) {
     context.version.new = Inputs.newVersion;
-  } else if (context.version.prerelease != null) {
+  } else if (context.version.prerelease) {
     context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
   }
   const semver = require_semver2();
   const semverLevel = context.version.old !== "0.0.0" ? semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]) : null;
   for (const versionInfo of Object.values(context.version.overrides)) {
     versionInfo.new = semverLevel != null ? semver.inc(versionInfo.old.split("-")[0], semverLevel) : versionInfo.old.split("-")[0];
-    if (versionInfo.prerelease != null) {
+    if (versionInfo.prerelease) {
       versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
     }
   }
@@ -34959,7 +34959,7 @@ async function buildVersionInfo(branch, tagPrefix) {
     { ignoreReturnCode: true }
   );
   const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
-  let prerelease = void 0;
+  let prerelease = branch.prerelease === "" ? "" : void 0;
   if (branch.prerelease) {
     const prereleaseName = typeof branch.prerelease === "string" ? branch.prerelease : branch.channel;
     const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
