@@ -43277,7 +43277,9 @@ async function success_default(context, config) {
       packageList.push(`**${pkgType}**: ${pkgName}`);
     }
   }
-  const releaseMessage = packageList.some((line) => line.includes("\u274C")) ? `Release succeeded for the \`${context.branch.name}\` branch with some errors. :warning:` : `Release succeeded for the \`${context.branch.name}\` branch. :tada:`;
+  const hasErrors = packageList.some((line) => line.includes("\u274C"));
+  const releaseMessage = hasErrors ? `Release succeeded for the \`${context.branch.name}\` branch with some errors. :warning:` : `Release succeeded for the \`${context.branch.name}\` branch. :tada:`;
+  const workflowRunUrl = `${config.githubUrl || "https://github.com"}/${context.ci.slug}/actions/runs/` + context.ci.build;
   await import_core3.utils.dryRunTask(context, "create success comment on pull request", async () => {
     await octokit.rest.issues.createComment({
       ...context.ci.repo,
@@ -43287,7 +43289,9 @@ async function success_default(context, config) {
 The following packages have been published:
 ` + packageList.map((line) => `* ${line}`).join("\n") + `
 
-<sub>Powered by Octorelease :rocket:</sub>`
+` + (hasErrors ? `Check the [workflow run](${workflowRunUrl}) for more error details.
+
+` : "") + `<sub>Powered by Octorelease :rocket:</sub>`
     });
   });
 }
