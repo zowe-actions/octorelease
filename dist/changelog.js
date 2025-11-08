@@ -20927,8 +20927,10 @@ function getPackageChangelog(context, changelogFile, headerLine) {
 function updatePackageChangelog(context, changelogFile, headerLine) {
   if (fs.existsSync(changelogFile)) {
     const oldContents = fs.readFileSync(changelogFile, "utf-8");
-    const newVersion = context.version.overrides[path.dirname(changelogFile)]?.new || context.version.new;
-    if (oldContents.includes(`## \`${newVersion}\``) || context.version.old === newVersion) {
+    const versionOverride = context.version.overrides[path.dirname(changelogFile)];
+    const oldVersion = versionOverride?.old || context.version.old;
+    const newVersion = versionOverride?.new || context.version.new;
+    if (oldContents.includes(`## \`${newVersion}\``) || oldVersion === newVersion) {
       return false;
     }
     const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
