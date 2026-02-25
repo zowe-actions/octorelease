@@ -1,22 +1,26 @@
 name: Rebuild dist
 
 on:
-  pull_request_target:
-    branches: [master]
-  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   rebuild:
-    if: github.event_name == 'workflow_dispatch' || github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.head_ref || github.ref }}
+        ref: ${{ github.event.pull_request.head.sha }}
 
     - name: Use Node.js LTS
       uses: actions/setup-node@v4
@@ -36,7 +40,7 @@ jobs:
           git config user.email "actions@github.com"
           git add -A
           git commit -m "chore: rebuild dist"
-          git push
+          git push origin HEAD:${{ github.head_ref }}
         else
           echo "No changes to commit"
         fi
