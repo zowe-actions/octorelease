@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { RequestError } from "@octokit/request-error";
 import delay from "delay";
 import { IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
@@ -96,7 +95,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
             try {
                 approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
             } catch (error) {
-                if (!(error instanceof RequestError && error.status === 304)) {
+                if (!(error instanceof Error && "status" in error && error.status === 304)) {
                     throw error;
                 }
             }

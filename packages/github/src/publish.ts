@@ -17,7 +17,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
-import { RequestError } from "@octokit/request-error";
 import { IContext, utils as coreUtils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
@@ -57,7 +56,7 @@ async function createRelease(context: IContext, octokit: utils.Octokit): Promise
             tag: tagName
         });
     } catch (error) {
-        if (!(error instanceof RequestError && error.status === 404)) {
+        if (!(error instanceof Error && "status" in error && error.status === 404)) {
             throw error;
         }
     }
