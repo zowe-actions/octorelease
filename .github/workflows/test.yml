@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [master]
 
-permissions:
-  contents: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,8 +17,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
     - name: Use Node.js LTS
       uses: actions/setup-node@v4
@@ -33,21 +28,9 @@ jobs:
 
     - name: Build and Test
       run: npm run all
-    
-    - name: Commit and Push Changes
-      if: github.actor == 'dependabot[bot]'
-      run: |
-        if [ -n "$(git status --porcelain)" ]; then
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add -A
-          git commit -sm "chore: rebuild dist"
-          git push origin HEAD:${{ github.head_ref }}
-        else
-          echo "No changes to commit"
-        fi
 
     - name: Fail if Build Outdated
+      if: github.actor != 'dependabot[bot]'
       run: test -z "$(git status --porcelain)"
 
   test:
