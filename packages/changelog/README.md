@@ -34,6 +34,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 | Options | Description | Default |
 | ------- | ----------- | ------- |
+| `autoDisplayNames` | For a monorepo, automatically load display names from the top level header in `README.md` for each package. | `true` |
 | `changelogFile` | Path to changelog file to update. | `"CHANGELOG.md"` |
 | `displayNames` | For a monorepo, define mapping of package directory names to display names that should be used in release notes (see example below). | `{}` |
 | `extraDirs` | Additional directories to scan for changelog files. | `[]` |
@@ -50,6 +51,21 @@ To define display names for "packages/api" and "packages/cli" folder in release 
       "displayNames": {
         "cli": "Sample CLI",
         "api": "Sample API"
+      }
+    }]
+  ]
+}
+```
+
+To parse display names from readmes but omit the API package in release notes:
+
+```json
+{
+  "plugins": [
+    ["@octorelease/changelog", {
+      "autoDisplayNames": true,
+      "displayNames": {
+        "api": false
       }
     }]
   ]

@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `1.5.1`
 
 * Added support for defining `prerelease` on branch config as an empty string, to allow prereleases without a version suffix
 
