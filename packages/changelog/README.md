@@ -36,7 +36,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | ------- | ----------- | ------- |
 | `autoDisplayNames` | For a monorepo, automatically load display names from the top level header in `README.md` for each package. | `true` |
 | `changelogFile` | Path to changelog file to update. | `"CHANGELOG.md"` |
-| `displayNames` | For a monorepo, define mapping of package directory names to display names that should be used in release notes (see example below). | `{}` |
+| `displayNames` | For a monorepo, map package directory names to custom display names that are used in release notes. Use `false` to exclude a package from release notes (see examples below). | `{}` |
 | `extraDirs` | Additional directories to scan for changelog files. | `[]` |
 | `headerLine` | Header for new release that will be replaced with version number. | `"## Recent Changes"` |
 
