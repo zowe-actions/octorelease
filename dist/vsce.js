@@ -1100,7 +1100,7 @@ async function npxCmd() {
   if (usePnpm == null) {
     try {
       usePnpm = await exec.exec("pnpm", ["--version"], { silent: true }) === 0 ? true : false;
-    } catch (error) {
+    } catch {
       usePnpm = false;
     }
   }
