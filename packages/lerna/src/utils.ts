@@ -22,11 +22,11 @@ async function npxCmd(): Promise<string> {
     if (usePnpm == null) {
         try {
             usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
-        } catch (error) {
+        } catch {
             usePnpm = false;
         }
     }
-    return usePnpm ? "pnpm exec" : "npx";
+    return usePnpm ? "pnpm dlx" : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {

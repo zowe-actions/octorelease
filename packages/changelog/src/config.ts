@@ -15,8 +15,9 @@
  */
 
 export interface IPluginConfig {
+    autoDisplayNames?: boolean;
     changelogFile?: string;
-    displayNames?: Record<string, string>;
+    displayNames?: Record<string, string | false>;
     extraDirs?: string[];
     headerLine?: string;
 }
