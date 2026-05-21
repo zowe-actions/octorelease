@@ -1104,7 +1104,7 @@ async function npxCmd() {
       usePnpm = false;
     }
   }
-  return usePnpm ? "pnpm dlx" : "npx";
+  return usePnpm ? "pnpm exec" : "npx";
 }
 async function ovsxInfo(extensionName) {
   try {
