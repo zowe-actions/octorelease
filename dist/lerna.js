@@ -22145,7 +22145,7 @@ async function npxCmd() {
       usePnpm = false;
     }
   }
-  return usePnpm ? "pnpm dlx" : "npx";
+  return usePnpm ? "pnpm exec" : "npx";
 }
 async function getLernaMajorVersion() {
   const cmdOutput = await exec.getExecOutput(await npxCmd(), ["lerna", "--version"]);

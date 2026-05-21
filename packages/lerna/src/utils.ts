@@ -26,7 +26,7 @@ async function npxCmd(): Promise<string> {
             usePnpm = false;
         }
     }
-    return usePnpm ? "pnpm dlx" : "npx";
+    return usePnpm ? "pnpm exec" : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {
