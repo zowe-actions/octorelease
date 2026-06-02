@@ -15,23 +15,26 @@
  */
 
 import * as fs from "fs";
+import * as path from "path";
 import * as exec from "@actions/exec";
 
 let usePnpm: boolean;
-async function npxCmd(): Promise<string> {
+let pnpmBinDir: string;
+async function npxCmd(binName: "lerna"): Promise<string> {
     if (usePnpm == null) {
         try {
-            usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
+            pnpmBinDir = (await exec.getExecOutput("pnpm", ["bin"])).stdout.trim();
+            usePnpm = true;
         } catch {
             usePnpm = false;
         }
     }
-    return usePnpm ? "pnpm dlx" : "npx";
+    return pnpmBinDir ? `pnpm ${fs.existsSync(path.join(pnpmBinDir, binName)) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {
     // If using lerna lite, the version is "unknown" so this function will return NaN
-    const cmdOutput = await exec.getExecOutput(await npxCmd(), ["lerna", "--version"]);
+    const cmdOutput = await exec.getExecOutput(await npxCmd("lerna"), ["lerna", "--version"]);
     return parseInt(cmdOutput.stdout.split(".", 1)[0]);
 }
 
@@ -48,7 +51,7 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
 }
 
 export async function lernaVersion(newVersion: string): Promise<void> {
-    await exec.exec(await npxCmd(), ["lerna", "version", newVersion,
+    await exec.exec(await npxCmd("lerna"), ["lerna", "version", newVersion,
         "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
 }
 

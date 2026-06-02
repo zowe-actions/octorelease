@@ -1096,19 +1096,21 @@ var path = __toESM(require("path"));
 var exec = __toESM(require_exec());
 var import_core = require("./core");
 var usePnpm;
-async function npxCmd() {
+var pnpmBinDir;
+async function npxCmd(binName) {
   if (usePnpm == null) {
     try {
-      usePnpm = await exec.exec("pnpm", ["--version"], { silent: true }) === 0 ? true : false;
+      pnpmBinDir = (await exec.getExecOutput("pnpm", ["bin"])).stdout.trim();
+      usePnpm = true;
     } catch {
       usePnpm = false;
     }
   }
-  return usePnpm ? "pnpm dlx" : "npx";
+  return pnpmBinDir ? `pnpm ${fs.existsSync(path.join(pnpmBinDir, binName)) ? "exec" : "dlx"}` : "npx";
 }
 async function ovsxInfo(extensionName) {
   try {
-    const cmdOutput = await exec.getExecOutput(await npxCmd(), ["ovsx", "get", extensionName, "--metadata"]);
+    const cmdOutput = await exec.getExecOutput(await npxCmd("ovsx"), ["ovsx", "get", extensionName, "--metadata"]);
     return JSON.parse(cmdOutput.stdout);
   } catch {
   }
@@ -1123,20 +1125,20 @@ async function ovsxPublish(context, vsixPath) {
   if (context.version.prerelease != null) {
     cmdArgs.push("--pre-release");
   }
-  await import_core.utils.dryRunTask(context, `${await npxCmd()} ${cmdArgs.join(" ")}`, async () => {
-    await exec.exec(await npxCmd(), cmdArgs);
+  await import_core.utils.dryRunTask(context, `${await npxCmd("ovsx")} ${cmdArgs.join(" ")}`, async () => {
+    await exec.exec(await npxCmd("ovsx"), cmdArgs);
   });
 }
 async function vsceInfo(extensionName) {
   try {
-    const cmdOutput = await exec.getExecOutput(await npxCmd(), ["vsce", "show", extensionName, "--json"]);
+    const cmdOutput = await exec.getExecOutput(await npxCmd("vsce"), ["vsce", "show", extensionName, "--json"]);
     return JSON.parse(cmdOutput.stdout);
   } catch {
   }
 }
 async function vscePackage(context) {
   const cmdArgs = ["vsce", "package"];
-  const npx_cmd = await npxCmd();
+  const npx_cmd = await npxCmd("vsce");
   if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
     cmdArgs.push("--yarn");
   }
@@ -1159,12 +1161,12 @@ async function vscePublish(context, vsixPath) {
   if (context.version.prerelease != null) {
     cmdArgs.push("--pre-release");
   }
-  await import_core.utils.dryRunTask(context, `${await npxCmd()} ${cmdArgs.join(" ")}`, async () => {
-    await exec.exec(await npxCmd(), cmdArgs);
+  await import_core.utils.dryRunTask(context, `${await npxCmd("vsce")} ${cmdArgs.join(" ")}`, async () => {
+    await exec.exec(await npxCmd("vsce"), cmdArgs);
   });
 }
 async function verifyToken(tool, publisher) {
-  await exec.exec(await npxCmd(), [tool, "verify-pat", publisher]);
+  await exec.exec(await npxCmd(tool), [tool, "verify-pat", publisher]);
 }
 
 // src/init.ts
