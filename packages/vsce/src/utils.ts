@@ -24,12 +24,14 @@ let pnpmBinDir: string;
 async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {
     if (usePnpm == null) {
         try {
-            pnpmBinDir = (await exec.getExecOutput("pnpm", ["bin"])).stdout.trim();
-            usePnpm = true;
+            const result = (await exec.getExecOutput("pnpm", ["bin"], { silent: true }));
+            usePnpm = result.exitCode === 0;
+            pnpmBinDir = result.stdout.trim();
         } catch {
             usePnpm = false;
         }
     }
+    // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
     return pnpmBinDir ? `pnpm ${fs.existsSync(path.join(pnpmBinDir, binName)) ? "exec" : "dlx"}` : "npx";
 }
 
@@ -50,8 +52,9 @@ export async function ovsxPublish(context: IContext, vsixPath?: string): Promise
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    await utils.dryRunTask(context, `${await npxCmd("ovsx")} ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec(await npxCmd("ovsx"), cmdArgs);
+    const npx = await npxCmd("ovsx");
+    await utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec(npx, cmdArgs);
     });
 }
 
@@ -64,7 +67,6 @@ export async function vsceInfo(extensionName: string): Promise<Record<string, an
 
 export async function vscePackage(context: IContext): Promise<string> {
     const cmdArgs = ["vsce", "package"];
-    const npx_cmd = await npxCmd("vsce");
     if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
@@ -82,7 +84,7 @@ export async function vscePackage(context: IContext): Promise<string> {
          */
         cmdArgs.push("--no-dependencies");
     }
-    const cmdOutput = await exec.getExecOutput(npx_cmd, cmdArgs);
+    const cmdOutput = await exec.getExecOutput(await npxCmd("vsce"), cmdArgs);
     return cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)?.[1] as string;
 }
 
@@ -96,8 +98,9 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    await utils.dryRunTask(context, `${await npxCmd("vsce")} ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec(await npxCmd("vsce"), cmdArgs);
+    const npx = await npxCmd("vsce");
+    await utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec(npx, cmdArgs);
     });
 }
 

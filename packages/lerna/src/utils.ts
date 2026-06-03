@@ -23,12 +23,14 @@ let pnpmBinDir: string;
 async function npxCmd(binName: "lerna"): Promise<string> {
     if (usePnpm == null) {
         try {
-            pnpmBinDir = (await exec.getExecOutput("pnpm", ["bin"])).stdout.trim();
-            usePnpm = true;
+            const result = (await exec.getExecOutput("pnpm", ["bin"], { silent: true }));
+            usePnpm = result.exitCode === 0;
+            pnpmBinDir = result.stdout.trim();
         } catch {
             usePnpm = false;
         }
     }
+    // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
     return pnpmBinDir ? `pnpm ${fs.existsSync(path.join(pnpmBinDir, binName)) ? "exec" : "dlx"}` : "npx";
 }
 

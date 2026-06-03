@@ -22142,8 +22142,9 @@ var pnpmBinDir;
 async function npxCmd(binName) {
   if (usePnpm == null) {
     try {
-      pnpmBinDir = (await exec.getExecOutput("pnpm", ["bin"])).stdout.trim();
-      usePnpm = true;
+      const result = await exec.getExecOutput("pnpm", ["bin"], { silent: true });
+      usePnpm = result.exitCode === 0;
+      pnpmBinDir = result.stdout.trim();
     } catch {
       usePnpm = false;
     }

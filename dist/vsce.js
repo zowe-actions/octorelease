@@ -1100,8 +1100,9 @@ var pnpmBinDir;
 async function npxCmd(binName) {
   if (usePnpm == null) {
     try {
-      pnpmBinDir = (await exec.getExecOutput("pnpm", ["bin"])).stdout.trim();
-      usePnpm = true;
+      const result = await exec.getExecOutput("pnpm", ["bin"], { silent: true });
+      usePnpm = result.exitCode === 0;
+      pnpmBinDir = result.stdout.trim();
     } catch {
       usePnpm = false;
     }
@@ -1125,8 +1126,9 @@ async function ovsxPublish(context, vsixPath) {
   if (context.version.prerelease != null) {
     cmdArgs.push("--pre-release");
   }
-  await import_core.utils.dryRunTask(context, `${await npxCmd("ovsx")} ${cmdArgs.join(" ")}`, async () => {
-    await exec.exec(await npxCmd("ovsx"), cmdArgs);
+  const npx = await npxCmd("ovsx");
+  await import_core.utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+    await exec.exec(npx, cmdArgs);
   });
 }
 async function vsceInfo(extensionName) {
@@ -1138,7 +1140,6 @@ async function vsceInfo(extensionName) {
 }
 async function vscePackage(context) {
   const cmdArgs = ["vsce", "package"];
-  const npx_cmd = await npxCmd("vsce");
   if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
     cmdArgs.push("--yarn");
   }
@@ -1148,7 +1149,7 @@ async function vscePackage(context) {
   if (usePnpm) {
     cmdArgs.push("--no-dependencies");
   }
-  const cmdOutput = await exec.getExecOutput(npx_cmd, cmdArgs);
+  const cmdOutput = await exec.getExecOutput(await npxCmd("vsce"), cmdArgs);
   return cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)?.[1];
 }
 async function vscePublish(context, vsixPath) {
@@ -1161,8 +1162,9 @@ async function vscePublish(context, vsixPath) {
   if (context.version.prerelease != null) {
     cmdArgs.push("--pre-release");
   }
-  await import_core.utils.dryRunTask(context, `${await npxCmd("vsce")} ${cmdArgs.join(" ")}`, async () => {
-    await exec.exec(await npxCmd("vsce"), cmdArgs);
+  const npx = await npxCmd("vsce");
+  await import_core.utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+    await exec.exec(npx, cmdArgs);
   });
 }
 async function verifyToken(tool, publisher) {
