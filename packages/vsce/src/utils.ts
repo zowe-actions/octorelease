@@ -20,20 +20,24 @@ import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
 let usePnpm: boolean;
-async function npxCmd(): Promise<string> {
+let pnpmBinDir: string;
+async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {
     if (usePnpm == null) {
         try {
-            usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
+            const result = (await exec.getExecOutput("pnpm", ["bin"], { silent: true }));
+            usePnpm = result.exitCode === 0;
+            pnpmBinDir = result.stdout.trim();
         } catch {
             usePnpm = false;
         }
     }
-    return usePnpm ? "pnpm dlx" : "npx";
+    // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
+    return pnpmBinDir ? `pnpm ${fs.existsSync(path.join(pnpmBinDir, binName)) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
     try {
-        const cmdOutput = await exec.getExecOutput(await npxCmd(), ["ovsx", "get", extensionName, "--metadata"]);
+        const cmdOutput = await exec.getExecOutput(await npxCmd("ovsx"), ["ovsx", "get", extensionName, "--metadata"]);
         return JSON.parse(cmdOutput.stdout);
     } catch { /* Do nothing */ }
 }
@@ -48,21 +52,21 @@ export async function ovsxPublish(context: IContext, vsixPath?: string): Promise
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    await utils.dryRunTask(context, `${await npxCmd()} ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec(await npxCmd(), cmdArgs);
+    const npx = await npxCmd("ovsx");
+    await utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec(npx, cmdArgs);
     });
 }
 
 export async function vsceInfo(extensionName: string): Promise<Record<string, any> | undefined> {
     try {
-        const cmdOutput = await exec.getExecOutput(await npxCmd(), ["vsce", "show", extensionName, "--json"]);
+        const cmdOutput = await exec.getExecOutput(await npxCmd("vsce"), ["vsce", "show", extensionName, "--json"]);
         return JSON.parse(cmdOutput.stdout);
     } catch { /* Do nothing */ }
 }
 
 export async function vscePackage(context: IContext): Promise<string> {
     const cmdArgs = ["vsce", "package"];
-    const npx_cmd = await npxCmd();
     if (fs.existsSync(path.join(context.rootDir, "yarn.lock"))) {
         cmdArgs.push("--yarn");
     }
@@ -80,7 +84,7 @@ export async function vscePackage(context: IContext): Promise<string> {
          */
         cmdArgs.push("--no-dependencies");
     }
-    const cmdOutput = await exec.getExecOutput(npx_cmd, cmdArgs);
+    const cmdOutput = await exec.getExecOutput(await npxCmd("vsce"), cmdArgs);
     return cmdOutput.stdout.trim().match(/Packaged: (.*\.vsix)/)?.[1] as string;
 }
 
@@ -94,11 +98,12 @@ export async function vscePublish(context: IContext, vsixPath?: string): Promise
     if (context.version.prerelease != null) {
         cmdArgs.push("--pre-release");
     }
-    await utils.dryRunTask(context, `${await npxCmd()} ${cmdArgs.join(" ")}`, async () => {
-        await exec.exec(await npxCmd(), cmdArgs);
+    const npx = await npxCmd("vsce");
+    await utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+        await exec.exec(npx, cmdArgs);
     });
 }
 
 export async function verifyToken(tool: "ovsx" | "vsce", publisher: string): Promise<void> {
-    await exec.exec(await npxCmd(), [tool, "verify-pat", publisher]);
+    await exec.exec(await npxCmd(tool), [tool, "verify-pat", publisher]);
 }
