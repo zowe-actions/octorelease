@@ -16,7 +16,6 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import * as which from "which";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
@@ -30,7 +29,7 @@ async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return usePnpm ? `pnpm ${which.sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${require("which").sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {

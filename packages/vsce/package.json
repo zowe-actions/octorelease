@@ -38,10 +38,7 @@
   },
   "dependencies": {
     "@actions/exec": "^1.1.0",
-    "which": "^6.0.0"
-  },
-  "devDependencies": {
-    "@types/which": "^3.0.4"
+    "which": "^4.0.0"
   },
   "peerDependencies": {
     "@octorelease/core": "^1.0.0"

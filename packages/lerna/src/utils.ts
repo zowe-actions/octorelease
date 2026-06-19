@@ -15,7 +15,6 @@
  */
 
 import * as fs from "fs";
-import * as which from "which";
 import * as exec from "@actions/exec";
 
 let usePnpm: boolean;
@@ -28,7 +27,7 @@ async function npxCmd(binName: "lerna"): Promise<string> {
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return usePnpm ? `pnpm ${which.sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${require("which").sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {
