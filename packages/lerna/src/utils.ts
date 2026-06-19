@@ -16,6 +16,7 @@
 
 import * as fs from "fs";
 import * as exec from "@actions/exec";
+import { utils } from "@octorelease/core";
 
 let usePnpm: boolean;
 async function npxCmd(binName: "lerna"): Promise<string> {
@@ -27,7 +28,7 @@ async function npxCmd(binName: "lerna"): Promise<string> {
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return usePnpm ? `pnpm ${require("which").sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {

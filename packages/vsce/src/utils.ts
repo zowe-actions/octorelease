@@ -29,7 +29,7 @@ async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return usePnpm ? `pnpm ${require("which").sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
