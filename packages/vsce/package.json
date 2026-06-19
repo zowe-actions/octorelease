@@ -37,7 +37,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/exec": "^1.1.0"
+    "@actions/exec": "^1.1.0",
+    "which": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/which": "^3.0.4"
   },
   "peerDependencies": {
     "@octorelease/core": "^1.0.0"

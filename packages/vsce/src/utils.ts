@@ -16,23 +16,21 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import * as which from "which";
 import * as exec from "@actions/exec";
 import { IContext, utils } from "@octorelease/core";
 
 let usePnpm: boolean;
-let pnpmBinDir: string;
 async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {
     if (usePnpm == null) {
         try {
-            const result = (await exec.getExecOutput("pnpm", ["bin"], { silent: true }));
-            usePnpm = result.exitCode === 0;
-            pnpmBinDir = result.stdout.trim();
+            usePnpm = await exec.exec("pnpm", ["--version"], { silent: true }) === 0;
         } catch {
             usePnpm = false;
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return pnpmBinDir ? `pnpm ${fs.existsSync(path.join(pnpmBinDir, binName)) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${which.sync(binName, { nothrow: true }) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
