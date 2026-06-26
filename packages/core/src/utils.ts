@@ -77,6 +77,14 @@ export async function buildContext(opts?: IContextOpts):
 }
 
 /**
+ * Check if command already exists on the user's PATH
+ * @param cmd Command to be run (e.g. lerna)
+ */
+export function commandExists(cmd: string): boolean {
+    return require("which").sync(cmd, { nothrow: true }) != null;
+}
+
+/**
  * In dry run mode skip the task, otherwise run it.
  * @param context Global context object for Octorelease
  * @param description Description to log when task is skipped

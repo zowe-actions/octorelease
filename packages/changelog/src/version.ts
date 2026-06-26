@@ -35,6 +35,10 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
         changelogDirs.unshift(...await globber.glob());
+
+        if (config.autoDisplayNames !== false) {
+            config.displayNames = { ...getAutoDisplayNames(changelogDirs), ...(config.displayNames || {}) };
+        }
     }
 
     for (const relPath of changelogDirs) {
@@ -58,12 +62,27 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         const orderedSections: string[] = [];
         for (const [k, v] of Object.entries(config.displayNames)) {
-            if (k in releaseNotes) {
+            if (releaseNotes[k]) {
                 orderedSections.push(`# ${v}\n${releaseNotes[k]}\n`);
             }
         }
         context.releaseNotes = tempReleaseNotes + orderedSections.join("\n");
     }
+}
+
+function getAutoDisplayNames(changelogDirs: string[]): Record<string, string> {
+    const autoDisplayNames: Record<string, string> = {};
+    for (const relPath of changelogDirs) {
+        const readmePath = path.join(relPath, "README.md");
+        if (fs.existsSync(readmePath)) {
+            const readmeContents = fs.readFileSync(readmePath, "utf-8");
+            const readmeDisplayName = readmeContents.match(/^# (.*)/);
+            if (readmeDisplayName) {
+                autoDisplayNames[path.basename(relPath)] = readmeDisplayName[1].trim();
+            }
+        }
+    }
+    return autoDisplayNames;
 }
 
 function getPackageChangelog(context: IContext, changelogFile: string, headerLine: string): string | undefined {

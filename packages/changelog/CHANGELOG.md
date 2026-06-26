@@ -1,6 +1,10 @@
 # Changelog
 
-## Recent Changes
+## `1.5.3`
+
+* Added `autoDisplayNames` option to parse display names from package readmes in a monorepo
+
+## `1.5.0`
 
 * Added `extraDirs` option to support multiple changelog files outside of monorepos
 

@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,6 +30,7 @@ jobs:
       run: npm run all
 
     - name: Fail if Build Outdated
+      if: github.actor != 'dependabot[bot]'
       run: test -z "$(git status --porcelain)"
 
   test:

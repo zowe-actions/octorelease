@@ -16,22 +16,24 @@
 
 import * as fs from "fs";
 import * as exec from "@actions/exec";
+import { utils } from "@octorelease/core";
 
 let usePnpm: boolean;
-async function npxCmd(): Promise<string> {
+async function npxCmd(binName: "lerna"): Promise<string> {
     if (usePnpm == null) {
         try {
-            usePnpm = await exec.exec("pnpm", ["--version"], {silent: true}) === 0 ? true : false;
-        } catch (error) {
+            usePnpm = await exec.exec("pnpm", ["--version"], { silent: true }) === 0;
+        } catch {
             usePnpm = false;
         }
     }
-    return usePnpm ? "pnpm exec" : "npx";
+    // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
+    return usePnpm ? `pnpm ${utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {
     // If using lerna lite, the version is "unknown" so this function will return NaN
-    const cmdOutput = await exec.getExecOutput(await npxCmd(), ["lerna", "--version"]);
+    const cmdOutput = await exec.getExecOutput(await npxCmd("lerna"), ["lerna", "--version"]);
     return parseInt(cmdOutput.stdout.split(".", 1)[0]);
 }
 
@@ -48,7 +50,7 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
 }
 
 export async function lernaVersion(newVersion: string): Promise<void> {
-    await exec.exec(await npxCmd(), ["lerna", "version", newVersion,
+    await exec.exec(await npxCmd("lerna"), ["lerna", "version", newVersion,
         "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
 }
 

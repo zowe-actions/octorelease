@@ -2,6 +2,10 @@
 
 ## Recent Changes
 
+* Added `commandExists` utility method to check if command already exists on the user's PATH
+
+## `1.5.1`
+
 * Added support for defining `prerelease` on branch config as an empty string, to allow prereleases without a version suffix
 
 ## `1.0.1`

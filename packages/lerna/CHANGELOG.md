@@ -1,5 +1,9 @@
 # Changelog
 
+## `1.5.4`
+
+* Fixed `pnpm dlx` overriding local package versions when running dev deps
+
 ## `1.0.2`
 
 * Fixed `lerna version` being run when version is already deployed

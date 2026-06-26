@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IContext } from "@octorelease/core";
+import { IContext, utils } from "@octorelease/core";
 import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
@@ -26,7 +26,7 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
         throw new Error("Required environment variable TWINE_PASSWORD is undefined");
     }
 
-    if (require("which").sync("twine", { nothrow: true }) == null) {
+    if (!utils.commandExists("twine")) {
         throw new Error("Could not find twine on PATH");
     }
 }
