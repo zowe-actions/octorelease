@@ -35,8 +35,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/github": "^7.0.0",
-    "@actions/glob": "^0.5.1",
+    "@actions/github": "^9.0.0",
+    "@actions/glob": "^0.7.0",
     "@octokit/plugin-enterprise-server": "^15.0.0",
     "delay": "^5.0.0",
     "mime-types": "^2.1.27",

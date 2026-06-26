@@ -35,7 +35,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/glob": "^0.5.1"
+    "@actions/glob": "^0.7.0"
   },
   "peerDependencies": {
     "@octorelease/core": "^1.0.0"
