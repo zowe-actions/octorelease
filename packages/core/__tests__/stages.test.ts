@@ -16,6 +16,8 @@
 
 import * as core from "@actions/core";
 import { IContext } from "../src/doc";
+
+vi.mock("@actions/core");
 import { Inputs } from "../src/inputs";
 import { Logger } from "../src/logger";
 import * as stages from "../src/stages";
@@ -34,14 +36,14 @@ function buildContext(stage: string): Partial<IContext> {
 }
 
 describe("Core stages", () => {
-    const testHandler = jest.fn(async (context: IContext, config: any) => {
+    const testHandler = vi.fn(async (context: IContext, config: any) => {
         context.logger.info(config.stage);
     });
     let oldProcessEnv: any;
 
     beforeAll(() => {
         oldProcessEnv = process.env;
-        jest.spyOn(core, "info").mockImplementation();
+        vi.mocked(core.info).mockImplementation(() => {});
         Logger.pluginPathMap = { [testPlugin]: __filename };
     });
 
@@ -60,7 +62,7 @@ describe("Core stages", () => {
     it("should not execute fail handler when fail stage is skipped", async () => {
         const context = buildContext("fail");
         const pluginsLoaded = { [testPlugin]: { fail: testHandler } };
-        jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["fail"]);
+        vi.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["fail"]);
         await stages.fail(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
@@ -76,7 +78,7 @@ describe("Core stages", () => {
     it("should still execute init handler when init stage is skipped", async () => {
         const context = buildContext("init");
         const pluginsLoaded = { [testPlugin]: { init: testHandler } };
-        jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["init"]);
+        vi.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["init"]);
         await stages.init(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(1);
     });
@@ -92,7 +94,7 @@ describe("Core stages", () => {
     it("should not execute publish handler when publish stage is skipped", async () => {
         const context = buildContext("publish");
         const pluginsLoaded = { [testPlugin]: { publish: testHandler } };
-        jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["publish"]);
+        vi.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["publish"]);
         await stages.publish(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
@@ -108,7 +110,7 @@ describe("Core stages", () => {
     it("should not execute success handler when success stage is skipped", async () => {
         const context = buildContext("success");
         const pluginsLoaded = { [testPlugin]: { success: testHandler } };
-        jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["success"]);
+        vi.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["success"]);
         await stages.success(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });
@@ -124,7 +126,7 @@ describe("Core stages", () => {
     it("should not execute version handler when version stage is skipped", async () => {
         const context = buildContext("version");
         const pluginsLoaded = { [testPlugin]: { fail: testHandler } };
-        jest.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["version"]);
+        vi.spyOn(Inputs, "skipStages", "get").mockReturnValueOnce(["version"]);
         await stages.version(context as IContext, pluginsLoaded);
         expect(testHandler).toHaveBeenCalledTimes(0);
     });

@@ -16,10 +16,12 @@
 
 import { IContext } from "@octorelease/core";
 
-const SCRIPTS: { [key: string]: any } = {
-    npmUpdate: require("../scripts/npmUpdate"),
-    prepareRelease: require("../scripts/prepareRelease"),
-    sonarConfig: require("../scripts/sonarConfig")
+type ScriptModule = { default: (context: IContext) => Promise<void> };
+
+const SCRIPTS: Record<string, () => Promise<ScriptModule>> = {
+    npmUpdate: () => import("./scripts/npmUpdate"),
+    prepareRelease: () => import("./scripts/prepareRelease"),
+    sonarConfig: () => import("./scripts/sonarConfig"),
 };
 
 // List of scripts that should only run in release branches
@@ -29,5 +31,5 @@ export function loadScript(scriptName: string): (context: IContext) => Promise<v
     if (!Object.keys(SCRIPTS).includes(scriptName)) {
         throw new Error(`Could not find script to run: ${scriptName}`);
     }
-    return SCRIPTS[scriptName].default;
+    return async (context) => (await SCRIPTS[scriptName]()).default(context);
 }

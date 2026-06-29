@@ -1,55 +1,15 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/index.ts
-var index_exports = {};
-__export(index_exports, {
-  fail: () => init_default,
-  init: () => init_default,
-  publish: () => publish_default,
-  success: () => success_default,
-  version: () => version_default
-});
-module.exports = __toCommonJS(index_exports);
-
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-var os = __toESM(require("os"), 1);
-var events = __toESM(require("events"), 1);
-var child = __toESM(require("child_process"), 1);
-var path3 = __toESM(require("path"), 1);
+import * as os from "os";
+import * as events from "events";
+import * as child from "child_process";
+import * as path3 from "path";
 
 // ../../node_modules/@actions/io/lib/io.js
-var path2 = __toESM(require("path"), 1);
+import * as path2 from "path";
 
 // ../../node_modules/@actions/io/lib/io-util.js
-var fs = __toESM(require("fs"), 1);
-var path = __toESM(require("path"), 1);
+import * as fs from "fs";
+import * as path from "path";
 var __awaiter = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve2) {
@@ -267,7 +227,7 @@ function findInPath(tool) {
 }
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-var import_timers = require("timers");
+import { setTimeout } from "timers";
 var __awaiter3 = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve2) {
@@ -676,7 +636,7 @@ var ExecState = class _ExecState extends events.EventEmitter {
     if (this.processClosed) {
       this._setResult();
     } else if (this.processExited) {
-      this.timeout = (0, import_timers.setTimeout)(_ExecState.HandleTimeout, this.delay, this);
+      this.timeout = setTimeout(_ExecState.HandleTimeout, this.delay, this);
     }
   }
   _debug(message) {
@@ -754,14 +714,14 @@ function exec(commandLine, args, options) {
 }
 
 // src/utils.ts
-var import_core = require("./core");
+import { utils } from "./core";
 async function runCmd(context, command, dryRunAllow = false) {
   const task = async () => {
     const exitCode = await exec(command);
     context.logger.debug(`Process finished with exit code ${exitCode}`);
   };
   if (!dryRunAllow) {
-    await import_core.utils.dryRunTask(context, command, task);
+    await utils.dryRunTask(context, command, task);
   } else {
     await task();
   }
@@ -794,11 +754,10 @@ async function version_default(context, config) {
     await runCmd(context, config.versionCmd, config.dryRunAllow?.includes("version"));
   }
 }
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  fail,
-  init,
-  publish,
-  success,
-  version
-});
+export {
+  init_default as fail,
+  init_default as init,
+  publish_default as publish,
+  success_default as success,
+  version_default as version
+};

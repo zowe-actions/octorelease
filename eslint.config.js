@@ -1,14 +1,14 @@
-const globals = require("globals");
-const jestPlugin = require("eslint-plugin-jest");
-const licenseHeaderPlugin = require("eslint-plugin-license-header");
-const tsEslintPlugin = require("@typescript-eslint/eslint-plugin");
-const tsParser = require("@typescript-eslint/parser");
+import globals from "globals";
+import vitestPlugin from "@vitest/eslint-plugin";
+import licenseHeaderPlugin from "eslint-plugin-license-header";
+import tsEslintPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
 
-module.exports = [
+export default [
     {
         ignores: [
             "**/*.js",
-            "**/*.mjs", 
+            "**/*.mjs",
             "**/*.d.ts",
             "**/dist/",
             "**/lib/",
@@ -23,17 +23,17 @@ module.exports = [
             sourceType: "module",
             globals: {
                 ...globals.node,
-                ...jestPlugin.environments.globals.globals,
+                ...vitestPlugin.environments.env.globals,
             }
         },
         plugins: {
             "@typescript-eslint": tsEslintPlugin,
-            "jest": jestPlugin,
+            "vitest": vitestPlugin,
             "license-header": licenseHeaderPlugin,
         },
         rules: {
             ...tsEslintPlugin.configs.recommended.rules,
-            ...jestPlugin.configs.recommended.rules,
+            ...vitestPlugin.configs.recommended.rules,
             "max-len": ["warn", 120],
             "no-console": "error",
             "no-multiple-empty-lines": "warn",

@@ -22,6 +22,7 @@ const onResolvePlugin = {
 await esbuild.build({
     bundle: true,
     entryPoints: [pkgName === "main" ? "src/main.ts" : "src/index.ts"],
+    format: "esm",
     logLevel: "info",
     outfile: `${__dirname}/dist/${pkgName === "main" ? "index" : pkgName}.js`,
     platform: "node",

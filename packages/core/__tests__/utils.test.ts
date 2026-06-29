@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import semver from "semver";
 import { IContext, SemverDiffLevels } from "../src/doc";
 import { verifyConditions } from "../src/utils";
 
@@ -42,7 +43,7 @@ describe("Utility functions", () => {
             },
             version: {
                 old: oldVersion,
-                new: require("semver").inc(oldVersion, level),
+                new: semver.inc(oldVersion, level),
                 overrides: {}
             }
         };
@@ -59,7 +60,7 @@ describe("Utility functions", () => {
             },
             version: {
                 old: oldVersion,
-                new: require("semver").inc(oldVersion, badLevel),
+                new: semver.inc(oldVersion, badLevel),
                 overrides: {}
             }
         };
