@@ -14,7 +14,7 @@ describe("CI tests", () => {
     // shows how the runner will run a javascript action with env / stdout protocol
     (process.env.CI ? it : it.skip)("test runs", () => {
         process.env["INPUT_DRY-RUN"] = "true";
-        const ip = path.join(__dirname, "..", "packages", "core", "lib", "main.js");
+        const ip = path.join(import.meta.dirname, "..", "packages", "core", "lib", "main.js");
         const options: cp.ExecSyncOptions = {
             env: process.env
         };

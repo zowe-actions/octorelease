@@ -1,41 +1,42 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    // "outDir": "./lib",
-    // "rootDir": "./src",
-    "strict": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "composite": true
-  },
-  "exclude": ["node_modules", "**/*.test.ts"],
-  "include": ["src"],
-  "references": [
-    {
-      "path": "packages/changelog"
-    },
-    {
-      "path": "packages/core"
-    },
-    {
-      "path": "packages/git"
-    },
-    {
-      "path": "packages/github"
-    },
-    {
-      "path": "packages/lerna"
-    },
-    {
-      "path": "packages/npm"
-    },
-    {
-      "path": "packages/vsce"
-    },
-    {
-      "path": "script"
-    },
-  ]
+	"compilerOptions": {
+		"target": "es2022",
+		"module": "esnext",
+		// "outDir": "./lib",
+        // "rootDir": "./src",
+		"strict": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"declaration": true,
+		"composite": true,
+		"moduleResolution": "bundler"
+	},
+	"exclude": ["node_modules", "**/*.test.ts"],
+	"include": ["src"],
+	"references": [
+		{
+			"path": "packages/changelog"
+		},
+		{
+			"path": "packages/core"
+		},
+		{
+			"path": "packages/git"
+		},
+		{
+			"path": "packages/github"
+		},
+		{
+			"path": "packages/lerna"
+		},
+		{
+			"path": "packages/npm"
+		},
+		{
+			"path": "packages/vsce"
+		},
+		{
+			"path": "script"
+		},
+	]
 }
