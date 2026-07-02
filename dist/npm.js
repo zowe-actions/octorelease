@@ -1,16 +1,11 @@
+"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined") return require.apply(this, arguments);
-  throw Error('Dynamic require of "' + x + '" is not supported');
-});
-var __commonJS = (cb, mod) => function __require2() {
+var __commonJS = (cb, mod) => function __require() {
   try {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   } catch (e) {
@@ -37,10 +32,11 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // ../../node_modules/delay/index.js
 var require_delay = __commonJS({
-  "../../node_modules/delay/index.js"(exports, module) {
+  "../../node_modules/delay/index.js"(exports2, module2) {
     "use strict";
     var randomInteger = (minimum, maximum) => Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
     var createAbortError = () => {
@@ -95,14 +91,14 @@ var require_delay = __commonJS({
     };
     var delay2 = createWithTimers();
     delay2.createWithTimers = createWithTimers;
-    module.exports = delay2;
-    module.exports.default = delay2;
+    module2.exports = delay2;
+    module2.exports.default = delay2;
   }
 });
 
 // ../../node_modules/yocto-queue/index.js
 var require_yocto_queue = __commonJS({
-  "../../node_modules/yocto-queue/index.js"(exports, module) {
+  "../../node_modules/yocto-queue/index.js"(exports2, module2) {
     var Node = class {
       /// value;
       /// next;
@@ -155,13 +151,13 @@ var require_yocto_queue = __commonJS({
         }
       }
     };
-    module.exports = Queue;
+    module2.exports = Queue;
   }
 });
 
 // ../../node_modules/p-limit/index.js
 var require_p_limit = __commonJS({
-  "../../node_modules/p-limit/index.js"(exports, module) {
+  "../../node_modules/p-limit/index.js"(exports2, module2) {
     "use strict";
     var Queue = require_yocto_queue();
     var pLimit = (concurrency) => {
@@ -213,13 +209,13 @@ var require_p_limit = __commonJS({
       });
       return generator;
     };
-    module.exports = pLimit;
+    module2.exports = pLimit;
   }
 });
 
 // ../../node_modules/p-locate/index.js
 var require_p_locate = __commonJS({
-  "../../node_modules/p-locate/index.js"(exports, module) {
+  "../../node_modules/p-locate/index.js"(exports2, module2) {
     "use strict";
     var pLimit = require_p_limit();
     var EndError = class extends Error {
@@ -254,17 +250,17 @@ var require_p_locate = __commonJS({
         throw error;
       }
     };
-    module.exports = pLocate;
+    module2.exports = pLocate;
   }
 });
 
 // ../../node_modules/locate-path/index.js
 var require_locate_path = __commonJS({
-  "../../node_modules/locate-path/index.js"(exports, module) {
+  "../../node_modules/locate-path/index.js"(exports2, module2) {
     "use strict";
-    var path8 = __require("path");
-    var fs6 = __require("fs");
-    var { promisify } = __require("util");
+    var path8 = require("path");
+    var fs6 = require("fs");
+    var { promisify } = require("util");
     var pLocate = require_p_locate();
     var fsStat = promisify(fs6.stat);
     var fsLStat = promisify(fs6.lstat);
@@ -279,7 +275,7 @@ var require_locate_path = __commonJS({
       throw new Error(`Invalid type specified: ${type}`);
     }
     var matchType = (type, stat2) => type === void 0 || stat2[typeMappings[type]]();
-    module.exports = async (paths, options) => {
+    module2.exports = async (paths, options) => {
       options = {
         cwd: process.cwd(),
         type: "file",
@@ -297,7 +293,7 @@ var require_locate_path = __commonJS({
         }
       }, options);
     };
-    module.exports.sync = (paths, options) => {
+    module2.exports.sync = (paths, options) => {
       options = {
         cwd: process.cwd(),
         allowSymlinks: true,
@@ -321,12 +317,12 @@ var require_locate_path = __commonJS({
 
 // ../../node_modules/path-exists/index.js
 var require_path_exists = __commonJS({
-  "../../node_modules/path-exists/index.js"(exports, module) {
+  "../../node_modules/path-exists/index.js"(exports2, module2) {
     "use strict";
-    var fs6 = __require("fs");
-    var { promisify } = __require("util");
+    var fs6 = require("fs");
+    var { promisify } = require("util");
     var pAccess = promisify(fs6.access);
-    module.exports = async (path8) => {
+    module2.exports = async (path8) => {
       try {
         await pAccess(path8);
         return true;
@@ -334,7 +330,7 @@ var require_path_exists = __commonJS({
         return false;
       }
     };
-    module.exports.sync = (path8) => {
+    module2.exports.sync = (path8) => {
       try {
         fs6.accessSync(path8);
         return true;
@@ -347,13 +343,13 @@ var require_path_exists = __commonJS({
 
 // ../../node_modules/find-up/index.js
 var require_find_up = __commonJS({
-  "../../node_modules/find-up/index.js"(exports, module) {
+  "../../node_modules/find-up/index.js"(exports2, module2) {
     "use strict";
-    var path8 = __require("path");
+    var path8 = require("path");
     var locatePath = require_locate_path();
     var pathExists = require_path_exists();
     var stop = /* @__PURE__ */ Symbol("findUp.stop");
-    module.exports = async (name, options = {}) => {
+    module2.exports = async (name, options = {}) => {
       let directory = path8.resolve(options.cwd || "");
       const { root } = path8.parse(directory);
       const paths = [].concat(name);
@@ -381,7 +377,7 @@ var require_find_up = __commonJS({
         directory = path8.dirname(directory);
       }
     };
-    module.exports.sync = (name, options = {}) => {
+    module2.exports.sync = (name, options = {}) => {
       let directory = path8.resolve(options.cwd || "");
       const { root } = path8.parse(directory);
       const paths = [].concat(name);
@@ -409,14 +405,26 @@ var require_find_up = __commonJS({
         directory = path8.dirname(directory);
       }
     };
-    module.exports.exists = pathExists;
-    module.exports.sync.exists = pathExists.sync;
-    module.exports.stop = stop;
+    module2.exports.exists = pathExists;
+    module2.exports.sync.exists = pathExists.sync;
+    module2.exports.stop = stop;
   }
 });
 
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  DEFAULT_NPM_REGISTRY: () => DEFAULT_NPM_REGISTRY,
+  init: () => init_default,
+  publish: () => publish_default,
+  success: () => success_default,
+  utils: () => utils_exports,
+  version: () => version_default
+});
+module.exports = __toCommonJS(index_exports);
+
 // src/init.ts
-import * as fs3 from "fs";
+var fs3 = __toESM(require("node:fs"));
 
 // src/config.ts
 var DEFAULT_NPM_REGISTRY = "https://registry.npmjs.org/";
@@ -433,25 +441,25 @@ __export(utils_exports, {
   npmView: () => npmView,
   verifyConditions: () => verifyConditions
 });
-import * as fs2 from "fs";
-import * as os2 from "os";
-import * as path4 from "path";
+var fs2 = __toESM(require("node:fs"));
+var os2 = __toESM(require("node:os"));
+var path4 = __toESM(require("node:path"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
-import { StringDecoder } from "string_decoder";
+var import_string_decoder = require("string_decoder");
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-import * as os from "os";
-import * as events from "events";
-import * as child from "child_process";
-import * as path3 from "path";
+var os = __toESM(require("os"), 1);
+var events = __toESM(require("events"), 1);
+var child = __toESM(require("child_process"), 1);
+var path3 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/io/lib/io.js
-import * as path2 from "path";
+var path2 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/io/lib/io-util.js
-import * as fs from "fs";
-import * as path from "path";
+var fs = __toESM(require("fs"), 1);
+var path = __toESM(require("path"), 1);
 var __awaiter = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve3) {
@@ -669,7 +677,7 @@ function findInPath(tool) {
 }
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-import { setTimeout as setTimeout2 } from "timers";
+var import_timers = require("timers");
 var __awaiter3 = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve3) {
@@ -1078,7 +1086,7 @@ var ExecState = class _ExecState extends events.EventEmitter {
     if (this.processClosed) {
       this._setResult();
     } else if (this.processExited) {
-      this.timeout = setTimeout2(_ExecState.HandleTimeout, this.delay, this);
+      this.timeout = (0, import_timers.setTimeout)(_ExecState.HandleTimeout, this.delay, this);
     }
   }
   _debug(message) {
@@ -1159,8 +1167,8 @@ function getExecOutput(commandLine, args, options) {
     var _a, _b;
     let stdout = "";
     let stderr = "";
-    const stdoutDecoder = new StringDecoder("utf8");
-    const stderrDecoder = new StringDecoder("utf8");
+    const stdoutDecoder = new import_string_decoder.StringDecoder("utf8");
+    const stderrDecoder = new import_string_decoder.StringDecoder("utf8");
     const originalStdoutListener = (_a = options === null || options === void 0 ? void 0 : options.listeners) === null || _a === void 0 ? void 0 : _a.stdout;
     const originalStdErrListener = (_b = options === null || options === void 0 ? void 0 : options.listeners) === null || _b === void 0 ? void 0 : _b.stderr;
     const stdErrListener = (data) => {
@@ -1188,11 +1196,11 @@ function getExecOutput(commandLine, args, options) {
 }
 
 // src/utils.ts
-import { utils } from "./core";
+var import_core = require("./core");
 async function npmAddTag(context, pkgSpec, tag, registry, inDir) {
   const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
   const cmdArgs = ["dist-tag", "add", pkgSpec, tag, `--${registryPrefix}registry=${registry}`];
-  await utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
+  await import_core.utils.dryRunTask(context, `npm ${cmdArgs.join(" ")}`, async () => {
     await exec("npm", cmdArgs, { cwd: inDir });
   });
 }
@@ -1289,8 +1297,8 @@ async function init_default(context, config) {
 }
 
 // src/publish.ts
-import * as fs4 from "fs";
-import * as path5 from "path";
+var fs4 = __toESM(require("node:fs"));
+var path5 = __toESM(require("node:path"));
 async function publish_default(context, config, inDir) {
   const cwd = inDir || process.cwd();
   const packageJson = JSON.parse(fs4.readFileSync(path5.join(cwd, "package.json"), "utf-8"));
@@ -1370,11 +1378,11 @@ function pruneShrinkwrap(context, inDir) {
 }
 
 // src/success.ts
+var fs5 = __toESM(require("node:fs"));
+var os3 = __toESM(require("node:os"));
+var path6 = __toESM(require("node:path"));
+var import_core2 = require("./core");
 var import_delay = __toESM(require_delay());
-import * as fs5 from "fs";
-import * as os3 from "os";
-import * as path6 from "path";
-import { utils as coreUtils } from "./core";
 async function success_default(context, config) {
   if (config.smokeTest && context.releasedPackages.npm != null) {
     context.logger.info("Performing smoke test, installing released package(s)");
@@ -1386,7 +1394,7 @@ async function success_default(context, config) {
         await (0, import_delay.default)(1e3);
         tries += 1;
       }
-      await coreUtils.dryRunTask(context, `install ${name} from ${registry}`, async () => {
+      await import_core2.utils.dryRunTask(context, `install ${name} from ${registry}`, async () => {
         await npmInstall(name, registry, tmpDir);
       });
       fs5.rmdirSync(tmpDir, { recursive: true });
@@ -1395,8 +1403,8 @@ async function success_default(context, config) {
 }
 
 // src/version.ts
+var path7 = __toESM(require("node:path"));
 var import_find_up = __toESM(require_find_up());
-import * as path7 from "path";
 async function version_default(context, _config) {
   if (context.workspaces != null) {
     context.logger.warn("Cannot run npm version in workspaces");
@@ -1414,11 +1422,12 @@ async function version_default(context, _config) {
     context.logger.warn("Could not find lockfile to update version in");
   }
 }
-export {
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
   DEFAULT_NPM_REGISTRY,
-  init_default as init,
-  publish_default as publish,
-  success_default as success,
-  utils_exports as utils,
-  version_default as version
-};
+  init,
+  publish,
+  success,
+  utils,
+  version
+});

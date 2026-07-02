@@ -1,11 +1,43 @@
+"use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  init: () => init_default,
+  publish: () => publish_default,
+  utils: () => utils_exports
+});
+module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
-import * as fs3 from "fs";
+var fs3 = __toESM(require("node:fs"));
 
 // src/utils.ts
 var utils_exports = {};
@@ -17,24 +49,24 @@ __export(utils_exports, {
   vscePackage: () => vscePackage,
   vscePublish: () => vscePublish
 });
-import * as fs2 from "fs";
-import * as path4 from "path";
+var fs2 = __toESM(require("node:fs"));
+var path4 = __toESM(require("node:path"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
-import { StringDecoder } from "string_decoder";
+var import_string_decoder = require("string_decoder");
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-import * as os from "os";
-import * as events from "events";
-import * as child from "child_process";
-import * as path3 from "path";
+var os = __toESM(require("os"), 1);
+var events = __toESM(require("events"), 1);
+var child = __toESM(require("child_process"), 1);
+var path3 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/io/lib/io.js
-import * as path2 from "path";
+var path2 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/io/lib/io-util.js
-import * as fs from "fs";
-import * as path from "path";
+var fs = __toESM(require("fs"), 1);
+var path = __toESM(require("path"), 1);
 var __awaiter = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve3) {
@@ -252,7 +284,7 @@ function findInPath(tool) {
 }
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-import { setTimeout } from "timers";
+var import_timers = require("timers");
 var __awaiter3 = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve3) {
@@ -661,7 +693,7 @@ var ExecState = class _ExecState extends events.EventEmitter {
     if (this.processClosed) {
       this._setResult();
     } else if (this.processExited) {
-      this.timeout = setTimeout(_ExecState.HandleTimeout, this.delay, this);
+      this.timeout = (0, import_timers.setTimeout)(_ExecState.HandleTimeout, this.delay, this);
     }
   }
   _debug(message) {
@@ -742,8 +774,8 @@ function getExecOutput(commandLine, args, options) {
     var _a, _b;
     let stdout = "";
     let stderr = "";
-    const stdoutDecoder = new StringDecoder("utf8");
-    const stderrDecoder = new StringDecoder("utf8");
+    const stdoutDecoder = new import_string_decoder.StringDecoder("utf8");
+    const stderrDecoder = new import_string_decoder.StringDecoder("utf8");
     const originalStdoutListener = (_a = options === null || options === void 0 ? void 0 : options.listeners) === null || _a === void 0 ? void 0 : _a.stdout;
     const originalStdErrListener = (_b = options === null || options === void 0 ? void 0 : options.listeners) === null || _b === void 0 ? void 0 : _b.stderr;
     const stdErrListener = (data) => {
@@ -771,7 +803,7 @@ function getExecOutput(commandLine, args, options) {
 }
 
 // src/utils.ts
-import { utils } from "./core";
+var import_core = require("./core");
 var usePnpm;
 async function npxCmd(binName) {
   if (usePnpm == null) {
@@ -781,7 +813,7 @@ async function npxCmd(binName) {
       usePnpm = false;
     }
   }
-  return usePnpm ? `pnpm ${utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
+  return usePnpm ? `pnpm ${import_core.utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
 }
 async function ovsxInfo(extensionName) {
   try {
@@ -801,7 +833,7 @@ async function ovsxPublish(context, vsixPath) {
     cmdArgs.push("--pre-release");
   }
   const npx = await npxCmd("ovsx");
-  await utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+  await import_core.utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
     await exec(npx, cmdArgs);
   });
 }
@@ -837,7 +869,7 @@ async function vscePublish(context, vsixPath) {
     cmdArgs.push("--pre-release");
   }
   const npx = await npxCmd("vsce");
-  await utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
+  await import_core.utils.dryRunTask(context, `${npx} ${cmdArgs.join(" ")}`, async () => {
     await exec(npx, cmdArgs);
   });
 }
@@ -869,8 +901,8 @@ async function init_default(context, config) {
 }
 
 // src/publish.ts
-import * as fs4 from "fs";
-import * as path5 from "path";
+var fs4 = __toESM(require("node:fs"));
+var path5 = __toESM(require("node:path"));
 async function publish_default(context, config) {
   const packageJson = JSON.parse(fs4.readFileSync("package.json", "utf-8"));
   const extensionName = `${packageJson.publisher}.${packageJson.name}`;
@@ -924,8 +956,9 @@ async function publish_default(context, config) {
     }
   }
 }
-export {
-  init_default as init,
-  publish_default as publish,
-  utils_exports as utils
-};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  init,
+  publish,
+  utils
+});
