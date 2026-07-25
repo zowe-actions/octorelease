@@ -28,10 +28,8 @@ function buildContext(stage: string): Partial<IContext> {
     return {
         logger: new Logger(),
         plugins: {
-            [testPlugin]: [
-                { stage }
-            ]
-        }
+            [testPlugin]: [{ stage }],
+        },
     };
 }
 

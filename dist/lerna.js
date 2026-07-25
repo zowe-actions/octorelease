@@ -19965,7 +19965,7 @@ async function success_default(context, config) {
 }
 
 // src/version.ts
-var import_find_up = __toESM(require_find_up());
+var import_find_up = __toESM(require_find_up(), 1);
 import * as fs5 from "fs";
 import * as path10 from "path";
 

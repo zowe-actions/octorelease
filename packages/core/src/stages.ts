@@ -16,18 +16,18 @@
 
 import * as path from "path";
 import * as core from "@actions/core";
-import { IContext, IPluginsLoaded } from "./doc";
-import { Inputs } from "./inputs";
+import { IContext, IPluginsLoaded } from "./doc/index.js";
+import { Inputs } from "./inputs.js";
 
 type Env = {
     cwd?: string;
     env?: Record<string, string>;
-}
+};
 
 type Stage = {
-    name: "fail" | "init" | "publish" | "success" | "version",
-    canSkip?: boolean
-}
+    name: "fail" | "init" | "publish" | "success" | "version";
+    canSkip?: boolean;
+};
 
 /**
  * Run "fail" stage for loaded plugins that have a "fail" handler.
@@ -97,7 +97,7 @@ async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage:
             continue;
         }
 
-        for (const pluginConfig of (context.plugins[pluginName] || [])) {
+        for (const pluginConfig of context.plugins[pluginName] || []) {
             context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
 

@@ -50,11 +50,13 @@ export async function gitConfig(context: IContext): Promise<void> {
         await exec.exec("git", ["config", "--global", "credential.helper", "store"]);
         const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
         const gitUrl = new url.URL(cmdOutput.stdout);
-        fs.appendFileSync(path.join(os.homedir(), ".git-credentials"),
-            `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
+        fs.appendFileSync(
+            path.join(os.homedir(), ".git-credentials"),
+            `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`,
+        );
     }
 
-    await exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);  // Validate Git credentials
+    await exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]); // Validate Git credentials
 }
 
 export async function gitPush(context: IContext, branch: string, tags?: boolean): Promise<boolean> {

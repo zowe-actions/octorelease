@@ -18,7 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import { IPluginConfig } from "./config.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";
@@ -34,7 +34,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         }
     } else {
         const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
-        changelogDirs.unshift(...await globber.glob());
+        changelogDirs.unshift(...(await globber.glob()));
 
         if (config.autoDisplayNames !== false) {
             config.displayNames = { ...getAutoDisplayNames(changelogDirs), ...(config.displayNames || {}) };
@@ -57,8 +57,11 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (Object.keys(releaseNotes).length === 0) {
         return;
     } else if (config.displayNames == null) {
-        context.releaseNotes = tempReleaseNotes +
-            Object.entries(releaseNotes).map(([k, v]) => `# ${k}\n${v}\n`).join("\n");
+        context.releaseNotes =
+            tempReleaseNotes +
+            Object.entries(releaseNotes)
+                .map(([k, v]) => `# ${k}\n${v}\n`)
+                .join("\n");
     } else {
         const orderedSections: string[] = [];
         for (const [k, v] of Object.entries(config.displayNames)) {
@@ -92,8 +95,9 @@ function getPackageChangelog(context: IContext, changelogFile: string, headerLin
         const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
         // Look for changelog header before versioning ("## Recent Changes") or after versioning ("## `1.0.0`").
         // We support either format to allow for a manual version bump or rerun of a failed build.
-        let lineNum = changelogLines.findIndex(line => line.startsWith(headerLine) ||
-            line.startsWith(`## \`${context.version.new}\``));
+        let lineNum = changelogLines.findIndex(
+            (line) => line.startsWith(headerLine) || line.startsWith(`## \`${context.version.new}\``),
+        );
 
         if (lineNum !== -1) {
             while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {
@@ -124,7 +128,7 @@ function updatePackageChangelog(context: IContext, changelogFile: string, header
         const newContents = oldContents.replace(headerLine, `## \`${newVersion}\``);
         if (newContents !== oldContents) {
             fs.writeFileSync(changelogFile, newContents);
-            context.logger.info(`Updated version header in ${changelogFile}`)
+            context.logger.info(`Updated version header in ${changelogFile}`);
             return true;
         }
     }

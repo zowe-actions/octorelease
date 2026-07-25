@@ -74,7 +74,7 @@ export class Inputs {
      */
     public static get skipStages(): string[] {
         const input = core.getInput("skip-stages");
-        return input ? input.split(",").map(s => s.trim()) : [];
+        return input ? input.split(",").map((s) => s.trim()) : [];
     }
 
     /**

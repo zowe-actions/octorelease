@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export * from "./doc";
-export * from "./inputs";
-export * from "./logger";
-export * as stages from "./stages";
-export * as utils from "./utils";
+export * from "./doc/index.js";
+export * from "./inputs.js";
+export * from "./logger.js";
+export * as stages from "./stages.js";
+export * as utils from "./utils.js";

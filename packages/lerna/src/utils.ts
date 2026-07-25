@@ -22,7 +22,7 @@ let usePnpm: boolean;
 async function npxCmd(binName: "lerna"): Promise<string> {
     if (usePnpm == null) {
         try {
-            usePnpm = await exec.exec("pnpm", ["--version"], { silent: true }) === 0;
+            usePnpm = (await exec.exec("pnpm", ["--version"], { silent: true })) === 0;
         } catch {
             usePnpm = false;
         }
@@ -50,8 +50,15 @@ export async function lernaList(onlyChanged?: boolean): Promise<Record<string, a
 }
 
 export async function lernaVersion(newVersion: string): Promise<void> {
-    await exec.exec(await npxCmd("lerna"), ["lerna", "version", newVersion,
-        "--exact", "--include-merged-tags", "--no-git-tag-version", "--yes"]);
+    await exec.exec(await npxCmd("lerna"), [
+        "lerna",
+        "version",
+        newVersion,
+        "--exact",
+        "--include-merged-tags",
+        "--no-git-tag-version",
+        "--yes",
+    ]);
 }
 
 export async function lernaPostVersion(): Promise<void> {

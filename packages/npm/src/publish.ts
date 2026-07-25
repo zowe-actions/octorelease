@@ -18,8 +18,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext } from "@octorelease/core";
-import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
-import * as utils from "./utils";
+import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config.js";
+import * as utils from "./utils.js";
 
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
     const cwd = inDir || process.cwd();
@@ -60,17 +60,19 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
                 tag: packageTag,
                 pkgSpec: packageJson.name,
                 registry: npmRegistry,
-                inDir
+                inDir,
             });
 
             context.releasedPackages.npm = [
                 ...(context.releasedPackages.npm || []),
                 {
                     name: `${packageJson.name}@${packageJson.version}`,
-                    url: npmRegistry === DEFAULT_NPM_REGISTRY ?
-                        `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : undefined,
-                    registry: npmRegistry
-                }
+                    url:
+                        npmRegistry === DEFAULT_NPM_REGISTRY
+                            ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}`
+                            : undefined,
+                    registry: npmRegistry,
+                },
             ];
         } else {
             context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
@@ -97,7 +99,7 @@ function pruneShrinkwrap(context: IContext, inDir?: string): void {
     const lockfile = JSON.parse(fs.readFileSync(shrinkwrapPath, "utf-8"));
     const filterPkgs = (obj: Record<string, any>, key: string) => {
         for (const [pkgName, pkgData] of Object.entries(obj[key]) as any) {
-            if (["dev", "extraneous"].some(prop => pkgData[prop])) {
+            if (["dev", "extraneous"].some((prop) => pkgData[prop])) {
                 delete obj[key][pkgName];
             }
         }

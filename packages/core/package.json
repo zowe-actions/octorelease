@@ -2,6 +2,7 @@
   "name": "@octorelease/core",
   "version": "1.0.0",
   "description": "Octorelease core package containing the CLI and APIs for plugins.",
+  "type": "module",
   "main": "lib/index.js",
   "bin": {
     "octorelease": "lib/main.js"
@@ -12,7 +13,7 @@
   ],
   "scripts": {
     "build": "tsc -b && npm run lint",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "pack": "node ../../esbuild.mjs && node ../../esbuild.mjs main",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",

@@ -16,8 +16,8 @@
 
 import { IContext } from "@octorelease/core";
 import { publish as npmPublish } from "@octorelease/npm";
-import { IPluginConfig } from "./config";
-import * as utils from "./utils";
+import { IPluginConfig } from "./config.js";
+import * as utils from "./utils.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     for (const { name, location } of await utils.lernaList()) {

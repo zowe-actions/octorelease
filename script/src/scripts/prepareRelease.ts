@@ -15,10 +15,13 @@
  */
 
 import * as fs from "fs";
+import { createRequire } from "module";
 import { IContext } from "@octorelease/core";
 import { utils as gitUtils } from "@octorelease/git";
 import { version as lernaVersion } from "@octorelease/lerna";
 import { version as npmVersion } from "@octorelease/npm";
+
+const require = createRequire(import.meta.url);
 
 export default async function (context: IContext): Promise<void> {
     context.version.new = context.version.old.split("-")[0];

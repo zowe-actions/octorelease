@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-export { default as init } from "./init";
-export { default as publish } from "./publish";
-export { default as success } from "./success";
-export { default as fail } from "./fail";
-export * from "./config";
-export * as utils from "./utils";
+export { default as init } from "./init.js";
+export { default as publish } from "./publish.js";
+export { default as success } from "./success.js";
+export { default as fail } from "./fail.js";
+export * from "./config.js";
+export * as utils from "./utils.js";

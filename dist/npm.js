@@ -1228,13 +1228,11 @@ async function npmPublish(context, options) {
   await exec("npm", cmdArgs, { cwd: options.inDir });
 }
 async function npmVersion(newVersion, inDir) {
-  await exec("npm", [
-    "version",
-    newVersion,
-    "--allow-same-version",
-    "--no-git-tag-version",
-    "--no-workspaces-update"
-  ], { cwd: inDir });
+  await exec(
+    "npm",
+    ["version", newVersion, "--allow-same-version", "--no-git-tag-version", "--no-workspaces-update"],
+    { cwd: inDir }
+  );
 }
 async function npmView(pkgSpec, registry, property) {
   const registryPrefix = pkgSpec.startsWith("@") ? `${pkgSpec.split("/")[0]}:` : "";
@@ -1253,7 +1251,9 @@ function verifyConditions(context) {
   if (useTokenAuth && context.env.NPM_TOKEN == null) {
     throw new Error("Required environment variable NPM_TOKEN is undefined");
   } else if (!useTokenAuth) {
-    const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter((name) => context.env[name] == null);
+    const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter(
+      (name) => context.env[name] == null
+    );
     if (missingEnvVars.length == 1) {
       throw new Error(`Required environment variable ${missingEnvVars[0]} is undefined`);
     } else if (missingEnvVars.length > 1) {
@@ -1370,7 +1370,7 @@ function pruneShrinkwrap(context, inDir) {
 }
 
 // src/success.ts
-var import_delay = __toESM(require_delay());
+var import_delay = __toESM(require_delay(), 1);
 import * as fs5 from "fs";
 import * as os3 from "os";
 import * as path6 from "path";
@@ -1395,7 +1395,7 @@ async function success_default(context, config) {
 }
 
 // src/version.ts
-var import_find_up = __toESM(require_find_up());
+var import_find_up = __toESM(require_find_up(), 1);
 import * as path7 from "path";
 async function version_default(context, _config) {
   if (context.workspaces != null) {

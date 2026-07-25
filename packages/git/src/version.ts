@@ -15,13 +15,13 @@
  */
 
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
-import * as utils from "./utils";
+import { IPluginConfig } from "./config.js";
+import * as utils from "./utils.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const commitMessage = config.commitMessage || "Bump version to {{version}}";
-    let tagMessage = config.tagMessage || (context.branch.channel &&
-        `Release {{version}} to ${context.branch.channel}`);
+    let tagMessage =
+        config.tagMessage || (context.branch.channel && `Release {{version}} to ${context.branch.channel}`);
 
     await utils.gitAdd(...new Set(context.changedFiles));
     let shouldPush = false;

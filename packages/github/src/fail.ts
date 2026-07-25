@@ -15,8 +15,8 @@
  */
 
 import { IContext, utils as coreUtils } from "@octorelease/core";
-import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
-import * as utils from "./utils";
+import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config.js";
+import * as utils from "./utils.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const octokit = utils.getOctokit(context, config);
@@ -28,31 +28,35 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (config.checkPrLabels) {
         const labels = await octokit.rest.issues.listLabelsOnIssue({
             ...context.ci.repo,
-            issue_number: prNumber
+            issue_number: prNumber,
         });
         const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
 
-        for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
+        for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
             await coreUtils.dryRunTask(context, `remove pull request label "${name}"`, async () => {
                 await octokit.rest.issues.removeLabel({
                     ...context.ci.repo,
                     issue_number: prNumber,
-                    name
+                    name,
                 });
             });
         }
     }
 
-    const workflowRunUrl = `${config.githubUrl || "https://github.com"}/${(context.ci as any).slug}/actions/runs/` +
+    const workflowRunUrl =
+        `${config.githubUrl || "https://github.com"}/${(context.ci as any).slug}/actions/runs/` +
         (context.ci as any).build;
     await coreUtils.dryRunTask(context, "create failure comment on pull request", async () => {
         await octokit.rest.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
-            body: `Release failed for the \`${context.branch.name}\` branch. :cry:\n\n` +
-                "```\n" + context.failError?.stack + "\n```\n\n" +
+            body:
+                `Release failed for the \`${context.branch.name}\` branch. :cry:\n\n` +
+                "```\n" +
+                context.failError?.stack +
+                "\n```\n\n" +
                 `Check the [workflow run](${workflowRunUrl}) for more error details.\n\n` +
-                `<sub>Powered by Octorelease :rocket:</sub>`
+                `<sub>Powered by Octorelease :rocket:</sub>`,
         });
     });
 }

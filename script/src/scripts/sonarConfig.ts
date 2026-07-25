@@ -26,7 +26,7 @@ async function downloadCoverageReports(context: IContext) {
         context.logger.warn("Unable to download coverage reports without the COVERAGE_ARTIFACT environment variable");
         return;
     }
-    if (context.ci.service as any !== "github") {
+    if ((context.ci.service as any) !== "github") {
         context.logger.warn("Unable to download coverage reports for a CI Environment other than GitHub");
         return;
     }
@@ -45,7 +45,7 @@ function getPrHeadRef(pr: any) {
 
 function rewriteCoverageReports(context: IContext) {
     // Workaround for https://community.sonarsource.com/t/code-coverage-doesnt-work-with-github-action/16747
-    if (context.ci.service as any !== "github") {
+    if ((context.ci.service as any) !== "github") {
         context.logger.warn("Unable to rewrite coverage reports for a CI Environment other than GitHub");
         return;
     }
@@ -69,8 +69,9 @@ function rewriteCoverageReports(context: IContext) {
 export default async function (context: IContext): Promise<void> {
     // Append Sonar properties to the sonar-project.properties file
     const sonarProps: { [key: string]: any } = {};
-    const packageJson = JSON.parse(fs.readFileSync(fs.existsSync("lerna.json") ? "lerna.json"
-        : "package.json", "utf-8"));
+    const packageJson = JSON.parse(
+        fs.readFileSync(fs.existsSync("lerna.json") ? "lerna.json" : "package.json", "utf-8"),
+    );
     sonarProps["sonar.projectVersion"] = packageJson.version;
     sonarProps["sonar.links.ci"] =
         `https://github.com/${(context.ci as any).slug}/actions/runs/${(context.ci as any).build}`;
@@ -85,13 +86,18 @@ export default async function (context: IContext): Promise<void> {
         sonarProps["sonar.pullrequest.branch"] = getPrHeadRef(pr);
         sonarProps["sonar.pullrequest.base"] = pr.base.ref;
     } else {
-        sonarProps["sonar.branch.name"] = github.context.payload.workflow_run?.head_branch ??
-            context.ci.branch as string;
+        sonarProps["sonar.branch.name"] =
+            github.context.payload.workflow_run?.head_branch ?? (context.ci.branch as string);
     }
 
     // Convert properties to argument string and store it in output
     context.logger.info("Sonar scan properties:\n" + JSON.stringify(sonarProps, null, 2));
-    fs.appendFileSync("sonar-project.properties", Object.entries(sonarProps).map(([k, v]) => `${k}=${v}`).join("\n"));
+    fs.appendFileSync(
+        "sonar-project.properties",
+        Object.entries(sonarProps)
+            .map(([k, v]) => `${k}=${v}`)
+            .join("\n"),
+    );
     context.logger.debug("All Sonar scan properties:\n" + fs.readFileSync("sonar-project.properties", "utf-8"));
     await downloadCoverageReports(context);
     rewriteCoverageReports(context);

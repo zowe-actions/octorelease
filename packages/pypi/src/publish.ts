@@ -17,8 +17,8 @@
 import * as path from "path";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
-import * as utils from "./utils";
+import { IPluginConfig } from "./config.js";
+import * as utils from "./utils.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     await utils.twineUpload(context, config.distPath);
@@ -27,6 +27,6 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         ...(context.releasedPackages.pypi || []),
         ...(await globber.glob()).map((tgzPath) => {
             return { name: path.basename(tgzPath, ".tar.gz") };
-        })
+        }),
     ];
 }

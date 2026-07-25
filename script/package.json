@@ -2,11 +2,12 @@
   "name": "@octorelease/run-script",
   "version": "1.0.0",
   "description": "GitHub action to run scripts in Octorelease context.",
+  "type": "module",
   "main": "lib/index.js",
   "private": true,
   "scripts": {
     "build": "tsc -b && npm run lint",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "pack": "node ../esbuild.mjs run-script",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w"

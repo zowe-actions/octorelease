@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-export * from "./IConfig";
-export * from "./IContext";
-export * from "./IContextOpts";
-export * from "./IPlugin";
-export * from "./IPluginsLoaded";
-export * from "./IProtectedBranch";
-export * from "./IReleasedPackage";
-export * from "./IVersionInfo";
+export * from "./IConfig.js";
+export * from "./IContext.js";
+export * from "./IContextOpts.js";
+export * from "./IPlugin.js";
+export * from "./IPluginsLoaded.js";
+export * from "./IProtectedBranch.js";
+export * from "./IReleasedPackage.js";
+export * from "./IVersionInfo.js";

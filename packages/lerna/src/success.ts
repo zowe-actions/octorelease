@@ -16,7 +16,7 @@
 
 import { IContext } from "@octorelease/core";
 import { success as npmSuccess } from "@octorelease/npm";
-import { IPluginConfig } from "./config";
+import { IPluginConfig } from "./config.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     await npmSuccess(context, config);

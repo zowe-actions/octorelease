@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IProtectedBranch } from "./IProtectedBranch";
+import { IProtectedBranch } from "./IProtectedBranch.js";
 
 /**
  * Union type for branch configuration. Can be string specifying branch name

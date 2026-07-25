@@ -16,7 +16,7 @@ describe("CI tests", () => {
         process.env["INPUT_DRY-RUN"] = "true";
         const ip = path.join(import.meta.dirname, "..", "packages", "core", "lib", "main.js");
         const options: cp.ExecSyncOptions = {
-            env: process.env
+            env: process.env,
         };
         console.log(`node ${ip}`, options);
         console.log(cp.execSync(`node ${ip}`, options).toString());

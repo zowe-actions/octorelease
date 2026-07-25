@@ -16,8 +16,8 @@
 
 import * as fs from "fs";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
-import * as utils from "./utils";
+import { IPluginConfig } from "./config.js";
+import * as utils from "./utils.js";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     let packageJson;

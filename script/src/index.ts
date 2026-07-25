@@ -19,8 +19,8 @@
 import * as path from "path";
 import * as core from "@actions/core";
 import { utils as coreUtils } from "@octorelease/core";
-import { loadScript, RELEASE_SCRIPTS } from "./loader";
-import * as utils from "./utils";
+import { loadScript, RELEASE_SCRIPTS } from "./loader.js";
+import * as utils from "./utils.js";
 
 async function run(): Promise<void> {
     try {
@@ -35,7 +35,7 @@ async function run(): Promise<void> {
         const context = await coreUtils.buildContext({
             branch: prBranch,
             force: !RELEASE_SCRIPTS.includes(scriptName),
-            logPrefix: scriptName
+            logPrefix: scriptName,
         });
         if (context == null) {
             core.info("Current branch is not targeting a release branch, exiting now");
