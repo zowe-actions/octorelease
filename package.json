@@ -2,8 +2,6 @@
 	"name": "octorelease",
 	"private": true,
 	"description": "Extensible GitHub action to publish semantic releases.",
-	"type": "module",
-	"main": "index.js",
 	"bin": "dist/index.js",
 	"scripts": {
 		"build": "tsc -b --force",
