@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import { createRequire } from "module";
-import delay from "delay";
 import { IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
+import delay from "delay";
+import * as semver from "semver";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config.js";
 import * as utils from "./utils.js";
-
-const require = createRequire(import.meta.url);
 
 let lastEtag: string | undefined;
 
@@ -33,11 +31,11 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         const releaseType = await getPrReleaseType(context, config);
         context.version.old = context.version.new || context.version.old;
         const oldVersion = context.version.old.split("-")[0];
-        context.version.new = releaseType != null ? require("semver").inc(oldVersion, releaseType) : oldVersion;
+        context.version.new = releaseType != null ? semver.inc(oldVersion, releaseType)! : oldVersion;
     }
 }
 
-async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<string | null> {
+async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<semver.ReleaseType | null> {
     const octokit = utils.getOctokit(context, config);
     const prNumber = await utils.findPrNumber(context, octokit);
     if (prNumber == null) {
@@ -72,7 +70,6 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         const oldVersion = (context.version.new || context.version.old).split("-")[0];
         // Check if prerelease is truthy to handle case of empty string
         const prereleaseSuffix = context.version.prerelease ? `-${context.version.prerelease}` : "";
-        const semverInc = require("semver/functions/inc");
         let commentBody =
             `Version info from a repo admin is required to publish a new version. ` +
             `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
@@ -81,7 +78,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
             if (context.branch.level != null && i >= SemverDiffLevels.indexOf(context.branch.level)) {
                 break;
             }
-            commentBody += `* **${releaseLabels[i + 1]}**: \`${semverInc(oldVersion, level)}${prereleaseSuffix}\`\n`;
+            commentBody += `* **${releaseLabels[i + 1]}**: \`${semver.inc(oldVersion, level as semver.ReleaseType)}${prereleaseSuffix}\`\n`;
         }
         const comment = await octokit.rest.issues.createComment({
             ...context.ci.repo,

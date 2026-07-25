@@ -16,10 +16,10 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import findUp from "find-up";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
+import findUp from "find-up";
 import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config.js";
 import * as utils from "./utils.js";
 

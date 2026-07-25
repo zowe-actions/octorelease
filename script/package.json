@@ -37,5 +37,10 @@
     "java-properties": "^1.0.2",
     "pluralize": "^8.0.0",
     "semver": "^7.5.2"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
+    "@types/pluralize": "^0.0.33",
+    "@types/semver": "^7.0.0"
   }
 }

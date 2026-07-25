@@ -19,6 +19,10 @@ import { createRequire } from "module";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
+import envCi from "env-ci";
+import * as micromatch from "micromatch";
+import * as semver from "semver";
+import which from "which";
 import {
     IContext,
     IContextOpts,
@@ -30,7 +34,7 @@ import {
 import { Inputs } from "./inputs.js";
 import { Logger } from "./logger.js";
 
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta?.url || __filename);
 
 /**
  * Build global context object that is passed to all plugin handlers.
@@ -44,10 +48,9 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
-    const micromatch = require("micromatch");
     const branches = rc.config.branches.map((branch: any) => (typeof branch === "string" ? { name: branch } : branch));
     const branchIndex = branches.findIndex((branch: any) =>
-        micromatch.isMatch(opts?.branch || envCi.branch, branch.name),
+        micromatch.isMatch(opts?.branch || envCi.branch!, branch.name),
     );
     if (branchIndex == -1 && !opts?.force) {
         return;
@@ -90,7 +93,7 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
  * @param cmd Command to be run (e.g. lerna)
  */
 export function commandExists(cmd: string): boolean {
-    return require("which").sync(cmd, { nothrow: true }) != null;
+    return which.sync(cmd, { nothrow: true }) != null;
 }
 
 /**
@@ -149,7 +152,6 @@ export async function verifyConditions(context: IContext): Promise<void> {
         context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
 
-    const semver = require("semver");
     const semverLevel =
         context.version.old !== "0.0.0"
             ? semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0])
@@ -157,7 +159,7 @@ export async function verifyConditions(context: IContext): Promise<void> {
     for (const versionInfo of Object.values(context.version.overrides)) {
         versionInfo.new =
             semverLevel != null
-                ? semver.inc(versionInfo.old.split("-")[0], semverLevel)
+                ? semver.inc(versionInfo.old.split("-")[0], semverLevel as semver.ReleaseType)!
                 : versionInfo.old.split("-")[0];
         if (versionInfo.prerelease) {
             versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
@@ -167,7 +169,8 @@ export async function verifyConditions(context: IContext): Promise<void> {
     if (
         semverLevel != null &&
         context.branch.level != null &&
-        SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)
+        SemverDiffLevels.indexOf(semverLevel as (typeof SemverDiffLevels)[number]) >
+            SemverDiffLevels.indexOf(context.branch.level)
     ) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }
@@ -212,36 +215,36 @@ export async function getLastCommitMessage(context: IContext): Promise<string | 
  * Load CI properties like branch name, commit SHA, and repository slug.
  * @returns CI environment for the `context.ci` property
  */
-async function loadCiEnv(): Promise<any> {
-    let envCi = require("env-ci")();
-    if (envCi.service == null) {
-        throw new Error(`Unsupported CI service detected: ${envCi.service}`);
+async function loadCiEnv(): Promise<IContext["ci"]> {
+    let env = envCi() as envCi.KnownCiEnv & { [key: string]: any };
+    if (env.service == null) {
+        throw new Error(`Unsupported CI service detected: ${process.env.CI}`);
     }
 
-    if (envCi.isPr) {
+    if (env.isPr) {
         // For PR builds, map `branch` (base) to `baseBranch` and `prBranch` (head) to `branch`
-        envCi = { ...envCi, baseBranch: envCi.branch, branch: envCi.prBranch, prBranch: undefined };
+        env = { ...env, baseBranch: env.branch, branch: env.prBranch, prBranch: undefined } as any;
     }
-    if (envCi.branch == null) {
+    if (env.branch == null) {
         const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
-        envCi.branch = cmdOutput.stdout.trim();
+        env.branch = cmdOutput.stdout.trim();
     }
 
-    if (envCi.commit == null) {
+    if (env.commit == null) {
         const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "HEAD"]);
-        envCi.commit = cmdOutput.stdout.trim();
+        env.commit = cmdOutput.stdout.trim();
     }
 
-    if (envCi.slug == null) {
+    if (env.slug == null) {
         const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
-        envCi.slug = cmdOutput.stdout
+        env.slug = cmdOutput.stdout
             .trim()
             .replace(/\.git$/, "")
             .split("/")
             .slice(-2)
             .join("/");
     }
-    const [owner, repo] = envCi.slug.split("/");
+    const [owner, repo] = env.slug.split("/");
 
-    return { ...envCi, repo: { owner, repo } };
+    return { ...env, repo: { owner, repo } };
 }

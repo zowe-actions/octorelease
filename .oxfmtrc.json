@@ -1,6 +1,9 @@
 {
   "tabWidth": 4,
   "printWidth": 120,
+  "sortImports": {
+    "newlinesBetween": false
+  },
   "ignorePatterns": [
     "**/*.md",
     "**/*.json",

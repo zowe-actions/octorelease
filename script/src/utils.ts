@@ -15,11 +15,9 @@
  */
 
 import * as fs from "fs";
-import { createRequire } from "module";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-
-const require = createRequire(import.meta.url);
+import AdmZip from "adm-zip";
 
 export async function downloadArtifact(runId: number, artifactName: string, extractPath?: string): Promise<void> {
     const octokit = github.getOctokit(core.getInput("github-token") || (process.env.GITHUB_TOKEN as string));
@@ -48,7 +46,7 @@ export async function downloadArtifact(runId: number, artifactName: string, extr
         fs.mkdirSync(extractPath, { recursive: true });
     }
     core.debug("Downloading artifact...");
-    new (require("adm-zip"))(artifactRaw).extractAllTo(extractPath ?? process.cwd());
+    new AdmZip(artifactRaw).extractAllTo(extractPath ?? process.cwd());
 }
 
 export async function findCurrentPr(state = "open"): Promise<any | undefined> {

@@ -17,8 +17,8 @@
 import * as fs from "fs";
 import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
-import * as properties from "java-properties";
 import * as utils from "@octorelease/run-script/src/utils";
+import * as properties from "java-properties";
 
 async function downloadCoverageReports(context: IContext) {
     // For GHA workflows triggered by workflow_run event, download coverage artifact from the triggering workflow

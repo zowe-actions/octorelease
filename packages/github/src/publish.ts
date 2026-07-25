@@ -15,14 +15,12 @@
  */
 
 import * as fs from "fs";
-import { createRequire } from "module";
 import * as path from "path";
 import * as glob from "@actions/glob";
 import { IContext, utils as coreUtils } from "@octorelease/core";
+import * as mime from "mime-types";
 import { IPluginConfig } from "./config.js";
 import * as utils from "./utils.js";
-
-const require = createRequire(import.meta.url);
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (!config.publishRelease && !config.assets) {
@@ -89,7 +87,6 @@ async function uploadAssets(
 ): Promise<void> {
     const globber = await glob.create(assetPaths.join("\n"));
     const artifactPaths: string[] = await globber.glob();
-    const mime = require("mime-types");
 
     for (const artifactPath of artifactPaths) {
         const assetName = path.basename(artifactPath);

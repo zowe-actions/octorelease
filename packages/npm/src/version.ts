@@ -15,8 +15,8 @@
  */
 
 import * as path from "path";
-import findUp from "find-up";
 import { IContext } from "@octorelease/core";
+import findUp from "find-up";
 import { IPluginConfig } from "./config.js";
 import * as utils from "./utils.js";
 

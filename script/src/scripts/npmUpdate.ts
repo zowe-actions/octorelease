@@ -15,13 +15,12 @@
  */
 
 import * as fs from "fs";
-import { createRequire } from "module";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext, IProtectedBranch } from "@octorelease/core";
 import { utils as gitUtils } from "@octorelease/git";
+import pluralize from "pluralize";
 
-const require = createRequire(import.meta.url);
 const lockfilePath = fs.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
 const updateDetails: string[] = [];
 let resolutions: Record<string, string> = {};
@@ -93,7 +92,6 @@ export default async function (context: IContext): Promise<void> {
         return;
     }
 
-    const pluralize = require("pluralize");
     const dependencies = getDependencies(context, branchConfig, false);
     const devDependencies = getDependencies(context, branchConfig, true);
     const changedFiles = ["package.json", lockfilePath];
