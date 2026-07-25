@@ -1,8 +1,40 @@
+"use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  init: () => init_default,
+  utils: () => utils_exports,
+  version: () => version_default
+});
+module.exports = __toCommonJS(index_exports);
 
 // src/utils.ts
 var utils_exports = {};
@@ -13,26 +45,26 @@ __export(utils_exports, {
   gitPush: () => gitPush,
   gitTag: () => gitTag
 });
-import * as fs2 from "fs";
-import * as os2 from "os";
-import * as path4 from "path";
-import * as url from "url";
+var fs2 = __toESM(require("fs"), 1);
+var os2 = __toESM(require("os"), 1);
+var path4 = __toESM(require("path"), 1);
+var url = __toESM(require("url"), 1);
 
 // ../../node_modules/@actions/exec/lib/exec.js
-import { StringDecoder } from "string_decoder";
+var import_string_decoder = require("string_decoder");
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-import * as os from "os";
-import * as events from "events";
-import * as child from "child_process";
-import * as path3 from "path";
+var os = __toESM(require("os"), 1);
+var events = __toESM(require("events"), 1);
+var child = __toESM(require("child_process"), 1);
+var path3 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/io/lib/io.js
-import * as path2 from "path";
+var path2 = __toESM(require("path"), 1);
 
 // ../../node_modules/@actions/io/lib/io-util.js
-import * as fs from "fs";
-import * as path from "path";
+var fs = __toESM(require("fs"), 1);
+var path = __toESM(require("path"), 1);
 var __awaiter = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve2) {
@@ -250,7 +282,7 @@ function findInPath(tool) {
 }
 
 // ../../node_modules/@actions/exec/lib/toolrunner.js
-import { setTimeout } from "timers";
+var import_timers = require("timers");
 var __awaiter3 = function(thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function(resolve2) {
@@ -659,7 +691,7 @@ var ExecState = class _ExecState extends events.EventEmitter {
     if (this.processClosed) {
       this._setResult();
     } else if (this.processExited) {
-      this.timeout = setTimeout(_ExecState.HandleTimeout, this.delay, this);
+      this.timeout = (0, import_timers.setTimeout)(_ExecState.HandleTimeout, this.delay, this);
     }
   }
   _debug(message) {
@@ -740,8 +772,8 @@ function getExecOutput(commandLine, args, options) {
     var _a, _b;
     let stdout = "";
     let stderr = "";
-    const stdoutDecoder = new StringDecoder("utf8");
-    const stderrDecoder = new StringDecoder("utf8");
+    const stdoutDecoder = new import_string_decoder.StringDecoder("utf8");
+    const stderrDecoder = new import_string_decoder.StringDecoder("utf8");
     const originalStdoutListener = (_a = options === null || options === void 0 ? void 0 : options.listeners) === null || _a === void 0 ? void 0 : _a.stdout;
     const originalStdErrListener = (_b = options === null || options === void 0 ? void 0 : options.listeners) === null || _b === void 0 ? void 0 : _b.stderr;
     const stdErrListener = (data) => {
@@ -862,8 +894,9 @@ async function version_default(context, config) {
     context.logger.warn("Nothing to push");
   }
 }
-export {
-  init_default as init,
-  utils_exports as utils,
-  version_default as version
-};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  init,
+  utils,
+  version
+});
