@@ -34057,7 +34057,7 @@ function escapeProperty(s) {
 // ../../node_modules/@actions/core/lib/core.js
 import * as os4 from "os";
 
-// ../../node_modules/@actions/core/node_modules/@actions/http-client/lib/index.js
+// ../../node_modules/@actions/http-client/lib/index.js
 var tunnel = __toESM(require_tunnel2(), 1);
 var import_undici = __toESM(require_undici(), 1);
 var HttpCodes;
