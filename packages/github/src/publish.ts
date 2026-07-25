@@ -18,7 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
 import { IContext, utils as coreUtils } from "@octorelease/core";
-import * as mime from "mime-types";
+import * as mime from "mime";
 import { IPluginConfig } from "./config.js";
 import * as utils from "./utils.js";
 
@@ -108,7 +108,7 @@ async function uploadAssets(
                 url: release.data.upload_url,
                 headers: {
                     "Content-Length": fs.statSync(artifactPath).size,
-                    "Content-Type": mime.lookup(artifactPath) || "application/octet-stream",
+                    "Content-Type": mime.getType(artifactPath) || "application/octet-stream",
                 },
             });
         });
