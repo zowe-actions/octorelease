@@ -31472,8 +31472,8 @@ var require_picomatch = __commonJS({
       if (Array.isArray(glob)) {
         const fns = glob.map((input) => picomatch(input, options, returnState));
         const arrayMatcher = (str) => {
-          for (const isMatch2 of fns) {
-            const state2 = isMatch2(str);
+          for (const isMatch of fns) {
+            const state2 = isMatch(str);
             if (state2) return state2;
           }
           return false;
@@ -31495,12 +31495,12 @@ var require_picomatch = __commonJS({
         isIgnored = picomatch(opts.ignore, ignoreOpts, returnState);
       }
       const matcher = (input, returnObject = false) => {
-        const { isMatch: isMatch2, match, output } = picomatch.test(input, regex, options, { glob, posix });
-        const result = { glob, state, regex, posix, input, output, match, isMatch: isMatch2 };
+        const { isMatch, match, output } = picomatch.test(input, regex, options, { glob, posix });
+        const result = { glob, state, regex, posix, input, output, match, isMatch };
         if (typeof opts.onResult === "function") {
           opts.onResult(result);
         }
-        if (isMatch2 === false) {
+        if (isMatch === false) {
           result.isMatch = false;
           return returnObject ? result : false;
         }
@@ -31634,11 +31634,11 @@ var require_micromatch = __commonJS({
         }
       };
       for (let i = 0; i < patterns.length; i++) {
-        let isMatch2 = picomatch(String(patterns[i]), { ...options, onResult }, true);
-        let negated = isMatch2.state.negated || isMatch2.state.negatedExtglob;
+        let isMatch = picomatch(String(patterns[i]), { ...options, onResult }, true);
+        let negated = isMatch.state.negated || isMatch.state.negatedExtglob;
         if (negated) negatives++;
         for (let item of list) {
-          let matched = isMatch2(item, true);
+          let matched = isMatch(item, true);
           let match = negated ? !matched.isMatch : matched.isMatch;
           if (!match) continue;
           if (negated) {
@@ -31710,8 +31710,8 @@ var require_micromatch = __commonJS({
     micromatch2.some = (list, patterns, options) => {
       let items = [].concat(list);
       for (let pattern of [].concat(patterns)) {
-        let isMatch2 = picomatch(String(pattern), options);
-        if (items.some((item) => isMatch2(item))) {
+        let isMatch = picomatch(String(pattern), options);
+        if (items.some((item) => isMatch(item))) {
           return true;
         }
       }
@@ -31720,8 +31720,8 @@ var require_micromatch = __commonJS({
     micromatch2.every = (list, patterns, options) => {
       let items = [].concat(list);
       for (let pattern of [].concat(patterns)) {
-        let isMatch2 = picomatch(String(pattern), options);
-        if (!items.every((item) => isMatch2(item))) {
+        let isMatch = picomatch(String(pattern), options);
+        if (!items.every((item) => isMatch(item))) {
           return false;
         }
       }
@@ -35415,7 +35415,7 @@ var import_module = require("module");
 var path6 = __toESM(require("path"), 1);
 var import_cosmiconfig = __toESM(require_dist2(), 1);
 var import_env_ci = __toESM(require_env_ci(), 1);
-var micromatch = __toESM(require_micromatch(), 1);
+var import_micromatch = __toESM(require_micromatch(), 1);
 var semver = __toESM(require_semver2(), 1);
 var import_which = __toESM(require_lib3(), 1);
 var import_meta = {};
@@ -35428,7 +35428,7 @@ async function buildContext(opts) {
   }
   const branches = rc.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
   const branchIndex = branches.findIndex(
-    (branch) => micromatch.isMatch(opts?.branch || envCi2.branch, branch.name)
+    (branch) => import_micromatch.default.isMatch(opts?.branch || envCi2.branch, branch.name)
   );
   if (branchIndex == -1 && !opts?.force) {
     return;

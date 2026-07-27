@@ -36539,7 +36539,7 @@ function create(patterns, options) {
 
 // src/publish.ts
 var import_core4 = require("./core");
-var mime = __toESM(require_mime(), 1);
+var import_mime = __toESM(require_mime(), 1);
 async function publish_default(context3, config) {
   if (!config.publishRelease && !config.assets) {
     return;
@@ -36608,7 +36608,7 @@ async function uploadAssets(context3, octokit, release, assetPaths) {
         url: release.data.upload_url,
         headers: {
           "Content-Length": fs3.statSync(artifactPath).size,
-          "Content-Type": mime.getType(artifactPath) || "application/octet-stream"
+          "Content-Type": import_mime.default.getType(artifactPath) || "application/octet-stream"
         }
       });
     });

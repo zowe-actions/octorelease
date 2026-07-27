@@ -20,7 +20,7 @@ import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
 import envCi from "env-ci";
-import * as micromatch from "micromatch";
+import micromatch from "micromatch";
 import * as semver from "semver";
 import which from "which";
 import {

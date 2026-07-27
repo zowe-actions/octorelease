@@ -19,6 +19,13 @@ describe("CI tests", () => {
             env: process.env,
         };
         console.log(`node ${ip}`, options);
-        console.log(cp.execSync(`node ${ip}`, options).toString());
+        try {
+            console.log(cp.execSync(`node ${ip}`, options).toString());
+        } catch (err) {
+            const execErr = err as cp.ExecException & { stdout?: Buffer; stderr?: Buffer };
+            throw new Error(
+                `${execErr.message}\n--- stdout ---\n${execErr.stdout?.toString()}\n--- stderr ---\n${execErr.stderr?.toString()}`,
+            );
+        }
     });
 });
