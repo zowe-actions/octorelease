@@ -21728,7 +21728,7 @@ async function version_default(context, config) {
     const globber = await create(context.workspaces.join("\n"), { implicitDescendants: false });
     changelogDirs.unshift(...await globber.glob());
     if (config.autoDisplayNames !== false) {
-      config.displayNames = { ...getAutoDisplayNames(changelogDirs), ...config.displayNames || {} };
+      config.displayNames = { ...getAutoDisplayNames(changelogDirs), ...config.displayNames };
     }
   }
   for (const relPath of changelogDirs) {

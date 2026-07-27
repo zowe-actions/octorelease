@@ -37,7 +37,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         changelogDirs.unshift(...(await globber.glob()));
 
         if (config.autoDisplayNames !== false) {
-            config.displayNames = { ...getAutoDisplayNames(changelogDirs), ...(config.displayNames || {}) };
+            config.displayNames = { ...getAutoDisplayNames(changelogDirs), ...config.displayNames };
         }
     }
 
