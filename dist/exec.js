@@ -30,7 +30,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  fail: () => init_default,
+  fail: () => fail_default,
   init: () => init_default,
   publish: () => publish_default,
   success: () => success_default,
@@ -764,6 +764,13 @@ async function runCmd(context, command, dryRunAllow = false) {
     await import_core.utils.dryRunTask(context, command, task);
   } else {
     await task();
+  }
+}
+
+// src/fail.ts
+async function fail_default(context, config) {
+  if (config.failCmd != null) {
+    await runCmd(context, config.failCmd, config.dryRunAllow?.includes("fail"));
   }
 }
 

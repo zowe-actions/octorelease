@@ -1,43 +1,43 @@
 {
-	"name": "octorelease",
-	"private": true,
-	"description": "Extensible GitHub action to publish semantic releases.",
-	"bin": "dist/index.js",
-	"scripts": {
-		"build": "tsc -b --force",
-		"format": "oxfmt .",
-		"format:check": "oxfmt --check .",
-		"lint": "oxlint packages",
-		"pack": "npm run pack --workspaces",
-		"test": "vitest run",
-		"test:ui": "vitest --ui",
-		"typedoc": "typedoc --plugin typedoc-plugin-markdown --out docs/typedoc packages/core/src/index.ts",
-		"watch": "tsc -w",
-		"all": "npm run build && npm run lint && npm run format:check && npm run pack && npm test",
-		"prepare": "husky"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/zowe-actions/octorelease.git"
-	},
-	"keywords": [],
-	"author": "t1m0thyj",
-	"license": "Apache-2.0",
-	"workspaces": [
-		"packages/*",
-		"script"
-	],
-	"devDependencies": {
-		"@types/node": "^22.9.0",
-		"@vitest/ui": "^4.1.10",
-		"esbuild": "^0.28.1",
-		"eslint-plugin-license-header": "^0.9.0",
-		"husky": "^9.0.11",
-		"oxfmt": "^0.60.0",
-		"oxlint": "^1.75.0",
-		"typedoc": "^0.28.0",
-		"typedoc-plugin-markdown": "^4.11.0",
-		"typescript": "^6.0.3",
-		"vitest": "^4.0.0"
-	}
+  "name": "octorelease",
+  "private": true,
+  "description": "Extensible GitHub action to publish semantic releases.",
+  "bin": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b --force",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint packages",
+    "pack": "npm run pack --workspaces",
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "typedoc": "typedoc --plugin typedoc-plugin-markdown --out docs/typedoc packages/core/src/index.ts",
+    "watch": "tsc -w",
+    "all": "npm run build && npm run lint && npm run format:check && npm run pack && npm test",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zowe-actions/octorelease.git"
+  },
+  "keywords": [],
+  "author": "t1m0thyj",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*",
+    "script"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@vitest/ui": "^4.1.10",
+    "esbuild": "^0.28.1",
+    "eslint-plugin-license-header": "^0.9.0",
+    "husky": "^9.0.11",
+    "oxfmt": "^0.60.0",
+    "oxlint": "^1.75.0",
+    "typedoc": "^0.28.0",
+    "typedoc-plugin-markdown": "^4.11.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.0.0"
+  }
 }
