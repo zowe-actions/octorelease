@@ -33,10 +33,10 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         pruneShrinkwrap(context, inDir);
     }
 
+    const tgzFile = await utils.npmPack(packageJson.name, npmRegistry, inDir);
     if (config.tarballDir != null) {
-        const tgzFile = await utils.npmPack(packageJson.name, npmRegistry, inDir);
         fs.mkdirSync(config.tarballDir, { recursive: true });
-        fs.renameSync(path.join(cwd, tgzFile), path.resolve(context.rootDir, config.tarballDir, tgzFile));
+        fs.cpSync(path.join(cwd, tgzFile), path.resolve(context.rootDir, config.tarballDir, tgzFile));
     }
 
     if (config.npmPublish === false) {
@@ -60,6 +60,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
                 tag: packageTag,
                 pkgSpec: packageJson.name,
                 registry: npmRegistry,
+                tarball: tgzFile,
                 inDir
             });
 

@@ -1521,6 +1521,9 @@ async function npmPublish(context, options) {
   if (context.dryRun) {
     cmdArgs.push("--dry-run");
   }
+  if (options.tarball != null) {
+    cmdArgs.splice(1, 0, options.tarball);
+  }
   await exec.exec("npm", cmdArgs, { cwd: options.inDir });
 }
 async function npmVersion(newVersion, inDir) {
@@ -1598,10 +1601,10 @@ async function publish_default(context, config, inDir) {
     }
     pruneShrinkwrap(context, inDir);
   }
+  const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
   if (config.tarballDir != null) {
-    const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
     fs3.mkdirSync(config.tarballDir, { recursive: true });
-    fs3.renameSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
+    fs3.cpSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));
   }
   if (config.npmPublish === false) {
     return;
@@ -1620,6 +1623,7 @@ async function publish_default(context, config, inDir) {
         tag: packageTag,
         pkgSpec: packageJson.name,
         registry: npmRegistry,
+        tarball: tgzFile,
         inDir
       });
       context.releasedPackages.npm = [

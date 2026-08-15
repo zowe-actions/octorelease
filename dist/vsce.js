@@ -1201,12 +1201,10 @@ var path2 = __toESM(require("path"));
 async function publish_default(context, config) {
   const packageJson = JSON.parse(fs3.readFileSync("package.json", "utf-8"));
   const extensionName = `${packageJson.publisher}.${packageJson.name}`;
-  let vsixPath;
+  const vsixPath = await vscePackage(context);
   if (config.vsixDir != null) {
-    const tempVsixPath = await vscePackage(context);
-    vsixPath = path2.resolve(context.rootDir, config.vsixDir, path2.basename(tempVsixPath));
     fs3.mkdirSync(config.vsixDir, { recursive: true });
-    fs3.renameSync(tempVsixPath, vsixPath);
+    fs3.cpSync(vsixPath, path2.resolve(context.rootDir, config.vsixDir, path2.basename(vsixPath)));
   }
   if (packageJson.private) {
     context.logger.info(`Skipping publish of private package ${packageJson.name}`);
