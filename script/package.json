@@ -2,7 +2,6 @@
   "name": "@octorelease/run-script",
   "version": "1.0.0",
   "description": "GitHub action to run scripts in Octorelease context.",
-  "type": "module",
   "main": "lib/index.js",
   "private": true,
   "scripts": {

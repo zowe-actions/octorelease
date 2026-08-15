@@ -17,8 +17,8 @@
 import * as path from "path";
 import { IContext } from "@octorelease/core";
 import findUp from "find-up";
-import { IPluginConfig } from "./config.js";
-import * as utils from "./utils.js";
+import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
     if (context.workspaces != null) {

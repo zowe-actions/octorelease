@@ -18840,8 +18840,8 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/version.ts
-var fs3 = __toESM(require("fs"), 1);
-var path6 = __toESM(require("path"), 1);
+var fs3 = __toESM(require("fs"));
+var path6 = __toESM(require("path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os = __toESM(require("os"), 1);

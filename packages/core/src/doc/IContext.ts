@@ -15,10 +15,10 @@
  */
 
 import { KnownCiEnv } from "env-ci";
-import { Logger } from "../logger.js";
-import { IProtectedBranch } from "./IProtectedBranch.js";
-import { IReleasedPackage } from "./IReleasedPackage.js";
-import { IVersionInfo } from "./IVersionInfo.js";
+import { Logger } from "../logger";
+import { IProtectedBranch } from "./IProtectedBranch";
+import { IReleasedPackage } from "./IReleasedPackage";
+import { IVersionInfo } from "./IVersionInfo";
 
 /**
  * Global context object for Octorelease

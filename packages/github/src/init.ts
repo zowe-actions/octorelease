@@ -17,8 +17,8 @@
 import { IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
 import delay from "delay";
 import * as semver from "semver";
-import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config.js";
-import * as utils from "./utils.js";
+import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 let lastEtag: string | undefined;
 

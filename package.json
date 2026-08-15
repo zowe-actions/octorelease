@@ -14,7 +14,7 @@
     "typedoc": "typedoc --plugin typedoc-plugin-markdown --out docs/typedoc packages/core/src/index.ts",
     "watch": "tsc -w",
     "all": "npm run build && npm run lint && npm run format:check && npm run pack && npm test",
-    "prepare": "husky"
+    "prepare": "husky && node patchEsmOnly.js"
   },
   "repository": {
     "type": "git",

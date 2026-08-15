@@ -18,8 +18,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { IContext } from "@octorelease/core";
-import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config.js";
-import * as utils from "./utils.js";
+import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
     const cwd = inDir || process.cwd();

@@ -37,7 +37,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
-var fs3 = __toESM(require("fs"), 1);
+var fs3 = __toESM(require("fs"));
 
 // src/utils.ts
 var utils_exports = {};
@@ -49,8 +49,8 @@ __export(utils_exports, {
   vscePackage: () => vscePackage,
   vscePublish: () => vscePublish
 });
-var fs2 = __toESM(require("fs"), 1);
-var path4 = __toESM(require("path"), 1);
+var fs2 = __toESM(require("fs"));
+var path4 = __toESM(require("path"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");
@@ -901,8 +901,8 @@ async function init_default(context, config) {
 }
 
 // src/publish.ts
-var fs4 = __toESM(require("fs"), 1);
-var path5 = __toESM(require("path"), 1);
+var fs4 = __toESM(require("fs"));
+var path5 = __toESM(require("path"));
 async function publish_default(context, config) {
   const packageJson = JSON.parse(fs4.readFileSync("package.json", "utf-8"));
   const extensionName = `${packageJson.publisher}.${packageJson.name}`;

@@ -15,7 +15,7 @@
  */
 
 import { IContext, utils } from "@octorelease/core";
-import { IPluginConfig } from "./config.js";
+import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
     if (context.env.TWINE_USERNAME == null) {

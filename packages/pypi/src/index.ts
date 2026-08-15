@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export { default as init } from "./init.js";
-export { default as publish } from "./publish.js";
-export * from "./config.js";
-export * as utils from "./utils.js";
+export { default as init } from "./init";
+export { default as publish } from "./publish";
+export * from "./config";
+export * as utils from "./utils";

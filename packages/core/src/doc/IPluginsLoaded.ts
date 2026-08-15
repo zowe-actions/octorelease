@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IPlugin } from "./IPlugin.js";
+import { IPlugin } from "./IPlugin";
 
 /**
  * Contains key-value pairs of plugin names and loaded modules

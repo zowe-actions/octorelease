@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export { default as version } from "./version.js";
-export * from "./config.js";
+export { default as version } from "./version";
+export * from "./config";

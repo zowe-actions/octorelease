@@ -8,7 +8,7 @@ const onResolvePlugin = {
     name: "onResolve",
     setup(build) {
         if (pkgName === "main") {
-            build.onResolve({ filter: /^\.\/index\.js$/ }, () => {
+            build.onResolve({ filter: /^.\/$/ }, () => {
                 return { path: "./core", external: true };
             });
         } else {

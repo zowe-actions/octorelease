@@ -20615,11 +20615,11 @@ var fs3, import_git, import_pluralize, lockfilePath, updateDetails, resolutions;
 var init_npmUpdate = __esm({
   "src/scripts/npmUpdate.ts"() {
     "use strict";
-    fs3 = __toESM(require("fs"), 1);
+    fs3 = __toESM(require("fs"));
     init_core();
     init_exec();
     import_git = require("./git");
-    import_pluralize = __toESM(require_pluralize(), 1);
+    import_pluralize = __toESM(require_pluralize());
     lockfilePath = fs3.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
     updateDetails = [];
     resolutions = {};
@@ -22644,11 +22644,11 @@ var fs4, import_git2, import_lerna, import_npm, semver;
 var init_prepareRelease = __esm({
   "src/scripts/prepareRelease.ts"() {
     "use strict";
-    fs4 = __toESM(require("fs"), 1);
+    fs4 = __toESM(require("fs"));
     import_git2 = require("./git");
     import_lerna = require("./lerna");
     import_npm = require("./npm");
-    semver = __toESM(require_semver2(), 1);
+    semver = __toESM(require_semver2());
   }
 });
 
@@ -30439,10 +30439,10 @@ var fs5, import_adm_zip;
 var init_utils4 = __esm({
   "src/utils.ts"() {
     "use strict";
-    fs5 = __toESM(require("fs"), 1);
+    fs5 = __toESM(require("fs"));
     init_core();
     init_github();
-    import_adm_zip = __toESM(require_adm_zip(), 1);
+    import_adm_zip = __toESM(require_adm_zip());
   }
 });
 
@@ -30687,15 +30687,15 @@ var fs6, properties;
 var init_sonarConfig = __esm({
   "src/scripts/sonarConfig.ts"() {
     "use strict";
-    fs6 = __toESM(require("fs"), 1);
+    fs6 = __toESM(require("fs"));
     init_github();
     init_utils4();
-    properties = __toESM(require_dist_node(), 1);
+    properties = __toESM(require_dist_node());
   }
 });
 
 // src/index.ts
-var path4 = __toESM(require("path"), 1);
+var path4 = __toESM(require("path"));
 init_core();
 var import_core3 = require("./core");
 

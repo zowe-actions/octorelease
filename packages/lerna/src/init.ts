@@ -18,8 +18,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
-import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config.js";
-import * as utils from "./utils.js";
+import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     let publishConfig;

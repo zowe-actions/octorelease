@@ -2,7 +2,6 @@
   "name": "@octorelease/vsce",
   "version": "1.0.0",
   "description": "Octorelease plugin to perform actions related to VS Code extensions.",
-  "type": "module",
   "main": "lib/index.js",
   "files": [
     "lib/*",

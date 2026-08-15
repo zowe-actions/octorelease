@@ -16,8 +16,8 @@
 
 import * as path from "path";
 import * as core from "@actions/core";
-import { IContext, IPluginsLoaded } from "./doc/index.js";
-import { Inputs } from "./inputs.js";
+import { IContext, IPluginsLoaded } from "./doc/index";
+import { Inputs } from "./inputs";
 
 type Env = {
     cwd?: string;

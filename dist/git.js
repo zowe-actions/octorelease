@@ -45,10 +45,10 @@ __export(utils_exports, {
   gitPush: () => gitPush,
   gitTag: () => gitTag
 });
-var fs2 = __toESM(require("fs"), 1);
-var os2 = __toESM(require("os"), 1);
-var path4 = __toESM(require("path"), 1);
-var url = __toESM(require("url"), 1);
+var fs2 = __toESM(require("fs"));
+var os2 = __toESM(require("os"));
+var path4 = __toESM(require("path"));
+var url = __toESM(require("url"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");

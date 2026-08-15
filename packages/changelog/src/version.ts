@@ -18,7 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config.js";
+import { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";

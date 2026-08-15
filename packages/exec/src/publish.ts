@@ -15,8 +15,8 @@
  */
 
 import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config.js";
-import * as utils from "./utils.js";
+import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (config.publishCmd != null) {

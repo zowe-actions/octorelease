@@ -19160,8 +19160,8 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
-var fs3 = __toESM(require("fs"), 1);
-var path4 = __toESM(require("path"), 1);
+var fs3 = __toESM(require("fs"));
+var path4 = __toESM(require("path"));
 var import_npm = require("./npm");
 
 // src/config.ts
@@ -19175,7 +19175,7 @@ __export(utils_exports, {
   lernaPostVersion: () => lernaPostVersion,
   lernaVersion: () => lernaVersion
 });
-var fs2 = __toESM(require("fs"), 1);
+var fs2 = __toESM(require("fs"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");
@@ -20055,8 +20055,8 @@ async function success_default(context, config) {
 }
 
 // src/version.ts
-var fs5 = __toESM(require("fs"), 1);
-var path10 = __toESM(require("path"), 1);
+var fs5 = __toESM(require("fs"));
+var path10 = __toESM(require("path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os2 = __toESM(require("os"), 1);
@@ -23022,7 +23022,7 @@ function create(patterns, options) {
 
 // src/version.ts
 var import_npm4 = require("./npm");
-var import_find_up = __toESM(require_find_up(), 1);
+var import_find_up = __toESM(require_find_up());
 async function version_default(context, config) {
   if (context.version.old === context.version.new) {
     context.logger.info("Version in lerna.json is already up to date");

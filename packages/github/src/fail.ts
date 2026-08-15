@@ -15,8 +15,8 @@
  */
 
 import { IContext, utils as coreUtils } from "@octorelease/core";
-import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config.js";
-import * as utils from "./utils.js";
+import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const octokit = utils.getOctokit(context, config);

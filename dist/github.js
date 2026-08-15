@@ -30802,8 +30802,8 @@ module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
 var import_core2 = require("./core");
-var import_delay = __toESM(require_delay(), 1);
-var semver = __toESM(require_semver2(), 1);
+var import_delay = __toESM(require_delay());
+var semver = __toESM(require_semver2());
 
 // src/config.ts
 var DEFAULT_RELEASE_LABELS = ["release-current", "release-patch", "release-minor", "release-major"];
@@ -33523,7 +33523,7 @@ function getOctokit(token, options, ...additionalPlugins) {
 }
 
 // src/utils.ts
-var import_plugin_enterprise_server = __toESM(require_dist_node(), 1);
+var import_plugin_enterprise_server = __toESM(require_dist_node());
 async function filterAsync(array, predicate) {
   const filterMap = await Promise.all(array.map(predicate));
   return array.filter((_value, index) => filterMap[index]);
@@ -33664,8 +33664,8 @@ async function findApprovedLabelEvents(context3, octokit, prNumber, releaseLabel
 }
 
 // src/publish.ts
-var fs3 = __toESM(require("fs"), 1);
-var path6 = __toESM(require("path"), 1);
+var fs3 = __toESM(require("fs"));
+var path6 = __toESM(require("path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os = __toESM(require("os"), 1);
@@ -36642,7 +36642,7 @@ function create(patterns, options) {
 
 // src/publish.ts
 var import_core4 = require("./core");
-var import_mime = __toESM(require_mime(), 1);
+var import_mime = __toESM(require_mime());
 async function publish_default(context3, config) {
   if (!config.publishRelease && !config.assets) {
     return;

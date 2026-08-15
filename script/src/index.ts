@@ -19,8 +19,8 @@
 import * as path from "path";
 import * as core from "@actions/core";
 import { utils as coreUtils } from "@octorelease/core";
-import { loadScript, RELEASE_SCRIPTS } from "./loader.js";
-import * as utils from "./utils.js";
+import { loadScript, RELEASE_SCRIPTS } from "./loader";
+import * as utils from "./utils";
 
 async function run(): Promise<void> {
     try {

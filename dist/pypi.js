@@ -18856,7 +18856,7 @@ async function init_default(context, _config) {
 }
 
 // src/publish.ts
-var path9 = __toESM(require("path"), 1);
+var path9 = __toESM(require("path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os = __toESM(require("os"), 1);

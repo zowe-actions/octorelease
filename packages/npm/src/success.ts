@@ -19,8 +19,8 @@ import * as os from "os";
 import * as path from "path";
 import { IContext, utils as coreUtils } from "@octorelease/core";
 import delay from "delay";
-import { IPluginConfig } from "./config.js";
-import * as utils from "./utils.js";
+import { IPluginConfig } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (config.smokeTest && context.releasedPackages.npm != null) {

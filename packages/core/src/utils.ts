@@ -15,7 +15,6 @@
  */
 
 import * as fs from "fs";
-import { createRequire } from "module";
 import * as path from "path";
 import * as exec from "@actions/exec";
 import { cosmiconfig } from "cosmiconfig";
@@ -23,18 +22,9 @@ import envCi from "env-ci";
 import micromatch from "micromatch";
 import * as semver from "semver";
 import which from "which";
-import {
-    IContext,
-    IContextOpts,
-    IPluginsLoaded,
-    IProtectedBranch,
-    IVersionInfo,
-    SemverDiffLevels,
-} from "./doc/index.js";
-import { Inputs } from "./inputs.js";
-import { Logger } from "./logger.js";
-
-const require = createRequire(import.meta?.url || __filename);
+import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo, SemverDiffLevels } from "./doc/index";
+import { Inputs } from "./inputs";
+import { Logger } from "./logger";
 
 /**
  * Build global context object that is passed to all plugin handlers.
@@ -129,7 +119,7 @@ export async function loadPlugins(context: IContext): Promise<IPluginsLoaded> {
             pluginPath = `./node_modules/${pluginName}`;
         }
         if (pluginName.startsWith("@octorelease/") && !fs.existsSync(pluginPath)) {
-            pluginPath = pluginName.replace("@octorelease", import.meta.dirname);
+            pluginPath = pluginName.replace("@octorelease", __dirname);
         }
         const fullPluginPath = path.resolve(pluginPath);
         pluginsLoaded[pluginName] = require(fullPluginPath);

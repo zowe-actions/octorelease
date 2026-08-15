@@ -20,8 +20,8 @@ import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
 import findUp from "find-up";
-import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config.js";
-import * as utils from "./utils.js";
+import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     if (context.version.old === context.version.new) {

@@ -34070,7 +34070,7 @@ module.exports = __toCommonJS(index_exports);
 var SemverDiffLevels = ["none", "patch", "minor", "major"];
 
 // src/inputs.ts
-var path4 = __toESM(require("path"), 1);
+var path4 = __toESM(require("path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os = __toESM(require("os"), 1);
@@ -35414,7 +35414,7 @@ __export(stages_exports, {
   success: () => success,
   version: () => version
 });
-var path5 = __toESM(require("path"), 1);
+var path5 = __toESM(require("path"));
 async function fail(context, pluginsLoaded) {
   await runStage(context, pluginsLoaded, { name: "fail" });
 }
@@ -35492,16 +35492,13 @@ __export(utils_exports, {
   loadPlugins: () => loadPlugins,
   verifyConditions: () => verifyConditions
 });
-var fs2 = __toESM(require("fs"), 1);
-var import_module = require("module");
-var path6 = __toESM(require("path"), 1);
-var import_cosmiconfig = __toESM(require_dist2(), 1);
-var import_env_ci = __toESM(require_env_ci(), 1);
-var import_micromatch = __toESM(require_micromatch(), 1);
-var semver = __toESM(require_semver2(), 1);
-var import_which = __toESM(require_lib3(), 1);
-var import_meta = {};
-var require2 = (0, import_module.createRequire)(import_meta?.url || __filename);
+var fs2 = __toESM(require("fs"));
+var path6 = __toESM(require("path"));
+var import_cosmiconfig = __toESM(require_dist2());
+var import_env_ci = __toESM(require_env_ci());
+var import_micromatch = __toESM(require_micromatch());
+var semver = __toESM(require_semver2());
+var import_which = __toESM(require_lib3());
 async function buildContext(opts) {
   const envCi2 = await loadCiEnv();
   const rc = await (0, import_cosmiconfig.cosmiconfig)("release").search(Inputs.configDir);
@@ -35562,11 +35559,11 @@ async function loadPlugins(context) {
       pluginPath = `./node_modules/${pluginName}`;
     }
     if (pluginName.startsWith("@octorelease/") && !fs2.existsSync(pluginPath)) {
-      pluginPath = pluginName.replace("@octorelease", import_meta.dirname);
+      pluginPath = pluginName.replace("@octorelease", __dirname);
     }
     const fullPluginPath = path6.resolve(pluginPath);
-    pluginsLoaded[pluginName] = require2(fullPluginPath);
-    Logger.pluginPathMap[pluginName] = require2.resolve(fullPluginPath);
+    pluginsLoaded[pluginName] = require(fullPluginPath);
+    Logger.pluginPathMap[pluginName] = require.resolve(fullPluginPath);
   }
   return pluginsLoaded;
 }
