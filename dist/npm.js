@@ -1601,6 +1601,9 @@ async function publish_default(context, config, inDir) {
     }
     pruneShrinkwrap(context, inDir);
   }
+  if (config.npmPublish !== false) {
+    await exec3.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
+  }
   const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
   if (config.tarballDir != null) {
     fs3.mkdirSync(config.tarballDir, { recursive: true });

@@ -33,6 +33,10 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         pruneShrinkwrap(context, inDir);
     }
 
+    if (config.npmPublish !== false) {
+        await exec.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
+    }
+
     const tgzFile = await utils.npmPack(packageJson.name, npmRegistry, inDir);
     if (config.tarballDir != null) {
         fs.mkdirSync(config.tarballDir, { recursive: true });
