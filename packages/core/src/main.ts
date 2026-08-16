@@ -18,7 +18,7 @@
 
 import * as path from "path";
 import * as core from "@actions/core";
-import { Inputs, stages, utils } from "./index";
+import { Inputs, stages, utils } from "./";
 
 async function run(): Promise<void> {
     try {
