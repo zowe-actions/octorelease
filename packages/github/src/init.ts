@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { RequestError } from "@octokit/request-error";
-import delay from "delay";
 import { IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
+import delay from "delay";
+import * as semver from "semver";
 import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
 import * as utils from "./utils";
 
@@ -31,11 +31,11 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         const releaseType = await getPrReleaseType(context, config);
         context.version.old = context.version.new || context.version.old;
         const oldVersion = context.version.old.split("-")[0];
-        context.version.new = releaseType != null ? require("semver").inc(oldVersion, releaseType) : oldVersion;
+        context.version.new = releaseType != null ? semver.inc(oldVersion, releaseType)! : oldVersion;
     }
 }
 
-async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<string | null> {
+async function getPrReleaseType(context: IContext, config: IPluginConfig): Promise<semver.ReleaseType | null> {
     const octokit = utils.getOctokit(context, config);
     const prNumber = await utils.findPrNumber(context, octokit);
     if (prNumber == null) {
@@ -44,9 +44,9 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
 
     const labels = await octokit.rest.issues.listLabelsOnIssue({
         ...context.ci.repo,
-        issue_number: prNumber
+        issue_number: prNumber,
     });
-    if (labels.data.some(label => label.name === "released")) {
+    if (labels.data.some((label) => label.name === "released")) {
         context.logger.warn("Pull request already released, no new version detected");
         return null;
     }
@@ -54,15 +54,15 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     const releaseLabels = Array.isArray(config.checkPrLabels) ? config.checkPrLabels : DEFAULT_RELEASE_LABELS;
     const timeoutInMinutes = 30;
     let approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
-    let semverDiffLevel: typeof SemverDiffLevels[number] = "none";
+    let semverDiffLevel: (typeof SemverDiffLevels)[number] = "none";
 
     if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== semverDiffLevel) {
         // Remove unapproved release labels
-        for (const { name } of labels.data.filter(label => releaseLabels.includes(label.name))) {
+        for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
             await octokit.rest.issues.removeLabel({
                 ...context.ci.repo,
                 issue_number: prNumber,
-                name
+                name,
             });
         }
 
@@ -70,41 +70,43 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         const oldVersion = (context.version.new || context.version.old).split("-")[0];
         // Check if prerelease is truthy to handle case of empty string
         const prereleaseSuffix = context.version.prerelease ? `-${context.version.prerelease}` : "";
-        const semverInc = require("semver/functions/inc");
-        let commentBody = `Version info from a repo admin is required to publish a new version. ` +
+        let commentBody =
+            `Version info from a repo admin is required to publish a new version. ` +
             `Please add one of the following labels within ${timeoutInMinutes} minutes:\n` +
             `* **${releaseLabels[0]}**: \`${oldVersion}${prereleaseSuffix}\` (default)\n`;
         for (const [i, level] of SemverDiffLevels.slice(1).entries()) {
             if (context.branch.level != null && i >= SemverDiffLevels.indexOf(context.branch.level)) {
                 break;
             }
-            commentBody += `* **${releaseLabels[i + 1]}**: \`${semverInc(oldVersion, level)}${prereleaseSuffix}\`\n`;
+            commentBody += `* **${releaseLabels[i + 1]}**: \`${semver.inc(oldVersion, level as semver.ReleaseType)}${prereleaseSuffix}\`\n`;
         }
         const comment = await octokit.rest.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
-            body: commentBody + "\n<sub>Powered by Octorelease :rocket:</sub>"
+            body: commentBody + "\n<sub>Powered by Octorelease :rocket:</sub>",
         });
 
         // Wait for release label to be added to PR
         context.logger.info("Waiting for repo admin to add release label to pull request...");
         const startTime = new Date().getTime();
         const timeoutInMsec = timeoutInMinutes * 60000;
-        while (approvedLabelEvents.length !== 1 && (new Date().getTime() - startTime) < timeoutInMsec) {
+        while (approvedLabelEvents.length !== 1 && new Date().getTime() - startTime < timeoutInMsec) {
             await delay(1000);
 
             try {
                 approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
             } catch (error) {
-                if (!(error instanceof RequestError && error.status === 304)) {
+                if (!(error instanceof Error && "status" in error && error.status === 304)) {
                     throw error;
                 }
             }
         }
 
         if (approvedLabelEvents.length === 1) {
-            context.logger.info(`Release label "${approvedLabelEvents[0].label.name}" was added by ` +
-                approvedLabelEvents[0].actor.login);
+            context.logger.info(
+                `Release label "${approvedLabelEvents[0].label.name}" was added by ` +
+                    approvedLabelEvents[0].actor.login,
+            );
         } else {
             context.logger.info("Timed out waiting for release label");
         }
@@ -112,7 +114,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
         // Delete comment since it is no longer useful
         await octokit.rest.issues.deleteComment({
             ...context.ci.repo,
-            comment_id: comment.data.id
+            comment_id: comment.data.id,
         });
     }
 
@@ -122,15 +124,19 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     return semverDiffLevel !== "none" ? semverDiffLevel : null;
 }
 
-async function findApprovedLabelEvents(context: IContext, octokit: utils.Octokit, prNumber: number,
-    releaseLabels: string[]): Promise<Record<string, any>[]> {
+async function findApprovedLabelEvents(
+    context: IContext,
+    octokit: utils.Octokit,
+    prNumber: number,
+    releaseLabels: string[],
+): Promise<Record<string, any>[]> {
     const getCollaboratorPermissionLevel = (username: string) =>
         octokit.rest.repos.getCollaboratorPermissionLevel({ ...context.ci.repo, username });
     const events = await octokit.rest.issues.listEvents({
         ...context.ci.repo,
         issue_number: prNumber,
         per_page: 100,
-        headers: lastEtag ? { "if-none-match": lastEtag } : undefined
+        headers: lastEtag ? { "if-none-match": lastEtag } : undefined,
     });
     lastEtag = events.headers.etag;
 
@@ -149,9 +155,9 @@ async function findApprovedLabelEvents(context: IContext, octokit: utils.Octokit
             return false;
         } else if (!releaseLabels.includes(current.label.name)) {
             return false;
-        } else if (futureEvents.some(e => e.event === "merged")) {
+        } else if (futureEvents.some((e) => e.event === "merged")) {
             return false;
-        } else if (futureEvents.some(e => e.event === "unlabeled" && e.label.name === current.label.name)) {
+        } else if (futureEvents.some((e) => e.event === "unlabeled" && e.label.name === current.label.name)) {
             return false;
         } else if ((await getCollaboratorPermissionLevel(current.actor.login)).data.permission !== "admin") {
             return false;

@@ -27,6 +27,6 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         ...(context.releasedPackages.pypi || []),
         ...(await globber.glob()).map((tgzPath) => {
             return { name: path.basename(tgzPath, ".tar.gz") };
-        })
+        }),
     ];
 }

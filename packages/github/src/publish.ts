@@ -17,8 +17,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as glob from "@actions/glob";
-import { RequestError } from "@octokit/request-error";
 import { IContext, utils as coreUtils } from "@octorelease/core";
+import mime from "mime";
 import { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
@@ -30,7 +30,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     const octokit = utils.getOctokit(context, config);
     const release = await createRelease(context, octokit);
     if (config.assets != null && config.assets.length > 0) {
-        const assetPaths: string[] = (typeof config.assets === "string") ? [config.assets] : config.assets;
+        const assetPaths: string[] = typeof config.assets === "string" ? [config.assets] : config.assets;
         await uploadAssets(context, octokit, release, assetPaths);
     }
 
@@ -40,7 +40,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 ...context.ci.repo,
                 release_id: release.data.id,
                 draft: false,
-                make_latest: "legacy"
+                make_latest: "legacy",
             });
         });
     }
@@ -54,10 +54,10 @@ async function createRelease(context: IContext, octokit: utils.Octokit): Promise
     try {
         release = await octokit.rest.repos.getReleaseByTag({
             ...context.ci.repo,
-            tag: tagName
+            tag: tagName,
         });
     } catch (error) {
-        if (!(error instanceof RequestError && error.status === 404)) {
+        if (!(error instanceof Error && "status" in error && error.status === 404)) {
             throw error;
         }
     }
@@ -65,25 +65,28 @@ async function createRelease(context: IContext, octokit: utils.Octokit): Promise
     // Create release if it doesn't exist and try to add release notes
     if (release == null) {
         context.logger.info(`Creating GitHub release with tag ${tagName}`);
-        release = await coreUtils.dryRunTask(context, "create GitHub release", async () => {
+        release = (await coreUtils.dryRunTask(context, "create GitHub release", async () => {
             return octokit.rest.repos.createRelease({
                 ...context.ci.repo,
                 tag_name: tagName,
                 body: context.releaseNotes,
                 draft: true,
-                prerelease: context.version.prerelease != null
+                prerelease: context.version.prerelease != null,
             });
-        }) || { data: {} };
+        })) || { data: {} };
     }
 
     return release;
 }
 
-async function uploadAssets(context: IContext, octokit: utils.Octokit, release: Record<string, any>,
-    assetPaths: string[]): Promise<void> {
+async function uploadAssets(
+    context: IContext,
+    octokit: utils.Octokit,
+    release: Record<string, any>,
+    assetPaths: string[],
+): Promise<void> {
     const globber = await glob.create(assetPaths.join("\n"));
     const artifactPaths: string[] = await globber.glob();
-    const mime = require("mime-types");
 
     for (const artifactPath of artifactPaths) {
         const assetName = path.basename(artifactPath);
@@ -105,9 +108,9 @@ async function uploadAssets(context: IContext, octokit: utils.Octokit, release: 
                 url: release.data.upload_url,
                 headers: {
                     "Content-Length": fs.statSync(artifactPath).size,
-                    "Content-Type": mime.lookup(artifactPath) || "application/octet-stream"
-                }
+                    "Content-Type": mime.getType(artifactPath) || "application/octet-stream",
+                },
             });
-        })
+        });
     }
 }

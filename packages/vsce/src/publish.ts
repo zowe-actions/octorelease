@@ -38,7 +38,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     if (config.vscePublish !== false) {
-        const vsceMetadata = await utils.vsceInfo(extensionName) || {};
+        const vsceMetadata = (await utils.vsceInfo(extensionName)) || {};
         if (context.version.prerelease != null) {
             // VSCE Marketplace doesn't support prerelease tags: https://github.com/microsoft/vsmarketplace/issues/50
             context.logger.warn("Cannot publish version with prerelease tag to VS Code Marketplace");
@@ -49,8 +49,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 ...(context.releasedPackages.vsce || []),
                 {
                     name: `${extensionName}@${packageJson.version}`,
-                    url: `https://marketplace.visualstudio.com/items?itemName=${extensionName}`
-                }
+                    url: `https://marketplace.visualstudio.com/items?itemName=${extensionName}`,
+                },
             ];
         } else {
             context.logger.error(`Version ${packageJson.version} has already been published to VS Code Marketplace`);
@@ -58,7 +58,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     if (config.ovsxPublish) {
-        const ovsxMetadata = await utils.ovsxInfo(extensionName) || {};
+        const ovsxMetadata = (await utils.ovsxInfo(extensionName)) || {};
         if (!Object.keys(ovsxMetadata.allVersions || {}).includes(packageJson.version)) {
             let success = true;
             try {
@@ -70,10 +70,12 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
             context.releasedPackages.vsce = [
                 ...(context.releasedPackages.vsce || []),
-                success ? {
-                    name: `${extensionName}@${packageJson.version} (OVSX)`,
-                    url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}/${packageJson.version}`
-                } : { name: `❌ ${extensionName}@${packageJson.version} (OVSX)` }
+                success
+                    ? {
+                          name: `${extensionName}@${packageJson.version} (OVSX)`,
+                          url: `https://open-vsx.org/extension/${extensionName.replace(".", "/")}/${packageJson.version}`,
+                      }
+                    : { name: `❌ ${extensionName}@${packageJson.version} (OVSX)` },
             ];
         } else {
             context.logger.error(`Version ${packageJson.version} has already been published to Open VSX Registry`);

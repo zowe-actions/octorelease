@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import semver from "semver";
 import { IContext, SemverDiffLevels } from "../src/doc";
 import { verifyConditions } from "../src/utils";
 
@@ -27,8 +28,8 @@ describe("Utility functions", () => {
                 old: oldVersion,
                 new: oldVersion,
                 overrides: {},
-                prerelease: "next"
-            }
+                prerelease: "next",
+            },
         };
         await verifyConditions(context as IContext);
         expect((context.version as any).new).toEqual(`${oldVersion}-next`);
@@ -38,32 +39,35 @@ describe("Utility functions", () => {
         const context: Partial<IContext> = {
             branch: {
                 name: "main",
-                level
+                level,
             },
             version: {
                 old: oldVersion,
-                new: require("semver").inc(oldVersion, level),
-                overrides: {}
-            }
+                new: semver.inc(oldVersion, level),
+                overrides: {},
+            },
         };
         await expect(verifyConditions(context as IContext)).resolves.not.toThrow();
     });
 
     it.each(SemverDiffLevels.slice(0, -1))(
-        "verifyConditions should block semver bumps when level is %s", async (level) => {
-        const badLevel = SemverDiffLevels[SemverDiffLevels.indexOf(level) + 1];
-        const context: Partial<IContext> = {
-            branch: {
-                name: "main",
-                level
-            },
-            version: {
-                old: oldVersion,
-                new: require("semver").inc(oldVersion, badLevel),
-                overrides: {}
-            }
-        };
-        await expect(verifyConditions(context as IContext)).rejects.toThrow(
-            `Protected branch main does not allow ${badLevel} version changes`);
-    });
+        "verifyConditions should block semver bumps when level is %s",
+        async (level) => {
+            const badLevel = SemverDiffLevels[SemverDiffLevels.indexOf(level) + 1];
+            const context: Partial<IContext> = {
+                branch: {
+                    name: "main",
+                    level,
+                },
+                version: {
+                    old: oldVersion,
+                    new: semver.inc(oldVersion, badLevel),
+                    overrides: {},
+                },
+            };
+            await expect(verifyConditions(context as IContext)).rejects.toThrow(
+                `Protected branch main does not allow ${badLevel} version changes`,
+            );
+        },
+    );
 });

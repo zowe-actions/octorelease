@@ -26,7 +26,7 @@ export default async function (context: IContext, _config: IPluginConfig): Promi
         throw new Error("Required environment variable TWINE_PASSWORD is undefined");
     }
 
-    if (!utils.commandExists("twine")) {
+    if (!(await utils.commandExists("twine"))) {
         throw new Error("Could not find twine on PATH");
     }
 }

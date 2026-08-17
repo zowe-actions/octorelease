@@ -30,7 +30,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             const tmpDir = path.join(os.tmpdir(), (context.ci as any).build, name);
             fs.mkdirSync(tmpDir, { recursive: true });
             let tries = 0;
-            while (await utils.npmView(name, registry) == null && tries < 60) {
+            while ((await utils.npmView(name, registry)) == null && tries < 60) {
                 await delay(1000);
                 tries += 1;
             }

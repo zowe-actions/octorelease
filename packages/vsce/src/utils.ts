@@ -23,20 +23,22 @@ let usePnpm: boolean;
 async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {
     if (usePnpm == null) {
         try {
-            usePnpm = await exec.exec("pnpm", ["--version"], { silent: true }) === 0;
+            usePnpm = (await exec.exec("pnpm", ["--version"], { silent: true })) === 0;
         } catch {
             usePnpm = false;
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return usePnpm ? `pnpm ${utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${(await utils.commandExists(binName)) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function ovsxInfo(extensionName: string): Promise<Record<string, any> | undefined> {
     try {
         const cmdOutput = await exec.getExecOutput(await npxCmd("ovsx"), ["ovsx", "get", extensionName, "--metadata"]);
         return JSON.parse(cmdOutput.stdout);
-    } catch { /* Do nothing */ }
+    } catch {
+        /* Do nothing */
+    }
 }
 
 export async function ovsxPublish(context: IContext, vsixPath?: string): Promise<void> {
@@ -59,7 +61,9 @@ export async function vsceInfo(extensionName: string): Promise<Record<string, an
     try {
         const cmdOutput = await exec.getExecOutput(await npxCmd("vsce"), ["vsce", "show", extensionName, "--json"]);
         return JSON.parse(cmdOutput.stdout);
-    } catch { /* Do nothing */ }
+    } catch {
+        /* Do nothing */
+    }
 }
 
 export async function vscePackage(context: IContext): Promise<string> {

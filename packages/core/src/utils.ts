@@ -17,8 +17,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
+import * as io from "@actions/io";
 import { cosmiconfig } from "cosmiconfig";
-import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo, SemverDiffLevels } from "./doc";
+import envCi from "env-ci";
+import micromatch from "micromatch";
+import * as semver from "semver";
+import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo, SemverDiffLevels } from "./doc/index";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
@@ -27,19 +31,17 @@ import { Logger } from "./logger";
  * @param opts Options for building the context object
  * @returns Global context object for Octorelease
  */
-export async function buildContext(opts?: IContextOpts):
-    Promise<IContext | undefined> {
+export async function buildContext(opts?: IContextOpts): Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
     const rc = await cosmiconfig("release").search(Inputs.configDir);
     if (rc == null || rc.isEmpty) {
         throw new Error("Failed to load config because file does not exist or is empty");
     }
 
-    const micromatch = require("micromatch");
-    const branches = rc.config.branches.map((branch: any) => typeof branch === "string" ?
-        { name: branch } : branch);
+    const branches = rc.config.branches.map((branch: any) => (typeof branch === "string" ? { name: branch } : branch));
     const branchIndex = branches.findIndex((branch: any) =>
-        micromatch.isMatch(opts?.branch || envCi.branch, branch.name));
+        micromatch.isMatch(opts?.branch || envCi.branch!, branch.name),
+    );
     if (branchIndex == -1 && !opts?.force) {
         return;
     }
@@ -50,7 +52,7 @@ export async function buildContext(opts?: IContextOpts):
     }
 
     const pluginConfig: Record<string, Record<string, any>[]> = {};
-    for (const pc of (rc.config.plugins || [])) {
+    for (const pc of rc.config.plugins || []) {
         if (typeof pc === "string") {
             pluginConfig[pc] = [{}];
         } else {
@@ -72,7 +74,7 @@ export async function buildContext(opts?: IContextOpts):
         releasedPackages: {},
         rootDir: process.cwd(),
         tagPrefix,
-        version: versionInfo
+        version: versionInfo,
     };
 }
 
@@ -80,8 +82,8 @@ export async function buildContext(opts?: IContextOpts):
  * Check if command already exists on the user's PATH
  * @param cmd Command to be run (e.g. lerna)
  */
-export function commandExists(cmd: string): boolean {
-    return require("which").sync(cmd, { nothrow: true }) != null;
+export async function commandExists(cmd: string): Promise<boolean> {
+    return (await io.which(cmd, false)) != null;
 }
 
 /**
@@ -90,8 +92,11 @@ export function commandExists(cmd: string): boolean {
  * @param description Description to log when task is skipped
  * @param task Callback to execute when not in dry run mode
  */
-export async function dryRunTask<T>(context: IContext, description: string, task: () => Promise<T>):
-    Promise<T | undefined> {
+export async function dryRunTask<T>(
+    context: IContext,
+    description: string,
+    task: () => Promise<T>,
+): Promise<T | undefined> {
     if (context.dryRun) {
         context.logger.info(`Skipping "${description}"`);
     } else {
@@ -137,19 +142,26 @@ export async function verifyConditions(context: IContext): Promise<void> {
         context.version.new = `${context.version.new.split("-")[0]}-${context.version.prerelease}`;
     }
 
-    const semver = require("semver");
-    const semverLevel = context.version.old !== "0.0.0" ?
-        semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0]) : null;
+    const semverLevel =
+        context.version.old !== "0.0.0"
+            ? semver.diff(context.version.old.split("-")[0], context.version.new.split("-")[0])
+            : null;
     for (const versionInfo of Object.values(context.version.overrides)) {
-        versionInfo.new = semverLevel != null ?
-            semver.inc(versionInfo.old.split("-")[0], semverLevel) : versionInfo.old.split("-")[0];
+        versionInfo.new =
+            semverLevel != null
+                ? semver.inc(versionInfo.old.split("-")[0], semverLevel as semver.ReleaseType)!
+                : versionInfo.old.split("-")[0];
         if (versionInfo.prerelease) {
             versionInfo.new = `${versionInfo.new}-${versionInfo.prerelease}`;
         }
     }
 
-    if (semverLevel != null && context.branch.level != null &&
-        SemverDiffLevels.indexOf(semverLevel) > SemverDiffLevels.indexOf(context.branch.level)) {
+    if (
+        semverLevel != null &&
+        context.branch.level != null &&
+        SemverDiffLevels.indexOf(semverLevel as (typeof SemverDiffLevels)[number]) >
+            SemverDiffLevels.indexOf(context.branch.level)
+    ) {
         throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
     }
 }
@@ -161,14 +173,17 @@ export async function verifyConditions(context: IContext): Promise<void> {
  * @returns Version info for the `context.version` property
  */
 async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Promise<IVersionInfo> {
-    const cmdOutput = await exec.getExecOutput("git",
-        ["describe", "--tags", "--abbrev=0", `--match=${tagPrefix}[0-9]*.[0-9]*.[0-9]*`], { ignoreReturnCode: true });
-    const oldVersion = cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length) || "0.0.0";
+    const cmdOutput = await exec.getExecOutput(
+        "git",
+        ["describe", "--tags", "--abbrev=0", `--match=${tagPrefix}[0-9]*.[0-9]*.[0-9]*`],
+        { ignoreReturnCode: true },
+    );
+    const oldVersion = (cmdOutput.exitCode === 0 && cmdOutput.stdout.trim().slice(tagPrefix.length)) || "0.0.0";
 
     let prerelease: string | undefined = branch.prerelease === "" ? "" : undefined;
     if (branch.prerelease) {
-        const prereleaseName = (typeof branch.prerelease === "string") ? branch.prerelease : branch.channel;
-        const timestamp = (new Date()).toISOString().replace(/\D/g, "").slice(0, 12);
+        const prereleaseName = typeof branch.prerelease === "string" ? branch.prerelease : branch.channel;
+        const timestamp = new Date().toISOString().replace(/\D/g, "").slice(0, 12);
         prerelease = `${prereleaseName}.${timestamp}`;
     }
 
@@ -180,40 +195,46 @@ async function buildVersionInfo(branch: IProtectedBranch, tagPrefix: string): Pr
  * @returns Commit message or undefined if there is no Git history
  */
 export async function getLastCommitMessage(context: IContext): Promise<string | undefined> {
-    const cmdOutput = await exec.getExecOutput("git",
-        ["log", "-1", "--pretty=format:%s", context.ci.commit], { ignoreReturnCode: true });
-    return cmdOutput.exitCode === 0 && cmdOutput.stdout.trim() || undefined;
+    const cmdOutput = await exec.getExecOutput("git", ["log", "-1", "--pretty=format:%s", context.ci.commit], {
+        ignoreReturnCode: true,
+    });
+    return (cmdOutput.exitCode === 0 && cmdOutput.stdout.trim()) || undefined;
 }
 
 /**
  * Load CI properties like branch name, commit SHA, and repository slug.
  * @returns CI environment for the `context.ci` property
  */
-async function loadCiEnv(): Promise<any> {
-    let envCi = require("env-ci")();
-    if (envCi.service == null) {
-        throw new Error(`Unsupported CI service detected: ${envCi.service}`);
+async function loadCiEnv(): Promise<IContext["ci"]> {
+    let env = envCi() as envCi.KnownCiEnv & { [key: string]: any };
+    if (env.service == null) {
+        throw new Error(`Unsupported CI service detected: ${process.env.CI}`);
     }
 
-    if (envCi.isPr) {
+    if (env.isPr) {
         // For PR builds, map `branch` (base) to `baseBranch` and `prBranch` (head) to `branch`
-        envCi = { ...envCi, baseBranch: envCi.branch, branch: envCi.prBranch, prBranch: undefined };
+        env = { ...env, baseBranch: env.branch, branch: env.prBranch, prBranch: undefined } as any;
     }
-    if (envCi.branch == null) {
+    if (env.branch == null) {
         const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
-        envCi.branch = cmdOutput.stdout.trim();
+        env.branch = cmdOutput.stdout.trim();
     }
 
-    if (envCi.commit == null) {
+    if (env.commit == null) {
         const cmdOutput = await exec.getExecOutput("git", ["rev-parse", "HEAD"]);
-        envCi.commit = cmdOutput.stdout.trim();
+        env.commit = cmdOutput.stdout.trim();
     }
 
-    if (envCi.slug == null) {
+    if (env.slug == null) {
         const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
-        envCi.slug = cmdOutput.stdout.trim().replace(/\.git$/, "").split("/").slice(-2).join("/");
+        env.slug = cmdOutput.stdout
+            .trim()
+            .replace(/\.git$/, "")
+            .split("/")
+            .slice(-2)
+            .join("/");
     }
-    const [owner, repo] = envCi.slug.split("/");
+    const [owner, repo] = env.slug.split("/");
 
-    return { ...envCi, repo: { owner, repo } };
+    return { ...env, repo: { owner, repo } };
 }

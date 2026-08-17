@@ -19,6 +19,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext, IProtectedBranch } from "@octorelease/core";
 import { utils as gitUtils } from "@octorelease/git";
+import pluralize from "pluralize";
 
 const lockfilePath = fs.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
 const updateDetails: string[] = [];
@@ -48,11 +49,11 @@ async function updateDependency(
     context: IContext,
     pkgName: string,
     pkgTag: string | string[],
-    dev: boolean
+    dev: boolean,
 ): Promise<void> {
     let tempPkgTag = "";
     let moreArgs: string[] = [];
-    const env: { [key: string]: string } = { ...process.env as any } // ?
+    const env: { [key: string]: string } = { ...(process.env as any) }; // ?
     if (!Array.isArray(pkgTag)) {
         tempPkgTag = pkgTag;
     } else {
@@ -70,8 +71,9 @@ async function updateDependency(
 
     if (resolutions[pkgName] == null) {
         context.logger.debug(`Gathering version information for: ${pkgName}@${tempPkgTag}`);
-        resolutions[pkgName] = (await exec.getExecOutput("npm",
-            ["view", `${pkgName}@${tempPkgTag}`, "version"], { env })).stdout.trim();
+        resolutions[pkgName] = (
+            await exec.getExecOutput("npm", ["view", `${pkgName}@${tempPkgTag}`, "version"], { env })
+        ).stdout.trim();
     }
     const latestVersion = resolutions[pkgName];
 
@@ -90,12 +92,13 @@ export default async function (context: IContext): Promise<void> {
         return;
     }
 
-    const pluralize = require("pluralize");
     const dependencies = getDependencies(context, branchConfig, false);
     const devDependencies = getDependencies(context, branchConfig, true);
     const changedFiles = ["package.json", lockfilePath];
-    context.logger.info(`Checking for updates to ${pluralize("dependency", Object.keys(dependencies).length, true)} ` +
-        `and ${pluralize("dev dependency", Object.keys(devDependencies).length, true)}`);
+    context.logger.info(
+        `Checking for updates to ${pluralize("dependency", Object.keys(dependencies).length, true)} ` +
+            `and ${pluralize("dev dependency", Object.keys(devDependencies).length, true)}`,
+    );
 
     if (context.env.NPM_RESOLUTIONS) {
         resolutions = JSON.parse(context.env.NPM_RESOLUTIONS);
@@ -128,8 +131,16 @@ export default async function (context: IContext): Promise<void> {
             const dependencyList = [...Object.keys(dependencies), ...Object.keys(devDependencies)];
 
             // See https://en.wikipedia.org/wiki/Escape_character#Windows_Command_Prompt for why we need '^'
-            await exec.exec("npx", ["-y", "--", "syncpack@8", "fix-mismatches", "--dev", "--prod", "--filter",
-                dependencyList.join(process.platform === "win32" ? "^|" : "|")]);
+            await exec.exec("npx", [
+                "-y",
+                "--",
+                "syncpack@8",
+                "fix-mismatches",
+                "--dev",
+                "--prod",
+                "--filter",
+                dependencyList.join(process.platform === "win32" ? "^|" : "|"),
+            ]);
             await exec.exec("git", ["checkout", lockfilePath]);
             await exec.exec("npm", ["install"]);
         }

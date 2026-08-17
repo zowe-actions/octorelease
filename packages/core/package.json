@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "tsc -b && npm run lint",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "pack": "node ../../esbuild.mjs && node ../../esbuild.mjs main",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
@@ -44,14 +44,18 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/exec": "^1.1.0",
+    "@actions/core": "^3.0.0",
+    "@actions/exec": "^3.0.0",
+    "@actions/io": "^1.1.0",
     "@types/env-ci": "^3.1.1",
     "cosmiconfig": "^7.0.0",
     "env-ci": "^5.4.0",
     "micromatch": "^4.0.4",
-    "semver": "^7.5.2",
-    "which": "^4.0.0"
+    "semver": "^7.5.2"
+  },
+  "devDependencies": {
+    "@types/micromatch": "^4.0.10",
+    "@types/semver": "^7.0.0"
   },
   "optionalDependencies": {
     "@octorelease/changelog": "^1.0.0",

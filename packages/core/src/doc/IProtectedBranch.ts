@@ -36,7 +36,7 @@ export interface IProtectedBranch {
     /**
      * Maximum semver bump level allowed
      */
-    level?: typeof SemverDiffLevels[number];
+    level?: (typeof SemverDiffLevels)[number];
 
     /**
      * Prerelease name (defaults to branch name if `true`)

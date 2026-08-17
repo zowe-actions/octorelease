@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from "./doc";
+export * from "./doc/index";
 export * from "./inputs";
 export * from "./logger";
 export * as stages from "./stages";

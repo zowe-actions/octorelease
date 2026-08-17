@@ -1,0 +1,50 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "builtin": true
+  },
+  "ignorePatterns": [
+    "**/*.js",
+    "**/*.mjs",
+    "**/*.d.ts",
+    "**/dist/",
+    "**/lib/",
+    "**/node_modules/"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.ts"
+      ],
+      "plugins": [
+        "typescript",
+        "vitest"
+      ],
+      "rules": {
+        "no-console": "error",
+        "no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^_"
+          }
+        ],
+        "license-header/header": [
+          "error",
+          "./LICENSE_HEADER"
+        ],
+        "vitest/require-mock-type-parameters": "off"
+      },
+      "jsPlugins": [
+        "eslint-plugin-license-header"
+      ],
+      "env": {
+        "es2020": true,
+        "node": true,
+        "vitest": true
+      }
+    }
+  ]
+}

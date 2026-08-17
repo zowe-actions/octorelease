@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc -b && npm run lint",
-    "lint": "eslint src",
+    "lint": "oxlint src",
     "pack": "node ../../esbuild.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
@@ -36,8 +36,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@actions/exec": "^1.1.0",
-    "@actions/glob": "^0.4.0"
+    "@actions/exec": "^3.0.0",
+    "@actions/glob": "^0.7.0"
   },
   "peerDependencies": {
     "@octorelease/core": "^1.0.0"

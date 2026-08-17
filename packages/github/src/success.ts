@@ -33,7 +33,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         await octokit.rest.issues.addLabels({
             ...context.ci.repo,
             issue_number: prNumber,
-            labels: ["released"]
+            labels: ["released"],
         });
     });
 
@@ -44,21 +44,24 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             packageList.push(`**${pkgType}**: ${pkgName}`);
         }
     }
-    const hasErrors = packageList.some(line => line.includes("❌"));
-    const releaseMessage = hasErrors ?
-        `Release succeeded for the \`${context.branch.name}\` branch with some errors. :warning:` :
-        `Release succeeded for the \`${context.branch.name}\` branch. :tada:`;
-    const workflowRunUrl = `${config.githubUrl || "https://github.com"}/${(context.ci as any).slug}/actions/runs/` +
+    const hasErrors = packageList.some((line) => line.includes("❌"));
+    const releaseMessage = hasErrors
+        ? `Release succeeded for the \`${context.branch.name}\` branch with some errors. :warning:`
+        : `Release succeeded for the \`${context.branch.name}\` branch. :tada:`;
+    const workflowRunUrl =
+        `${config.githubUrl || "https://github.com"}/${(context.ci as any).slug}/actions/runs/` +
         (context.ci as any).build;
     await coreUtils.dryRunTask(context, "create success comment on pull request", async () => {
         await octokit.rest.issues.createComment({
             ...context.ci.repo,
             issue_number: prNumber,
-            body: `${releaseMessage}\n\n` +
+            body:
+                `${releaseMessage}\n\n` +
                 `The following packages have been published:\n` +
-                packageList.map(line => `* ${line}`).join("\n") + `\n\n` +
+                packageList.map((line) => `* ${line}`).join("\n") +
+                `\n\n` +
                 (hasErrors ? `Check the [workflow run](${workflowRunUrl}) for more error details.\n\n` : "") +
-                `<sub>Powered by Octorelease :rocket:</sub>`
+                `<sub>Powered by Octorelease :rocket:</sub>`,
         });
     });
 }

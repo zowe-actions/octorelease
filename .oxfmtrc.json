@@ -1,0 +1,21 @@
+{
+  "tabWidth": 4,
+  "printWidth": 120,
+  "sortImports": {
+    "newlinesBetween": false
+  },
+  "ignorePatterns": [
+    "**/*.md",
+    "**/*.json",
+    "**/*.jsonc",
+    "**/*.yml",
+    "**/*.yaml",
+    "**/*.js",
+    "**/*.mjs",
+    "**/*.d.ts",
+    "**/dist/**",
+    "**/lib/**",
+    "**/docs/**",
+    "**/node_modules/**"
+  ]
+}

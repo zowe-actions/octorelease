@@ -16,10 +16,10 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import findUp from "find-up";
 import * as glob from "@actions/glob";
 import { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
+import findUp from "find-up";
 import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
 import * as utils from "./utils";
 
@@ -35,7 +35,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
         lernaJson.version = context.version.new;
         fs.writeFileSync("lerna.json", JSON.stringify(lernaJson, null, 2) + "\n");
-        for (const pkgInfo of changedPackageInfo.filter(pkgInfo => !pkgInfo.private)) {
+        for (const pkgInfo of changedPackageInfo.filter((pkgInfo) => !pkgInfo.private)) {
             let versionOverride = null;
             for (const packageDir of Object.keys(context.version.overrides)) {
                 if (packageDir === path.relative(context.rootDir, pkgInfo.location)) {
@@ -74,12 +74,15 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 }
 
-async function updateIndependentVersion(context: IContext, pkgInfo: { name: string, location: string },
-    newVersion: string) {
+async function updateIndependentVersion(
+    context: IContext,
+    pkgInfo: { name: string; location: string },
+    newVersion: string,
+) {
     await npmUtils.npmVersion(newVersion, pkgInfo.location);
     if (context.workspaces != null) {
         const globber = await glob.create(context.workspaces.join("\n"), { implicitDescendants: false });
-        for (const packageDir of [context.rootDir, ...await globber.glob()]) {
+        for (const packageDir of [context.rootDir, ...(await globber.glob())]) {
             const packageJsonPath = path.join(packageDir, "package.json");
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
             let depsObj: Record<string, string> | undefined = undefined;
