@@ -40,28 +40,10 @@
       "jsPlugins": [
         "eslint-plugin-license-header"
       ],
-      "globals": {
-        "suite": "writable",
-        "test": "writable",
-        "describe": "writable",
-        "it": "writable",
-        "expectTypeOf": "writable",
-        "assertType": "writable",
-        "expect": "writable",
-        "assert": "writable",
-        "chai": "writable",
-        "vitest": "writable",
-        "vi": "writable",
-        "beforeAll": "writable",
-        "afterAll": "writable",
-        "beforeEach": "writable",
-        "afterEach": "writable",
-        "onTestFailed": "writable",
-        "onTestFinished": "writable"
-      },
       "env": {
         "es2020": true,
-        "node": true
+        "node": true,
+        "vitest": true
       }
     }
   ]
