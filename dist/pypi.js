@@ -18850,7 +18850,7 @@ async function init_default(context, _config) {
   if (context.env.TWINE_PASSWORD == null) {
     throw new Error("Required environment variable TWINE_PASSWORD is undefined");
   }
-  if (!import_core.utils.commandExists("twine")) {
+  if (!await import_core.utils.commandExists("twine")) {
     throw new Error("Could not find twine on PATH");
   }
 }

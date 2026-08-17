@@ -28,7 +28,7 @@ async function npxCmd(binName: "lerna"): Promise<string> {
         }
     }
     // pnpm doesn't have a direct npx equivalent so dlx always downloads and exec never does
-    return usePnpm ? `pnpm ${utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
+    return usePnpm ? `pnpm ${(await utils.commandExists(binName)) ? "exec" : "dlx"}` : "npx";
 }
 
 export async function getLernaMajorVersion(): Promise<number> {

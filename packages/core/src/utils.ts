@@ -17,11 +17,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as exec from "@actions/exec";
+import * as io from "@actions/io";
 import { cosmiconfig } from "cosmiconfig";
 import envCi from "env-ci";
 import micromatch from "micromatch";
 import * as semver from "semver";
-import which from "which";
 import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo, SemverDiffLevels } from "./doc/index";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
@@ -82,8 +82,8 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
  * Check if command already exists on the user's PATH
  * @param cmd Command to be run (e.g. lerna)
  */
-export function commandExists(cmd: string): boolean {
-    return which.sync(cmd, { nothrow: true }) != null;
+export async function commandExists(cmd: string): Promise<boolean> {
+    return (await io.which(cmd, false)) != null;
 }
 
 /**

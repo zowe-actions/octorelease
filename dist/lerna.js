@@ -19938,7 +19938,7 @@ async function npxCmd(binName) {
       usePnpm = false;
     }
   }
-  return usePnpm ? `pnpm ${import_core.utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
+  return usePnpm ? `pnpm ${await import_core.utils.commandExists(binName) ? "exec" : "dlx"}` : "npx";
 }
 async function getLernaMajorVersion() {
   const cmdOutput = await getExecOutput(await npxCmd("lerna"), ["lerna", "--version"]);
