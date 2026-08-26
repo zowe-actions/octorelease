@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 import * as fs from "fs";
 import { IContext } from "@octorelease/core";
-import { utils as gitUtils } from "@octorelease/git";
-import { version as lernaVersion } from "@octorelease/lerna";
-import { version as npmVersion } from "@octorelease/npm";
 import * as semver from "semver";
+import { IPluginApi } from "../plugins";
 
-export default async function (context: IContext): Promise<void> {
+export default async function (context: IContext, api: IPluginApi): Promise<void> {
     context.version.new = context.version.old.split("-")[0];
     if (!context.branch.prerelease && context.branch.level !== "none") {
         context.version.new = semver.inc(context.version.new, context.branch.level as semver.ReleaseType)!;
@@ -30,12 +28,12 @@ export default async function (context: IContext): Promise<void> {
 
     const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
     if (packageJson.workspaces != null) {
-        await lernaVersion(context, {});
+        await api.lerna.version(context, {});
     } else {
-        await npmVersion(context, {});
+        await api.npm.version(context, {});
     }
 
-    await gitUtils.gitAdd(...context.changedFiles);
-    await gitUtils.gitCommit(`Bump version to ${context.version.new}`);
-    await gitUtils.gitPush(context, context.branch.name);
+    await api.git.utils.gitAdd(...context.changedFiles);
+    await api.git.utils.gitCommit(`Bump version to ${context.version.new}`);
+    await api.git.utils.gitPush(context, context.branch.name);
 }

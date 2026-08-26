@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import * as fs from "fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext, IProtectedBranch } from "@octorelease/core";
-import { utils as gitUtils } from "@octorelease/git";
 import pluralize from "pluralize";
+import { IPluginApi } from "../plugins";
 
 const lockfilePath = fs.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
 const updateDetails: string[] = [];
@@ -86,9 +86,12 @@ async function updateDependency(
     }
 }
 
-export default async function (context: IContext): Promise<void> {
+export default async function (context: IContext, api: IPluginApi): Promise<void> {
     const branchConfig = context.branch as IProtectedBranchWithDeps;
-    if (branchConfig.dependencies == null && branchConfig.devDependencies == null) {
+    if (branchConfig.channel == null) {
+        core.info("Current branch is not targeting a release branch, exiting now");
+        return;
+    } else if (branchConfig.dependencies == null && branchConfig.devDependencies == null) {
         return;
     }
 
@@ -146,9 +149,9 @@ export default async function (context: IContext): Promise<void> {
         }
 
         if (context.env.GIT_COMMITTER_NAME !== null && context.env.GIT_COMMITTER_EMAIL !== null) {
-            await gitUtils.gitConfig(context);
-            await gitUtils.gitAdd(...changedFiles);
-            await gitUtils.gitCommit("Update dependencies [ci skip]\n\n" + updateDetails.join("\n"));
+            await api.git.utils.gitConfig(context);
+            await api.git.utils.gitAdd(...changedFiles);
+            await api.git.utils.gitCommit("Update dependencies [ci skip]\n\n" + updateDetails.join("\n"));
         }
     }
 }

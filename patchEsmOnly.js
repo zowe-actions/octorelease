@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 
 const actionsDir = path.join(__dirname, "node_modules", "@actions");
+let numChanged = 0;
 
 for (const packageName of fs.readdirSync(actionsDir)) {
     const packageJsonPath = path.join(actionsDir, packageName, "package.json");
@@ -22,6 +23,10 @@ for (const packageName of fs.readdirSync(actionsDir)) {
 
     if (changed) {
         fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
-        console.log(`Fixed exports.require in @actions/${packageName}/package.json`);
+        numChanged++;
     }
+}
+
+if (numChanged) {
+    console.log(`Patched ${numChanged} '@actions/*' packages to support CJS`);
 }

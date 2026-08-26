@@ -1,16 +1,12 @@
-# Sample plugin
+# octorelease-script
 
 GitHub action to run scripts in [Octorelease](https://github.com/octorelease/octorelease) context.
 
-<!-- [![Build Status](https://github.com/octorelease/run-script/workflows/Test/badge.svg)](https://github.com/octorelease/run-script/actions?query=workflow%3ATest+branch%3Amaster)
-[![npm latest version](https://img.shields.io/npm/v/@octorelease/run-script/latest.svg)](https://www.npmjs.com/package/@octorelease/run-script)
-[![npm next version](https://img.shields.io/npm/v/@octorelease/run-script/next.svg)](https://www.npmjs.com/package/@octorelease/run-script) -->
-
 ## Inputs
 
-### `artifact-name`
+### `config-dir`
 
-Name of artifact to create for sharing data between jobs.
+Custom directory to search for release configuration.
 
 ### `github-token`
 
@@ -18,11 +14,20 @@ Personal access token for authentication to GitHub APIs. Default `github.token`.
 
 ### `script`
 
-**Required** Name of script to run from the [scripts](scripts) directory.
+**Required** Name of a built-in script to run from the [scripts](src/scripts) directory, or a
+`./`-prefixed path to a custom script (resolved relative to the working directory) to run with a
+hydrated Octorelease context. See [customScript.ts](__tests__/fixtures/customScript.ts) for a
+sample custom script.
 
 ### `working-dir`
 
 Custom working directory to use instead of the project root.
+
+## Outputs
+
+### `result`
+
+The output of the script for other steps to reference.
 
 ## Example usage
 
@@ -30,4 +35,10 @@ Custom working directory to use instead of the project root.
 - uses: zowe-actions/octorelease/script@v1
   with:
     script: npmUpdate
+```
+
+```yaml
+- uses: zowe-actions/octorelease/script@v1
+  with:
+    script: ./ci/mycustomscript.js
 ```

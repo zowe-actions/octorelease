@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 import * as fs from "fs";
+import * as path from "path";
 import { loadScript } from "../src/loader";
 
 describe("Run Script action", () => {
@@ -25,4 +26,16 @@ describe("Run Script action", () => {
             expect(typeof loadScript(scriptName)).toBe("function");
         });
     }
+
+    it("should reject an unknown script name", () => {
+        expect(() => loadScript("doesNotExist")).toThrow("Could not find script to run: doesNotExist");
+    });
+
+    it("should load and run a custom script path prefixed with './'", async () => {
+        const fixturePath = path.join(__dirname, "fixtures/customScript");
+        const relativePath = "./" + path.relative(process.cwd(), fixturePath).replace(/\\/g, "/");
+        const fakeContext = { logger: { info: () => {} }, version: { new: "1.0.0" } } as any;
+        const fakeApi = { git: { utils: { gitAdd: async () => {} } } } as any;
+        await expect(loadScript(relativePath)(fakeContext, fakeApi)).resolves.toBeUndefined();
+    });
 });

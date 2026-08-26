@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,8 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import AdmZip from "adm-zip";
-
-export async function downloadArtifact(runId: number, artifactName: string, extractPath?: string): Promise<void> {
-    const octokit = github.getOctokit(core.getInput("github-token") || (process.env.GITHUB_TOKEN as string));
-    core.debug("Gathering artifact information...");
-    const artifactInfo = (
-        await octokit.rest.actions.listWorkflowRunArtifacts({
-            ...github.context.repo,
-            run_id: runId,
-        })
-    ).data.artifacts.find((a) => a.name === artifactName);
-    if (artifactInfo == null) {
-        throw new Error(`Could not find artifact ${artifactName} for run ID ${runId}`);
-    }
-    core.debug(`Artifact information:\n${JSON.stringify(artifactInfo)}`);
-    core.debug("Downloading artifact...");
-    const artifactRaw = Buffer.from(
-        (
-            await octokit.rest.actions.downloadArtifact({
-                ...github.context.repo,
-                artifact_id: artifactInfo.id,
-                archive_format: "zip",
-            })
-        ).data as any,
-    );
-    if (extractPath != null) {
-        fs.mkdirSync(extractPath, { recursive: true });
-    }
-    core.debug("Downloading artifact...");
-    new AdmZip(artifactRaw).extractAllTo(extractPath ?? process.cwd());
-}
 
 export async function findCurrentPr(state = "open"): Promise<any | undefined> {
     core.debug("Gather information about current pull request");

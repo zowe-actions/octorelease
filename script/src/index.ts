@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
 
 import * as path from "path";
 import * as core from "@actions/core";
-import { utils as coreUtils } from "@octorelease/core";
-import { loadScript, RELEASE_SCRIPTS } from "./loader";
+import { utils as coreUtils, IContext } from "@octorelease/core";
+import { loadScript } from "./loader";
+import { createPluginApi } from "./plugins";
 import * as utils from "./utils";
 
 async function run(): Promise<void> {
@@ -32,17 +33,12 @@ async function run(): Promise<void> {
         }
 
         const prBranch = (await utils.findCurrentPr())?.base.ref;
-        const context = await coreUtils.buildContext({
+        const context = (await coreUtils.buildContext({
             branch: prBranch,
-            force: !RELEASE_SCRIPTS.includes(scriptName),
+            force: true,
             logPrefix: scriptName,
-        });
-        if (context == null) {
-            core.info("Current branch is not targeting a release branch, exiting now");
-            return;
-        }
-
-        await loadScript(scriptName)(context);
+        })) as IContext;
+        await loadScript(scriptName)(context, createPluginApi());
     } catch (error) {
         if (error instanceof Error) {
             core.error(error.stack || error.message);
