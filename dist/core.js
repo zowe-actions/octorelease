@@ -35307,16 +35307,21 @@ async function buildContext(opts) {
     throw new Error("Failed to load config because file does not exist or is empty");
   }
   const micromatch = require_micromatch();
+  console.log("opts:", opts);
   const branches = rc.config.branches.map((branch) => typeof branch === "string" ? { name: branch } : branch);
+  console.log("branches:", branches);
   const branchIndex = branches.findIndex((branch) => micromatch.isMatch(opts?.branch || envCi.branch, branch.name));
+  console.log("branchMatches:", branches.map((branch) => micromatch.isMatch(opts?.branch || envCi.branch, branch.name)));
   if (branchIndex == -1 && !opts?.force) {
     return;
   }
+  console.log("branchIndex:", branchIndex);
   const branchInfo = branches[branchIndex] ?? {};
   branchInfo.name = opts?.branch || envCi.branch;
   if (branchIndex > 0 && branchInfo.channel == null) {
     branchInfo.channel = branchInfo.name;
   }
+  console.log("branchInfo:", branchInfo);
   const pluginConfig = {};
   for (const pc of rc.config.plugins || []) {
     if (typeof pc === "string") {
