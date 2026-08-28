@@ -27642,10 +27642,17 @@ function getOctokit(token, options, ...additionalPlugins) {
 // src/utils.ts
 async function findCurrentPr(state = "open") {
   debug("Gather information about current pull request");
-  if (context2.payload.pull_request?.state === state) {
-    return context2.payload.pull_request;
-  }
   const octokit = getOctokit(getInput("github-token") || process.env.GITHUB_TOKEN);
+  if (context2.payload.pull_request != null) {
+    if (state !== "open") {
+      return context2.payload.pull_request.state === state ? context2.payload.pull_request : void 0;
+    }
+    const { data: pr } = await octokit.rest.pulls.get({
+      ...context2.repo,
+      pull_number: context2.payload.pull_request.number
+    });
+    return pr.state === state ? pr : void 0;
+  }
   debug(`Looking through ${state?.toUpperCase() ?? ""} pull requests`);
   if (context2.payload.workflow_run == null) {
     const prs = (await octokit.rest.repos.listPullRequestsAssociatedWithCommit({

@@ -19,10 +19,21 @@ import * as github from "@actions/github";
 
 export async function findCurrentPr(state = "open"): Promise<any | undefined> {
     core.debug("Gather information about current pull request");
-    if (github.context.payload.pull_request?.state === state) {
-        return github.context.payload.pull_request;
-    }
     const octokit = github.getOctokit(core.getInput("github-token") || (process.env.GITHUB_TOKEN as string));
+    if (github.context.payload.pull_request != null) {
+        if (state !== "open") {
+            return github.context.payload.pull_request.state === state
+                ? github.context.payload.pull_request
+                : undefined;
+        }
+        // Fields like `base.ref` in the event payload go stale if the PR is edited (e.g. retargeted)
+        // after this run was triggered, so re-fetch the PR by number to get its current state.
+        const { data: pr } = await octokit.rest.pulls.get({
+            ...github.context.repo,
+            pull_number: github.context.payload.pull_request.number,
+        });
+        return pr.state === state ? pr : undefined;
+    }
     core.debug(`Looking through ${state?.toUpperCase() ?? ""} pull requests`);
     if (github.context.payload.workflow_run == null) {
         const prs = (
