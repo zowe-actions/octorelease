@@ -60,6 +60,7 @@ export interface INpmPublishOptions {
     tag: string;
     pkgSpec: string;
     registry: string;
+    tarball?: string;
     inDir?: string;
 }
 export async function npmPublish(context: IContext, options: INpmPublishOptions): Promise<void> {
@@ -67,6 +68,9 @@ export async function npmPublish(context: IContext, options: INpmPublishOptions)
     const cmdArgs = ["publish", "--tag", options.tag, `--${registryPrefix}registry=${options.registry}`];
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
+    }
+    if (options.tarball != null) {
+        cmdArgs.splice(1, 0, options.tarball);
     }
     await exec.exec("npm", cmdArgs, { cwd: options.inDir });
 }
