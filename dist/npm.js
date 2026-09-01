@@ -1601,7 +1601,7 @@ async function publish_default(context, config, inDir) {
     }
     pruneShrinkwrap(context, inDir);
   }
-  if (config.npmPublish !== false) {
+  if (config.npmPublish !== false && !packageJson.private) {
     await exec3.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
   }
   const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
