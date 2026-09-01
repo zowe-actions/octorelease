@@ -1604,7 +1604,7 @@ async function publish_default(context, config, inDir) {
   }
   if (config.stripRegistry && packageJson.publishConfig?.registry != null) {
     delete packageJson.publishConfig.registry;
-    if (Object.keys(packageJson.publishConfig).length == 0) {
+    if (Object.keys(packageJson.publishConfig).length === 0) {
       delete packageJson.publishConfig;
     }
     fs3.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
