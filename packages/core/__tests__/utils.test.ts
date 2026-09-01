@@ -57,6 +57,7 @@ describe("Utility functions", () => {
                 name: "main",
                 level
             },
+            env: {},
             version: {
                 old: oldVersion,
                 new: require("semver").inc(oldVersion, badLevel),
@@ -65,5 +66,38 @@ describe("Utility functions", () => {
         };
         await expect(verifyConditions(context as IContext)).rejects.toThrow(
             `Protected branch main does not allow ${badLevel} version changes`);
+    });
+
+    it("verifyConditions should allow major bump when ALLOW_MAJOR_VERSION matches new major version", async () => {
+        const context: Partial<IContext> = {
+            branch: {
+                name: "main",
+                level: "minor"
+            },
+            env: { ALLOW_MAJOR_VERSION: "2" },
+            version: {
+                old: oldVersion,
+                new: require("semver").inc(oldVersion, "major"),
+                overrides: {}
+            }
+        };
+        await expect(verifyConditions(context as IContext)).resolves.not.toThrow();
+    });
+
+    it("verifyConditions should still block major bump when ALLOW_MAJOR_VERSION does not match", async () => {
+        const context: Partial<IContext> = {
+            branch: {
+                name: "main",
+                level: "minor"
+            },
+            env: { ALLOW_MAJOR_VERSION: "5" },
+            version: {
+                old: oldVersion,
+                new: require("semver").inc(oldVersion, "major"),
+                overrides: {}
+            }
+        };
+        await expect(verifyConditions(context as IContext)).rejects.toThrow(
+            "Protected branch main does not allow major version changes");
     });
 });
