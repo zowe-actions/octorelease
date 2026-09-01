@@ -23,7 +23,8 @@ import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
     const cwd = inDir || process.cwd();
-    const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+    const packageJsonPath = path.join(cwd, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
     const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
 
     if (config.pruneShrinkwrap) {
@@ -31,6 +32,14 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
             await exec.exec("npm", ["run", "preshrinkwrap"], { cwd });
         }
         pruneShrinkwrap(context, inDir);
+    }
+
+    if (config.stripRegistry && packageJson.publishConfig?.registry != null) {
+        delete packageJson.publishConfig.registry;
+        if (Object.keys(packageJson.publishConfig).length === 0) {
+            delete packageJson.publishConfig;
+        }
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
     }
 
     if (config.npmPublish !== false && !packageJson.private) {

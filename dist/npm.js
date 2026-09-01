@@ -1593,13 +1593,21 @@ var path2 = __toESM(require("path"));
 var exec3 = __toESM(require_exec());
 async function publish_default(context, config, inDir) {
   const cwd = inDir || process.cwd();
-  const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+  const packageJsonPath = path2.join(cwd, "package.json");
+  const packageJson = JSON.parse(fs3.readFileSync(packageJsonPath, "utf-8"));
   const npmRegistry = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
   if (config.pruneShrinkwrap) {
     if (packageJson.scripts.preshrinkwrap != null) {
       await exec3.exec("npm", ["run", "preshrinkwrap"], { cwd });
     }
     pruneShrinkwrap(context, inDir);
+  }
+  if (config.stripRegistry && packageJson.publishConfig?.registry != null) {
+    delete packageJson.publishConfig.registry;
+    if (Object.keys(packageJson.publishConfig).length === 0) {
+      delete packageJson.publishConfig;
+    }
+    fs3.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
   }
   if (config.npmPublish !== false && !packageJson.private) {
     await exec3.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });

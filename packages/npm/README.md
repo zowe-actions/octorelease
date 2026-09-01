@@ -52,6 +52,7 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 | `npmPublish` | Specify false to skip publishing to the NPM registry. | `true` |
 | `pruneShrinkwrap` | Specify true to prune dev and extraneous dependencies from npm-shrinkwrap.json. | `false` |
 | `smokeTest` | Specify true to test installing the package from the NPM registry after it is published. | `false` |
+| `stripRegistry` | Specify true to remove the `publishConfig.registry` property from `package.json` before publishing. | `false` |
 | `tarballDir` | Path to directory where package tarball (TGZ) should be generated, or `false` to skip creating a tarball. | `false` |
 
 ### Examples
