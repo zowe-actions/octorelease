@@ -1609,7 +1609,7 @@ async function publish_default(context, config, inDir) {
     }
     fs3.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
   }
-  if (config.npmPublish !== false) {
+  if (config.npmPublish !== false && !packageJson.private) {
     await exec3.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
   }
   const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);

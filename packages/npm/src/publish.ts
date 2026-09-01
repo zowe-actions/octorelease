@@ -42,7 +42,7 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
     }
 
-    if (config.npmPublish !== false) {
+    if (config.npmPublish !== false && !packageJson.private) {
         await exec.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
     }
 
