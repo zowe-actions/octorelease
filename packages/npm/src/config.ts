@@ -24,5 +24,6 @@ export interface IPluginConfig {
      */
     pruneShrinkwrap?: boolean;
     smokeTest?: boolean;
+    stripRegistry?: boolean;
     tarballDir?: string;
 }

@@ -1593,7 +1593,9 @@ var path2 = __toESM(require("path"));
 var exec3 = __toESM(require_exec());
 async function publish_default(context, config, inDir) {
   const cwd = inDir || process.cwd();
-  const packageJson = JSON.parse(fs3.readFileSync(path2.join(cwd, "package.json"), "utf-8"));
+  const packageJsonPath = path2.join(cwd, "package.json");
+  const packageJsonContents = fs3.readFileSync(packageJsonPath, "utf-8");
+  const packageJson = JSON.parse(packageJsonContents);
   const npmRegistry = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
   if (config.pruneShrinkwrap) {
     if (packageJson.scripts.preshrinkwrap != null) {
@@ -1601,10 +1603,26 @@ async function publish_default(context, config, inDir) {
     }
     pruneShrinkwrap(context, inDir);
   }
-  if (config.npmPublish !== false && !packageJson.private) {
-    await exec3.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
+  let restorePackageJson = false;
+  if (config.stripRegistry && packageJson.publishConfig?.registry != null) {
+    delete packageJson.publishConfig.registry;
+    if (Object.keys(packageJson.publishConfig).length === 0) {
+      delete packageJson.publishConfig;
+    }
+    fs3.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+    restorePackageJson = true;
   }
-  const tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
+  let tgzFile;
+  try {
+    if (config.npmPublish !== false && !packageJson.private) {
+      await exec3.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
+    }
+    tgzFile = await npmPack(packageJson.name, npmRegistry, inDir);
+  } finally {
+    if (restorePackageJson) {
+      fs3.writeFileSync(packageJsonPath, packageJsonContents);
+    }
+  }
   if (config.tarballDir != null) {
     fs3.mkdirSync(config.tarballDir, { recursive: true });
     fs3.cpSync(path2.join(cwd, tgzFile), path2.resolve(context.rootDir, config.tarballDir, tgzFile));

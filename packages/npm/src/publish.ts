@@ -23,7 +23,9 @@ import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
     const cwd = inDir || process.cwd();
-    const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
+    const packageJsonPath = path.join(cwd, "package.json");
+    const packageJsonContents = fs.readFileSync(packageJsonPath, "utf-8");
+    const packageJson = JSON.parse(packageJsonContents);
     const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
 
     if (config.pruneShrinkwrap) {
@@ -33,11 +35,31 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
         pruneShrinkwrap(context, inDir);
     }
 
-    if (config.npmPublish !== false && !packageJson.private) {
-        await exec.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
+    // Whether package.json was modified on disk and must be restored after packing
+    let restorePackageJson = false;
+
+    if (config.stripRegistry && packageJson.publishConfig?.registry != null) {
+        delete packageJson.publishConfig.registry;
+        if (Object.keys(packageJson.publishConfig).length === 0) {
+            delete packageJson.publishConfig;
+        }
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+        restorePackageJson = true;
     }
 
-    const tgzFile = await utils.npmPack(packageJson.name, npmRegistry, inDir);
+    let tgzFile: string;
+    try {
+        if (config.npmPublish !== false && !packageJson.private) {
+            await exec.exec("npm", ["run", "prepublishOnly", "--if-present"], { cwd });
+        }
+
+        tgzFile = await utils.npmPack(packageJson.name, npmRegistry, inDir);
+    } finally {
+        if (restorePackageJson) {
+            fs.writeFileSync(packageJsonPath, packageJsonContents);
+        }
+    }
+
     if (config.tarballDir != null) {
         fs.mkdirSync(config.tarballDir, { recursive: true });
         fs.cpSync(path.join(cwd, tgzFile), path.resolve(context.rootDir, config.tarballDir, tgzFile));
