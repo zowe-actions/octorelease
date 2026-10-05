@@ -23,13 +23,11 @@ import * as utils from "./utils";
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
     const extensionName = `${packageJson.publisher}.${packageJson.name}`;
-    let vsixPath: string | undefined;
+    const vsixPath = await utils.vscePackage(context);
 
     if (config.vsixDir != null) {
-        const tempVsixPath = await utils.vscePackage(context);
-        vsixPath = path.resolve(context.rootDir, config.vsixDir, path.basename(tempVsixPath));
         fs.mkdirSync(config.vsixDir, { recursive: true });
-        fs.renameSync(tempVsixPath, vsixPath);
+        fs.cpSync(vsixPath, path.resolve(context.rootDir, config.vsixDir, path.basename(vsixPath)));
     }
 
     if (packageJson.private) {

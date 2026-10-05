@@ -169,7 +169,12 @@ export async function verifyConditions(context: IContext): Promise<void> {
         SemverDiffLevels.indexOf(semverLevel as (typeof SemverDiffLevels)[number]) >
             SemverDiffLevels.indexOf(context.branch.level)
     ) {
-        throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
+        const allowedMajor = context.env.ALLOW_MAJOR_VERSION;
+        const isAllowedMajor =
+            semverLevel === "major" && allowedMajor && context.version.new.startsWith(`${allowedMajor}.`);
+        if (!isAllowedMajor) {
+            throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
+        }
     }
 }
 

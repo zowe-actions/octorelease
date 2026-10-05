@@ -22,7 +22,7 @@ import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    let publishConfig: Record<string, any>;
+    let publishConfig: Record<string, any> | undefined;
     config[IS_LERNA_JSON_TEMP] = !fs.existsSync("lerna.json");
     if (!config[IS_LERNA_JSON_TEMP]) {
         try {
