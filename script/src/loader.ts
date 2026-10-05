@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 
 type ScriptModule = { default: (context: IContext) => Promise<void> };
 

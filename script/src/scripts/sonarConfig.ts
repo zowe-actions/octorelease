@@ -16,7 +16,7 @@
 
 import * as fs from "node:fs";
 import * as github from "@actions/github";
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 import * as utils from "@octorelease/run-script/src/utils";
 import * as properties from "java-properties";
 

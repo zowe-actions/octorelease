@@ -17,7 +17,7 @@
 import * as fs from "node:fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import { IContext, IProtectedBranch } from "@octorelease/core";
+import type { IContext, IProtectedBranch } from "@octorelease/core";
 import { utils as gitUtils } from "@octorelease/git";
 import pluralize from "pluralize";
 
