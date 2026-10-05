@@ -45,10 +45,10 @@ __export(utils_exports, {
   gitPush: () => gitPush,
   gitTag: () => gitTag
 });
-var fs2 = __toESM(require("fs"));
-var os2 = __toESM(require("os"));
-var path4 = __toESM(require("path"));
-var url = __toESM(require("url"));
+var fs2 = __toESM(require("node:fs"));
+var os2 = __toESM(require("node:os"));
+var path4 = __toESM(require("node:path"));
+var url = __toESM(require("node:url"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");
@@ -807,7 +807,7 @@ async function gitAdd(...files) {
 async function gitCommit(message, amend) {
   if (!amend) {
     const cmdOutput = await getExecOutput("git", ["diff", "--name-only", "--cached"]);
-    if (cmdOutput.stdout.trim().length == 0) {
+    if (cmdOutput.stdout.trim().length === 0) {
       return false;
     }
   }
@@ -835,7 +835,7 @@ async function gitConfig(context) {
 async function gitPush(context, branch, tags) {
   if (!tags) {
     const cmdOutput = await getExecOutput("git", ["cherry"]);
-    if (cmdOutput.stdout.trim().length == 0) {
+    if (cmdOutput.stdout.trim().length === 0) {
       return false;
     }
   }

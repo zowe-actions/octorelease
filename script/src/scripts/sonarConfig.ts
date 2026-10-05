@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import * as github from "@actions/github";
 import { IContext } from "@octorelease/core";
 import * as utils from "@octorelease/run-script/src/utils";

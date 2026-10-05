@@ -19159,13 +19159,13 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/init.ts
-var fs3 = __toESM(require("fs"));
-var path4 = __toESM(require("path"));
-var import_npm = require("./npm");
-
 // src/config.ts
 var IS_LERNA_JSON_TEMP = /* @__PURE__ */ Symbol();
+
+// src/init.ts
+var fs3 = __toESM(require("node:fs"));
+var path4 = __toESM(require("node:path"));
+var import_npm = require("./npm");
 
 // src/utils.ts
 var utils_exports = {};
@@ -19175,7 +19175,7 @@ __export(utils_exports, {
   lernaPostVersion: () => lernaPostVersion,
   lernaVersion: () => lernaVersion
 });
-var fs2 = __toESM(require("fs"));
+var fs2 = __toESM(require("node:fs"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");
@@ -20055,8 +20055,8 @@ async function success_default(context, config) {
 }
 
 // src/version.ts
-var fs5 = __toESM(require("fs"));
-var path10 = __toESM(require("path"));
+var fs5 = __toESM(require("node:fs"));
+var path10 = __toESM(require("node:path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os2 = __toESM(require("os"), 1);
@@ -23074,7 +23074,7 @@ async function updateIndependentVersion(context, pkgInfo, newVersion) {
     for (const packageDir of [context.rootDir, ...await globber.glob()]) {
       const packageJsonPath = path10.join(packageDir, "package.json");
       const packageJson = JSON.parse(fs5.readFileSync(packageJsonPath, "utf-8"));
-      let depsObj = void 0;
+      let depsObj;
       for (const depsKey of ["dependencies", "devDependencies", "optionalDependencies"]) {
         if (packageJson[depsKey]?.[pkgInfo.name] != null) {
           depsObj = packageJson[depsKey];

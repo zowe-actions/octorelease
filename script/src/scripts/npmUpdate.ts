@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { IContext, IProtectedBranch } from "@octorelease/core";

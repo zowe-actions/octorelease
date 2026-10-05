@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 import { publish as npmPublish } from "@octorelease/npm";
-import { IPluginConfig } from "./config";
+import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {

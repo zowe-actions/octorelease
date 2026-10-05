@@ -30,7 +30,7 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import { loadScript } from "../src/loader";
 
 describe("Run Script action", () => {

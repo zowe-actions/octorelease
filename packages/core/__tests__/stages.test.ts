@@ -15,9 +15,10 @@
  */
 
 import * as core from "@actions/core";
-import { IContext } from "../src/doc";
+import type { IContext } from "../src/doc";
 
 vi.mock("@actions/core");
+
 import { Inputs } from "../src/inputs";
 import { Logger } from "../src/logger";
 import * as stages from "../src/stages";

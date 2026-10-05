@@ -17,8 +17,8 @@
 import * as github from "@actions/github";
 import { GitHub, getOctokitOptions } from "@actions/github/lib/utils";
 import { enterpriseServer37 } from "@octokit/plugin-enterprise-server";
-import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import type { IContext } from "@octorelease/core";
+import type { IPluginConfig } from "./config";
 
 export type Octokit = ReturnType<typeof github.getOctokit>;
 

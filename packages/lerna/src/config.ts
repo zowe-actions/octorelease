@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IPluginConfig as NpmPluginConfig } from "@octorelease/npm";
+import type { IPluginConfig as NpmPluginConfig } from "@octorelease/npm";
 
 export const IS_LERNA_JSON_TEMP = Symbol();
 

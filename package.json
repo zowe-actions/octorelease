@@ -5,7 +5,7 @@
   "bin": "dist/index.js",
   "scripts": {
     "build": "npx license-check-and-add add && tsc -b --force",
-    "lint": "npx @biomejs/biome check --write packages",
+    "lint": "npx @biomejs/biome check --diagnostic-level=warn --write packages",
     "pack": "npm run pack --workspaces",
     "test": "vitest run",
     "test:ui": "vitest --ui",

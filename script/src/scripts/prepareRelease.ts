@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import { IContext } from "@octorelease/core";
 import { utils as gitUtils } from "@octorelease/git";
 import { version as lernaVersion } from "@octorelease/lerna";

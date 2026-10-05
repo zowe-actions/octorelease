@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import type { IContext } from "@octorelease/core";
+import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {

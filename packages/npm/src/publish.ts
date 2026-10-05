@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as exec from "@actions/exec";
-import { IContext } from "@octorelease/core";
-import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
+import type { IContext } from "@octorelease/core";
+import { DEFAULT_NPM_REGISTRY, type IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {

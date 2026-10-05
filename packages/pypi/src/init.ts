@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { IContext, utils } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import { type IContext, utils } from "@octorelease/core";
+import type { IPluginConfig } from "./config";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
     if (context.env.TWINE_USERNAME == null) {

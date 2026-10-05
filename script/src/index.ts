@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import * as path from "path";
+import * as path from "node:path";
 import * as core from "@actions/core";
 import { utils as coreUtils } from "@octorelease/core";
 import { loadScript, RELEASE_SCRIPTS } from "./loader";

@@ -15,7 +15,7 @@
  */
 
 import semver from "semver";
-import { IContext, SemverDiffLevels } from "../src/doc";
+import { type IContext, SemverDiffLevels } from "../src/doc";
 import { verifyConditions } from "../src/utils";
 
 describe("Utility functions", () => {

@@ -423,11 +423,11 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/init.ts
-var fs3 = __toESM(require("fs"));
-
 // src/config.ts
 var DEFAULT_NPM_REGISTRY = "https://registry.npmjs.org/";
+
+// src/init.ts
+var fs3 = __toESM(require("node:fs"));
 
 // src/utils.ts
 var utils_exports = {};
@@ -441,9 +441,9 @@ __export(utils_exports, {
   npmView: () => npmView,
   verifyConditions: () => verifyConditions
 });
-var fs2 = __toESM(require("fs"));
-var os2 = __toESM(require("os"));
-var path4 = __toESM(require("path"));
+var fs2 = __toESM(require("node:fs"));
+var os2 = __toESM(require("node:os"));
+var path4 = __toESM(require("node:path"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");
@@ -1262,7 +1262,7 @@ function verifyConditions(context) {
     const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter(
       (name) => context.env[name] == null
     );
-    if (missingEnvVars.length == 1) {
+    if (missingEnvVars.length === 1) {
       throw new Error(`Required environment variable ${missingEnvVars[0]} is undefined`);
     } else if (missingEnvVars.length > 1) {
       throw new Error(`Required environment variables ${missingEnvVars.join(", ")} are undefined`);
@@ -1297,8 +1297,8 @@ async function init_default(context, config) {
 }
 
 // src/publish.ts
-var fs4 = __toESM(require("fs"));
-var path5 = __toESM(require("path"));
+var fs4 = __toESM(require("node:fs"));
+var path5 = __toESM(require("node:path"));
 async function publish_default(context, config, inDir) {
   const cwd = inDir || process.cwd();
   const packageJson = JSON.parse(fs4.readFileSync(path5.join(cwd, "package.json"), "utf-8"));
@@ -1378,9 +1378,9 @@ function pruneShrinkwrap(context, inDir) {
 }
 
 // src/success.ts
-var fs5 = __toESM(require("fs"));
-var os3 = __toESM(require("os"));
-var path6 = __toESM(require("path"));
+var fs5 = __toESM(require("node:fs"));
+var os3 = __toESM(require("node:os"));
+var path6 = __toESM(require("node:path"));
 var import_core2 = require("./core");
 var import_delay = __toESM(require_delay());
 async function success_default(context, config) {
@@ -1403,7 +1403,7 @@ async function success_default(context, config) {
 }
 
 // src/version.ts
-var path7 = __toESM(require("path"));
+var path7 = __toESM(require("node:path"));
 var import_find_up = __toESM(require_find_up());
 async function version_default(context, _config) {
   if (context.workspaces != null) {

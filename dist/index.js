@@ -18829,7 +18829,7 @@ var require_undici = __commonJS({
 });
 
 // src/main.ts
-var path = __toESM(require("path"));
+var path = __toESM(require("node:path"));
 
 // ../../node_modules/@actions/core/lib/command.js
 var os = __toESM(require("os"), 1);

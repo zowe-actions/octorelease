@@ -20615,7 +20615,7 @@ var fs3, import_git, import_pluralize, lockfilePath, updateDetails, resolutions;
 var init_npmUpdate = __esm({
   "src/scripts/npmUpdate.ts"() {
     "use strict";
-    fs3 = __toESM(require("fs"));
+    fs3 = __toESM(require("node:fs"));
     init_core();
     init_exec();
     import_git = require("./git");
@@ -22644,7 +22644,7 @@ var fs4, import_git2, import_lerna, import_npm, semver;
 var init_prepareRelease = __esm({
   "src/scripts/prepareRelease.ts"() {
     "use strict";
-    fs4 = __toESM(require("fs"));
+    fs4 = __toESM(require("node:fs"));
     import_git2 = require("./git");
     import_lerna = require("./lerna");
     import_npm = require("./npm");
@@ -30439,7 +30439,7 @@ var fs5, import_adm_zip;
 var init_utils4 = __esm({
   "src/utils.ts"() {
     "use strict";
-    fs5 = __toESM(require("fs"));
+    fs5 = __toESM(require("node:fs"));
     init_core();
     init_github();
     import_adm_zip = __toESM(require_adm_zip());
@@ -30687,7 +30687,7 @@ var fs6, properties;
 var init_sonarConfig = __esm({
   "src/scripts/sonarConfig.ts"() {
     "use strict";
-    fs6 = __toESM(require("fs"));
+    fs6 = __toESM(require("node:fs"));
     init_github();
     init_utils4();
     properties = __toESM(require_dist_node());
@@ -30695,7 +30695,7 @@ var init_sonarConfig = __esm({
 });
 
 // src/index.ts
-var path4 = __toESM(require("path"));
+var path4 = __toESM(require("node:path"));
 init_core();
 var import_core3 = require("./core");
 
