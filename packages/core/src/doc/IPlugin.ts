@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IContext } from "./IContext";
+import type { IContext } from "./IContext";
 
 /**
  * Type for loaded plugin modules

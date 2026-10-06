@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as glob from "@actions/glob";
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
 import findUp from "find-up";
-import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -85,7 +85,7 @@ async function updateIndependentVersion(
         for (const packageDir of [context.rootDir, ...(await globber.glob())]) {
             const packageJsonPath = path.join(packageDir, "package.json");
             const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-            let depsObj: Record<string, string> | undefined = undefined;
+            let depsObj: Record<string, string> | undefined;
             for (const depsKey of ["dependencies", "devDependencies", "optionalDependencies"]) {
                 if (packageJson[depsKey]?.[pkgInfo.name] != null) {
                     depsObj = packageJson[depsKey];

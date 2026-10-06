@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import * as exec from "@actions/exec";
-import { IContext, utils } from "@octorelease/core";
+import { type IContext, utils } from "@octorelease/core";
 
 export async function npmAddTag(
     context: IContext,
@@ -65,6 +65,7 @@ export interface INpmPublishOptions {
     tag: string;
     pkgSpec: string;
     registry: string;
+    tarball?: string;
     inDir?: string;
 }
 export async function npmPublish(context: IContext, options: INpmPublishOptions): Promise<void> {
@@ -72,6 +73,9 @@ export async function npmPublish(context: IContext, options: INpmPublishOptions)
     const cmdArgs = ["publish", "--tag", options.tag, `--${registryPrefix}registry=${options.registry}`];
     if (context.dryRun) {
         cmdArgs.push("--dry-run");
+    }
+    if (options.tarball != null) {
+        cmdArgs.splice(1, 0, options.tarball);
     }
     await exec.exec("npm", cmdArgs, { cwd: options.inDir });
 }
@@ -107,7 +111,7 @@ export function verifyConditions(context: IContext): boolean {
         const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter(
             (name) => context.env[name] == null,
         );
-        if (missingEnvVars.length == 1) {
+        if (missingEnvVars.length === 1) {
             throw new Error(`Required environment variable ${missingEnvVars[0]} is undefined`);
         } else if (missingEnvVars.length > 1) {
             throw new Error(`Required environment variables ${missingEnvVars.join(", ")} are undefined`);

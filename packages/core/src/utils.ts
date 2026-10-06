@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as exec from "@actions/exec";
 import * as io from "@actions/io";
 import { cosmiconfig } from "cosmiconfig";
 import envCi from "env-ci";
-import micromatch from "micromatch";
+import picomatch from "picomatch";
 import * as semver from "semver";
-import { IContext, IContextOpts, IPluginsLoaded, IProtectedBranch, IVersionInfo, SemverDiffLevels } from "./doc/index";
+import {
+    type IContext,
+    type IContextOpts,
+    type IPluginsLoaded,
+    type IProtectedBranch,
+    type IVersionInfo,
+    SemverDiffLevels,
+} from "./doc/index";
 import { Inputs } from "./inputs";
 import { Logger } from "./logger";
 
@@ -40,9 +47,9 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
 
     const branches = rc.config.branches.map((branch: any) => (typeof branch === "string" ? { name: branch } : branch));
     const branchIndex = branches.findIndex((branch: any) =>
-        micromatch.isMatch(opts?.branch || envCi.branch!, branch.name),
+        picomatch.isMatch(opts?.branch || envCi.branch!, branch.name),
     );
-    if (branchIndex == -1 && !opts?.force) {
+    if (branchIndex === -1 && !opts?.force) {
         return;
     }
     const branchInfo = branches[branchIndex] ?? {};
@@ -162,7 +169,12 @@ export async function verifyConditions(context: IContext): Promise<void> {
         SemverDiffLevels.indexOf(semverLevel as (typeof SemverDiffLevels)[number]) >
             SemverDiffLevels.indexOf(context.branch.level)
     ) {
-        throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
+        const allowedMajor = context.env.ALLOW_MAJOR_VERSION;
+        const isAllowedMajor =
+            semverLevel === "major" && allowedMajor && context.version.new.startsWith(`${allowedMajor}.`);
+        if (!isAllowedMajor) {
+            throw new Error(`Protected branch ${context.branch.name} does not allow ${semverLevel} version changes`);
+        }
     }
 }
 

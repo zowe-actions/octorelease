@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import { IContext, IProtectedBranch } from "@octorelease/core";
+import type { IContext, IProtectedBranch } from "@octorelease/core";
 import pluralize from "pluralize";
-import { IPluginApi } from "../plugins";
+import type { IPluginApi } from "../plugins";
 
 const lockfilePath = fs.existsSync("npm-shrinkwrap.json") ? "npm-shrinkwrap.json" : "package-lock.json";
 const updateDetails: string[] = [];

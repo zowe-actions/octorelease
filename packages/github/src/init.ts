@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
+import { type IContext, Inputs, SemverDiffLevels } from "@octorelease/core";
 import delay from "delay";
 import * as semver from "semver";
-import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
+import { DEFAULT_RELEASE_LABELS, type IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 let lastEtag: string | undefined;
@@ -88,9 +88,9 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
 
         // Wait for release label to be added to PR
         context.logger.info("Waiting for repo admin to add release label to pull request...");
-        const startTime = new Date().getTime();
+        const startTime = Date.now();
         const timeoutInMsec = timeoutInMinutes * 60000;
-        while (approvedLabelEvents.length !== 1 && new Date().getTime() - startTime < timeoutInMsec) {
+        while (approvedLabelEvents.length !== 1 && Date.now() - startTime < timeoutInMsec) {
             await delay(1000);
 
             try {

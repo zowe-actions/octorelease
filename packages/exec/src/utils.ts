@@ -15,7 +15,7 @@
  */
 
 import * as exec from "@actions/exec";
-import { IContext, utils } from "@octorelease/core";
+import { type IContext, utils } from "@octorelease/core";
 
 export async function runCmd(context: IContext, command: string, dryRunAllow = false): Promise<void> {
     const task = async () => {

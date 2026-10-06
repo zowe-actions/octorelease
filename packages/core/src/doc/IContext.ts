@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { KnownCiEnv } from "env-ci";
-import { Logger } from "../logger";
-import { IProtectedBranch } from "./IProtectedBranch";
-import { IReleasedPackage } from "./IReleasedPackage";
-import { IVersionInfo } from "./IVersionInfo";
+import type { KnownCiEnv } from "env-ci";
+import type { Logger } from "../logger";
+import type { IProtectedBranch } from "./IProtectedBranch";
+import type { IReleasedPackage } from "./IReleasedPackage";
+import type { IVersionInfo } from "./IVersionInfo";
 
 /**
  * Global context object for Octorelease

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as glob from "@actions/glob";
-import { IContext, utils as coreUtils } from "@octorelease/core";
+import { utils as coreUtils, type IContext } from "@octorelease/core";
 import mime from "mime";
-import { IPluginConfig } from "./config";
+import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
@@ -92,7 +92,7 @@ async function uploadAssets(
         const assetName = path.basename(artifactPath);
 
         // Skip uploading asset if one with same name was uploaded previously
-        if (release.data.assets && release.data.assets.some((asset: any) => asset.name === assetName)) {
+        if (release.data.assets?.some((asset: any) => asset.name === assetName)) {
             context.logger.error(`Release asset ${artifactPath} has already been uploaded to GitHub`);
             continue;
         }

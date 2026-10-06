@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { IContext, utils as coreUtils } from "@octorelease/core";
-import { DEFAULT_RELEASE_LABELS, IPluginConfig } from "./config";
+import { utils as coreUtils, type IContext } from "@octorelease/core";
+import { DEFAULT_RELEASE_LABELS, type IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {

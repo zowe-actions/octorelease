@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { loadScript } from "../src/loader";
 
 describe("Run Script action", () => {
     const scriptNames = fs.readdirSync(__dirname + "/../src/scripts").map((s) => s.slice(0, s.lastIndexOf(".")));
 
     for (const scriptName of scriptNames) {
-        it("should load script " + scriptName, () => {
-            expect(typeof loadScript(scriptName)).toBe("function");
+        it("should load script " + scriptName, async () => {
+            expect(typeof (await loadScript(scriptName))).toBe("function");
         });
     }
 

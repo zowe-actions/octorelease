@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as path from "path";
-import { IContext } from "@octorelease/core";
-import { IPluginApi } from "./plugins";
+import * as path from "node:path";
+import type { IContext } from "@octorelease/core";
+import type { IPluginApi } from "./plugins";
 
 type ScriptModule = { default: (context: IContext, api: IPluginApi) => Promise<void> };
 
@@ -31,15 +31,13 @@ const SCRIPTS: Record<string, () => Promise<ScriptModule>> = {
  * make it explicit that it refers to a custom script path, resolved relative
  * to the current working directory.
  */
-export function loadScript(scriptName: string): (context: IContext, api: IPluginApi) => Promise<void> {
+export async function loadScript(scriptName: string): Promise<ScriptModule["default"]> {
     if (scriptName.startsWith(".")) {
-        return async (context, api) => {
-            const scriptModule = (await import(path.resolve(process.cwd(), scriptName))) as ScriptModule;
-            return scriptModule.default(context, api);
-        };
+        const scriptModule = (await import(path.resolve(process.cwd(), scriptName))) as ScriptModule;
+        return scriptModule.default;
     }
     if (!Object.keys(SCRIPTS).includes(scriptName)) {
         throw new Error(`Could not find script to run: ${scriptName}`);
     }
-    return async (context, api) => (await SCRIPTS[scriptName]()).default(context, api);
+    return (await SCRIPTS[scriptName]()).default;
 }

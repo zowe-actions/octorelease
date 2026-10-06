@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
-import { IContext, utils as coreUtils } from "@octorelease/core";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import { utils as coreUtils, type IContext } from "@octorelease/core";
 import delay from "delay";
-import { IPluginConfig } from "./config";
+import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {

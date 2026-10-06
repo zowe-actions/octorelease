@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "tsc -b && npm run lint",
-    "lint": "oxlint src",
+    "lint": "npx @biomejs/biome check --write",
     "pack": "node ../../esbuild.mjs && node ../../esbuild.mjs main",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postversion": "cd ../.. && npm install --package-lock-only --ignore-scripts --no-audit",
@@ -50,11 +50,11 @@
     "@types/env-ci": "^3.1.1",
     "cosmiconfig": "^7.0.0",
     "env-ci": "^5.4.0",
-    "micromatch": "^4.0.4",
+    "picomatch": "^4.0.7",
     "semver": "^7.5.2"
   },
   "devDependencies": {
-    "@types/micromatch": "^4.0.10",
+    "@types/picomatch": "^4.0.3",
     "@types/semver": "^7.0.0"
   },
   "optionalDependencies": {

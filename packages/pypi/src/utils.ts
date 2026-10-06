@@ -15,7 +15,7 @@
  */
 
 import * as exec from "@actions/exec";
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 
 export async function twineUpload(context: IContext, distPath?: string): Promise<void> {
     const cmdArgs = ["upload", `${distPath || "dist"}/*`];

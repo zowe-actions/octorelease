@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as exec from "@actions/exec";
-import { IContext, utils } from "@octorelease/core";
+import { type IContext, utils } from "@octorelease/core";
 
 let usePnpm: boolean;
 async function npxCmd(binName: "ovsx" | "vsce"): Promise<string> {

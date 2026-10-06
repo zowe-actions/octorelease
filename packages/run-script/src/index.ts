@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import * as path from "path";
+import * as path from "node:path";
 import * as core from "@actions/core";
 import { utils as coreUtils, IContext } from "@octorelease/core";
 import { loadScript } from "./loader";
@@ -38,7 +38,9 @@ async function run(): Promise<void> {
             force: true,
             logPrefix: scriptName,
         })) as IContext;
-        await loadScript(scriptName)(context, createPluginApi());
+
+        const script = await loadScript(scriptName);
+        await script(context, createPluginApi());
     } catch (error) {
         if (error instanceof Error) {
             core.error(error.stack || error.message);

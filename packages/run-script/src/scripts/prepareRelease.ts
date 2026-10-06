@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import { IContext } from "@octorelease/core";
+import * as fs from "node:fs";
+import type { IContext } from "@octorelease/core";
 import * as semver from "semver";
-import { IPluginApi } from "../plugins";
+import type { IPluginApi } from "../plugins";
 
 export default async function (context: IContext, api: IPluginApi): Promise<void> {
     context.version.new = context.version.old.split("-")[0];

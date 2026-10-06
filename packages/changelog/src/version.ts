@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as glob from "@actions/glob";
-import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import type { IContext } from "@octorelease/core";
+import type { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     const changelogFile = config.changelogFile || "CHANGELOG.md";

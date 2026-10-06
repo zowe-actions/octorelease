@@ -37,7 +37,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/init.ts
-var fs3 = __toESM(require("fs"));
+var fs3 = __toESM(require("node:fs"));
 
 // src/utils.ts
 var utils_exports = {};
@@ -49,8 +49,8 @@ __export(utils_exports, {
   vscePackage: () => vscePackage,
   vscePublish: () => vscePublish
 });
-var fs2 = __toESM(require("fs"));
-var path4 = __toESM(require("path"));
+var fs2 = __toESM(require("node:fs"));
+var path4 = __toESM(require("node:path"));
 
 // ../../node_modules/@actions/exec/lib/exec.js
 var import_string_decoder = require("string_decoder");
@@ -901,17 +901,15 @@ async function init_default(context, config) {
 }
 
 // src/publish.ts
-var fs4 = __toESM(require("fs"));
-var path5 = __toESM(require("path"));
+var fs4 = __toESM(require("node:fs"));
+var path5 = __toESM(require("node:path"));
 async function publish_default(context, config) {
   const packageJson = JSON.parse(fs4.readFileSync("package.json", "utf-8"));
   const extensionName = `${packageJson.publisher}.${packageJson.name}`;
-  let vsixPath;
+  const vsixPath = await vscePackage(context);
   if (config.vsixDir != null) {
-    const tempVsixPath = await vscePackage(context);
-    vsixPath = path5.resolve(context.rootDir, config.vsixDir, path5.basename(tempVsixPath));
     fs4.mkdirSync(config.vsixDir, { recursive: true });
-    fs4.renameSync(tempVsixPath, vsixPath);
+    fs4.cpSync(vsixPath, path5.resolve(context.rootDir, config.vsixDir, path5.basename(vsixPath)));
   }
   if (packageJson.private) {
     context.logger.info(`Skipping publish of private package ${packageJson.name}`);
