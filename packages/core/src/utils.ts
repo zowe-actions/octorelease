@@ -20,7 +20,7 @@ import * as exec from "@actions/exec";
 import * as io from "@actions/io";
 import { cosmiconfig } from "cosmiconfig";
 import envCi from "env-ci";
-import micromatch from "micromatch";
+import picomatch from "picomatch";
 import * as semver from "semver";
 import {
     type IContext,
@@ -47,7 +47,7 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
 
     const branches = rc.config.branches.map((branch: any) => (typeof branch === "string" ? { name: branch } : branch));
     const branchIndex = branches.findIndex((branch: any) =>
-        micromatch.isMatch(opts?.branch || envCi.branch!, branch.name),
+        picomatch.isMatch(opts?.branch || envCi.branch!, branch.name),
     );
     if (branchIndex === -1 && !opts?.force) {
         return;

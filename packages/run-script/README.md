@@ -1,4 +1,4 @@
-# Sample plugin
+# Run Script action
 
 GitHub action to run scripts in [Octorelease](https://github.com/octorelease/octorelease) context.
 
@@ -27,7 +27,7 @@ Custom working directory to use instead of the project root.
 ## Example usage
 
 ```yaml
-- uses: zowe-actions/octorelease/script@v1
+- uses: zowe-actions/octorelease/run-script@v1
   with:
     script: npmUpdate
 ```
