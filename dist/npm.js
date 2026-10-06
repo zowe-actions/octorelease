@@ -1295,8 +1295,9 @@ async function init_default(context, config) {
   if (config.npmPublish === false) {
     return;
   }
+  const npmRegistry = config.publishRegistry || publishConfig?.registry || DEFAULT_NPM_REGISTRY;
   const useTokenAuth = verifyConditions(context);
-  await npmConfig(context, publishConfig?.registry || DEFAULT_NPM_REGISTRY, useTokenAuth);
+  await npmConfig(context, npmRegistry, useTokenAuth);
 }
 
 // src/publish.ts
@@ -1305,7 +1306,7 @@ var path5 = __toESM(require("node:path"));
 async function publish_default(context, config, inDir) {
   const cwd = inDir || process.cwd();
   const packageJson = JSON.parse(fs4.readFileSync(path5.join(cwd, "package.json"), "utf-8"));
-  const npmRegistry = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
+  const npmRegistry = config.publishRegistry || packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
   if (config.pruneShrinkwrap) {
     if (packageJson.scripts.preshrinkwrap != null) {
       await exec("npm", ["run", "preshrinkwrap"], { cwd });
