@@ -42,7 +42,8 @@ async function run(): Promise<void> {
             return;
         }
 
-        await loadScript(scriptName)(context);
+        const script = await loadScript(scriptName);
+        await script(context);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error.stack || error.message);

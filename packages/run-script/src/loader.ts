@@ -27,9 +27,9 @@ const SCRIPTS: Record<string, () => Promise<ScriptModule>> = {
 // List of scripts that should only run in release branches
 export const RELEASE_SCRIPTS: string[] = ["npmUpdate"];
 
-export function loadScript(scriptName: string): (context: IContext) => Promise<void> {
+export async function loadScript(scriptName: string): Promise<ScriptModule["default"]> {
     if (!Object.keys(SCRIPTS).includes(scriptName)) {
         throw new Error(`Could not find script to run: ${scriptName}`);
     }
-    return async (context) => (await SCRIPTS[scriptName]()).default(context);
+    return (await SCRIPTS[scriptName]()).default;
 }

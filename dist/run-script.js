@@ -31047,11 +31047,11 @@ var SCRIPTS = {
   sonarConfig: () => Promise.resolve().then(() => (init_sonarConfig(), sonarConfig_exports))
 };
 var RELEASE_SCRIPTS = ["npmUpdate"];
-function loadScript(scriptName) {
+async function loadScript(scriptName) {
   if (!Object.keys(SCRIPTS).includes(scriptName)) {
     throw new Error(`Could not find script to run: ${scriptName}`);
   }
-  return async (context3) => (await SCRIPTS[scriptName]()).default(context3);
+  return (await SCRIPTS[scriptName]()).default;
 }
 
 // src/index.ts
@@ -31074,7 +31074,8 @@ async function run() {
       info("Current branch is not targeting a release branch, exiting now");
       return;
     }
-    await loadScript(scriptName)(context3);
+    const script = await loadScript(scriptName);
+    await script(context3);
   } catch (error2) {
     if (error2 instanceof Error) {
       error(error2.stack || error2.message);
