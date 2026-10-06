@@ -27912,12 +27912,16 @@ async function run() {
       debug(`Changing working directory to '${workingDir}'`);
       process.chdir(path6.resolve(workingDir));
     }
-    const prBranch = (await findCurrentPr())?.base.ref;
+    const prData = await findCurrentPr();
     const context3 = await import_core3.utils.buildContext({
-      branch: prBranch,
+      branch: prData?.base.ref,
       force: true,
       logPrefix: scriptName
     });
+    if (prData != null) {
+      context3.ci.pr = prData.number;
+      context3.ci.prBranch = prData.base.repo.full_name === prData.head.repo.full_name ? prData.head.ref : `${prData.head.repo.full_name.split("/")[0]}:${prData.head.ref}`;
+    }
     const script = await loadScript(scriptName);
     await script(context3, createPluginApi());
   } catch (error2) {

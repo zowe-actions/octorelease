@@ -27,8 +27,8 @@ describe("Run Script action", () => {
         });
     }
 
-    it("should reject an unknown script name", () => {
-        expect(() => loadScript("doesNotExist")).toThrow("Could not find script to run: doesNotExist");
+    it("should reject an unknown script name", async () => {
+        await expect(loadScript("doesNotExist")).rejects.toThrow("Could not find script to run: doesNotExist");
     });
 
     it("should load and run a custom script path prefixed with './'", async () => {
@@ -36,6 +36,7 @@ describe("Run Script action", () => {
         const relativePath = "./" + path.relative(process.cwd(), fixturePath).replace(/\\/g, "/");
         const fakeContext = { logger: { info: () => {} }, version: { new: "1.0.0" } } as any;
         const fakeApi = { git: { utils: { gitAdd: async () => {} } } } as any;
-        await expect(loadScript(relativePath)(fakeContext, fakeApi)).resolves.toBeUndefined();
+        const script = await loadScript(relativePath);
+        await expect(script(fakeContext, fakeApi)).resolves.toBeUndefined();
     });
 });

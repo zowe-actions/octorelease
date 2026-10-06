@@ -18,7 +18,7 @@
 
 import * as path from "node:path";
 import * as core from "@actions/core";
-import { utils as coreUtils, IContext } from "@octorelease/core";
+import { utils as coreUtils, type IContext } from "@octorelease/core";
 import { loadScript } from "./loader";
 import { createPluginApi } from "./plugins";
 import * as utils from "./utils";
@@ -32,12 +32,19 @@ async function run(): Promise<void> {
             process.chdir(path.resolve(workingDir));
         }
 
-        const prBranch = (await utils.findCurrentPr())?.base.ref;
+        const prData = await utils.findCurrentPr();
         const context = (await coreUtils.buildContext({
-            branch: prBranch,
+            branch: prData?.base.ref,
             force: true,
             logPrefix: scriptName,
         })) as IContext;
+        if (prData != null) {
+            (context.ci as any).pr = prData.number;
+            (context.ci as any).prBranch =
+                prData.base.repo.full_name === prData.head.repo.full_name
+                    ? prData.head.ref
+                    : `${prData.head.repo.full_name.split("/")[0]}:${prData.head.ref}`;
+        }
 
         const script = await loadScript(scriptName);
         await script(context, createPluginApi());
