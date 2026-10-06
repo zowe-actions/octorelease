@@ -18,7 +18,7 @@ import * as path from "node:path";
 import type { IContext } from "@octorelease/core";
 import type { IPluginApi } from "./plugins";
 
-type ScriptModule = { default: (context: IContext, api: IPluginApi) => Promise<void> };
+type ScriptModule = { default: (context: IContext, api: IPluginApi, event: object) => Promise<void> };
 
 const SCRIPTS: Record<string, () => Promise<ScriptModule>> = {
     npmUpdate: () => import("./scripts/npmUpdate"),

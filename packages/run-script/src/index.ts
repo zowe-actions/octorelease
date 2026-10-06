@@ -18,6 +18,7 @@
 
 import * as path from "node:path";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import { utils as coreUtils, type IContext } from "@octorelease/core";
 import { loadScript } from "./loader";
 import { createPluginApi } from "./plugins";
@@ -47,7 +48,7 @@ async function run(): Promise<void> {
         }
 
         const script = await loadScript(scriptName);
-        await script(context, createPluginApi());
+        await script(context, createPluginApi(), github.context.payload);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error.stack || error.message);
