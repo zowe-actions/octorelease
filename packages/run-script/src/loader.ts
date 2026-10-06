@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 
-const SCRIPTS: { [key: string]: any } = {
-    npmUpdate: require("../scripts/npmUpdate"),
-    prepareRelease: require("../scripts/prepareRelease"),
-    sonarConfig: require("../scripts/sonarConfig")
+type ScriptModule = { default: (context: IContext) => Promise<void> };
+
+const SCRIPTS: Record<string, () => Promise<ScriptModule>> = {
+    npmUpdate: () => import("./scripts/npmUpdate"),
+    prepareRelease: () => import("./scripts/prepareRelease"),
+    sonarConfig: () => import("./scripts/sonarConfig"),
 };
 
 // List of scripts that should only run in release branches
 export const RELEASE_SCRIPTS: string[] = ["npmUpdate"];
 
-export function loadScript(scriptName: string): (context: IContext) => Promise<void> {
+export async function loadScript(scriptName: string): Promise<ScriptModule["default"]> {
     if (!Object.keys(SCRIPTS).includes(scriptName)) {
         throw new Error(`Could not find script to run: ${scriptName}`);
     }
-    return SCRIPTS[scriptName].default;
+    return (await SCRIPTS[scriptName]()).default;
 }

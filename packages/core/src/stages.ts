@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import * as path from "path";
+import * as path from "node:path";
 import * as core from "@actions/core";
-import { IContext, IPluginsLoaded } from "./doc";
+import type { IContext, IPluginsLoaded } from "./doc/index";
 import { Inputs } from "./inputs";
 
 type Env = {
     cwd?: string;
     env?: Record<string, string>;
-}
+};
 
 type Stage = {
-    name: "fail" | "init" | "publish" | "success" | "version",
-    canSkip?: boolean
-}
+    name: "fail" | "init" | "publish" | "success" | "version";
+    canSkip?: boolean;
+};
 
 /**
  * Run "fail" stage for loaded plugins that have a "fail" handler.
@@ -97,7 +97,7 @@ async function runStage(context: IContext, pluginsLoaded: IPluginsLoaded, stage:
             continue;
         }
 
-        for (const pluginConfig of (context.plugins[pluginName] || [])) {
+        for (const pluginConfig of context.plugins[pluginName] || []) {
             context.logger.info(`Running "${stage.name}" stage for plugin ${pluginName}`);
             const oldEnv = loadEnv({ cwd: pluginConfig.$cwd, env: pluginConfig.$env });
 

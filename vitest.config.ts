@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import { loadScript } from "../src/loader";
+import { defineConfig } from "vitest/config";
 
-describe("Run Script action", () => {
-    const scriptNames = fs.readdirSync(__dirname + "/../scripts").map(s => s.slice(0, s.lastIndexOf(".")));
-
-    for (const scriptName of scriptNames) {
-        it("should load script " + scriptName, () => {
-            expect(typeof loadScript(scriptName)).toBe("function");
-        });
-    }
+export default defineConfig({
+    test: {
+        clearMocks: true,
+        environment: "node",
+        globals: true,
+        include: ["**/*.test.ts"],
+        exclude: ["**/node_modules/**"],
+    },
 });

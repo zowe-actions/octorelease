@@ -1,5 +1,5 @@
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import { IContext } from "@octorelease/core";
+import * as fs from "node:fs";
+import type { IContext } from "@octorelease/core";
 import { utils as gitUtils } from "@octorelease/git";
 import { version as lernaVersion } from "@octorelease/lerna";
 import { version as npmVersion } from "@octorelease/npm";
+import * as semver from "semver";
 
 export default async function (context: IContext): Promise<void> {
     context.version.new = context.version.old.split("-")[0];
     if (!context.branch.prerelease && context.branch.level !== "none") {
-        context.version.new = require("semver").inc(context.version.new, context.branch.level);
+        context.version.new = semver.inc(context.version.new, context.branch.level as semver.ReleaseType)!;
     }
     context.version.new = (context.env.VERSION_STRING || "%s").replace("%s", context.version.new);
 

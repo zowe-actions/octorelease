@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as path from "path";
+import * as path from "node:path";
 import * as core from "@actions/core";
 
 /**
@@ -23,6 +23,7 @@ import * as core from "@actions/core";
  * supplied as environment variables. For example, the "dry-run" input is
  * associated with the "INPUT_DRY-RUN" environment variable.
  */
+// biome-ignore lint/complexity/noStaticOnlyClass: Global class for loading CI inputs
 export class Inputs {
     private static readonly rootDir = process.cwd();
 
@@ -45,7 +46,7 @@ export class Inputs {
      */
     public static get configDir(): string | undefined {
         const input = core.getInput("config-dir");
-        return input ? path.resolve(this.rootDir, input) : undefined;
+        return input ? path.resolve(Inputs.rootDir, input) : undefined;
     }
 
     /**
@@ -74,7 +75,7 @@ export class Inputs {
      */
     public static get skipStages(): string[] {
         const input = core.getInput("skip-stages");
-        return input ? input.split(",").map(s => s.trim()) : [];
+        return input ? input.split(",").map((s) => s.trim()) : [];
     }
 
     /**

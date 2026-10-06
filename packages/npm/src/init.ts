@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import { IContext } from "@octorelease/core";
-import { DEFAULT_NPM_REGISTRY, IPluginConfig } from "./config";
+import * as fs from "node:fs";
+import type { IContext } from "@octorelease/core";
+import { DEFAULT_NPM_REGISTRY, type IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    let publishConfig;
+    let publishConfig: Record<string, any>;
     try {
         const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         publishConfig = packageJson.publishConfig;

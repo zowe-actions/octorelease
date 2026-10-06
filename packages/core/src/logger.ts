@@ -76,10 +76,11 @@ export class Logger {
      */
     private getPluginName(): string | undefined {
         const stackMatches = new Error().stack?.matchAll(/\s\((.+?):\d+:\d+\)$/gm);
-        for (const match of (stackMatches || [])) {
+        for (const match of stackMatches || []) {
             const callStackPath = match[1];
-            const activePluginName = Object.keys(Logger.pluginPathMap)
-                .find((pluginName) => callStackPath === Logger.pluginPathMap[pluginName]);
+            const activePluginName = Object.keys(Logger.pluginPathMap).find(
+                (pluginName) => callStackPath === Logger.pluginPathMap[pluginName],
+            );
             if (activePluginName != null) {
                 return activePluginName;
             }

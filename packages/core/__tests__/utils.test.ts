@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { IContext, SemverDiffLevels } from "../src/doc";
+import semver from "semver";
+import { type IContext, SemverDiffLevels } from "../src/doc";
 import { verifyConditions } from "../src/utils";
 
 describe("Utility functions", () => {
@@ -27,8 +28,8 @@ describe("Utility functions", () => {
                 old: oldVersion,
                 new: oldVersion,
                 overrides: {},
-                prerelease: "next"
-            }
+                prerelease: "next",
+            },
         };
         await verifyConditions(context as IContext);
         expect((context.version as any).new).toEqual(`${oldVersion}-next`);
@@ -38,48 +39,51 @@ describe("Utility functions", () => {
         const context: Partial<IContext> = {
             branch: {
                 name: "main",
-                level
+                level,
             },
             version: {
                 old: oldVersion,
-                new: require("semver").inc(oldVersion, level),
-                overrides: {}
-            }
+                new: semver.inc(oldVersion, level),
+                overrides: {},
+            },
         };
         await expect(verifyConditions(context as IContext)).resolves.not.toThrow();
     });
 
     it.each(SemverDiffLevels.slice(0, -1))(
-        "verifyConditions should block semver bumps when level is %s", async (level) => {
-        const badLevel = SemverDiffLevels[SemverDiffLevels.indexOf(level) + 1];
-        const context: Partial<IContext> = {
-            branch: {
-                name: "main",
-                level
-            },
-            env: {},
-            version: {
-                old: oldVersion,
-                new: require("semver").inc(oldVersion, badLevel),
-                overrides: {}
-            }
-        };
-        await expect(verifyConditions(context as IContext)).rejects.toThrow(
-            `Protected branch main does not allow ${badLevel} version changes`);
-    });
+        "verifyConditions should block semver bumps when level is %s",
+        async (level) => {
+            const badLevel = SemverDiffLevels[SemverDiffLevels.indexOf(level) + 1];
+            const context: Partial<IContext> = {
+                branch: {
+                    name: "main",
+                    level,
+                },
+                env: {},
+                version: {
+                    old: oldVersion,
+                    new: require("semver").inc(oldVersion, badLevel),
+                    overrides: {},
+                },
+            };
+            await expect(verifyConditions(context as IContext)).rejects.toThrow(
+                `Protected branch main does not allow ${badLevel} version changes`,
+            );
+        },
+    );
 
     it("verifyConditions should allow major bump when ALLOW_MAJOR_VERSION matches new major version", async () => {
         const context: Partial<IContext> = {
             branch: {
                 name: "main",
-                level: "minor"
+                level: "minor",
             },
             env: { ALLOW_MAJOR_VERSION: "2" },
             version: {
                 old: oldVersion,
                 new: require("semver").inc(oldVersion, "major"),
-                overrides: {}
-            }
+                overrides: {},
+            },
         };
         await expect(verifyConditions(context as IContext)).resolves.not.toThrow();
     });
@@ -88,16 +92,17 @@ describe("Utility functions", () => {
         const context: Partial<IContext> = {
             branch: {
                 name: "main",
-                level: "minor"
+                level: "minor",
             },
             env: { ALLOW_MAJOR_VERSION: "5" },
             version: {
                 old: oldVersion,
                 new: require("semver").inc(oldVersion, "major"),
-                overrides: {}
-            }
+                overrides: {},
+            },
         };
         await expect(verifyConditions(context as IContext)).rejects.toThrow(
-            "Protected branch main does not allow major version changes");
+            "Protected branch main does not allow major version changes",
+        );
     });
 });

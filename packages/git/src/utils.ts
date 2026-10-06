@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
-import * as url from "url";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import * as url from "node:url";
 import * as exec from "@actions/exec";
-import { IContext } from "@octorelease/core";
+import type { IContext } from "@octorelease/core";
 
 export async function gitAdd(...files: string[]): Promise<void> {
     await exec.exec("git", ["add", ...files]);
@@ -29,7 +29,7 @@ export async function gitCommit(message: string, amend?: boolean): Promise<boole
     // Check if there is anything to commit
     if (!amend) {
         const cmdOutput = await exec.getExecOutput("git", ["diff", "--name-only", "--cached"]);
-        if (cmdOutput.stdout.trim().length == 0) {
+        if (cmdOutput.stdout.trim().length === 0) {
             return false;
         }
     }
@@ -50,18 +50,20 @@ export async function gitConfig(context: IContext): Promise<void> {
         await exec.exec("git", ["config", "--global", "credential.helper", "store"]);
         const cmdOutput = await exec.getExecOutput("git", ["config", "--get", "remote.origin.url"]);
         const gitUrl = new url.URL(cmdOutput.stdout);
-        fs.appendFileSync(path.join(os.homedir(), ".git-credentials"),
-            `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`);
+        fs.appendFileSync(
+            path.join(os.homedir(), ".git-credentials"),
+            `${gitUrl.protocol}//${context.env.GIT_CREDENTIALS}@${gitUrl.host}`,
+        );
     }
 
-    await exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]);  // Validate Git credentials
+    await exec.exec("git", ["ls-remote", "--heads", "origin", context.branch.name]); // Validate Git credentials
 }
 
 export async function gitPush(context: IContext, branch: string, tags?: boolean): Promise<boolean> {
     // Check if there is anything to push
     if (!tags) {
         const cmdOutput = await exec.getExecOutput("git", ["cherry"]);
-        if (cmdOutput.stdout.trim().length == 0) {
+        if (cmdOutput.stdout.trim().length === 0) {
             return false;
         }
     }

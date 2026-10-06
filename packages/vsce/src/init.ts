@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import { IContext } from "@octorelease/core";
-import { IPluginConfig } from "./config";
+import * as fs from "node:fs";
+import type { IContext } from "@octorelease/core";
+import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    let packageJson;
+    let packageJson: Record<string, any>;
     try {
         packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
         context.logger.info(`VS Code extension: ${packageJson.publisher}.${packageJson.name}`);

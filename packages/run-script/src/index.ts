@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Copyright 2020-2023 Zowe Actions Contributors
+ * Copyright 2020-202X Zowe Actions Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import * as path from "path";
+import * as path from "node:path";
 import * as core from "@actions/core";
 import { utils as coreUtils } from "@octorelease/core";
 import { loadScript, RELEASE_SCRIPTS } from "./loader";
@@ -35,14 +35,15 @@ async function run(): Promise<void> {
         const context = await coreUtils.buildContext({
             branch: prBranch,
             force: !RELEASE_SCRIPTS.includes(scriptName),
-            logPrefix: scriptName
+            logPrefix: scriptName,
         });
         if (context == null) {
             core.info("Current branch is not targeting a release branch, exiting now");
             return;
         }
 
-        await loadScript(scriptName)(context);
+        const script = await loadScript(scriptName);
+        await script(context);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error.stack || error.message);

@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-import * as plugin from "../src";
+import * as fs from "node:fs";
+import { loadScript } from "../src/loader";
 
-describe("Git plugin", () => {
-    it("should export stages", () => {
-        expect(plugin.init).toBeDefined();
-        expect(plugin.version).toBeDefined();
-    });
+describe("Run Script action", () => {
+    const scriptNames = fs.readdirSync(__dirname + "/../src/scripts").map((s) => s.slice(0, s.lastIndexOf(".")));
+
+    for (const scriptName of scriptNames) {
+        it("should load script " + scriptName, async () => {
+            expect(typeof (await loadScript(scriptName))).toBe("function");
+        });
+    }
 });

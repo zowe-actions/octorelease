@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { IContext } from "@octorelease/core";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import type { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
-import { IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    let publishConfig;
+    let publishConfig: Record<string, any> | undefined;
     config[IS_LERNA_JSON_TEMP] = !fs.existsSync("lerna.json");
     if (!config[IS_LERNA_JSON_TEMP]) {
         try {
@@ -46,7 +46,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             if (fs.existsSync("pnpm-workspaces.yaml")) {
                 lernaConfig.npmClient = "pnpm";
             }
-            if ((await utils.getLernaMajorVersion() || 0) < 7) {
+            if (((await utils.getLernaMajorVersion()) || 0) < 7) {
                 lernaConfig.useWorkspaces = true;
             }
             context.logger.debug("Writing lerna.json with contents: " + JSON.stringify(lernaConfig));
@@ -71,7 +71,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 context.version.overrides[relPackageDir] = {
                     old: packageJson.version,
                     new: packageJson.version,
-                    prerelease: context.version.prerelease
+                    prerelease: context.version.prerelease,
                 };
             }
         }
