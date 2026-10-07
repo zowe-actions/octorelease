@@ -27822,7 +27822,7 @@ var SCRIPTS = {
   prepareRelease: () => Promise.resolve().then(() => (init_prepareRelease(), prepareRelease_exports))
 };
 async function loadScript(scriptName) {
-  if (scriptName.startsWith(".")) {
+  if (path4.isAbsolute(scriptName) || scriptName.startsWith(".")) {
     const scriptModule = await import(path4.resolve(process.cwd(), scriptName));
     return scriptModule.default;
   }

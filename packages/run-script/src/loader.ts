@@ -32,7 +32,7 @@ const SCRIPTS: Record<string, () => Promise<ScriptModule>> = {
  * to the current working directory.
  */
 export async function loadScript(scriptName: string): Promise<ScriptModule["default"]> {
-    if (scriptName.startsWith(".")) {
+    if (path.isAbsolute(scriptName) || scriptName.startsWith(".")) {
         const scriptModule = (await import(path.resolve(process.cwd(), scriptName))) as ScriptModule;
         return scriptModule.default;
     }
