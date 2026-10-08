@@ -19,6 +19,7 @@ export const DEFAULT_NPM_REGISTRY = "https://registry.npmjs.org/";
 export interface IPluginConfig {
     aliasTags?: Record<string, string | string[]>;
     npmPublish?: boolean;
+    publishRegistry?: string;
     /**
      * @deprecated npm@12 dropped support for shrinkwrap files; use `bundleDependencies` in package.json instead
      */

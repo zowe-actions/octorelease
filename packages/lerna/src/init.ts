@@ -82,6 +82,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         return;
     }
 
+    const npmRegistry = config.publishRegistry || publishConfig?.registry || DEFAULT_NPM_REGISTRY;
     const useTokenAuth = npmUtils.verifyConditions(context);
-    await npmUtils.npmConfig(context, publishConfig?.registry || DEFAULT_NPM_REGISTRY, useTokenAuth);
+    await npmUtils.npmConfig(context, npmRegistry, useTokenAuth);
 }
