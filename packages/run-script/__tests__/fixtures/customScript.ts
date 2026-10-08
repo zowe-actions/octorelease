@@ -27,8 +27,11 @@ import type { IPluginApi } from "../../src/plugins";
  * because it lives in this repo. They receive Octorelease's hydrated
  * context, plus lazy access to its built-in plugins.
  */
-export default async function (context: IContext, _api: IPluginApi): Promise<void> {
+export default async function (context: IContext, api: IPluginApi, event: object): Promise<void> {
     // context has release info like context.version, context.branch, context.env
     // api exposes Octorelease's built-in plugins, e.g. api.git.utils.gitAdd(...)
+    // event provides GitHub webhook payload for events like push or pull_request
     context.logger.info(`Releasing version ${context.version.new}`);
+    context.logger.info(`Using NPM registry: ${api.npm.DEFAULT_NPM_REGISTRY}`);
+    context.logger.debug(`Event payload: ${JSON.stringify(event)}`);
 }

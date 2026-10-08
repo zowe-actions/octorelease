@@ -31,12 +31,22 @@ describe("Run Script action", () => {
         await expect(loadScript("doesNotExist")).rejects.toThrow("Could not find script to run: doesNotExist");
     });
 
-    it("should load and run a custom script path prefixed with './'", async () => {
+    it("should load and run a custom script from absolute path", async () => {
+        const fixturePath = path.join(__dirname, "fixtures/customScript");
+        const fakeContext = { logger: { debug: vi.fn(), info: vi.fn() }, version: { new: "1.0.0" } } as any;
+        const fakeApi = { npm: {} } as any;
+        const fakeEvent = { ref: "main" } as any;
+        const script = await loadScript(fixturePath);
+        await expect(script(fakeContext, fakeApi, fakeEvent)).resolves.toBeUndefined();
+    });
+
+    it("should load and run a custom script from relative path prefixed with './'", async () => {
         const fixturePath = path.join(__dirname, "fixtures/customScript");
         const relativePath = "./" + path.relative(process.cwd(), fixturePath).replace(/\\/g, "/");
-        const fakeContext = { logger: { info: () => {} }, version: { new: "1.0.0" } } as any;
-        const fakeApi = { git: { utils: { gitAdd: async () => {} } } } as any;
+        const fakeContext = { logger: { debug: vi.fn(), info: vi.fn() }, version: { new: "1.0.0" } } as any;
+        const fakeApi = { npm: {} } as any;
+        const fakeEvent = { ref: "main" } as any;
         const script = await loadScript(relativePath);
-        await expect(script(fakeContext, fakeApi)).resolves.toBeUndefined();
+        await expect(script(fakeContext, fakeApi, fakeEvent)).resolves.toBeUndefined();
     });
 });
