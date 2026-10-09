@@ -45,8 +45,10 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | ------- | ----------- | ------- |
 | `assets` | File patterns to upload to draft GitHub release. Can specify one string or an array of strings. | `[]` |
 | `checkPrLabels` | Specify true to check pull request labels for a semver bump level. Can specify `true` to use default labels, or an array of custom label names (see example below). | `false` |
+| `failComment` | Create a GitHub issue with error details after a failed release. | `true` |
 | `githubUrl` | Hostname of private GitHub instance. | https://github.com |
 | `publishRelease` | Specify true to publish the GitHub release associated with `assets` rather than leaving it in draft mode. | `false` |
+| `successComment` | Post a comment on latest pull request after a successful release. | `true` |
 
 ### Examples
 

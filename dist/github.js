@@ -33782,6 +33782,9 @@ function getOctokit2(context3, config) {
 
 // src/fail.ts
 async function fail_default(context3, config) {
+  if (config.failComment === false) {
+    return;
+  }
   const octokit = getOctokit2(context3, config);
   const prNumber = await findPrNumber(context3, octokit);
   if (prNumber == null) {
@@ -37009,7 +37012,7 @@ async function uploadAssets(context3, octokit, release, assetPaths) {
 // src/success.ts
 var import_core6 = require("./core");
 async function success_default(context3, config) {
-  if (Object.keys(context3.releasedPackages).length === 0) {
+  if (config.successComment === false || Object.keys(context3.releasedPackages).length === 0) {
     return;
   }
   const octokit = getOctokit2(context3, config);

@@ -19,6 +19,10 @@ import { DEFAULT_RELEASE_LABELS, type IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    if (config.failComment === false) {
+        return;
+    }
+
     const octokit = utils.getOctokit(context, config);
     const prNumber = await utils.findPrNumber(context, octokit);
     if (prNumber == null) {
