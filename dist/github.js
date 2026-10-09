@@ -37009,7 +37009,7 @@ async function uploadAssets(context3, octokit, release, assetPaths) {
 // src/success.ts
 var import_core6 = require("./core");
 async function success_default(context3, config) {
-  if (Object.keys(context3.releasedPackages).length === 0) {
+  if (config.successComment === false || Object.keys(context3.releasedPackages).length === 0) {
     return;
   }
   const octokit = getOctokit2(context3, config);

@@ -19,7 +19,7 @@ import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    if (Object.keys(context.releasedPackages).length === 0) {
+    if (config.successComment === false || Object.keys(context.releasedPackages).length === 0) {
         return;
     }
 

@@ -21,4 +21,5 @@ export interface IPluginConfig {
     checkPrLabels?: boolean | [string, string, string, string];
     githubUrl?: string;
     publishRelease?: boolean;
+    successComment?: boolean;
 }
