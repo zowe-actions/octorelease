@@ -33782,6 +33782,9 @@ function getOctokit2(context3, config) {
 
 // src/fail.ts
 async function fail_default(context3, config) {
+  if (config.failComment === false) {
+    return;
+  }
   const octokit = getOctokit2(context3, config);
   const prNumber = await findPrNumber(context3, octokit);
   if (prNumber == null) {
