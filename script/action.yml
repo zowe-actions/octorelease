@@ -11,7 +11,7 @@ inputs:
     default: ${{ github.token }}
     required: false
   script:
-    description: 'Name of script to run from the scripts directory'
+    description: 'Name of a built-in script to run, or a "./"-prefixed path to a custom script'
     required: true
     default: ''
   working-dir:

@@ -14,47 +14,26 @@
  * limitations under the License.
  */
 
-import * as fs from "node:fs";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import AdmZip from "adm-zip";
-
-export async function downloadArtifact(runId: number, artifactName: string, extractPath?: string): Promise<void> {
-    const octokit = github.getOctokit(core.getInput("github-token") || (process.env.GITHUB_TOKEN as string));
-    core.debug("Gathering artifact information...");
-    const artifactInfo = (
-        await octokit.rest.actions.listWorkflowRunArtifacts({
-            ...github.context.repo,
-            run_id: runId,
-        })
-    ).data.artifacts.find((a) => a.name === artifactName);
-    if (artifactInfo == null) {
-        throw new Error(`Could not find artifact ${artifactName} for run ID ${runId}`);
-    }
-    core.debug(`Artifact information:\n${JSON.stringify(artifactInfo)}`);
-    core.debug("Downloading artifact...");
-    const artifactRaw = Buffer.from(
-        (
-            await octokit.rest.actions.downloadArtifact({
-                ...github.context.repo,
-                artifact_id: artifactInfo.id,
-                archive_format: "zip",
-            })
-        ).data as any,
-    );
-    if (extractPath != null) {
-        fs.mkdirSync(extractPath, { recursive: true });
-    }
-    core.debug("Downloading artifact...");
-    new AdmZip(artifactRaw).extractAllTo(extractPath ?? process.cwd());
-}
 
 export async function findCurrentPr(state = "open"): Promise<any | undefined> {
     core.debug("Gather information about current pull request");
-    if (github.context.payload.pull_request?.state === state) {
-        return github.context.payload.pull_request;
-    }
     const octokit = github.getOctokit(core.getInput("github-token") || (process.env.GITHUB_TOKEN as string));
+    if (github.context.payload.pull_request != null) {
+        if (state !== "open") {
+            return github.context.payload.pull_request.state === state
+                ? github.context.payload.pull_request
+                : undefined;
+        }
+        // Fields like `base.ref` in the event payload go stale if the PR is edited (e.g. retargeted)
+        // after this run was triggered, so re-fetch the PR by number to get its current state.
+        const { data: pr } = await octokit.rest.pulls.get({
+            ...github.context.repo,
+            pull_number: github.context.payload.pull_request.number,
+        });
+        return pr.state === state ? pr : undefined;
+    }
     core.debug(`Looking through ${state?.toUpperCase() ?? ""} pull requests`);
     if (github.context.payload.workflow_run == null) {
         const prs = (
