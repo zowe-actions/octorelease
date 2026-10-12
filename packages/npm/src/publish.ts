@@ -24,7 +24,7 @@ import * as utils from "./utils";
 export default async function (context: IContext, config: IPluginConfig, inDir?: string): Promise<void> {
     const cwd = inDir || process.cwd();
     const packageJson = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf-8"));
-    const npmRegistry: string = packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
+    const npmRegistry: string = config.publishRegistry || packageJson.publishConfig?.registry || DEFAULT_NPM_REGISTRY;
 
     if (config.pruneShrinkwrap) {
         if (packageJson.scripts.preshrinkwrap != null) {
