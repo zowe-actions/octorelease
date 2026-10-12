@@ -53,6 +53,8 @@ jobs:
 The following is a minimal configuration for Octorelease with a declarative pipeline running Node.
 
 ```groovy
+@Library('zowe-octorelease') _
+
 pipeline {
     agent any  // Use agent with Node.js preinstalled
 
@@ -70,7 +72,7 @@ pipeline {
 
         stage("Publish Release") {
             steps {
-                sh "npx octorelease"
+                octorelease()
             }
         }
     }
