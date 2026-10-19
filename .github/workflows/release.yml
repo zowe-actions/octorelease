@@ -1,22 +1,15 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      package:
-        description: Package name to publish (e.g., core)
-        required: true
-        type: choice
-        default: core
-        options: [changelog, core, exec, git, github, lerna, npm, pypi, vsce]
-      version:
-        description: Version number to publish (e.g., 1.0.0)
-        required: false
-        type: string
-      dry-run:
-        description: Dry run mode
-        required: false
-        type: boolean
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-master
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -27,7 +20,8 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        ref: ${{ github.ref }}
+        ref: ${{ github.sha }}
+        persist-credentials: false
 
     - name: Use Node.js LTS
       uses: actions/setup-node@v4
@@ -40,14 +34,16 @@ jobs:
     - name: Build Source
       run: npm run build
 
-    - uses: ./
-      env:
-        GIT_COMMITTER_NAME: GitHub Actions
-        GIT_COMMITTER_EMAIL: actions@github.com
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.ZOWE_ACTIONS_NPM_TOKEN }}
+    - name: Set Prerelease Version
+      id: set-version
+      run: |
+        base_version="$(node -p "require('./package.json').version.split('-')[0]")"
+        echo "version=${base_version}-next.$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"
+
+    - name: Publish to Artifactory
+      uses: ./
       with:
         config-dir: .github
-        dry-run: ${{ github.event.inputs.dry-run }}
-        new-version: ${{ github.event.inputs.version }}
-        working-dir: packages/${{ github.event.inputs.package }}
+        new-version: ${{ steps.set-version.outputs.version }}
+      env:
+        NPM_TOKEN: ${{ secrets.ZOWE_ARTIFACTORY_TOKEN }}
