@@ -1,40 +1,37 @@
-[@octorelease/core](../README.md) / [Exports](../modules.md) / IReleasedPackage
+[**@octorelease/core**](../README.md)
+
+***
+
+[@octorelease/core](../globals.md) / IReleasedPackage
 
 # Interface: IReleasedPackage
+
+Defined in: [doc/IReleasedPackage.ts:20](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IReleasedPackage.ts#L20)
 
 Info about successfully released package
 
 ## Indexable
 
-▪ [key: `string`]: `any`
+> \[`key`: `string`\]: `any`
 
-## Table of contents
-
-### Properties
-
-- [name](IReleasedPackage.md#name)
-- [url](IReleasedPackage.md#url)
+Other plugin-specific properties
 
 ## Properties
 
 ### name
 
-• **name**: `string`
+> **name**: `string`
+
+Defined in: [doc/IReleasedPackage.ts:24](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IReleasedPackage.ts#L24)
 
 Package name
 
-#### Defined in
+***
 
-[doc/IReleasedPackage.ts:24](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IReleasedPackage.ts#L24)
+### url?
 
-___
+> `optional` **url?**: `string`
 
-### url
-
-• `Optional` **url**: `string`
+Defined in: [doc/IReleasedPackage.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IReleasedPackage.ts#L29)
 
 URL to download package
-
-#### Defined in
-
-[doc/IReleasedPackage.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IReleasedPackage.ts#L29)

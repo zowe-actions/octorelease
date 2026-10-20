@@ -113,7 +113,7 @@ export async function dryRunTask<T>(
 
 /**
  * Load plugins listed in config by requiring their modules from disk.
- * If running as a GitHub Action, @octorelease-scoped plugins missing from
+ * If running as a GitHub Action, `@octorelease`-scoped plugins missing from
  * node_modules are loaded from the "dist" folder where they are bundled.
  * @param context Global context object for Octorelease
  * @returns Key-value pairs of plugin names and loaded modules
