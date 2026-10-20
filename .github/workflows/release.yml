@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [master]
+    branches: [master, chore/publish-prerelease]
 
 permissions:
   contents: read
@@ -37,8 +37,13 @@ jobs:
     - name: Set Prerelease Version
       id: set-version
       run: |
-        base_version="$(node -p "require('./package.json').version.split('-')[0]")"
-        echo "version=${base_version}-next.$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"
+        latest_tag="$(git tag --list 'v*' --sort=-version:refname |
+          awk '/^v[0-9]+\.[0-9]+\.[0-9]+$/ && !found { print; found = 1 }')"
+        if [ -z "$latest_tag" ]; then
+          echo "::error::No release tag matching vMAJOR.MINOR.PATCH was found."
+          exit 1
+        fi
+        echo "version=${latest_tag#v}-next.$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"
 
     - name: Publish to Artifactory
       uses: ./
