@@ -1,49 +1,41 @@
-[@octorelease/core](../README.md) / [Exports](../modules.md) / IContextOpts
+[**@octorelease/core**](../README.md)
+
+***
+
+[@octorelease/core](../globals.md) / IContextOpts
 
 # Interface: IContextOpts
 
+Defined in: [doc/IContextOpts.ts:20](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L20)
+
 Options for building the global context object
-
-## Table of contents
-
-### Properties
-
-- [branch](IContextOpts.md#branch)
-- [force](IContextOpts.md#force)
-- [logPrefix](IContextOpts.md#logprefix)
 
 ## Properties
 
-### branch
+### branch?
 
-• `Optional` **branch**: `string`
+> `optional` **branch?**: `string`
+
+Defined in: [doc/IContextOpts.ts:24](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L24)
 
 Overrides the branch name automatically detected in the CI environment.
 
-#### Defined in
+***
 
-[doc/IContextOpts.ts:24](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContextOpts.ts#L24)
+### force?
 
-___
+> `optional` **force?**: `boolean`
 
-### force
-
-• `Optional` **force**: `boolean`
+Defined in: [doc/IContextOpts.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L29)
 
 Forces context to be built even if branch is not a release branch.
 
-#### Defined in
+***
 
-[doc/IContextOpts.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContextOpts.ts#L29)
+### logPrefix?
 
-___
+> `optional` **logPrefix?**: `string`
 
-### logPrefix
-
-• `Optional` **logPrefix**: `string`
+Defined in: [doc/IContextOpts.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L34)
 
 Sets custom prefix for log messages.
-
-#### Defined in
-
-[doc/IContextOpts.ts:34](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IContextOpts.ts#L34)

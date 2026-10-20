@@ -1,4 +1,6 @@
-@octorelease/core / [Exports](modules.md)
+**@octorelease/core**
+
+***
 
 # Octorelease CLI
 

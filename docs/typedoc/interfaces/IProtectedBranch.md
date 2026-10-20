@@ -1,62 +1,51 @@
-[@octorelease/core](../README.md) / [Exports](../modules.md) / IProtectedBranch
+[**@octorelease/core**](../README.md)
+
+***
+
+[@octorelease/core](../globals.md) / IProtectedBranch
 
 # Interface: IProtectedBranch
 
+Defined in: [doc/IProtectedBranch.ts:25](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L25)
+
 Protected branch configuration object
-
-## Table of contents
-
-### Properties
-
-- [channel](IProtectedBranch.md#channel)
-- [level](IProtectedBranch.md#level)
-- [name](IProtectedBranch.md#name)
-- [prerelease](IProtectedBranch.md#prerelease)
 
 ## Properties
 
-### channel
+### channel?
 
-• `Optional` **channel**: `string`
+> `optional` **channel?**: `string`
+
+Defined in: [doc/IProtectedBranch.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L34)
 
 Release channel (e.g., NPM tag)
 
-#### Defined in
+***
 
-[doc/IProtectedBranch.ts:34](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L34)
+### level?
 
-___
+> `optional` **level?**: `"none"` \| `"patch"` \| `"minor"` \| `"major"`
 
-### level
-
-• `Optional` **level**: ``"none"`` \| ``"patch"`` \| ``"minor"`` \| ``"major"``
+Defined in: [doc/IProtectedBranch.ts:39](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L39)
 
 Maximum semver bump level allowed
 
-#### Defined in
-
-[doc/IProtectedBranch.ts:39](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L39)
-
-___
+***
 
 ### name
 
-• **name**: `string`
+> **name**: `string`
+
+Defined in: [doc/IProtectedBranch.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L29)
 
 Branch name
 
-#### Defined in
+***
 
-[doc/IProtectedBranch.ts:29](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L29)
+### prerelease?
 
-___
+> `optional` **prerelease?**: `string` \| `boolean`
 
-### prerelease
-
-• `Optional` **prerelease**: `string` \| `boolean`
+Defined in: [doc/IProtectedBranch.ts:44](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L44)
 
 Prerelease name (defaults to branch name if `true`)
-
-#### Defined in
-
-[doc/IProtectedBranch.ts:44](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/doc/IProtectedBranch.ts#L44)

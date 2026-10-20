@@ -1,139 +1,128 @@
-[@octorelease/core](../README.md) / [Exports](../modules.md) / Inputs
+[**@octorelease/core**](../README.md)
+
+***
+
+[@octorelease/core](../globals.md) / Inputs
 
 # Class: Inputs
+
+Defined in: [inputs.ts:27](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L27)
 
 Class for accessing GitHub action inputs.
 If Octorelease is used outside of GitHub Actions, these inputs can be
 supplied as environment variables. For example, the "dry-run" input is
 associated with the "INPUT_DRY-RUN" environment variable.
 
-## Table of contents
-
-### Constructors
-
-- [constructor](Inputs.md#constructor)
-
-### Properties
-
-- [rootDir](Inputs.md#rootdir)
-
-### Accessors
-
-- [ciSkip](Inputs.md#ciskip)
-- [configDir](Inputs.md#configdir)
-- [dryRun](Inputs.md#dryrun)
-- [newVersion](Inputs.md#newversion)
-- [skipStages](Inputs.md#skipstages)
-- [workingDir](Inputs.md#workingdir)
-
 ## Constructors
 
-### constructor
+### Constructor
 
-• **new Inputs**()
+> **new Inputs**(): `Inputs`
+
+#### Returns
+
+`Inputs`
 
 ## Properties
 
 ### rootDir
 
-▪ `Static` `Private` `Readonly` **rootDir**: `string`
+> `private` `readonly` `static` **rootDir**: `string`
 
-#### Defined in
-
-[inputs.ts:27](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L27)
+Defined in: [inputs.ts:28](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L28)
 
 ## Accessors
 
 ### ciSkip
 
-• `Static` `get` **ciSkip**(): `boolean`
+#### Get Signature
+
+> **get** `static` **ciSkip**(): `boolean`
+
+Defined in: [inputs.ts:33](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L33)
 
 Specify whether to detect [ci skip] in last commit message
 
-#### Returns
+##### Returns
 
 `boolean`
 
-#### Defined in
-
-[inputs.ts:32](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L32)
-
-___
+***
 
 ### configDir
 
-• `Static` `get` **configDir**(): `undefined` \| `string`
+#### Get Signature
+
+> **get** `static` **configDir**(): `string` \| `undefined`
+
+Defined in: [inputs.ts:47](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L47)
 
 Custom directory to search for release configuration.
 
-#### Returns
+##### Returns
 
-`undefined` \| `string`
+`string` \| `undefined`
 
-#### Defined in
-
-[inputs.ts:46](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L46)
-
-___
+***
 
 ### dryRun
 
-• `Static` `get` **dryRun**(): `boolean`
+#### Get Signature
+
+> **get** `static` **dryRun**(): `boolean`
+
+Defined in: [inputs.ts:55](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L55)
 
 Don't make any changes but report what would have been done.
 
-#### Returns
+##### Returns
 
 `boolean`
 
-#### Defined in
-
-[inputs.ts:54](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L54)
-
-___
+***
 
 ### newVersion
 
-• `Static` `get` **newVersion**(): `undefined` \| `string`
+#### Get Signature
+
+> **get** `static` **newVersion**(): `string` \| `undefined`
+
+Defined in: [inputs.ts:69](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L69)
 
 New version number that should be released.
 
-#### Returns
+##### Returns
 
-`undefined` \| `string`
+`string` \| `undefined`
 
-#### Defined in
-
-[inputs.ts:68](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L68)
-
-___
+***
 
 ### skipStages
 
-• `Static` `get` **skipStages**(): `string`[]
+#### Get Signature
+
+> **get** `static` **skipStages**(): `string`[]
+
+Defined in: [inputs.ts:76](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L76)
 
 Comma-separated list of stages that should be skipped.
 
-#### Returns
+##### Returns
 
 `string`[]
 
-#### Defined in
-
-[inputs.ts:75](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L75)
-
-___
+***
 
 ### workingDir
 
-• `Static` `get` **workingDir**(): `undefined` \| `string`
+#### Get Signature
+
+> **get** `static` **workingDir**(): `string` \| `undefined`
+
+Defined in: [inputs.ts:84](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/inputs.ts#L84)
 
 Custom working directory to use instead of the project root.
 
-#### Returns
+##### Returns
 
-`undefined` \| `string`
-
-#### Defined in
-
-[inputs.ts:83](https://github.com/zowe-actions/octorelease/blob/3eb8460/packages/core/src/inputs.ts#L83)
+`string` \| `undefined`
