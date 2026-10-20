@@ -6,7 +6,7 @@
 
 # Class: Logger
 
-Defined in: [logger.ts:22](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L22)
+Defined in: [logger.ts:22](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L22)
 
 Class for logging messages to the console.
 
@@ -16,7 +16,7 @@ Class for logging messages to the console.
 
 > **new Logger**(`prefix?`): `Logger`
 
-Defined in: [logger.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L29)
+Defined in: [logger.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L29)
 
 #### Parameters
 
@@ -34,7 +34,7 @@ Defined in: [logger.ts:29](https://github.com/zowe-actions/octorelease/blob/chor
 
 > `private` `optional` **prefix?**: `string`
 
-Defined in: [logger.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L29)
+Defined in: [logger.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L29)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [logger.ts:29](https://github.com/zowe-actions/octorelease/blob/chor
 
 > `static` **pluginPathMap**: `Record`\<`string`, `string`\> = `{}`
 
-Defined in: [logger.ts:27](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L27)
+Defined in: [logger.ts:27](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L27)
 
 **`Internal`**
 
@@ -54,7 +54,7 @@ Mapping of plugin names to their file paths
 
 > `private` **addPrefix**(`message`): `string`
 
-Defined in: [logger.ts:68](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L68)
+Defined in: [logger.ts:68](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L68)
 
 If prefix is defined for this logger, prepend it to message.
 
@@ -78,7 +78,7 @@ Text with prefix prepended
 
 > **debug**(`message`): `void`
 
-Defined in: [logger.ts:35](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L35)
+Defined in: [logger.ts:35](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L35)
 
 Output debug level message with plugin name prepended.
 
@@ -100,7 +100,7 @@ Text to output
 
 > **error**(`message`): `void`
 
-Defined in: [logger.ts:43](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L43)
+Defined in: [logger.ts:43](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L43)
 
 Output error level message with plugin name prepended.
 
@@ -122,7 +122,7 @@ Text to output
 
 > `private` **getPluginName**(): `string` \| `undefined`
 
-Defined in: [logger.ts:77](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L77)
+Defined in: [logger.ts:77](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L77)
 
 Searches the call stack for file paths associated with a plugin.
 
@@ -138,7 +138,7 @@ Name of active plugin if one is found
 
 > **info**(`message`): `void`
 
-Defined in: [logger.ts:51](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L51)
+Defined in: [logger.ts:51](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L51)
 
 Output info level message with plugin name prepended.
 
@@ -160,7 +160,7 @@ Text to output
 
 > **warn**(`message`): `void`
 
-Defined in: [logger.ts:59](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/logger.ts#L59)
+Defined in: [logger.ts:59](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/logger.ts#L59)
 
 Output warning level message with plugin name prepended.
 

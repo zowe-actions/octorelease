@@ -6,7 +6,7 @@
 
 # Interface: IConfig
 
-Defined in: [doc/IConfig.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IConfig.ts#L34)
+Defined in: [doc/IConfig.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IConfig.ts#L34)
 
 Configuration object loaded from release config file
 
@@ -16,7 +16,7 @@ Configuration object loaded from release config file
 
 > **branches**: [`BranchConfig`](../type-aliases/BranchConfig.md)[]
 
-Defined in: [doc/IConfig.ts:38](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IConfig.ts#L38)
+Defined in: [doc/IConfig.ts:38](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IConfig.ts#L38)
 
 Array of protected branch configurations
 
@@ -26,7 +26,7 @@ Array of protected branch configurations
 
 > **plugins**: [`PluginConfig`](../type-aliases/PluginConfig.md)[]
 
-Defined in: [doc/IConfig.ts:43](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IConfig.ts#L43)
+Defined in: [doc/IConfig.ts:43](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IConfig.ts#L43)
 
 Array of Octorelease plugin configurations
 
@@ -36,6 +36,6 @@ Array of Octorelease plugin configurations
 
 > **tagPrefix**: `string`
 
-Defined in: [doc/IConfig.ts:48](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IConfig.ts#L48)
+Defined in: [doc/IConfig.ts:48](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IConfig.ts#L48)
 
 Git tag prefix that precedes version number (default is "v")

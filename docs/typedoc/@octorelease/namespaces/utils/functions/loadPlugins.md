@@ -8,7 +8,7 @@
 
 > **loadPlugins**(`context`): `Promise`\<[`IPluginsLoaded`](../../../../interfaces/IPluginsLoaded.md)\>
 
-Defined in: [utils.ts:121](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/utils.ts#L121)
+Defined in: [utils.ts:128](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/utils.ts#L128)
 
 Load plugins listed in config by requiring their modules from disk.
 If running as a GitHub Action, `@octorelease`-scoped plugins missing from

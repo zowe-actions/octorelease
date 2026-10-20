@@ -1,8 +1,10 @@
 {
-  "name": "octorelease",
+  "name": "@octorelease/workspace",
   "private": true,
-  "description": "Extensible GitHub action to publish semantic releases.",
-  "bin": "dist/index.js",
+  "description": "Development workspace for Octorelease, a plugin-based GitHub Action and CLI for versioning and publishing packages.",
+  "bin": {
+    "octorelease": "dist/index.js"
+  },
   "scripts": {
     "build": "node scripts/updateLicenses.js && tsc -b --force",
     "lint": "npx @biomejs/biome check --diagnostic-level=warn --write packages",

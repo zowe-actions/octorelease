@@ -6,7 +6,7 @@
 
 # Interface: IProtectedBranch
 
-Defined in: [doc/IProtectedBranch.ts:25](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L25)
+Defined in: [doc/IProtectedBranch.ts:25](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IProtectedBranch.ts#L25)
 
 Protected branch configuration object
 
@@ -16,7 +16,7 @@ Protected branch configuration object
 
 > `optional` **channel?**: `string`
 
-Defined in: [doc/IProtectedBranch.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L34)
+Defined in: [doc/IProtectedBranch.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IProtectedBranch.ts#L34)
 
 Release channel (e.g., NPM tag)
 
@@ -26,7 +26,7 @@ Release channel (e.g., NPM tag)
 
 > `optional` **level?**: `"none"` \| `"patch"` \| `"minor"` \| `"major"`
 
-Defined in: [doc/IProtectedBranch.ts:39](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L39)
+Defined in: [doc/IProtectedBranch.ts:39](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IProtectedBranch.ts#L39)
 
 Maximum semver bump level allowed
 
@@ -36,7 +36,7 @@ Maximum semver bump level allowed
 
 > **name**: `string`
 
-Defined in: [doc/IProtectedBranch.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L29)
+Defined in: [doc/IProtectedBranch.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IProtectedBranch.ts#L29)
 
 Branch name
 
@@ -46,6 +46,6 @@ Branch name
 
 > `optional` **prerelease?**: `string` \| `boolean`
 
-Defined in: [doc/IProtectedBranch.ts:44](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IProtectedBranch.ts#L44)
+Defined in: [doc/IProtectedBranch.ts:44](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IProtectedBranch.ts#L44)
 
 Prerelease name (defaults to branch name if `true`)

@@ -6,9 +6,12 @@
 
 # Interface: IPlugin
 
-Defined in: [doc/IPlugin.ts:22](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L22)
+Defined in: [doc/IPlugin.ts:25](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IPlugin.ts#L25)
 
-Type for loaded plugin modules
+Named async handlers exported by a plugin module.
+Core awaits each handler and ignores its return value. Handlers communicate
+through the shared context and throw an Error to fail the stage. Each plugin
+is responsible for respecting `context.dryRun` before making changes.
 
 ## Properties
 
@@ -16,7 +19,7 @@ Type for loaded plugin modules
 
 > `optional` **fail?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:28](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L28)
+Defined in: [doc/IPlugin.ts:31](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IPlugin.ts#L31)
 
 Handler for "fail" stage
 
@@ -44,7 +47,7 @@ Plugin configuration object
 
 > `optional` **init?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:35](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L35)
+Defined in: [doc/IPlugin.ts:38](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IPlugin.ts#L38)
 
 Handler for "init" stage
 
@@ -72,7 +75,7 @@ Plugin configuration object
 
 > `optional` **publish?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:42](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L42)
+Defined in: [doc/IPlugin.ts:45](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IPlugin.ts#L45)
 
 Handler for "publish" stage
 
@@ -100,7 +103,7 @@ Plugin configuration object
 
 > `optional` **success?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:49](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L49)
+Defined in: [doc/IPlugin.ts:52](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IPlugin.ts#L52)
 
 Handler for "success" stage
 
@@ -128,7 +131,7 @@ Plugin configuration object
 
 > `optional` **version?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:56](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L56)
+Defined in: [doc/IPlugin.ts:59](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/doc/IPlugin.ts#L59)
 
 Handler for "version" stage
 

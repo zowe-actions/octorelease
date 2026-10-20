@@ -8,9 +8,11 @@
 
 > **dryRunTask**\<`T`\>(`context`, `description`, `task`): `Promise`\<`T` \| `undefined`\>
 
-Defined in: [utils.ts:102](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/utils.ts#L102)
+Defined in: [utils.ts:109](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/utils.ts#L109)
 
 In dry run mode skip the task, otherwise run it.
+Only the supplied callback is guarded; callers must separately handle any
+preparation, file writes, or external commands performed outside it.
 
 ## Type Parameters
 
@@ -41,3 +43,5 @@ Callback to execute when not in dry run mode
 ## Returns
 
 `Promise`\<`T` \| `undefined`\>
+
+Task result, or undefined when skipped

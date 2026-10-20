@@ -8,9 +8,11 @@
 
 > **buildContext**(`opts?`): `Promise`\<[`IContext`](../../../../interfaces/IContext.md) \| `undefined`\>
 
-Defined in: [utils.ts:41](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/utils.ts#L41)
+Defined in: [utils.ts:45](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/utils.ts#L45)
 
 Build global context object that is passed to all plugin handlers.
+Requires a recognized CI environment and a release configuration with a
+`branches` array. Plugins are configured here but initialized separately.
 
 ## Parameters
 
@@ -24,4 +26,9 @@ Options for building the context object
 
 `Promise`\<[`IContext`](../../../../interfaces/IContext.md) \| `undefined`\>
 
-Global context object for Octorelease
+Shared release context, or undefined when no branch matches and
+`opts.force` is not set
+
+## Throws
+
+If CI detection, configuration loading, or Git inspection fails
