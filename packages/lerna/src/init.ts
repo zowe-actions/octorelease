@@ -41,8 +41,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
             publishConfig = packageJson.publishConfig;
         }
         if (config[IS_LERNA_JSON_TEMP]) {
-            context.version.new = packageJson.version;
-            const lernaConfig: Record<string, any> = { version: packageJson.version };
+            context.version.new = packageJson.version ?? context.version.new;
+            const lernaConfig: Record<string, any> = { version: context.version.new };
             if (fs.existsSync("pnpm-workspaces.yaml")) {
                 lernaConfig.npmClient = "pnpm";
             }

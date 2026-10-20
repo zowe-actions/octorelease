@@ -20225,8 +20225,8 @@ async function init_default(context, config) {
       publishConfig = packageJson.publishConfig;
     }
     if (config[IS_LERNA_JSON_TEMP]) {
-      context.version.new = packageJson.version;
-      const lernaConfig = { version: packageJson.version };
+      context.version.new = packageJson.version ?? context.version.new;
+      const lernaConfig = { version: context.version.new };
       if (fs3.existsSync("pnpm-workspaces.yaml")) {
         lernaConfig.npmClient = "pnpm";
       }
@@ -23299,8 +23299,10 @@ async function version_default(context, config) {
   } else {
     const oldPkgRaw = fs5.readFileSync("package.json").toString();
     const pkgJson = JSON.parse(oldPkgRaw);
-    pkgJson.version = context.version.new;
-    fs5.writeFileSync("package.json", JSON.stringify(pkgJson, null, 2) + "\n");
+    if (pkgJson.version != null) {
+      pkgJson.version = context.version.new;
+      fs5.writeFileSync("package.json", JSON.stringify(pkgJson, null, 2) + "\n");
+    }
   }
   await lernaPostVersion();
   const lockfilePath = await (0, import_find_up.default)(["pnpm-lock.yaml", "yarn.lock", "npm-shrinkwrap.json", "package-lock.json"]);
