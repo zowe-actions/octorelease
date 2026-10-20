@@ -17,7 +17,7 @@
 module.exports = {
     branches: [
         {
-            name: "master",
+            name: "chore/publish-prerelease",
             channel: "next",
             prerelease: "next",
         },
