@@ -8,7 +8,7 @@
 
 > **version**(`context`, `pluginsLoaded`): `Promise`\<`void`\>
 
-Defined in: [stages.ts:78](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/stages.ts#L78)
+Defined in: [packages/core/src/stages.ts:78](/packages/core/src/stages.ts#L78)
 
 Run "version" stage for loaded plugins that have a "version" handler.
 If "version" is included in `Inputs.skipStages`, this stage will be skipped.

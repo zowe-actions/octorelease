@@ -11,6 +11,13 @@ CLI and plugin APIs for [Octorelease](https://github.com/zowe-actions/octoreleas
 npm install --save-dev @octorelease/core
 ```
 
+For a prerelease from `master`, use Zowe Artifactory:
+
+```sh
+npm install --save-dev @octorelease/core@next \
+  --@octorelease:registry=https://zowe.jfrog.io/zowe/api/npm/npm-local-release/
+```
+
 - Run in CI with Node.js, npm, and Git.
 - Install additional plugins in the release project.
 - Include core's optional dependencies if you use changelog, Git, GitHub, or npm plugins.

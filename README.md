@@ -45,6 +45,13 @@ npm install --save-dev @octorelease/core
 npx octorelease
 ```
 
+To try a prerelease from `master`, install from [Zowe Artifactory](https://zowe.jfrog.io/zowe/api/npm/npm-local-release/):
+
+```sh
+npm install --save-dev @octorelease/core@next \
+  --@octorelease:registry=https://zowe.jfrog.io/zowe/api/npm/npm-local-release/
+```
+
 ## Requirements
 
 - A Git repository with release history and tags available in CI.
@@ -57,6 +64,8 @@ npx octorelease
 - [Usage](docs/usage.md) — Installation, configuration, and running a release.
 - [Plugins](docs/extending.md) — Available plugins and reusable configuration.
 - [Recipes](docs/recipes.md) — Examples for common CI setups.
+- [Release examples](docs/release-examples.md) — How three Zowe projects use Octorelease.
+- [Maintainer guide](docs/maintainer-guide.md) — Your first change and how to release it.
 - [Developer guide](docs/developer-guide.md) — Design principles, architecture, and plugin development.
 - [API reference](docs/typedoc/globals.md) — Exported types and functions.
 - [Support](docs/support.md) — Troubleshooting and reporting problems.

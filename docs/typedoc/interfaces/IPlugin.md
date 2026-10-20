@@ -6,7 +6,7 @@
 
 # Interface: IPlugin
 
-Defined in: [doc/IPlugin.ts:25](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IPlugin.ts#L25)
+Defined in: [packages/core/src/doc/IPlugin.ts:25](/packages/core/src/doc/IPlugin.ts#L25)
 
 Named async handlers exported by a plugin module.
 Core awaits each handler and ignores its return value. Handlers communicate
@@ -19,7 +19,7 @@ is responsible for respecting `context.dryRun` before making changes.
 
 > `optional` **fail?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:31](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IPlugin.ts#L31)
+Defined in: [packages/core/src/doc/IPlugin.ts:31](/packages/core/src/doc/IPlugin.ts#L31)
 
 Handler for "fail" stage
 
@@ -47,7 +47,7 @@ Plugin configuration object
 
 > `optional` **init?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:38](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IPlugin.ts#L38)
+Defined in: [packages/core/src/doc/IPlugin.ts:38](/packages/core/src/doc/IPlugin.ts#L38)
 
 Handler for "init" stage
 
@@ -75,7 +75,7 @@ Plugin configuration object
 
 > `optional` **publish?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:45](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IPlugin.ts#L45)
+Defined in: [packages/core/src/doc/IPlugin.ts:45](/packages/core/src/doc/IPlugin.ts#L45)
 
 Handler for "publish" stage
 
@@ -103,7 +103,7 @@ Plugin configuration object
 
 > `optional` **success?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:52](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IPlugin.ts#L52)
+Defined in: [packages/core/src/doc/IPlugin.ts:52](/packages/core/src/doc/IPlugin.ts#L52)
 
 Handler for "success" stage
 
@@ -131,7 +131,7 @@ Plugin configuration object
 
 > `optional` **version?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:59](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IPlugin.ts#L59)
+Defined in: [packages/core/src/doc/IPlugin.ts:59](/packages/core/src/doc/IPlugin.ts#L59)
 
 Handler for "version" stage
 

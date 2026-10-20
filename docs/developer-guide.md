@@ -1,6 +1,6 @@
 # Developer guide
 
-[Contributing](../CONTRIBUTING.md) · [Configuration](usage.md#configuration) · [API reference](typedoc/globals.md)
+[Contributing](../CONTRIBUTING.md) · [First change](maintainer-guide.md#your-first-change) · [Release examples](release-examples.md) · [API reference](typedoc/globals.md)
 
 ## Design principles
 
@@ -189,3 +189,12 @@ Reject the handler promise with an `Error` containing an actionable message. Cor
 - Check context changes, plugin order, dry runs, errors, and reruns after a partial release.
 - Use each package's `__tests__` directory for examples.
 - Run tests from the repository root; see [Contributing](../CONTRIBUTING.md#build-and-test).
+
+## Generating API docs
+
+Run `npm run typedoc` after changing core APIs or their comments.
+
+- [typedoc.json](../typedoc.json) configures the Markdown output.
+- `displayBasePath: "."` makes source paths relative to the repository root.
+- `sourceLinkTemplate: "/{path}#L{line}"` creates source links with line anchors and no Git revision.
+- GitHub resolves these links from the repository root on the current branch. Other Markdown viewers may interpret a leading `/` differently.

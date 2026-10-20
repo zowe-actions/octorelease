@@ -58,7 +58,7 @@ npm run pack
 npm test
 ```
 
-- Build packages outside the root [TypeScript project references](tsconfig.json) with `npx tsc -b packages/<name>`. Bundling does not type-check source.
+- Keep new packages in the root [TypeScript project references](tsconfig.json). Bundling does not type-check source.
 - Check CI results for integration tests of the release command and action.
 - Use a disposable CI checkout for dry runs; [local preparation still runs](docs/support.md#what-does-a-dry-run-change). See the [test workflow](.github/workflows/test.yml).
 - The [pre-commit hook](.husky/pre-commit) runs `pack` and `typedoc`, then stages generated files. Run the build and tests yourself.
@@ -77,7 +77,7 @@ Do not edit bundles or generated API pages directly. Fix their sources and regen
 
 ## Changelog entries
 
-Each published package owns `packages/<name>/CHANGELOG.md`. Add entries under `## Recent Changes`; the changelog plugin replaces that heading with the release version. A starting template is:
+Each published package owns `packages/<name>/CHANGELOG.md`. Add entries under `## Recent Changes`. A starting template is:
 
 ```markdown
 # Changelog
@@ -99,42 +99,16 @@ Each published package owns `packages/<name>/CHANGELOG.md`. Add entries under `#
 
 - Keep only categories with entries.
 - Use `###` for categories; the next `##` heading ends the release notes.
-- After a release, add `## Recent Changes` above the versioned history.
+- The automatic prerelease workflow leaves changelogs unchanged.
+- When preparing release notes, move the relevant entries under a version heading and keep `## Recent Changes` for new work.
 
-## Release the GitHub Action
+## First change and releases
 
-Action releases use repository tags such as `v1.2.3`; npm package releases use separate package-prefixed tags. To release the action:
+See the [maintainer guide](docs/maintainer-guide.md) for:
 
-1. Merge the code and generated bundles into `master`. Confirm CI passed for the release commit.
-2. Open **Releases → Draft a new release**.
-3. Create an unused version tag, such as `v1.2.3`, targeting the tested commit.
-4. Select the previous action tag and **Generate release notes**.
-5. Review the notes, add any upgrade instructions, and publish.
-6. Check the [Update latest tag workflow](.github/workflows/update-tag.yml). Verify the major alias, such as `v1`, points to the release commit.
-7. Test the action in a consumer workflow using the exact version tag.
-
-See [GitHub's release-note instructions](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes) for the release form.
-
-The tag must contain current `dist/` files: consumers execute the bundle from that tag. Creating an action release does not publish the npm workspaces.
-
-## Release an npm package
-
-The separate [Release workflow](.github/workflows/release.yml) publishes a selected package:
-
-1. Update that package's changelog and merge its tested code and bundles.
-2. Open **Actions → Release → Run workflow**, select the intended branch, choose a package, and enter a complete version. Enable dry run first; its default is not enabled in this repository's workflow.
-3. Review the logs, then dispatch a real run. The workflow requires the `ZOWE_ACTIONS_NPM_TOKEN` secret and GitHub credentials permitted to update the repository.
-4. Verify the npm package, its distribution tag, and the generated GitHub draft release and tarball.
-
-The [package release configuration](.github/release.config.js):
-
-- Uses package-prefixed tags, such as `core-1.2.3`.
-- Allows up to minor bumps on `master` and prereleases on `next`.
-- Uploads tarballs to a draft GitHub release.
-
-Include the prerelease suffix in an explicit version when needed. The private root and run-script packages are not published.
-
-The workflow compiles source but uses the **committed action bundle** for release orchestration. Rebuilding and committing bundles before dispatch is required.
+- A first change from source through tests and bundle verification.
+- Automatic package prereleases from `master` and tagged action releases.
+- Versioning, dependency updates, and release verification.
 
 ## Keep documentation current
 
@@ -143,6 +117,6 @@ The workflow compiles source but uses the **committed action bundle** for releas
 | Action input or configuration default | `action.yml`, source comments, `docs/usage.md`, and an example. |
 | Plugin handler or option | Package README, `docs/extending.md`, and handler tests. |
 | Core API | Source docstrings, `docs/developer-guide.md`, and generated TypeDoc. |
-| Build tools or release workflow | This guide and any commands copied into the root README. |
+| Build tools or release workflow | This guide, the maintainer guide, and any commands copied into the root README. |
 
 Keep the commit hook and CI checks aligned with these steps. When extending documentation checks, prioritize broken links, invalid configuration examples, and generated API docs that differ from their sources.

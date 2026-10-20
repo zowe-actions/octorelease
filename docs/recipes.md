@@ -1,6 +1,6 @@
 # Recipes
 
-[Configuration reference](usage.md#configuration) · [Manual GitHub workflow](usage.md#workflow-configuration) · [Troubleshooting](support.md)
+[Configuration reference](usage.md#configuration) · [Release examples](release-examples.md) · [Manual GitHub workflow](usage.md#workflow-configuration) · [Troubleshooting](support.md)
 
 ## Release after a push
 

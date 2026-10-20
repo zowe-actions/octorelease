@@ -6,7 +6,7 @@
 
 # Interface: IContext
 
-Defined in: [doc/IContext.ts:26](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L26)
+Defined in: [packages/core/src/doc/IContext.ts:26](/packages/core/src/doc/IContext.ts#L26)
 
 Global context object for Octorelease
 
@@ -16,7 +16,7 @@ Global context object for Octorelease
 
 > **branch**: [`IProtectedBranch`](IProtectedBranch.md)
 
-Defined in: [doc/IContext.ts:31](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L31)
+Defined in: [packages/core/src/doc/IContext.ts:31](/packages/core/src/doc/IContext.ts#L31)
 
 Properties for current Git branch
 
@@ -32,7 +32,7 @@ Properties for current Git branch
 
 > **changedFiles**: `string`[]
 
-Defined in: [doc/IContext.ts:37](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L37)
+Defined in: [packages/core/src/doc/IContext.ts:37](/packages/core/src/doc/IContext.ts#L37)
 
 List of changed files to stage
 
@@ -48,7 +48,7 @@ List of changed files to stage
 
 > **ci**: `KnownCiEnv` & `object`
 
-Defined in: [doc/IContext.ts:43](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L43)
+Defined in: [packages/core/src/doc/IContext.ts:43](/packages/core/src/doc/IContext.ts#L43)
 
 Properties for current CI environment
 
@@ -78,7 +78,7 @@ Properties for current CI environment
 
 > **dryRun**: `boolean`
 
-Defined in: [doc/IContext.ts:53](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L53)
+Defined in: [packages/core/src/doc/IContext.ts:53](/packages/core/src/doc/IContext.ts#L53)
 
 If true, don't make any changes but report what would have been done
 
@@ -88,7 +88,7 @@ If true, don't make any changes but report what would have been done
 
 > **env**: `Record`\<`string`, `string`\>
 
-Defined in: [doc/IContext.ts:58](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L58)
+Defined in: [packages/core/src/doc/IContext.ts:58](/packages/core/src/doc/IContext.ts#L58)
 
 Environment variables
 
@@ -98,7 +98,7 @@ Environment variables
 
 > `optional` **failError?**: `Error`
 
-Defined in: [doc/IContext.ts:63](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L63)
+Defined in: [packages/core/src/doc/IContext.ts:63](/packages/core/src/doc/IContext.ts#L63)
 
 Error object defined for "fail" stage
 
@@ -108,7 +108,7 @@ Error object defined for "fail" stage
 
 > **logger**: [`Logger`](../classes/Logger.md)
 
-Defined in: [doc/IContext.ts:68](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L68)
+Defined in: [packages/core/src/doc/IContext.ts:68](/packages/core/src/doc/IContext.ts#L68)
 
 Logger for writing to console
 
@@ -118,7 +118,7 @@ Logger for writing to console
 
 > **plugins**: `object`
 
-Defined in: [doc/IContext.ts:74](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L74)
+Defined in: [packages/core/src/doc/IContext.ts:74](/packages/core/src/doc/IContext.ts#L74)
 
 Key-value pairs of plugin names and configuration objects
 
@@ -138,7 +138,7 @@ Key-value pairs of plugin names and configuration objects
 
 > **releasedPackages**: `object`
 
-Defined in: [doc/IContext.ts:80](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L80)
+Defined in: [packages/core/src/doc/IContext.ts:80](/packages/core/src/doc/IContext.ts#L80)
 
 Key-value pairs of release types and released package info
 
@@ -158,7 +158,7 @@ Key-value pairs of release types and released package info
 
 > `optional` **releaseNotes?**: `string`
 
-Defined in: [doc/IContext.ts:85](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L85)
+Defined in: [packages/core/src/doc/IContext.ts:85](/packages/core/src/doc/IContext.ts#L85)
 
 Multi-line string containing changelog
 
@@ -168,7 +168,7 @@ Multi-line string containing changelog
 
 > **rootDir**: `string`
 
-Defined in: [doc/IContext.ts:90](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L90)
+Defined in: [packages/core/src/doc/IContext.ts:90](/packages/core/src/doc/IContext.ts#L90)
 
 Absolute path of project root directory
 
@@ -178,7 +178,7 @@ Absolute path of project root directory
 
 > **tagPrefix**: `string`
 
-Defined in: [doc/IContext.ts:95](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L95)
+Defined in: [packages/core/src/doc/IContext.ts:95](/packages/core/src/doc/IContext.ts#L95)
 
 Git tag prefix that precedes version number (default is "v")
 
@@ -188,7 +188,7 @@ Git tag prefix that precedes version number (default is "v")
 
 > **version**: [`IVersionInfo`](IVersionInfo.md)
 
-Defined in: [doc/IContext.ts:101](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L101)
+Defined in: [packages/core/src/doc/IContext.ts:101](/packages/core/src/doc/IContext.ts#L101)
 
 Version info including old and new project version
 
@@ -204,7 +204,7 @@ Version info including old and new project version
 
 > `optional` **workspaces?**: `string`[]
 
-Defined in: [doc/IContext.ts:107](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IContext.ts#L107)
+Defined in: [packages/core/src/doc/IContext.ts:107](/packages/core/src/doc/IContext.ts#L107)
 
 Subpackage paths or globs for monorepo
 

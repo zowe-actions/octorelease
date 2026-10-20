@@ -8,7 +8,7 @@
 
 > **dryRunTask**\<`T`\>(`context`, `description`, `task`): `Promise`\<`T` \| `undefined`\>
 
-Defined in: [utils.ts:109](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/utils.ts#L109)
+Defined in: [packages/core/src/utils.ts:109](/packages/core/src/utils.ts#L109)
 
 In dry run mode skip the task, otherwise run it.
 Only the supplied callback is guarded; callers must separately handle any

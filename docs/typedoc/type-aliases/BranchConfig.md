@@ -8,7 +8,7 @@
 
 > **BranchConfig** = `string` \| [`IProtectedBranch`](../interfaces/IProtectedBranch.md)
 
-Defined in: [doc/IConfig.ts:23](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/doc/IConfig.ts#L23)
+Defined in: [packages/core/src/doc/IConfig.ts:23](/packages/core/src/doc/IConfig.ts#L23)
 
 Union type for branch configuration. Can be string specifying branch name
 or object containing branch config.

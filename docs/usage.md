@@ -34,6 +34,8 @@ npx --package=@octorelease/core octorelease
 - Install additional plugins before running the CLI.
 - Include optional dependencies if you use core's changelog, Git, GitHub, or npm plugins.
 
+Prerelease packages from `master` are published to Zowe Artifactory under `next`. Use the [prerelease installation instructions](../packages/core/README.md#install) for core and additional official plugins.
+
 The CLI accepts [environment inputs](#action-inputs), not command-line flags. For example, on a POSIX runner:
 
 ```sh
