@@ -1,81 +1,115 @@
 # Recipes
 
-## CI Configurations
+[Configuration reference](usage.md#configuration) · [Release examples](release-examples.md) · [Manual GitHub workflow](usage.md#workflow-configuration) · [Troubleshooting](support.md)
 
-### GitHub Actions
+## Release after a push
 
-The following is a minimal configuration for Octorelease with a build running on the latest LTS version of Node when a new commit is pushed to a `master` branch.
+Before enabling this workflow:
+
+- Add a [release configuration](usage.md#configuration) with your release branch in `branches`.
+- Commit the intended package version and changelog.
+- To select bumps from PR labels instead, enable `checkPrLabels` and put npm before GitHub in the plugin list.
 
 ```yaml
 name: Release
-
 on:
   push:
-    branches:
-      - master
-
+    branches: [main]
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'lts/*'
-
-    - name: Install Dependencies
-      run: npm ci
-
-    - name: Publish Release
-      uses: zowe-actions/octorelease@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
+      - uses: zowe-actions/octorelease@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GIT_COMMITTER_NAME: GitHub Actions
+          GIT_COMMITTER_EMAIL: actions@github.com
+        with:
+          dry-run: true
 ```
 
-**Notes:**
-* To keep `package.json` updated in the `master` branch, [`@octorelease/git`](https://github.com/octorelease/octorelease/tree/master/packages/git) plugin can be used.
-  * To allow the workflow to be rerun after changes have been pushed, add this input to `@actions/checkout`:
-    ```yaml
-    ref: ${{ github.ref }}
-    ```
-  * Automatically populated `GITHUB_TOKEN` variable cannot be used if branch protection is enabled for the target branch. In this case you need to create a personal access token with elevated permissions and should be aware of the security risks of using it.
-* To trigger Octorelease on demand, you can use the [`workflow_dispatch`](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow) event to trigger releases manually with a button click, or the [`repository_dispatch`](https://docs.github.com/en/rest/reference/repos#create-a-repository-dispatch-event) event to trigger releases using a REST API call.
+- Review the dry run, then set `dry-run: false` to publish on future pushes.
+- Check that the checkout identity can push version commits under your branch protection rules.
+- For manual releases, use the [workflow in Usage](usage.md#workflow-configuration).
 
-### Jenkins
+## Release a subpackage with shared configuration
 
-The following is a minimal configuration for Octorelease with a declarative pipeline running Node.
+Keep configuration at `.github/release.config.cjs` and execute plugins from the package directory:
+
+```yaml
+- uses: zowe-actions/octorelease@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    GIT_COMMITTER_NAME: GitHub Actions
+    GIT_COMMITTER_EMAIL: actions@github.com
+  with:
+    config-dir: .github
+    working-dir: packages/api
+    new-version: '1.2.3'
+    dry-run: true
+```
+
+- Set a package-specific `tagPrefix`, such as `api-`.
+- `config-dir` resolves from the original checkout directory.
+- Plugin paths and package files resolve from `working-dir`.
+- For CLI use, install plugins where the loader can resolve them. The action can use its bundled official plugins.
+
+## Jenkins
+
+Prepare the Jenkins agent and project:
+
+- Install Node.js, npm, and Git.
+- Check out full history and tags; disable shallow cloning.
+- Install `@octorelease/core` as a dev dependency.
+- Commit the [release configuration](usage.md#configuration).
+- Replace the example credential IDs and Git identity. Configure checkout credentials if Git will push.
 
 ```groovy
 pipeline {
-    agent any  // Use agent with Node.js preinstalled
-
+    agent any
     environment {
-        GITHUB_TOKEN = credentials('GITHUB_TOKEN')
-        NPM_TOKEN = credentials('NPM_TOKEN')
+        GITHUB_TOKEN = credentials('github-release-token')
+        NPM_TOKEN = credentials('npm-release-token')
+        GIT_COMMITTER_NAME = 'Release Bot'
+        GIT_COMMITTER_EMAIL = 'release-bot@example.com'
     }
-
     stages {
-        stage("Install Dependencies") {
+        stage('Install') {
+            steps { sh 'npm ci' }
+        }
+        stage('Build and test') {
             steps {
-                sh "npm ci"
+                sh 'npm run build --if-present'
+                sh 'npm test'
             }
         }
-
-        stage("Publish Release") {
+        stage('Preview release') {
             steps {
-                sh "npx octorelease"
+                sh "env 'INPUT_DRY-RUN=true' npx octorelease"
             }
         }
     }
 }
 ```
 
-Notes:
-* For Octorelease to read Git history, make sure "shallow clone" is disabled in the Git settings for your pipeline.
+- Remove `INPUT_DRY-RUN=true` after validating the preview to enable publishing.
+- Without an explicit version or PR label selection, npm uses the version in `package.json`.

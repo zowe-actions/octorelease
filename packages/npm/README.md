@@ -1,8 +1,8 @@
 # NPM plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to NPM.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin to version, package, and publish npm packages.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
+[![Build Status](https://github.com/zowe-actions/octorelease/workflows/Test/badge.svg)](https://github.com/zowe-actions/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
 [![npm latest version](https://img.shields.io/npm/v/@octorelease/npm/latest.svg)](https://www.npmjs.com/package/@octorelease/npm)
 <!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/npm/next.svg)](https://www.npmjs.com/package/@octorelease/npm) -->
 
@@ -21,7 +21,7 @@ $ npm install @octorelease/npm -D
 
 ## Usage
 
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Add this plugin to your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
 
 ```json
 {
@@ -46,18 +46,18 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 
 ### Options
 
-| Options | Description | Default |
+| Option | Description | Default |
 | ------- | ----------- | ------- |
 | `aliasTags` | Key-value pairs of package tags that should be mirrored (see example below). | `{}` |
-| `npmPublish` | Specify false to skip publishing to the NPM registry. | `true` |
+| `npmPublish` | Set `false` to skip publishing to the NPM registry. | `true` |
 | `publishRegistry` | NPM registry URL where the package should be published. | `publishConfig.registry` in package.json |
-| `pruneShrinkwrap` | Specify true to prune dev and extraneous dependencies from npm-shrinkwrap.json. | `false` |
-| `smokeTest` | Specify true to test installing the package from the NPM registry after it is published. | `false` |
-| `tarballDir` | Path to directory where package tarball (TGZ) should be generated, or `false` to skip creating a tarball. | `false` |
+| `pruneShrinkwrap` | Set `true` to prune dev and extraneous dependencies from npm-shrinkwrap.json. | `false` |
+| `smokeTest` | Set `true` to test installing the package from the NPM registry after it is published. | `false` |
+| `tarballDir` | Directory to copy the generated package tarball (TGZ) into, relative to the release root. A tarball is still created when this option is omitted. | Unset |
 
 ### Examples
 
-To mirror the `@latest` tag to `@lts`:
+Mirror the `latest` tag to `lts`:
 
 ```json
 {
@@ -72,7 +72,7 @@ To mirror the `@latest` tag to `@lts`:
 ```
 
 ---
-To skip publishing to the NPM registry and release the package tarball with another plugin like [@octorelease/github](https://github.com/octorelease/octorelease/tree/master/packages/github):
+To skip publishing to the NPM registry and release the package tarball with another plugin like [@octorelease/github](https://github.com/zowe-actions/octorelease/tree/master/packages/github):
 
 ```json
 {
