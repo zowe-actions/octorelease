@@ -11,7 +11,7 @@
     "pack": "npm run pack --workspaces",
     "test": "vitest run",
     "test:ui": "vitest --ui",
-    "typedoc": "typedoc --plugin typedoc-plugin-markdown --excludePrivate false --gitRevision '{branch}' --out docs/typedoc packages/core/src/index.ts",
+    "typedoc": "typedoc --plugin typedoc-plugin-markdown --excludePrivate false --gitRevision master --out docs/typedoc packages/core/src/index.ts",
     "watch": "tsc -w",
     "all": "npm run build && npm run lint && npm run pack && npm test",
     "prepare": "husky && node scripts/patchEsmOnly.js"

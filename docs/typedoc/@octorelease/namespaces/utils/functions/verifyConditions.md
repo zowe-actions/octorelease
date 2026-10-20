@@ -8,7 +8,7 @@
 
 > **verifyConditions**(`context`): `Promise`\<`void`\>
 
-Defined in: [utils.ts:152](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/utils.ts#L152)
+Defined in: [utils.ts:152](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/utils.ts#L152)
 
 Verify release conditions after plugins have initialized before proceeding.
 This finalizes the new version by appending a prerelease string if one is

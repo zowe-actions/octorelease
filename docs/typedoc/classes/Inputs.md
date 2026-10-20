@@ -6,7 +6,7 @@
 
 # Class: Inputs
 
-Defined in: [inputs.ts:27](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L27)
+Defined in: [inputs.ts:27](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L27)
 
 Class for accessing GitHub action inputs.
 If Octorelease is used outside of GitHub Actions, these inputs can be
@@ -29,7 +29,7 @@ associated with the "INPUT_DRY-RUN" environment variable.
 
 > `private` `readonly` `static` **rootDir**: `string`
 
-Defined in: [inputs.ts:28](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L28)
+Defined in: [inputs.ts:28](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L28)
 
 ## Accessors
 
@@ -39,7 +39,7 @@ Defined in: [inputs.ts:28](https://github.com/zowe-actions/octorelease/blob/chor
 
 > **get** `static` **ciSkip**(): `boolean`
 
-Defined in: [inputs.ts:33](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L33)
+Defined in: [inputs.ts:33](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L33)
 
 Specify whether to detect [ci skip] in last commit message
 
@@ -55,7 +55,7 @@ Specify whether to detect [ci skip] in last commit message
 
 > **get** `static` **configDir**(): `string` \| `undefined`
 
-Defined in: [inputs.ts:47](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L47)
+Defined in: [inputs.ts:47](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L47)
 
 Custom directory to search for release configuration.
 
@@ -71,7 +71,7 @@ Custom directory to search for release configuration.
 
 > **get** `static` **dryRun**(): `boolean`
 
-Defined in: [inputs.ts:55](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L55)
+Defined in: [inputs.ts:55](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L55)
 
 Don't make any changes but report what would have been done.
 
@@ -87,7 +87,7 @@ Don't make any changes but report what would have been done.
 
 > **get** `static` **newVersion**(): `string` \| `undefined`
 
-Defined in: [inputs.ts:69](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L69)
+Defined in: [inputs.ts:69](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L69)
 
 New version number that should be released.
 
@@ -103,7 +103,7 @@ New version number that should be released.
 
 > **get** `static` **skipStages**(): `string`[]
 
-Defined in: [inputs.ts:76](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L76)
+Defined in: [inputs.ts:76](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L76)
 
 Comma-separated list of stages that should be skipped.
 
@@ -119,7 +119,7 @@ Comma-separated list of stages that should be skipped.
 
 > **get** `static` **workingDir**(): `string` \| `undefined`
 
-Defined in: [inputs.ts:84](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/inputs.ts#L84)
+Defined in: [inputs.ts:84](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/inputs.ts#L84)
 
 Custom working directory to use instead of the project root.
 

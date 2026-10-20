@@ -8,7 +8,7 @@
 
 > **success**(`context`, `pluginsLoaded`): `Promise`\<`void`\>
 
-Defined in: [stages.ts:68](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/stages.ts#L68)
+Defined in: [stages.ts:68](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/stages.ts#L68)
 
 Run "success" stage for loaded plugins that have a "success" handler.
 If "success" is included in `Inputs.skipStages`, this stage will be skipped.

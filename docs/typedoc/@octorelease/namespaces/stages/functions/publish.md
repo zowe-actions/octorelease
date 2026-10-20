@@ -8,7 +8,7 @@
 
 > **publish**(`context`, `pluginsLoaded`): `Promise`\<`void`\>
 
-Defined in: [stages.ts:58](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/stages.ts#L58)
+Defined in: [stages.ts:58](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/stages.ts#L58)
 
 Run "publish" stage for loaded plugins that have a "publish" handler.
 If "publish" is included in `Inputs.skipStages`, this stage will be skipped.

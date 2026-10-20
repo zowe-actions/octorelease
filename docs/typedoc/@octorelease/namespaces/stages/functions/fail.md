@@ -8,7 +8,7 @@
 
 > **fail**(`context`, `pluginsLoaded`): `Promise`\<`void`\>
 
-Defined in: [stages.ts:38](https://github.com/zowe-actions/octorelease/blob/chore/add-dev-docs/packages/core/src/stages.ts#L38)
+Defined in: [stages.ts:38](https://github.com/zowe-actions/octorelease/blob/master/packages/core/src/stages.ts#L38)
 
 Run "fail" stage for loaded plugins that have a "fail" handler.
 If "fail" is included in `Inputs.skipStages`, this stage will be skipped.
