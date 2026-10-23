@@ -2,9 +2,8 @@
 
 [Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to NPM for Lerna monorepo.
 
-[![Build Status](https://github.com/octorelease/lerna/workflows/Test/badge.svg)](https://github.com/octorelease/lerna/actions?query=workflow%3ATest+branch%3Amaster)
-[![npm latest version](https://img.shields.io/npm/v/@octorelease/lerna/latest.svg)](https://www.npmjs.com/package/@octorelease/lerna)
-<!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/lerna/next.svg)](https://www.npmjs.com/package/@octorelease/lerna) -->
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
 | Step | Description |
 |------|-------------|
