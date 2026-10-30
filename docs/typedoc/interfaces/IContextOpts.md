@@ -6,7 +6,7 @@
 
 # Interface: IContextOpts
 
-Defined in: [doc/IContextOpts.ts:20](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L20)
+Defined in: [packages/core/src/doc/IContextOpts.ts:20](/packages/core/src/doc/IContextOpts.ts#L20)
 
 Options for building the global context object
 
@@ -16,7 +16,7 @@ Options for building the global context object
 
 > `optional` **branch?**: `string`
 
-Defined in: [doc/IContextOpts.ts:24](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L24)
+Defined in: [packages/core/src/doc/IContextOpts.ts:24](/packages/core/src/doc/IContextOpts.ts#L24)
 
 Overrides the branch name automatically detected in the CI environment.
 
@@ -26,7 +26,7 @@ Overrides the branch name automatically detected in the CI environment.
 
 > `optional` **force?**: `boolean`
 
-Defined in: [doc/IContextOpts.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L29)
+Defined in: [packages/core/src/doc/IContextOpts.ts:29](/packages/core/src/doc/IContextOpts.ts#L29)
 
 Forces context to be built even if branch is not a release branch.
 
@@ -36,6 +36,6 @@ Forces context to be built even if branch is not a release branch.
 
 > `optional` **logPrefix?**: `string`
 
-Defined in: [doc/IContextOpts.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IContextOpts.ts#L34)
+Defined in: [packages/core/src/doc/IContextOpts.ts:34](/packages/core/src/doc/IContextOpts.ts#L34)
 
 Sets custom prefix for log messages.

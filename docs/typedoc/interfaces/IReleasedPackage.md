@@ -6,7 +6,7 @@
 
 # Interface: IReleasedPackage
 
-Defined in: [doc/IReleasedPackage.ts:20](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IReleasedPackage.ts#L20)
+Defined in: [packages/core/src/doc/IReleasedPackage.ts:20](/packages/core/src/doc/IReleasedPackage.ts#L20)
 
 Info about successfully released package
 
@@ -22,7 +22,7 @@ Other plugin-specific properties
 
 > **name**: `string`
 
-Defined in: [doc/IReleasedPackage.ts:24](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IReleasedPackage.ts#L24)
+Defined in: [packages/core/src/doc/IReleasedPackage.ts:24](/packages/core/src/doc/IReleasedPackage.ts#L24)
 
 Package name
 
@@ -32,6 +32,6 @@ Package name
 
 > `optional` **url?**: `string`
 
-Defined in: [doc/IReleasedPackage.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IReleasedPackage.ts#L29)
+Defined in: [packages/core/src/doc/IReleasedPackage.ts:29](/packages/core/src/doc/IReleasedPackage.ts#L29)
 
 URL to download package

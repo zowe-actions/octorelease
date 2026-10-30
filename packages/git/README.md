@@ -1,8 +1,8 @@
 # Git plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions on a Git repository.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin to configure Git, commit release changes, and create tags.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
+[![Build Status](https://github.com/zowe-actions/octorelease/workflows/Test/badge.svg)](https://github.com/zowe-actions/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
 [![npm latest version](https://img.shields.io/npm/v/@octorelease/git/latest.svg)](https://www.npmjs.com/package/@octorelease/git)
 <!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/git/next.svg)](https://www.npmjs.com/package/@octorelease/git) -->
 
@@ -19,7 +19,7 @@ $ npm install @octorelease/git -D
 
 ## Usage
 
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Add this plugin to your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
 
 ```json
 {
@@ -41,7 +41,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 ### Options
 
-| Options | Description | Default |
+| Option | Description | Default |
 | ------- | ----------- | ------- |
 | `commitMessage` | Message for version commit. `{{version}}` is a placeholder for the version number. | `"Bump version to {{version}}"` |
 | `tagMessage` | Message for annotated version tag. `{{version}}` is a placeholder for the version number. | `"Release {{version}} to ${context.branch.channel}"` |

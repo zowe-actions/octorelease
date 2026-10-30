@@ -8,7 +8,7 @@
 
 > **getLastCommitMessage**(`context`): `Promise`\<`string` \| `undefined`\>
 
-Defined in: [utils.ts:209](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/utils.ts#L209)
+Defined in: [packages/core/src/utils.ts:216](/packages/core/src/utils.ts#L216)
 
 Retrieve most recent Git commit message if there is one.
 

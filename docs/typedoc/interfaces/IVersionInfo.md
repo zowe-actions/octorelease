@@ -6,7 +6,7 @@
 
 # Interface: IVersionInfo
 
-Defined in: [doc/IVersionInfo.ts:20](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IVersionInfo.ts#L20)
+Defined in: [packages/core/src/doc/IVersionInfo.ts:20](/packages/core/src/doc/IVersionInfo.ts#L20)
 
 Info about project version
 
@@ -16,7 +16,7 @@ Info about project version
 
 > **new**: `string`
 
-Defined in: [doc/IVersionInfo.ts:29](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IVersionInfo.ts#L29)
+Defined in: [packages/core/src/doc/IVersionInfo.ts:29](/packages/core/src/doc/IVersionInfo.ts#L29)
 
 New version to be released
 
@@ -26,7 +26,7 @@ New version to be released
 
 > **old**: `string`
 
-Defined in: [doc/IVersionInfo.ts:24](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IVersionInfo.ts#L24)
+Defined in: [packages/core/src/doc/IVersionInfo.ts:24](/packages/core/src/doc/IVersionInfo.ts#L24)
 
 Old version found in Git history
 
@@ -36,7 +36,7 @@ Old version found in Git history
 
 > **overrides**: `Record`\<`string`, `Omit`\<`IVersionInfo`, `"overrides"`\>\>
 
-Defined in: [doc/IVersionInfo.ts:39](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IVersionInfo.ts#L39)
+Defined in: [packages/core/src/doc/IVersionInfo.ts:39](/packages/core/src/doc/IVersionInfo.ts#L39)
 
 Version overrides for directories in workspace
 
@@ -46,6 +46,6 @@ Version overrides for directories in workspace
 
 > `optional` **prerelease?**: `string`
 
-Defined in: [doc/IVersionInfo.ts:34](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IVersionInfo.ts#L34)
+Defined in: [packages/core/src/doc/IVersionInfo.ts:34](/packages/core/src/doc/IVersionInfo.ts#L34)
 
 Prerelease string if this is a prerelease branch

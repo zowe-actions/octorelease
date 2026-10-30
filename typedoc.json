@@ -1,0 +1,14 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "packages/core/src/index.ts"
+  ],
+  "plugin": [
+    "typedoc-plugin-markdown"
+  ],
+  "out": "docs/typedoc",
+  "disableGit": true,
+  "displayBasePath": ".",
+  "excludePrivate": false,
+  "sourceLinkTemplate": "/{path}#L{line}"
+}
