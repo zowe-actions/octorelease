@@ -112,7 +112,7 @@ No new PR is needed solely to retry. Octorelease revisits its stages and checks 
 
 ## 3. Zowe Explorer: different packages, different destinations
 
-**Goal:** release a JavaScript API package and two VS Code extensions together.
+**Goal:** release a TypeScript API package and two VS Code extensions together.
 
 Sources: [release configuration](https://github.com/zowe/zowe-explorer-vscode/blob/8e6b78ef925d09dc477b22961338437fa338db7e/.github/release.config.js) and [deployment workflow](https://github.com/zowe/zowe-explorer-vscode/blob/8e6b78ef925d09dc477b22961338437fa338db7e/.github/workflows/deployment.yml).
 
