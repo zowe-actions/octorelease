@@ -93,7 +93,7 @@ For both repositories, a repository **admin must apply exactly one label after m
 | `release-minor` | `3.11.0` | Minor release on `master`. |
 | `release-major` | `4.0.0` | Requires changing these configurations' branch limits first. |
 
-The [GitHub plugin](../packages/github/README.md) selects the version from the label and current branch version; Octorelease enforces branch limits. `release-current` still publishes.
+The [GitHub plugin](../packages/github/README.md) selects the version from the label and current branch version; Octorelease enforces branch limits. `release-current` still publishes but does not overwrite.
 
 ### Retry a CLI or sample plugin release
 
