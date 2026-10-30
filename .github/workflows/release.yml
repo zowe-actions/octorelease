@@ -51,4 +51,4 @@ jobs:
         config-dir: .github
         new-version: ${{ steps.set-version.outputs.version }}
       env:
-        NPM_TOKEN: ${{ secrets.ZOWE_ARTIFACTORY_TOKEN }}
+        NPM_TOKEN: ${{ secrets.ZOWE_ACTIONS_JFROG_TOKEN }}
