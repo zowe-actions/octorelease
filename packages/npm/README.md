@@ -2,9 +2,8 @@
 
 [Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to NPM.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
-[![npm latest version](https://img.shields.io/npm/v/@octorelease/npm/latest.svg)](https://www.npmjs.com/package/@octorelease/npm)
-<!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/npm/next.svg)](https://www.npmjs.com/package/@octorelease/npm) -->
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
 | Step | Description |
 |------|-------------|
@@ -52,7 +51,7 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 | `npmPublish` | Specify false to skip publishing to the NPM registry. | `true` |
 | `publishRegistry` | NPM registry URL where the package should be published. | `publishConfig.registry` in package.json |
 | `pruneShrinkwrap` | Specify true to prune dev and extraneous dependencies from npm-shrinkwrap.json. | `false` |
-| `smokeTest` | Specify true to test installing the package from the NPM registry after it is published. | `false` |
+| `smokeTest` | Specify true to test installing the package from the NPM registry after it is published. Skipped during dry runs. | `false` |
 | `tarballDir` | Path to directory where package tarball (TGZ) should be generated, or `false` to skip creating a tarball. | `false` |
 
 ### Examples

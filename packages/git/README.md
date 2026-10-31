@@ -2,9 +2,8 @@
 
 [Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions on a Git repository.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
-[![npm latest version](https://img.shields.io/npm/v/@octorelease/git/latest.svg)](https://www.npmjs.com/package/@octorelease/git)
-<!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/git/next.svg)](https://www.npmjs.com/package/@octorelease/git) -->
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
 | Step | Description |
 |------|-------------|
@@ -45,3 +44,11 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | ------- | ----------- | ------- |
 | `commitMessage` | Message for version commit. `{{version}}` is a placeholder for the version number. | `"Bump version to {{version}}"` |
 | `tagMessage` | Message for annotated version tag. `{{version}}` is a placeholder for the version number. | `"Release {{version}} to ${context.branch.channel}"` |
+
+When the Lerna plugin uses `versionIndependent: true`, place it and the changelog
+plugin before this plugin. Stable releases create one commit and a tag for each
+selected package, all pointing to that commit. Tag names come from Lerna's
+`packageTagFormat`. The default commit message lists the package tags;
+`{{version}}` in a custom commit message expands to that list. A custom tag message
+supports `{{name}}` and `{{version}}` for the individual package. Independent
+timestamped prereleases skip Git commits and tags. Shared versioning is unchanged.

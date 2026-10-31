@@ -18,16 +18,27 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
-import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import type { IPluginConfig } from "./config";
+import { LernaState } from "./state";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    const state = LernaState.get(config);
+    state.workspacePackages = undefined;
+    if (config.packageTagFormat != null && config.versionIndependent !== true) {
+        throw new Error("packageTagFormat requires versionIndependent: true");
+    }
+    if (config.versionIndependent === true) {
+        context.packageReleases = [];
+    }
     let publishConfig: Record<string, any> | undefined;
-    config[IS_LERNA_JSON_TEMP] = !fs.existsSync("lerna.json");
-    if (!config[IS_LERNA_JSON_TEMP]) {
+    state.isLernaJsonTemp = !fs.existsSync("lerna.json");
+    if (!state.isLernaJsonTemp) {
         try {
             const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
-            context.version.new = lernaJson.version;
+            if (config.versionIndependent !== true) {
+                context.version.new = lernaJson.version;
+            }
             publishConfig = lernaJson.command?.publish;
         } catch {
             throw new Error(`Missing or invalid lerna.json in branch ${context.branch.name}`);
@@ -40,9 +51,13 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         if (publishConfig == null) {
             publishConfig = packageJson.publishConfig;
         }
-        if (config[IS_LERNA_JSON_TEMP]) {
-            context.version.new = packageJson.version;
-            const lernaConfig: Record<string, any> = { version: packageJson.version };
+        if (state.isLernaJsonTemp) {
+            if (config.versionIndependent !== true) {
+                context.version.new = packageJson.version ?? context.version.new;
+            }
+            const lernaConfig: Record<string, any> = {
+                version: config.versionIndependent === true ? "independent" : context.version.new,
+            };
             if (fs.existsSync("pnpm-workspaces.yaml")) {
                 lernaConfig.npmClient = "pnpm";
             }
@@ -60,7 +75,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (pkgInfo.length === 0) {
         throw new Error("No packages found in workspace, check the 'workspaces' configuration in package.json");
     }
-    if (config.versionIndependent != null) {
+    state.workspacePackages = pkgInfo.map(({ name, location }) => ({ name, location }));
+    if (Array.isArray(config.versionIndependent)) {
         for (const { name, location } of pkgInfo) {
             if (!config.versionIndependent.includes(name)) {
                 continue;

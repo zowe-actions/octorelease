@@ -1,5 +1,9 @@
 # Changelog
 
+## Recent Changes
+
+* Added per-package release notes and changelog versions for independent stable releases; snapshots leave changelogs unchanged.
+
 ## `1.5.3`
 
 * Added `autoDisplayNames` option to parse display names from package readmes in a monorepo

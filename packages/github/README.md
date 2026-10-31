@@ -2,9 +2,8 @@
 
 [Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to GitHub.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
-[![npm latest version](https://img.shields.io/npm/v/@octorelease/github/latest.svg)](https://www.npmjs.com/package/@octorelease/github)
-<!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/github/next.svg)](https://www.npmjs.com/package/@octorelease/github) -->
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
 | Step | Description |
 |------|-------------|
@@ -78,3 +77,10 @@ To check pull request labels for a semver bump level:
 ```
 
 The pull request label must be added by a repo admin after the pull request is merged. If you forget to add the label, a reminder comment will be posted on the pull request and you will have 30 minutes to add a label before the build times out.
+
+With Lerna's `versionIndependent: true`, package versions are prepared in manifests
+and `checkPrLabels` does not apply. Configure Lerna, changelog, and Git before this
+plugin to create stable GitHub Releases from each package's tag and release notes.
+All releases in the batch target the same release commit. Package releases do not
+replace the action's latest GitHub Release, and configured assets are uploaded to
+each package release. Timestamped independent prereleases skip GitHub Releases.

@@ -79,10 +79,15 @@ export async function gitPush(context: IContext, branch: string, tags?: boolean)
     return true;
 }
 
-export async function gitTag(tagName: string, message?: string): Promise<boolean> {
+export async function gitTag(tagName: string, message?: string, commit?: string): Promise<boolean> {
     // Check if tag already exists
     const cmdOutput = await exec.getExecOutput("git", ["tag", "-l", tagName]);
     if (cmdOutput.stdout.trim().length > 0) {
+        if (commit != null) {
+            const existing = await exec.getExecOutput("git", ["rev-parse", `refs/tags/${tagName}^{commit}`]);
+            if (existing.stdout.trim() !== commit)
+                throw new Error(`Git tag ${tagName} already points to another commit`);
+        }
         return false;
     }
 
@@ -90,6 +95,7 @@ export async function gitTag(tagName: string, message?: string): Promise<boolean
     if (message != null) {
         cmdArgs.push("-a", "-m", message);
     }
+    if (commit != null) cmdArgs.push(commit);
     await exec.exec("git", cmdArgs);
     return true;
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## Recent Changes
+
+* Added independent package tags on one release commit and disabled Git writes for independent snapshots.
+
 ## `1.0.0`
 
 * License project under Apache-2.0
