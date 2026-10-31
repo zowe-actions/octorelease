@@ -37,6 +37,6 @@
     "@actions/exec": "^3.0.0"
   },
   "peerDependencies": {
-    "@octorelease/core": "^1.0.0"
+    "@octorelease/core": "^1.0.0-next"
   }
 }

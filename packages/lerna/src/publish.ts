@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as path from "node:path";
 import type { IContext } from "@octorelease/core";
 import { publish as npmPublish } from "@octorelease/npm";
 import type { IPluginConfig } from "./config";
@@ -21,6 +22,12 @@ import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
     for (const { name, location } of await utils.lernaList()) {
+        if (
+            config.versionIndependent === true &&
+            !context.packageReleases?.some((release) => release.directory === path.relative(context.rootDir, location))
+        ) {
+            continue;
+        }
         const tempConfig = { ...config };
         if (Array.isArray(config.pruneShrinkwrap)) {
             tempConfig.pruneShrinkwrap = config.pruneShrinkwrap.includes(name);

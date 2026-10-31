@@ -57,9 +57,9 @@
     "@types/semver": "^7.0.0"
   },
   "optionalDependencies": {
-    "@octorelease/changelog": "^1.0.0",
-    "@octorelease/git": "^1.0.0",
-    "@octorelease/github": "^1.0.0",
-    "@octorelease/npm": "^1.0.0"
+    "@octorelease/changelog": "^1.0.0-next",
+    "@octorelease/git": "^1.0.0-next",
+    "@octorelease/github": "^1.0.0-next",
+    "@octorelease/npm": "^1.0.0-next"
   }
 }

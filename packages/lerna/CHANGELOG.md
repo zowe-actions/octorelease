@@ -1,5 +1,10 @@
 # Changelog
 
+## Recent Changes
+
+* Added configurable package tags and change detection against each package's previous stable release, with Git and GitHub release integration.
+* Added `versionIndependent: true` to publish changed packages using their manifest versions, with per-package prerelease versions on prerelease branches.
+
 ## `1.5.4`
 
 * Fixed `pnpm dlx` overriding local package versions when running dev deps

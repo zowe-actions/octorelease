@@ -22064,6 +22064,7 @@ function create(patterns, options) {
 
 // src/version.ts
 async function version_default(context, config) {
+  if (context.packageReleases != null && context.version.prerelease) return;
   const changelogFile = config.changelogFile || "CHANGELOG.md";
   const headerLine = config.headerLine || "## Recent Changes";
   const changelogDirs = config.extraDirs || [];
@@ -22081,8 +22082,12 @@ async function version_default(context, config) {
     }
   }
   for (const relPath of changelogDirs) {
-    const changelogPath = path6.join(path6.relative(context.rootDir, relPath), changelogFile);
+    const directory = path6.relative(context.rootDir, relPath);
+    const release = context.packageReleases?.find((pkg) => pkg.directory === directory);
+    if (context.packageReleases != null && release == null) continue;
+    const changelogPath = path6.join(directory, changelogFile);
     const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
+    if (release) release.releaseNotes = packageReleaseNotes;
     if (packageReleaseNotes != null) {
       releaseNotes[path6.basename(relPath)] = packageReleaseNotes;
     }
@@ -22125,10 +22130,11 @@ function getAutoDisplayNames(changelogDirs) {
 }
 function getPackageChangelog(context, changelogFile, headerLine) {
   let releaseNotes = "";
+  const version = context.version.overrides[path6.dirname(changelogFile)]?.new || context.version.new;
   if (fs3.existsSync(changelogFile)) {
     const changelogLines = fs3.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
     let lineNum = changelogLines.findIndex(
-      (line) => line.startsWith(headerLine) || line.startsWith(`## \`${context.version.new}\``)
+      (line) => line.startsWith(headerLine) || line.startsWith(`## \`${version}\``)
     );
     if (lineNum !== -1) {
       while (changelogLines[lineNum + 1] != null && !changelogLines[lineNum + 1].startsWith("## ")) {

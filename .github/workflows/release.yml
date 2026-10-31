@@ -34,21 +34,10 @@ jobs:
     - name: Build Source
       run: npm run build
 
-    - name: Set Prerelease Version
-      id: set-version
-      run: |
-        latest_tag="$(git tag --list 'v*' --sort=-version:refname |
-          awk '/^v[0-9]+\.[0-9]+\.[0-9]+$/ && !found { print; found = 1 }')"
-        if [ -z "$latest_tag" ]; then
-          echo "::error::No release tag matching vMAJOR.MINOR.PATCH was found."
-          exit 1
-        fi
-        echo "version=${latest_tag#v}-next.$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"
-
     - name: Publish to Artifactory
       uses: ./
       with:
         config-dir: .github
-        new-version: ${{ steps.set-version.outputs.version }}
+        dry-run: true
       env:
         NPM_TOKEN: ${{ secrets.ZOWE_ACTIONS_JFROG_TOKEN }}

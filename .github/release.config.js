@@ -17,6 +17,11 @@
 module.exports = {
     branches: [
         {
+            name: "master",
+            channel: "next",
+            prerelease: "next",
+        },
+        {
             name: "chore/publish-prerelease",
             channel: "next",
             prerelease: "next",
@@ -28,6 +33,7 @@ module.exports = {
             {
                 publishRegistry: "https://zowe.jfrog.io/zowe/api/npm/npm-local-release/",
                 smokeTest: true,
+                versionIndependent: true,
             },
         ],
     ],

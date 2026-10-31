@@ -33833,7 +33833,7 @@ async function init_default(context3, config) {
   if (context3.env.GITHUB_TOKEN == null) {
     throw new Error("Required environment variable GITHUB_TOKEN is undefined");
   }
-  if (config.checkPrLabels && import_core3.Inputs.newVersion == null) {
+  if (config.checkPrLabels && import_core3.Inputs.newVersion == null && context3.packageReleases == null) {
     const releaseType = await getPrReleaseType(context3, config);
     context3.version.old = context3.version.new || context3.version.old;
     const oldVersion = context3.version.old.split("-")[0];
@@ -36938,8 +36938,22 @@ async function publish_default(context3, config) {
   if (!config.publishRelease && !config.assets) {
     return;
   }
+  if (context3.packageReleases != null) {
+    if (context3.version.prerelease) return;
+    const releases = context3.packageReleases.filter((release) => release.tagName != null);
+    if (releases.length === 0) return;
+    const commit = context3.releaseCommit || context3.ci.commit;
+    if (!commit) throw new Error("Missing release commit; configure the Git plugin before the GitHub plugin");
+    for (const release of releases) {
+      await publishRelease(context3, config, release.tagName, release.releaseNotes, commit);
+    }
+    return;
+  }
+  await publishRelease(context3, config, context3.tagPrefix + context3.version.new, context3.releaseNotes);
+}
+async function publishRelease(context3, config, tagName, notes, commit) {
   const octokit = getOctokit2(context3, config);
-  const release = await createRelease(context3, octokit);
+  const release = await createRelease(context3, octokit, tagName, notes, commit);
   if (config.assets != null && config.assets.length > 0) {
     const assetPaths = typeof config.assets === "string" ? [config.assets] : config.assets;
     await uploadAssets(context3, octokit, release, assetPaths);
@@ -36950,13 +36964,12 @@ async function publish_default(context3, config) {
         ...context3.ci.repo,
         release_id: release.data.id,
         draft: false,
-        make_latest: "legacy"
+        make_latest: context3.packageReleases != null ? "false" : "legacy"
       });
     });
   }
 }
-async function createRelease(context3, octokit) {
-  const tagName = context3.tagPrefix + context3.version.new;
+async function createRelease(context3, octokit, tagName, notes, commit) {
   let release;
   try {
     release = await octokit.rest.repos.getReleaseByTag({
@@ -36974,7 +36987,8 @@ async function createRelease(context3, octokit) {
       return octokit.rest.repos.createRelease({
         ...context3.ci.repo,
         tag_name: tagName,
-        body: context3.releaseNotes,
+        body: notes,
+        ...commit ? { target_commitish: commit } : {},
         draft: true,
         prerelease: context3.version.prerelease != null
       });

@@ -44,3 +44,11 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | ------- | ----------- | ------- |
 | `commitMessage` | Message for version commit. `{{version}}` is a placeholder for the version number. | `"Bump version to {{version}}"` |
 | `tagMessage` | Message for annotated version tag. `{{version}}` is a placeholder for the version number. | `"Release {{version}} to ${context.branch.channel}"` |
+
+When the Lerna plugin uses `versionIndependent: true`, place it and the changelog
+plugin before this plugin. Stable releases create one commit and a tag for each
+selected package, all pointing to that commit. Tag names come from Lerna's
+`packageTagFormat`. The default commit message lists the package tags;
+`{{version}}` in a custom commit message expands to that list. A custom tag message
+supports `{{name}}` and `{{version}}` for the individual package. Independent
+timestamped prereleases skip Git commits and tags. Shared versioning is unchanged.
