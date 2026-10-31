@@ -21374,7 +21374,6 @@ var require_find_up = __commonJS({
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  IS_LERNA_JSON_TEMP: () => IS_LERNA_JSON_TEMP,
   init: () => init_default,
   publish: () => publish_default,
   success: () => success_default,
@@ -21383,13 +21382,28 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/config.ts
-var IS_LERNA_JSON_TEMP = /* @__PURE__ */ Symbol();
-
 // src/init.ts
 var fs3 = __toESM(require("node:fs"));
 var path5 = __toESM(require("node:path"));
 var import_npm = require("./npm");
+
+// src/state.ts
+var LernaState = class _LernaState {
+  static instances = /* @__PURE__ */ new WeakMap();
+  isLernaJsonTemp = false;
+  // Resolved packages in dependency order; context.workspaces contains paths/globs.
+  workspacePackages;
+  constructor() {
+  }
+  static get(config) {
+    let state = _LernaState.instances.get(config);
+    if (state == null) {
+      state = new _LernaState();
+      _LernaState.instances.set(config, state);
+    }
+    return state;
+  }
+};
 
 // src/utils.ts
 var utils_exports = {};
@@ -22214,7 +22228,10 @@ function packageTag(name, version, format = "{{shortName}}-{{version}}") {
   return tag;
 }
 async function planPackageReleases(context, config) {
-  const packages = (await lernaList()).filter((pkg) => !pkg.private);
+  const packages = (LernaState.get(config).workspacePackages ?? await lernaList()).map(({ location }) => ({
+    ...JSON.parse(fs2.readFileSync(path4.join(location, "package.json"), "utf8")),
+    location
+  })).filter((pkg) => !pkg.private);
   const tags = (await getExecOutput("git", [
     "for-each-ref",
     "--merged=HEAD",
@@ -22273,6 +22290,8 @@ async function planPackageReleases(context, config) {
 
 // src/init.ts
 async function init_default(context, config) {
+  const state = LernaState.get(config);
+  state.workspacePackages = void 0;
   if (config.packageTagFormat != null && config.versionIndependent !== true) {
     throw new Error("packageTagFormat requires versionIndependent: true");
   }
@@ -22280,8 +22299,8 @@ async function init_default(context, config) {
     context.packageReleases = [];
   }
   let publishConfig;
-  config[IS_LERNA_JSON_TEMP] = !fs3.existsSync("lerna.json");
-  if (!config[IS_LERNA_JSON_TEMP]) {
+  state.isLernaJsonTemp = !fs3.existsSync("lerna.json");
+  if (!state.isLernaJsonTemp) {
     try {
       const lernaJson = JSON.parse(fs3.readFileSync("lerna.json", "utf-8"));
       if (config.versionIndependent !== true) {
@@ -22298,7 +22317,7 @@ async function init_default(context, config) {
     if (publishConfig == null) {
       publishConfig = packageJson.publishConfig;
     }
-    if (config[IS_LERNA_JSON_TEMP]) {
+    if (state.isLernaJsonTemp) {
       if (config.versionIndependent !== true) {
         context.version.new = packageJson.version ?? context.version.new;
       }
@@ -22321,6 +22340,7 @@ async function init_default(context, config) {
   if (pkgInfo.length === 0) {
     throw new Error("No packages found in workspace, check the 'workspaces' configuration in package.json");
   }
+  state.workspacePackages = pkgInfo.map(({ name, location }) => ({ name, location }));
   if (Array.isArray(config.versionIndependent)) {
     for (const { name, location } of pkgInfo) {
       if (!config.versionIndependent.includes(name)) {
@@ -22350,10 +22370,11 @@ async function init_default(context, config) {
 var path6 = __toESM(require("node:path"));
 var import_npm2 = require("./npm");
 async function publish_default(context, config) {
-  for (const { name, location } of await lernaList()) {
-    if (config.versionIndependent === true && !context.packageReleases?.some((release) => release.directory === path6.relative(context.rootDir, location))) {
-      continue;
-    }
+  const packages = config.versionIndependent === true ? (context.packageReleases ?? []).map(({ name, directory }) => ({
+    name,
+    location: path6.join(context.rootDir, directory)
+  })) : await lernaList();
+  for (const { name, location } of packages) {
     const tempConfig = { ...config };
     if (Array.isArray(config.pruneShrinkwrap)) {
       tempConfig.pruneShrinkwrap = config.pruneShrinkwrap.includes(name);
@@ -25353,6 +25374,7 @@ function create(patterns, options) {
 var import_npm4 = require("./npm");
 var import_find_up = __toESM(require_find_up());
 async function version_default(context, config) {
+  const state = LernaState.get(config);
   if (config.versionIndependent !== true && context.version.old === context.version.new) {
     context.logger.info("Version in lerna.json is already up to date");
     return;
@@ -25388,7 +25410,7 @@ async function version_default(context, config) {
   }
   context.changedFiles.push("package.json");
   if (config.versionIndependent !== true) {
-    if (!config[IS_LERNA_JSON_TEMP]) {
+    if (!state.isLernaJsonTemp) {
       context.changedFiles.push("lerna.json");
     } else {
       const oldPkgRaw = fs5.readFileSync("package.json").toString();
@@ -25406,7 +25428,7 @@ async function version_default(context, config) {
   } else {
     context.logger.warn("Could not find lockfile to update version in");
   }
-  for (const { location } of await lernaList(false)) {
+  for (const { location } of state.workspacePackages ?? await lernaList(false)) {
     const relLocation = path12.relative(context.rootDir, location);
     context.changedFiles.push(path12.join(relLocation, "package.json"));
   }
@@ -25435,7 +25457,6 @@ async function updateIndependentVersion(context, pkgInfo, newVersion) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  IS_LERNA_JSON_TEMP,
   init,
   publish,
   success,

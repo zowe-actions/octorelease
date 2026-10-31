@@ -23,6 +23,11 @@ import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    if (context.dryRun) {
+        if (config.smokeTest)
+            context.logger.info("Skipping registry smoke tests during dry run; no packages were published");
+        return;
+    }
     if (config.smokeTest && context.releasedPackages.npm != null) {
         context.logger.info("Performing smoke test, installing released package(s)");
 

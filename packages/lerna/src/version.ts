@@ -20,10 +20,12 @@ import * as glob from "@actions/glob";
 import type { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
 import findUp from "find-up";
-import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import type { IPluginConfig } from "./config";
+import { LernaState } from "./state";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    const state = LernaState.get(config);
     if (config.versionIndependent !== true && context.version.old === context.version.new) {
         context.logger.info("Version in lerna.json is already up to date");
         return;
@@ -61,7 +63,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
 
     context.changedFiles.push("package.json");
     if (config.versionIndependent !== true) {
-        if (!config[IS_LERNA_JSON_TEMP]) {
+        if (!state.isLernaJsonTemp) {
             context.changedFiles.push("lerna.json");
         } else {
             const oldPkgRaw = fs.readFileSync("package.json").toString();
@@ -82,7 +84,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         context.logger.warn("Could not find lockfile to update version in");
     }
-    for (const { location } of await utils.lernaList(false)) {
+    for (const { location } of state.workspacePackages ?? (await utils.lernaList(false))) {
         const relLocation = path.relative(context.rootDir, location);
         context.changedFiles.push(path.join(relLocation, "package.json"));
     }

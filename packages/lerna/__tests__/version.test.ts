@@ -141,6 +141,7 @@ it("uses package bases for snapshots and publishes only changed public packages"
     expect(utils.lernaVersion).not.toHaveBeenCalled();
     await publish(context, config);
     expect(vi.mocked(npmPublish).mock.calls.map((call) => path.basename(call[2]!))).toEqual(["core", "plugin"]);
+    expect(utils.lernaList).toHaveBeenCalledTimes(1);
 });
 
 it("keeps prepared stable versions even when the shared version does not change", async () => {

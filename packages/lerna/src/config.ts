@@ -16,11 +16,8 @@
 
 import type { IPluginConfig as NpmPluginConfig } from "@octorelease/npm";
 
-export const IS_LERNA_JSON_TEMP = Symbol();
-
 export type IPluginConfig = NpmPluginConfig & {
     pruneShrinkwrap?: boolean | string[];
     versionIndependent?: boolean | string[];
     packageTagFormat?: string;
-    [IS_LERNA_JSON_TEMP]?: boolean;
 };

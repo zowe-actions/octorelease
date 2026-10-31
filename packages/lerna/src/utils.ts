@@ -20,6 +20,7 @@ import * as exec from "@actions/exec";
 import { type IContext, type IPackageRelease, utils } from "@octorelease/core";
 import * as semver from "semver";
 import type { IPluginConfig } from "./config";
+import { LernaState } from "./state";
 
 let usePnpm: boolean;
 async function npxCmd(binName: "lerna"): Promise<string> {
@@ -95,7 +96,12 @@ export function packageTag(name: string, version: string, format = "{{shortName}
 
 /** Plan the entire batch before changing any manifest. */
 export async function planPackageReleases(context: IContext, config: IPluginConfig): Promise<IPackageRelease[]> {
-    const packages = (await lernaList()).filter((pkg) => !pkg.private);
+    const packages = (LernaState.get(config).workspacePackages ?? (await lernaList()))
+        .map(({ location }) => ({
+            ...JSON.parse(fs.readFileSync(path.join(location, "package.json"), "utf8")),
+            location,
+        }))
+        .filter((pkg) => !pkg.private);
     const tags = (
         await exec.getExecOutput("git", [
             "for-each-ref",

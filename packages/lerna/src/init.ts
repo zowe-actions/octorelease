@@ -18,10 +18,13 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { IContext } from "@octorelease/core";
 import { DEFAULT_NPM_REGISTRY, utils as npmUtils } from "@octorelease/npm";
-import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import type { IPluginConfig } from "./config";
+import { LernaState } from "./state";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    const state = LernaState.get(config);
+    state.workspacePackages = undefined;
     if (config.packageTagFormat != null && config.versionIndependent !== true) {
         throw new Error("packageTagFormat requires versionIndependent: true");
     }
@@ -29,8 +32,8 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         context.packageReleases = [];
     }
     let publishConfig: Record<string, any> | undefined;
-    config[IS_LERNA_JSON_TEMP] = !fs.existsSync("lerna.json");
-    if (!config[IS_LERNA_JSON_TEMP]) {
+    state.isLernaJsonTemp = !fs.existsSync("lerna.json");
+    if (!state.isLernaJsonTemp) {
         try {
             const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
             if (config.versionIndependent !== true) {
@@ -48,7 +51,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         if (publishConfig == null) {
             publishConfig = packageJson.publishConfig;
         }
-        if (config[IS_LERNA_JSON_TEMP]) {
+        if (state.isLernaJsonTemp) {
             if (config.versionIndependent !== true) {
                 context.version.new = packageJson.version ?? context.version.new;
             }
@@ -72,6 +75,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     if (pkgInfo.length === 0) {
         throw new Error("No packages found in workspace, check the 'workspaces' configuration in package.json");
     }
+    state.workspacePackages = pkgInfo.map(({ name, location }) => ({ name, location }));
     if (Array.isArray(config.versionIndependent)) {
         for (const { name, location } of pkgInfo) {
             if (!config.versionIndependent.includes(name)) {

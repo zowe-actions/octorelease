@@ -23,6 +23,7 @@ import type { IContext } from "@octorelease/core";
 import changelog from "../packages/changelog/src/version";
 import * as gitUtils from "../packages/git/src/utils";
 import gitVersion from "../packages/git/src/version";
+import { LernaState } from "../packages/lerna/src/state";
 import { packageTag, planPackageReleases } from "../packages/lerna/src/utils";
 
 vi.mock("@actions/exec", async (importOriginal) => {
@@ -219,4 +220,18 @@ it("rejects ambiguous short package names before mutating manifests", async () =
     }
     await expect(plan()).rejects.toThrow("duplicate tag names");
     expect(read("core").version).toBe("1.0.0");
+});
+
+it("reuses discovered workspace paths while reading current manifest versions", async () => {
+    const cachedConfig = { ...config };
+    LernaState.get(cachedConfig).workspacePackages = names.map((name) => ({
+        name: `@octorelease/${name}`,
+        location: path.join(root, "packages", name),
+    }));
+    write("core", "1.1.0");
+    const releases = await planPackageReleases(context, cachedConfig);
+    expect(releases.map((release) => release.tagName)).toEqual(["core-1.1.0"]);
+    const lernaCalls = vi.mocked(exec.getExecOutput).mock.calls.filter(([command]) => command === "npx");
+    expect(lernaCalls).toHaveLength(1); // one shared historical SHA; no extra workspace discovery
+    expect(lernaCalls[0][1]).toContain("--since");
 });

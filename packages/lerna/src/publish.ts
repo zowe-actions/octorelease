@@ -21,13 +21,14 @@ import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    for (const { name, location } of await utils.lernaList()) {
-        if (
-            config.versionIndependent === true &&
-            !context.packageReleases?.some((release) => release.directory === path.relative(context.rootDir, location))
-        ) {
-            continue;
-        }
+    const packages =
+        config.versionIndependent === true
+            ? (context.packageReleases ?? []).map(({ name, directory }) => ({
+                  name,
+                  location: path.join(context.rootDir, directory),
+              }))
+            : await utils.lernaList();
+    for (const { name, location } of packages) {
         const tempConfig = { ...config };
         if (Array.isArray(config.pruneShrinkwrap)) {
             tempConfig.pruneShrinkwrap = config.pruneShrinkwrap.includes(name);
