@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `1.5.8`
 
 * Added `commandExists` utility method to check if command already exists on the user's PATH
 

@@ -6,7 +6,7 @@
 
 # Interface: IPlugin
 
-Defined in: [doc/IPlugin.ts:22](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L22)
+Defined in: [doc/IPlugin.ts:22](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPlugin.ts#L22)
 
 Type for loaded plugin modules
 
@@ -16,7 +16,7 @@ Type for loaded plugin modules
 
 > `optional` **fail?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:28](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L28)
+Defined in: [doc/IPlugin.ts:28](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPlugin.ts#L28)
 
 Handler for "fail" stage
 
@@ -44,7 +44,7 @@ Plugin configuration object
 
 > `optional` **init?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:35](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L35)
+Defined in: [doc/IPlugin.ts:35](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPlugin.ts#L35)
 
 Handler for "init" stage
 
@@ -72,7 +72,7 @@ Plugin configuration object
 
 > `optional` **publish?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:42](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L42)
+Defined in: [doc/IPlugin.ts:42](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPlugin.ts#L42)
 
 Handler for "publish" stage
 
@@ -100,7 +100,7 @@ Plugin configuration object
 
 > `optional` **success?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:49](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L49)
+Defined in: [doc/IPlugin.ts:49](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPlugin.ts#L49)
 
 Handler for "success" stage
 
@@ -128,7 +128,7 @@ Plugin configuration object
 
 > `optional` **version?**: (`context`, `config`) => `Promise`\<`void`\>
 
-Defined in: [doc/IPlugin.ts:56](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/doc/IPlugin.ts#L56)
+Defined in: [doc/IPlugin.ts:56](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPlugin.ts#L56)
 
 Handler for "version" stage
 

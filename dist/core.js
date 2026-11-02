@@ -34772,7 +34772,7 @@ async function buildContext(opts) {
   };
 }
 async function commandExists(cmd) {
-  return await io.which(cmd, false) != null;
+  return (await io.which(cmd, false))?.length > 0;
 }
 async function dryRunTask(context, description, task) {
   if (context.dryRun) {
