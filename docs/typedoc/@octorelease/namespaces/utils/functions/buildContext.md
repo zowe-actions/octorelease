@@ -8,7 +8,7 @@
 
 > **buildContext**(`opts?`): `Promise`\<[`IContext`](../../../../interfaces/IContext.md) \| `undefined`\>
 
-Defined in: [utils.ts:41](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/utils.ts#L41)
+Defined in: [utils.ts:41](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/utils.ts#L41)
 
 Build global context object that is passed to all plugin handlers.
 

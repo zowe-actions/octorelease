@@ -8,7 +8,7 @@
 
 > **dryRunTask**\<`T`\>(`context`, `description`, `task`): `Promise`\<`T` \| `undefined`\>
 
-Defined in: [utils.ts:102](https://github.com/zowe-actions/octorelease/blob/chore/update-typedoc/packages/core/src/utils.ts#L102)
+Defined in: [utils.ts:102](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/utils.ts#L102)
 
 In dry run mode skip the task, otherwise run it.
 
