@@ -19,6 +19,40 @@ import * as os from "node:os";
 import * as path from "node:path";
 import * as exec from "@actions/exec";
 import { type IContext, utils } from "@octorelease/core";
+import semver from "semver";
+import { DEFAULT_NPM_REGISTRY } from "./config";
+
+export async function npmAuthenticate(context: IContext, registry: string): Promise<void> {
+    const hasLegacyAuth = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].some((name) => context.env[name] != null);
+    const isGitHubActions = context.env.GITHUB_ACTIONS === "true";
+    const isSupportedCi = isGitHubActions || context.env.GITLAB_CI === "true" || context.env.CIRCLECI === "true";
+    const hasOidc =
+        isSupportedCi &&
+        (!!context.env.NPM_ID_TOKEN ||
+            !!(
+                isGitHubActions &&
+                context.env.ACTIONS_ID_TOKEN_REQUEST_URL &&
+                context.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN
+            ));
+    const isNpmRegistry = registry.replace(/\/+$/, "") === DEFAULT_NPM_REGISTRY.replace(/\/+$/, "");
+
+    if (!context.env.NPM_TOKEN && !hasLegacyAuth && hasOidc && isNpmRegistry) {
+        const { stdout } = await exec.getExecOutput("npm", ["--version"]);
+        const version = stdout.trim();
+        // Publishing also updates dist-tags, which require newer npm versions than publishing alone.
+        if (!semver.satisfies(version, "^11.21.0 || >=12.2.0")) {
+            throw new Error(
+                `npm ${version} does not support trusted publishing with dist-tags; use npm 11.21.0+ or 12.2.0+`,
+            );
+        }
+        context.logger.info("Using npm OIDC trusted publishing; authentication will be verified when publishing");
+        // npm handles the exchange for each package. whoami cannot verify trusted publishing permissions.
+        return;
+    }
+
+    const useTokenAuth = verifyConditions(context);
+    await npmConfig(context, registry, useTokenAuth);
+}
 
 export async function npmAddTag(
     context: IContext,
@@ -105,7 +139,7 @@ export async function npmView(pkgSpec: string, registry: string, property?: stri
 export function verifyConditions(context: IContext): boolean {
     const useTokenAuth =
         context.env.NPM_USERNAME == null && context.env.NPM_PASSWORD == null && context.env.NPM_EMAIL == null;
-    if (useTokenAuth && context.env.NPM_TOKEN == null) {
+    if (useTokenAuth && !context.env.NPM_TOKEN) {
         throw new Error("Required environment variable NPM_TOKEN is undefined");
     } else if (!useTokenAuth) {
         const missingEnvVars = ["NPM_USERNAME", "NPM_PASSWORD", "NPM_EMAIL"].filter(

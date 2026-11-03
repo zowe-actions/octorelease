@@ -35,6 +35,8 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 See the documentation for [@octorelease/npm](https://github.com/octorelease/octorelease/tree/master/packages/npm#configuration). In addition the following options are supported.
 
+Authentication follows the same automatic OIDC detection as the NPM plugin when credentials are absent. For trusted publishing, configure a trusted publisher for every package published from the workspace; see the [NPM plugin authentication documentation](../npm/README.md#environment-variables).
+
 | Options | Description | Default |
 | ------- | ----------- | ------- |
 | `pruneShrinkwrap` | List of packages in the workspace that should be published with a pruned npm-shrinkwrap.json. | `[]` |

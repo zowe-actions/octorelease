@@ -20349,8 +20349,7 @@ async function init_default(context, config) {
     return;
   }
   const npmRegistry = config.publishRegistry || publishConfig?.registry || import_npm.DEFAULT_NPM_REGISTRY;
-  const useTokenAuth = import_npm.utils.verifyConditions(context);
-  await import_npm.utils.npmConfig(context, npmRegistry, useTokenAuth);
+  await import_npm.utils.npmAuthenticate(context, npmRegistry);
 }
 
 // src/publish.ts
