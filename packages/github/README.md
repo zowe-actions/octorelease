@@ -48,6 +48,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 | `failComment` | Create a GitHub issue with error details after a failed release. | `true` |
 | `githubUrl` | Hostname of private GitHub instance. | https://github.com |
 | `publishRelease` | Specify true to publish the GitHub release associated with `assets` rather than leaving it in draft mode. | `false` |
+| `skipPromptLabels` | PR labels that skip the prompt and wait for release labelling when `checkPrLabels` is enabled. | `[]` |
 | `successComment` | Post a comment on latest pull request after a successful release. | `true` |
 
 ### Examples
@@ -71,10 +72,11 @@ To check pull request labels for a semver bump level:
 {
   "plugins": [
     ["@octorelease/github", {
-      "checkPrLabels": ["release-current", "release-patch", "release-minor", "release-major"]
+      "checkPrLabels": ["release-current", "release-patch", "release-minor", "release-major"],
+      "skipPromptLabels": ["dependencies"]
     }]
   ]
 }
 ```
 
-The pull request label must be added by a repo admin after the pull request is merged. If you forget to add the label, a reminder comment will be posted on the pull request and you will have 30 minutes to add a label before the build times out.
+The pull request label must be added by a repo admin after the pull request is merged. If you forget to add the label, a reminder comment will be posted on the pull request and you will have 30 minutes to add a label before the build times out. To disable the reminder comment for Dependabot PRs, set `skipPromptLabels` to `["dependencies"]`.

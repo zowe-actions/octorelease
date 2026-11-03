@@ -33943,7 +33943,8 @@ async function getPrReleaseType(context3, config) {
   const timeoutInMinutes = 30;
   let approvedLabelEvents = await findApprovedLabelEvents(context3, octokit, prNumber, releaseLabels);
   let semverDiffLevel = "none";
-  if (approvedLabelEvents.length !== 1 && !context3.dryRun && context3.branch.level !== semverDiffLevel) {
+  const skipPrompt = labels.data.some((label) => config.skipPromptLabels?.includes(label.name));
+  if (approvedLabelEvents.length !== 1 && !skipPrompt && !context3.dryRun && context3.branch.level !== semverDiffLevel) {
     for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
       await octokit.rest.issues.removeLabel({
         ...context3.ci.repo,

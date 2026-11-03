@@ -55,8 +55,14 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     const timeoutInMinutes = 30;
     let approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
     let semverDiffLevel: (typeof SemverDiffLevels)[number] = "none";
+    const skipPrompt = labels.data.some((label) => config.skipPromptLabels?.includes(label.name));
 
-    if (approvedLabelEvents.length !== 1 && !context.dryRun && context.branch.level !== semverDiffLevel) {
+    if (
+        approvedLabelEvents.length !== 1 &&
+        !skipPrompt &&
+        !context.dryRun &&
+        context.branch.level !== semverDiffLevel
+    ) {
         // Remove unapproved release labels
         for (const { name } of labels.data.filter((label) => releaseLabels.includes(label.name))) {
             await octokit.rest.issues.removeLabel({
