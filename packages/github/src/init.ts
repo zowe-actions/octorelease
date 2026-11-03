@@ -55,7 +55,7 @@ async function getPrReleaseType(context: IContext, config: IPluginConfig): Promi
     const timeoutInMinutes = 30;
     let approvedLabelEvents = await findApprovedLabelEvents(context, octokit, prNumber, releaseLabels);
     let semverDiffLevel: (typeof SemverDiffLevels)[number] = "none";
-    const skipPrompt = labels.data.some((label) => config.skipPromptLabels?.includes(label.name));
+    const skipPrompt = labels.data.some((label) => config.skipLabelPrompt?.includes(label.name));
 
     if (
         approvedLabelEvents.length !== 1 &&
