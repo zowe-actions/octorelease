@@ -8,7 +8,7 @@
 
 > **init**(`context`, `pluginsLoaded`): `Promise`\<`void`\>
 
-Defined in: [packages/core/src/stages.ts:48](/packages/core/src/stages.ts#L48)
+Defined in: [stages.ts:48](/packages/core/src/stages.ts#L48)
 
 Run "init" stage for loaded plugins that have an "init" handler.
 The "init" stage cannot be skipped.

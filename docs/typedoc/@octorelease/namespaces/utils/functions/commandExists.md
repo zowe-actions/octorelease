@@ -8,7 +8,7 @@
 
 > **commandExists**(`cmd`): `Promise`\<`boolean`\>
 
-Defined in: [packages/core/src/utils.ts:96](/packages/core/src/utils.ts#L96)
+Defined in: [utils.ts:96](/packages/core/src/utils.ts#L96)
 
 Check if command already exists on the user's PATH
 

@@ -8,7 +8,7 @@
   ],
   "out": "docs/typedoc",
   "disableGit": true,
-  "displayBasePath": ".",
+  "displayBasePath": "packages/core/src",
   "excludePrivate": false,
-  "sourceLinkTemplate": "/{path}#L{line}"
+  "sourceLinkTemplate": "/packages/core/src/{path}#L{line}"
 }

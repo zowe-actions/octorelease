@@ -8,7 +8,7 @@
 
 > **loadPlugins**(`context`): `Promise`\<[`IPluginsLoaded`](../../../../interfaces/IPluginsLoaded.md)\>
 
-Defined in: [packages/core/src/utils.ts:128](/packages/core/src/utils.ts#L128)
+Defined in: [utils.ts:128](/packages/core/src/utils.ts#L128)
 
 Load plugins listed in config by requiring their modules from disk.
 If running as a GitHub Action, `@octorelease`-scoped plugins missing from

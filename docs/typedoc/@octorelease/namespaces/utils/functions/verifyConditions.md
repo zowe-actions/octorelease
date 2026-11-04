@@ -8,7 +8,7 @@
 
 > **verifyConditions**(`context`): `Promise`\<`void`\>
 
-Defined in: [packages/core/src/utils.ts:152](/packages/core/src/utils.ts#L152)
+Defined in: [utils.ts:152](/packages/core/src/utils.ts#L152)
 
 Verify release conditions after plugins have initialized before proceeding.
 This finalizes the new version by appending a prerelease string if one is
