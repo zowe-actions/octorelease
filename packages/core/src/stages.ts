@@ -81,8 +81,10 @@ export async function version(context: IContext, pluginsLoaded: IPluginsLoaded):
 
 /**
  * Run a stage for loaded plugins that have a registered handler.
+ * Handlers run sequentially in plugin order, once per configuration object,
+ * sharing the same mutable context. A rejected handler stops the stage.
  * If the plugin config defines $cwd or $env, then cwd and env vars will be
- * overridden in a temporary environment during the runtime of the handler.
+ * overridden during the handler and restored even if it throws.
  * @param context Global context object for Octorelease
  * @param pluginsLoaded Key-value pairs of plugin names and loaded modules
  * @param stage Stage to run

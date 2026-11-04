@@ -1,6 +1,6 @@
 # Changelog
 
-## Recent Changes
+## `1.5.8`
 
 * Added shared context for independent package release plans and their release commit.
 * Added `commandExists` utility method to check if command already exists on the user's PATH

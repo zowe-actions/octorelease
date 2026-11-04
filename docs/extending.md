@@ -1,45 +1,96 @@
-# Extending
+# Extending Octorelease
+
+[Configuration](usage.md#plugins) · [Writing a plugin](developer-guide.md#writing-a-plugin)
 
 ## Official plugins
 
-- [@octorelease/changelog](https://github.com/octorelease/octorelease/tree/master/packages/changelog)
-  - **Note:** this is already part of @octorelease/core and does not have to be installed separately
-  - `init`: Gather release notes from the package changelog(s)
-  - `version`: Update the version numbers in the package changelog(s)
-- [@octorelease/git](https://github.com/octorelease/octorelease/tree/master/packages/git)
-  - **Note:** this is already part of @octorelease/core and does not have to be installed separately
-  - `init`: Configure user name and email to be used for Git commits
-  - `version`: Commit changed files, tag the new version, and push these changes
-- [@octorelease/github](https://github.com/octorelease/octorelease/tree/master/packages/github)
-  - **Note:** this is already part of @octorelease/core and does not have to be installed separately
-  - `init`: Prompt for semantic release label on associated pull request
-  - `version`: Publish a new release to GitHub and upload assets
-  - `success`: Add "released" label to associated pull request
-  - `fail`: Remove semantic release label on associated pull request
-- [@octorelease/npm](https://github.com/octorelease/octorelease/tree/master/packages/npm)
-  - **Note:** this is already part of @octorelease/core and does not have to be installed separately
-  - `init`: Load version numbers from package.json and login to NPM registry
-  - `version`: Bump the package version with npm CLI
-  - `publish`: Publish the new package version to NPM registry
-  - `success`: Verify that new package version can be installed successfully
-- [@octorelease/exec](https://github.com/octorelease/octorelease/tree/master/packages/exec)
-  - For All Stages: Execute a shell command during this stage
-- [@octorelease/lerna](https://github.com/octorelease/octorelease/tree/master/packages/lerna)
-  - `init`: Load version numbers from lerna.json and login to NPM registry
-  - `version`: Bump changed package versions with lerna CLI
-  - `publish`: Publish the new package versions to NPM registry
-  - `success`: Verify that new package versions can be installed successfully
-- [@octorelease/pypi](https://github.com/octorelease/octorelease/tree/master/packages/pypi)
-  - `init`: Verify that `twine` is installed and configured
-  - `publish`: Publish packages in dist folder to PyPI registry
-- [@octorelease/vsce](https://github.com/octorelease/octorelease/tree/master/packages/vsce)
-  - `init`: Verify personal access tokens to publish to VSIX registry
-  - `publish`: Publish the new extension to VS Code marketplace and/or OVSX registry
+All official plugins live in [zowe-actions/octorelease](https://github.com/zowe-actions/octorelease).
 
-## Community plugins
+- **GitHub Action:** includes all official release plugins.
+- **CLI:** core includes changelog, Git, GitHub, and npm as optional dependencies. Install other plugins separately.
+- **Configuration:** add plugins to the `plugins` array to enable them. Put Git after plugins that update release files.
 
-[Open a Pull Request](https://github.com/octorelease/octorelease/blob/master/CONTRIBUTING.md#submitting-a-pull-request) to add your plugin to the list.
+### [@octorelease/changelog](../packages/changelog/README.md)
 
-<!-- ## Shareable configurations
+- `version`: Read release notes and update changelog version headings.
 
-- [octorelease-zowe-config](https://github.com/t1m0thyj/octorelease-zowe-config) - Octorelease shareable configuration for releasing Zowe packages -->
+### [@octorelease/npm](../packages/npm/README.md)
+
+- `init`: Read the package version and authenticate to the registry.
+- `version`: Update the package version.
+- `publish`: Create a tarball and publish the package.
+- `success`: Optionally test installation of the published package.
+
+### [@octorelease/lerna](../packages/lerna/README.md)
+
+- `init`: Discover workspace packages, read versions, and authenticate to npm.
+- `version`: Update package versions and the workspace lockfile.
+- `publish`: Package and publish workspace members through npm.
+- `success`: Optionally test installation of published packages.
+
+Use Lerna in place of the npm plugin for workspace releases.
+
+### [@octorelease/git](../packages/git/README.md)
+
+- `init`: Configure Git identity and credentials.
+- `version`: Commit release changes, tag the version, and push.
+
+### [@octorelease/github](../packages/github/README.md)
+
+- `init`: Optionally select a version from approved PR labels.
+- `publish`: Create a GitHub release and upload assets.
+- `success`: Update PR labels and post a release comment.
+- `fail`: Remove release labels and post error details on the PR.
+
+### [@octorelease/exec](../packages/exec/README.md)
+
+- Any stage: Run a configured command.
+
+### [@octorelease/pypi](../packages/pypi/README.md)
+
+- `init`: Check Twine and publishing credentials.
+- `publish`: Upload prebuilt Python distributions.
+
+### [@octorelease/vsce](../packages/vsce/README.md)
+
+- `init`: Validate publishing credentials.
+- `publish`: Package and publish extensions to the VS Code Marketplace or Open VSX.
+
+## Companion script action
+
+Use [`zowe-actions/octorelease/script@v1`](../packages/run-script/README.md) to run the repository's helper scripts. Configure it as a separate workflow step, not an entry in `plugins`.
+
+## Custom and community plugins
+
+Plugins export one or more async handlers: `init`, `version`, `publish`, `success`, and `fail`. See [Writing a plugin](developer-guide.md#writing-a-plugin) for an example.
+
+- Install external plugins in the release project's `node_modules`.
+- Reference local CommonJS files with a path beginning `./`.
+- Resolve paths from the release working directory.
+- An installed official plugin takes precedence over the action's bundled copy.
+
+```json
+{
+  "branches": ["main"],
+  "plugins": ["./scripts/release-plugin.cjs"]
+}
+```
+
+To list a community plugin here, [submit a pull request](../CONTRIBUTING.md#submitting-a-pull-request) with its repository, supported stages, installation command, and documentation.
+
+## Reusing configuration
+
+Import a shared configuration from a CommonJS file:
+
+```js
+// release.config.cjs
+const shared = require("./config/release-base.cjs");
+module.exports = {
+  ...shared,
+  branches: ["main", { name: "next", channel: "next", prerelease: true }],
+};
+```
+
+- The imported module must export an Octorelease configuration object.
+- Merge options in JavaScript; Octorelease has no built-in `extends` option.
+- Use Octorelease plugins and options. semantic-release configuration is not compatible.

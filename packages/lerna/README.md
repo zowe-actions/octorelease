@@ -1,43 +1,72 @@
 # Lerna plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to NPM for Lerna monorepo.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin for versioning and publishing packages in a Lerna workspace.
 
 [![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
 [![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
-| Step | Description |
-|------|-------------|
-| `init` | Load version numbers from lerna.json and login to NPM registry. |
-| `version` | Bump changed package versions with lerna CLI. |
-| `publish` | Publish the new package versions to NPM registry. |
-| `success` | Verify that new package versions can be installed successfully. |
+| Stage | Behavior |
+| --- | --- |
+| `init` | Discover packages, read the workspace version, and configure npm authentication. |
+| `version` | Update package versions and the workspace lockfile. |
+| `publish` | Package workspace members and publish eligible packages through the npm plugin. |
+| `success` | Optionally test installation of published packages. |
 
-## Install
+## Requirements
 
-```bash
-$ npm install @octorelease/lerna -D
-```
+- [npm workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces/) require npm 7 or newer.
+- This plugin requires **npm 8.5 or newer** to refresh the npm lockfile.
+- Install a Lerna version compatible with your project.
 
-## Usage
-
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Declare workspace paths in the root `package.json`:
 
 ```json
 {
+  "name": "example-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": ["packages/*"]
+}
+```
+
+- Each workspace package needs a `package.json`.
+- Set a fixed semantic version in `lerna.json`. If the file is absent, the plugin creates a temporary one from the root package version.
+- Use `versionIndependent` for selected packages with independent versions.
+
+## Install and use
+
+For the CLI, install core, this plugin, and your project's chosen Lerna version:
+
+```sh
+npm install --save-dev @octorelease/core @octorelease/lerna lerna
+```
+
+The GitHub Action bundles the Octorelease plugin; your release project still needs Lerna tooling. Configure the plugin in your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
+
+```json
+{
+  "branches": ["main"],
   "plugins": [
-    "@octorelease/lerna"
+    "@octorelease/changelog",
+    ["@octorelease/lerna", { "smokeTest": true }],
+    ["@octorelease/github", { "publishRelease": true }],
+    "@octorelease/git"
   ]
 }
 ```
 
+- Run from the workspace root with full Git history.
+- Use this plugin in place of `@octorelease/npm`; it handles npm publishing for workspace members.
+- Supply npm, GitHub, and Git credentials as shown in the [workflow guide](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#workflow-configuration).
+
 ## Configuration
 
-See the documentation for [@octorelease/npm](https://github.com/octorelease/octorelease/tree/master/packages/npm#configuration). In addition the following options are supported.
+The plugin accepts the [npm plugin options and credentials](https://github.com/zowe-actions/octorelease/blob/master/packages/npm/README.md#configuration), with these additions:
 
-| Options | Description | Default |
-| ------- | ----------- | ------- |
-| `pruneShrinkwrap` | List of packages in the workspace that should be published with a pruned npm-shrinkwrap.json. | `[]` |
-| `versionIndependent` | `true` to use each package's checked-in version, or a list of packages to override the shared version. Omitted or `false` uses the shared version. | `false` |
+| Option | Description | Default |
+| --- | --- | --- |
+| `pruneShrinkwrap` | Boolean or list of workspace package names whose `npm-shrinkwrap.json` should be pruned before packaging. | Disabled |
+| `versionIndependent` | Package names that receive their own version increments alongside the fixed workspace version. Names refer to `package.json` names, not directory paths. | Unset |
 | `packageTagFormat` | Package tag template, used for both discovery and creation. Requires `versionIndependent: true`. Supports `{{name}}` (full name), `{{shortName}}` (without scope), and `{{version}}`. | `"{{shortName}}-{{version}}"` |
 
 With `versionIndependent: true`, each package is compared with its own latest
@@ -101,4 +130,7 @@ release's major/minor/patch bump relative to their own versions, while unlisted
 packages use the shared version. Run the `version` stage before `publish` in the
 `true` mode, because versioning records which packages should be published.
 
-<!-- TODO Mention npm@7 or newer requirement for workspaces -->
+- Independent versioning updates changed packages and their dependent version ranges.
+- Private packages are not published to npm.
+- If no packages are found, run `npx lerna list --all --json` and check workspace globs.
+- Dry runs can update manifests, lockfiles, and temporary configuration. Use a disposable checkout.

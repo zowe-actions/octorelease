@@ -35,8 +35,12 @@ import { Logger } from "./logger";
 
 /**
  * Build global context object that is passed to all plugin handlers.
+ * Requires a recognized CI environment and a release configuration with a
+ * `branches` array. Plugins are configured here but initialized separately.
  * @param opts Options for building the context object
- * @returns Global context object for Octorelease
+ * @returns Shared release context, or undefined when no branch matches and
+ * `opts.force` is not set
+ * @throws If CI detection, configuration loading, or Git inspection fails
  */
 export async function buildContext(opts?: IContextOpts): Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
@@ -90,14 +94,17 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
  * @param cmd Command to be run (e.g. lerna)
  */
 export async function commandExists(cmd: string): Promise<boolean> {
-    return (await io.which(cmd, false)) != null;
+    return (await io.which(cmd, false))?.length > 0;
 }
 
 /**
  * In dry run mode skip the task, otherwise run it.
+ * Only the supplied callback is guarded; callers must separately handle any
+ * preparation, file writes, or external commands performed outside it.
  * @param context Global context object for Octorelease
  * @param description Description to log when task is skipped
  * @param task Callback to execute when not in dry run mode
+ * @returns Task result, or undefined when skipped
  */
 export async function dryRunTask<T>(
     context: IContext,
@@ -113,7 +120,7 @@ export async function dryRunTask<T>(
 
 /**
  * Load plugins listed in config by requiring their modules from disk.
- * If running as a GitHub Action, @octorelease-scoped plugins missing from
+ * If running as a GitHub Action, `@octorelease`-scoped plugins missing from
  * node_modules are loaded from the "dist" folder where they are bundled.
  * @param context Global context object for Octorelease
  * @returns Key-value pairs of plugin names and loaded modules

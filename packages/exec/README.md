@@ -1,6 +1,6 @@
 # Exec plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to execute shell commands.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin to execute shell commands.
 
 [![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
 [![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
@@ -21,7 +21,7 @@ $ npm install @octorelease/exec -D
 
 ## Usage
 
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Add this plugin to your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
 
 ```json
 {
@@ -35,14 +35,14 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 ### Options
 
-| Options | Description | Default |
+| Option | Description | Default |
 | ------- | ----------- | ------- |
 | `dryRunAllow` | List of stages for which command should be executed in dry run mode. | `[]` |
 | `failCmd`<br>`initCmd`<br>`publishCmd`<br>`successCmd`<br>`versionCmd` | Shell command to execute during the associated stage. | `null` |
 
 ### Examples
 
-To run custom command to publish npm package:
+Run a packaging command during `publish`:
 
 ```json
 {

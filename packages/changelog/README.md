@@ -1,6 +1,6 @@
 # Changelog plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to read and update changelogs.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin to read and update changelogs.
 
 [![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
 [![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
@@ -17,7 +17,7 @@ $ npm install @octorelease/changelog -D
 
 ## Usage
 
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Add this plugin to your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
 
 ```json
 {
@@ -31,7 +31,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 ### Options
 
-| Options | Description | Default |
+| Option | Description | Default |
 | ------- | ----------- | ------- |
 | `autoDisplayNames` | For a monorepo, automatically load display names from the top level header in `README.md` for each package. | `true` |
 | `changelogFile` | Path to changelog file to update. | `"CHANGELOG.md"` |
@@ -41,7 +41,7 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 ## Examples
 
-To define display names for "packages/api" and "packages/cli" folder in release notes:
+Set release-note headings for `packages/api` and `packages/cli`:
 
 ```json
 {
@@ -56,7 +56,7 @@ To define display names for "packages/api" and "packages/cli" folder in release 
 }
 ```
 
-To parse display names from readmes but omit the API package in release notes:
+Read display names from package READMEs and omit the API package:
 
 ```json
 {
