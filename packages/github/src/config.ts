@@ -22,5 +22,6 @@ export interface IPluginConfig {
     failComment?: boolean;
     githubUrl?: string;
     publishRelease?: boolean;
+    skipLabelPrompt?: string[];
     successComment?: boolean;
 }

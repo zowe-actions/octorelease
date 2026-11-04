@@ -48,6 +48,7 @@ Add this plugin to your [release configuration](https://github.com/zowe-actions/
 | `failComment` | Post error details on the associated pull request after a failed release. | `true` |
 | `githubUrl` | Hostname of private GitHub instance. | https://github.com |
 | `publishRelease` | Set `true` to publish the GitHub release associated with `assets` rather than leaving it in draft mode. | `false` |
+| `skipLabelPrompt` | PR labels that skip the prompt and wait for release labelling when `checkPrLabels` is enabled. | `[]` |
 | `successComment` | Post a comment on latest pull request after a successful release. | `true` |
 
 ### Examples
@@ -71,11 +72,11 @@ Choose version bumps from PR labels:
 {
   "plugins": [
     ["@octorelease/github", {
-      "checkPrLabels": ["release-current", "release-patch", "release-minor", "release-major"]
+      "checkPrLabels": ["release-current", "release-patch", "release-minor", "release-major"],
+      "skipLabelPrompt": ["dependencies"]
     }]
   ]
 }
 ```
 
-- A repository admin must add the label after the PR is merged.
-- If approval is needed, the plugin posts a reminder and waits up to 30 minutes for a label.
+The pull request label must be added by a repo admin after the pull request is merged. If you forget to add the label, a reminder comment will be posted on the pull request and you will have 30 minutes to add a label before the build times out. To disable the reminder comment for Dependabot PRs, set `skipLabelPrompt` to `["dependencies"]`.

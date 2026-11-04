@@ -94,7 +94,7 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
  * @param cmd Command to be run (e.g. lerna)
  */
 export async function commandExists(cmd: string): Promise<boolean> {
-    return (await io.which(cmd, false)) != null;
+    return (await io.which(cmd, false))?.length > 0;
 }
 
 /**

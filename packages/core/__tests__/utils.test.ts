@@ -14,12 +14,28 @@
  * limitations under the License.
  */
 
+import * as io from "@actions/io";
 import semver from "semver";
 import { type IContext, SemverDiffLevels } from "../src/doc";
-import { verifyConditions } from "../src/utils";
+import { commandExists, verifyConditions } from "../src/utils";
+
+vi.mock("@actions/io");
 
 describe("Utility functions", () => {
     const oldVersion = "1.0.0";
+
+    it("commandExists should return false when the command is missing", async () => {
+        vi.mocked(io.which).mockResolvedValueOnce("");
+
+        await expect(commandExists("ovsx")).resolves.toBe(false);
+        expect(io.which).toHaveBeenCalledWith("ovsx", false);
+    });
+
+    it("commandExists should return true when the command is on PATH", async () => {
+        vi.mocked(io.which).mockResolvedValueOnce("/usr/local/bin/ovsx");
+
+        await expect(commandExists("ovsx")).resolves.toBe(true);
+    });
 
     it("verifyConditions should append prerelease string to new version", async () => {
         const context: Partial<IContext> = {
