@@ -21,6 +21,7 @@ import type { IContext } from "@octorelease/core";
 import type { IPluginConfig } from "./config";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    if (context.packageReleases != null && context.version.prerelease) return;
     const changelogFile = config.changelogFile || "CHANGELOG.md";
     const headerLine = config.headerLine || "## Recent Changes";
     const changelogDirs = config.extraDirs || [];
@@ -42,8 +43,12 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     for (const relPath of changelogDirs) {
-        const changelogPath = path.join(path.relative(context.rootDir, relPath), changelogFile);
+        const directory = path.relative(context.rootDir, relPath);
+        const release = context.packageReleases?.find((pkg) => pkg.directory === directory);
+        if (context.packageReleases != null && release == null) continue;
+        const changelogPath = path.join(directory, changelogFile);
         const packageReleaseNotes = getPackageChangelog(context, changelogPath, headerLine);
+        if (release) release.releaseNotes = packageReleaseNotes;
 
         if (packageReleaseNotes != null) {
             releaseNotes[path.basename(relPath)] = packageReleaseNotes;
@@ -90,13 +95,14 @@ function getAutoDisplayNames(changelogDirs: string[]): Record<string, string> {
 
 function getPackageChangelog(context: IContext, changelogFile: string, headerLine: string): string | undefined {
     let releaseNotes = "";
+    const version = context.version.overrides[path.dirname(changelogFile)]?.new || context.version.new;
 
     if (fs.existsSync(changelogFile)) {
         const changelogLines: string[] = fs.readFileSync(changelogFile, "utf-8").split(/\r?\n/);
         // Look for changelog header before versioning ("## Recent Changes") or after versioning ("## `1.0.0`").
         // We support either format to allow for a manual version bump or rerun of a failed build.
         let lineNum = changelogLines.findIndex(
-            (line) => line.startsWith(headerLine) || line.startsWith(`## \`${context.version.new}\``),
+            (line) => line.startsWith(headerLine) || line.startsWith(`## \`${version}\``),
         );
 
         if (lineNum !== -1) {

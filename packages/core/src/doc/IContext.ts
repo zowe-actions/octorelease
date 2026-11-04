@@ -16,6 +16,7 @@
 
 import type { KnownCiEnv } from "env-ci";
 import type { Logger } from "../logger";
+import type { IPackageRelease } from "./IPackageRelease";
 import type { IProtectedBranch } from "./IProtectedBranch";
 import type { IReleasedPackage } from "./IReleasedPackage";
 import type { IVersionInfo } from "./IVersionInfo";
@@ -24,6 +25,12 @@ import type { IVersionInfo } from "./IVersionInfo";
  * Global context object for Octorelease
  */
 export interface IContext {
+    /** Independent release plan; undefined for shared versioning. */
+    packageReleases?: IPackageRelease[];
+
+    /** Commit shared by every Git tag in this release. */
+    releaseCommit?: string;
+
     /**
      * Properties for current Git branch
      * @example { name: "master", level: "minor" }

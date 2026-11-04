@@ -14,11 +14,30 @@
  * limitations under the License.
  */
 
-import type { IContext } from "@octorelease/core";
+import * as exec from "@actions/exec";
+import { utils as coreUtils, type IContext } from "@octorelease/core";
 import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
+    if (context.packageReleases != null) {
+        const releases = context.packageReleases.filter((release) => release.tagName != null);
+        if (context.version.prerelease || releases.length === 0) return;
+        await coreUtils.dryRunTask(context, "commit and tag independent releases", async () => {
+            if (context.changedFiles.length > 0) await utils.gitAdd(...new Set(context.changedFiles));
+            const versions = releases.map((release) => release.tagName).join(", ");
+            await utils.gitCommit((config.commitMessage || "Release {{version}}").replaceAll("{{version}}", versions));
+            context.releaseCommit = (await exec.getExecOutput("git", ["rev-parse", "HEAD"])).stdout.trim();
+            for (const release of releases) {
+                const message = config.tagMessage
+                    ?.replaceAll("{{version}}", release.version.new)
+                    .replaceAll("{{name}}", release.name);
+                await utils.gitTag(release.tagName!, message, context.releaseCommit);
+            }
+            await utils.gitPush(context, context.branch.name, true);
+        });
+        return;
+    }
     const commitMessage = config.commitMessage || "Bump version to {{version}}";
     let tagMessage =
         config.tagMessage || (context.branch.channel && `Release {{version}} to ${context.branch.channel}`);

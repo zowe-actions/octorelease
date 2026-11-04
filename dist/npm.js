@@ -1251,11 +1251,18 @@ async function npmView(pkgSpec, registry, property) {
   if (property != null) {
     cmdArgs.push(property);
   }
+  const cmdOutput = await getExecOutput("npm", cmdArgs, { ignoreReturnCode: true, silent: true });
+  let result;
   try {
-    const cmdOutput = await getExecOutput("npm", cmdArgs);
-    return JSON.parse(cmdOutput.stdout.trim());
+    result = JSON.parse(cmdOutput.stdout.trim());
   } catch {
+    if (cmdOutput.exitCode === 0) throw new Error(`Invalid JSON returned by npm view ${pkgSpec}`);
   }
+  if (cmdOutput.exitCode !== 0) {
+    if (result?.error?.code === "E404" || /\bcode E404\b/.test(cmdOutput.stderr)) return void 0;
+    throw new Error(`npm view ${pkgSpec} failed: ${cmdOutput.stderr.trim() || cmdOutput.stdout.trim()}`);
+  }
+  return result;
 }
 function verifyConditions(context) {
   const useTokenAuth = context.env.NPM_USERNAME == null && context.env.NPM_PASSWORD == null && context.env.NPM_EMAIL == null;
@@ -1341,14 +1348,15 @@ async function publish_default(context, config, inDir) {
         tarball: tgzFile,
         inDir
       });
-      context.releasedPackages.npm = [
-        ...context.releasedPackages.npm || [],
-        {
-          name: `${packageJson.name}@${packageJson.version}`,
-          url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
-          registry: npmRegistry
-        }
-      ];
+      if (!context.dryRun)
+        context.releasedPackages.npm = [
+          ...context.releasedPackages.npm || [],
+          {
+            name: `${packageJson.name}@${packageJson.version}`,
+            url: npmRegistry === DEFAULT_NPM_REGISTRY ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}` : void 0,
+            registry: npmRegistry
+          }
+        ];
     } else {
       context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
     }
@@ -1392,6 +1400,11 @@ var path6 = __toESM(require("node:path"));
 var import_core2 = require("./core");
 var import_delay = __toESM(require_delay());
 async function success_default(context, config) {
+  if (context.dryRun) {
+    if (config.smokeTest)
+      context.logger.info("Skipping registry smoke tests during dry run; no packages were published");
+    return;
+  }
   if (config.smokeTest && context.releasedPackages.npm != null) {
     context.logger.info("Performing smoke test, installing released package(s)");
     for (const { name, registry } of context.releasedPackages.npm) {

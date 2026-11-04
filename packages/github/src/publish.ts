@@ -27,8 +27,29 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         return;
     }
 
+    if (context.packageReleases != null) {
+        if (context.version.prerelease) return;
+        const releases = context.packageReleases.filter((release) => release.tagName != null);
+        if (releases.length === 0) return;
+        const commit = context.releaseCommit || context.ci.commit;
+        if (!commit) throw new Error("Missing release commit; configure the Git plugin before the GitHub plugin");
+        for (const release of releases) {
+            await publishRelease(context, config, release.tagName!, release.releaseNotes, commit);
+        }
+        return;
+    }
+    await publishRelease(context, config, context.tagPrefix + context.version.new, context.releaseNotes);
+}
+
+async function publishRelease(
+    context: IContext,
+    config: IPluginConfig,
+    tagName: string,
+    notes?: string,
+    commit?: string,
+): Promise<void> {
     const octokit = utils.getOctokit(context, config);
-    const release = await createRelease(context, octokit);
+    const release = await createRelease(context, octokit, tagName, notes, commit);
     if (config.assets != null && config.assets.length > 0) {
         const assetPaths: string[] = typeof config.assets === "string" ? [config.assets] : config.assets;
         await uploadAssets(context, octokit, release, assetPaths);
@@ -40,14 +61,19 @@ export default async function (context: IContext, config: IPluginConfig): Promis
                 ...context.ci.repo,
                 release_id: release.data.id,
                 draft: false,
-                make_latest: "legacy",
+                make_latest: context.packageReleases != null ? "false" : "legacy",
             });
         });
     }
 }
 
-async function createRelease(context: IContext, octokit: utils.Octokit): Promise<Record<string, any>> {
-    const tagName = context.tagPrefix + context.version.new;
+async function createRelease(
+    context: IContext,
+    octokit: utils.Octokit,
+    tagName: string,
+    notes?: string,
+    commit?: string,
+): Promise<Record<string, any>> {
     let release: any;
 
     // Get release if it already exists
@@ -69,7 +95,8 @@ async function createRelease(context: IContext, octokit: utils.Octokit): Promise
             return octokit.rest.repos.createRelease({
                 ...context.ci.repo,
                 tag_name: tagName,
-                body: context.releaseNotes,
+                body: notes,
+                ...(commit ? { target_commitish: commit } : {}),
                 draft: true,
                 prerelease: context.version.prerelease != null,
             });

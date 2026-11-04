@@ -2,7 +2,8 @@
 
 Automate package versioning and publishing with a configurable release workflow.
 
-[![Test](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
 Octorelease runs version updates, changelogs, publishing, and release notifications in CI. Use the GitHub Action or CLI. Inspired by [semantic-release](https://github.com/semantic-release/semantic-release).
 

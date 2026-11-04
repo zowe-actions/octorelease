@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-const package = require("path").basename(process.env["INPUT_WORKING-DIR"]);
 module.exports = {
     branches: [
         {
             name: "master",
-            level: "minor"
+            channel: "next",
+            prerelease: "next",
         },
         {
-            name: "next",
-            prerelease: true
-        }
+            name: "chore/publish-prerelease",
+            channel: "next",
+            prerelease: "next",
+        },
     ],
     plugins: [
-        "@octorelease/changelog",
-        ["@octorelease/npm", {
-            smokeTest: true,
-            tarballDir: "dist"
-        }],
-        ["@octorelease/github", {
-            assets: "dist/*.tgz"
-        }],
-        ["@octorelease/git", {
-            commitMessage: "Bump " + package + " version to {{version}}"
-        }]
+        [
+            "@octorelease/lerna",
+            {
+                publishRegistry: "https://zowe.jfrog.io/zowe/api/npm/npm-local-release/",
+                smokeTest: true,
+                versionIndependent: true,
+            },
+        ],
     ],
-    tagPrefix: package + "-"
 };

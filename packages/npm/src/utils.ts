@@ -94,12 +94,18 @@ export async function npmView(pkgSpec: string, registry: string, property?: stri
     if (property != null) {
         cmdArgs.push(property);
     }
+    const cmdOutput = await exec.getExecOutput("npm", cmdArgs, { ignoreReturnCode: true, silent: true });
+    let result: any;
     try {
-        const cmdOutput = await exec.getExecOutput("npm", cmdArgs);
-        return JSON.parse(cmdOutput.stdout.trim());
+        result = JSON.parse(cmdOutput.stdout.trim());
     } catch {
-        /* Do nothing */
+        if (cmdOutput.exitCode === 0) throw new Error(`Invalid JSON returned by npm view ${pkgSpec}`);
     }
+    if (cmdOutput.exitCode !== 0) {
+        if (result?.error?.code === "E404" || /\bcode E404\b/.test(cmdOutput.stderr)) return undefined;
+        throw new Error(`npm view ${pkgSpec} failed: ${cmdOutput.stderr.trim() || cmdOutput.stdout.trim()}`);
+    }
+    return result;
 }
 
 export function verifyConditions(context: IContext): boolean {

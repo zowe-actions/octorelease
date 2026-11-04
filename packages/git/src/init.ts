@@ -19,6 +19,7 @@ import type { IPluginConfig } from "./config";
 import * as utils from "./utils";
 
 export default async function (context: IContext, _config: IPluginConfig): Promise<void> {
+    if (context.packageReleases != null && context.version.prerelease) return;
     if (context.env.GIT_COMMITTER_NAME == null) {
         throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
     }

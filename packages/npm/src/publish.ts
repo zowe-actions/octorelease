@@ -68,17 +68,18 @@ export default async function (context: IContext, config: IPluginConfig, inDir?:
                 inDir,
             });
 
-            context.releasedPackages.npm = [
-                ...(context.releasedPackages.npm || []),
-                {
-                    name: `${packageJson.name}@${packageJson.version}`,
-                    url:
-                        npmRegistry === DEFAULT_NPM_REGISTRY
-                            ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}`
-                            : undefined,
-                    registry: npmRegistry,
-                },
-            ];
+            if (!context.dryRun)
+                context.releasedPackages.npm = [
+                    ...(context.releasedPackages.npm || []),
+                    {
+                        name: `${packageJson.name}@${packageJson.version}`,
+                        url:
+                            npmRegistry === DEFAULT_NPM_REGISTRY
+                                ? `https://www.npmjs.com/package/${packageJson.name}/v/${packageJson.version}`
+                                : undefined,
+                        registry: npmRegistry,
+                    },
+                ];
         } else {
             context.logger.error(`Version ${packageJson.version} has already been published to NPM`);
         }

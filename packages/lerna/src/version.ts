@@ -20,17 +20,29 @@ import * as glob from "@actions/glob";
 import type { IContext } from "@octorelease/core";
 import { utils as npmUtils } from "@octorelease/npm";
 import findUp from "find-up";
-import { type IPluginConfig, IS_LERNA_JSON_TEMP } from "./config";
+import type { IPluginConfig } from "./config";
+import { LernaState } from "./state";
 import * as utils from "./utils";
 
 export default async function (context: IContext, config: IPluginConfig): Promise<void> {
-    if (context.version.old === context.version.new) {
+    const state = LernaState.get(config);
+    if (config.versionIndependent !== true && context.version.old === context.version.new) {
         context.logger.info("Version in lerna.json is already up to date");
         return;
     }
 
-    if (config.versionIndependent != null) {
-        // Lerna doesn't support hybrid fixed/independent versioning so we handle it ourselves
+    if (config.versionIndependent === true) {
+        context.packageReleases = await utils.planPackageReleases(context, config);
+        if (context.packageReleases.length === 0) return;
+        for (const release of context.packageReleases) {
+            context.version.overrides[release.directory] = release.version;
+            await updateIndependentVersion(
+                context,
+                { name: release.name, location: path.join(context.rootDir, release.directory) },
+                release.version.new,
+            );
+        }
+    } else if (Array.isArray(config.versionIndependent)) {
         const changedPackageInfo = await utils.lernaList(true);
         const lernaJson = JSON.parse(fs.readFileSync("lerna.json", "utf-8"));
         lernaJson.version = context.version.new;
@@ -50,14 +62,18 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     }
 
     context.changedFiles.push("package.json");
-    if (!config[IS_LERNA_JSON_TEMP]) {
-        context.changedFiles.push("lerna.json");
-    } else {
-        const oldPkgRaw = fs.readFileSync("package.json").toString();
-        // Detect indentation here :yum:
-        const pkgJson = JSON.parse(oldPkgRaw);
-        pkgJson.version = context.version.new;
-        fs.writeFileSync("package.json", JSON.stringify(pkgJson, null, 2) + "\n");
+    if (config.versionIndependent !== true) {
+        if (!state.isLernaJsonTemp) {
+            context.changedFiles.push("lerna.json");
+        } else {
+            const oldPkgRaw = fs.readFileSync("package.json").toString();
+            // Detect indentation here :yum:
+            const pkgJson = JSON.parse(oldPkgRaw);
+            if (pkgJson.version != null) {
+                pkgJson.version = context.version.new;
+                fs.writeFileSync("package.json", JSON.stringify(pkgJson, null, 2) + "\n");
+            }
+        }
     }
 
     await utils.lernaPostVersion(); // Update lockfile because lerna doesn't
@@ -68,7 +84,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
     } else {
         context.logger.warn("Could not find lockfile to update version in");
     }
-    for (const { location } of await utils.lernaList(false)) {
+    for (const { location } of state.workspacePackages ?? (await utils.lernaList(false))) {
         const relLocation = path.relative(context.rootDir, location);
         context.changedFiles.push(path.join(relLocation, "package.json"));
     }

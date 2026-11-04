@@ -1,5 +1,9 @@
 # Changelog
 
+## Recent Changes
+
+* Added GitHub Releases for independent packages using their own tags and notes at a shared commit.
+
 ## `1.0.0`
 
 * Fix release labels not detected on PRs

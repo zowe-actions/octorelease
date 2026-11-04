@@ -6,8 +6,8 @@
 
 CLI and plugin APIs for [Octorelease](https://github.com/zowe-actions/octorelease), a configurable release workflow for CI.
 
-[![Test](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
-[![npm version](https://img.shields.io/npm/v/@octorelease/core/latest.svg)](https://www.npmjs.com/package/@octorelease/core)
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
 
 ## Install
 

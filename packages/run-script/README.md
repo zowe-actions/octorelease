@@ -2,6 +2,9 @@
 
 GitHub action to run scripts in [Octorelease](https://github.com/zowe-actions/octorelease) context.
 
+[![Build Status](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/zowe-actions/octorelease/actions/workflows/test.yml)
+[![Latest GitHub tag](https://img.shields.io/github/v/tag/zowe-actions/octorelease?sort=date&label=tag)](https://github.com/zowe-actions/octorelease/tags)
+
 ## Inputs
 
 ### `config-dir`

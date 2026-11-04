@@ -19,6 +19,7 @@
 - [IConfig](interfaces/IConfig.md)
 - [IContext](interfaces/IContext.md)
 - [IContextOpts](interfaces/IContextOpts.md)
+- [IPackageRelease](interfaces/IPackageRelease.md)
 - [IPlugin](interfaces/IPlugin.md)
 - [IPluginsLoaded](interfaces/IPluginsLoaded.md)
 - [IProtectedBranch](interfaces/IProtectedBranch.md)

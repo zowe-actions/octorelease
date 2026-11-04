@@ -23903,7 +23903,7 @@ var require_package = __commonJS({
         "@actions/core": "^3.0.0",
         "@actions/exec": "^3.0.0",
         "@actions/github": "^9.0.0",
-        "@octorelease/core": "^1.0.0",
+        "@octorelease/core": "^1.0.0-next",
         pluralize: "^8.0.0",
         semver: "^7.5.2"
       },

@@ -1,5 +1,10 @@
 # Changelog
 
+## Recent Changes
+
+* Skip registry smoke tests during dry runs and do not record simulated publications as released packages.
+* Silence expected registry 404s for unpublished packages while reporting other registry errors.
+
 ## `1.0.2`
 
 * Fixed `npm version` being run when version is already deployed

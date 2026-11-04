@@ -849,21 +849,28 @@ async function gitPush(context, branch, tags) {
   await exec("git", cmdArgs);
   return true;
 }
-async function gitTag(tagName, message) {
+async function gitTag(tagName, message, commit) {
   const cmdOutput = await getExecOutput("git", ["tag", "-l", tagName]);
   if (cmdOutput.stdout.trim().length > 0) {
+    if (commit != null) {
+      const existing = await getExecOutput("git", ["rev-parse", `refs/tags/${tagName}^{commit}`]);
+      if (existing.stdout.trim() !== commit)
+        throw new Error(`Git tag ${tagName} already points to another commit`);
+    }
     return false;
   }
   const cmdArgs = ["tag", tagName];
   if (message != null) {
     cmdArgs.push("-a", "-m", message);
   }
+  if (commit != null) cmdArgs.push(commit);
   await exec("git", cmdArgs);
   return true;
 }
 
 // src/init.ts
 async function init_default(context, _config) {
+  if (context.packageReleases != null && context.version.prerelease) return;
   if (context.env.GIT_COMMITTER_NAME == null) {
     throw new Error("Required environment variable GIT_COMMITTER_NAME is undefined");
   }
@@ -874,7 +881,24 @@ async function init_default(context, _config) {
 }
 
 // src/version.ts
+var import_core = require("./core");
 async function version_default(context, config) {
+  if (context.packageReleases != null) {
+    const releases = context.packageReleases.filter((release) => release.tagName != null);
+    if (context.version.prerelease || releases.length === 0) return;
+    await import_core.utils.dryRunTask(context, "commit and tag independent releases", async () => {
+      if (context.changedFiles.length > 0) await gitAdd(...new Set(context.changedFiles));
+      const versions = releases.map((release) => release.tagName).join(", ");
+      await gitCommit((config.commitMessage || "Release {{version}}").replaceAll("{{version}}", versions));
+      context.releaseCommit = (await getExecOutput("git", ["rev-parse", "HEAD"])).stdout.trim();
+      for (const release of releases) {
+        const message = config.tagMessage?.replaceAll("{{version}}", release.version.new).replaceAll("{{name}}", release.name);
+        await gitTag(release.tagName, message, context.releaseCommit);
+      }
+      await gitPush(context, context.branch.name, true);
+    });
+    return;
+  }
   const commitMessage = config.commitMessage || "Bump version to {{version}}";
   let tagMessage = config.tagMessage || context.branch.channel && `Release {{version}} to ${context.branch.channel}`;
   await gitAdd(...new Set(context.changedFiles));

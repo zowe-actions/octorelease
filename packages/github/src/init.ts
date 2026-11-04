@@ -27,7 +27,7 @@ export default async function (context: IContext, config: IPluginConfig): Promis
         throw new Error("Required environment variable GITHUB_TOKEN is undefined");
     }
 
-    if (config.checkPrLabels && Inputs.newVersion == null) {
+    if (config.checkPrLabels && Inputs.newVersion == null && context.packageReleases == null) {
         const releaseType = await getPrReleaseType(context, config);
         context.version.old = context.version.new || context.version.old;
         const oldVersion = context.version.old.split("-")[0];

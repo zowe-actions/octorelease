@@ -17,6 +17,7 @@
 export * from "./IConfig";
 export * from "./IContext";
 export * from "./IContextOpts";
+export * from "./IPackageRelease";
 export * from "./IPlugin";
 export * from "./IPluginsLoaded";
 export * from "./IProtectedBranch";

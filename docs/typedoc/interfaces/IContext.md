@@ -6,7 +6,7 @@
 
 # Interface: IContext
 
-Defined in: [doc/IContext.ts:26](/packages/core/src/doc/IContext.ts#L26)
+Defined in: [doc/IContext.ts:27](/packages/core/src/doc/IContext.ts#L27)
 
 Global context object for Octorelease
 
@@ -16,7 +16,7 @@ Global context object for Octorelease
 
 > **branch**: [`IProtectedBranch`](IProtectedBranch.md)
 
-Defined in: [doc/IContext.ts:31](/packages/core/src/doc/IContext.ts#L31)
+Defined in: [doc/IContext.ts:38](/packages/core/src/doc/IContext.ts#L38)
 
 Properties for current Git branch
 
@@ -32,7 +32,7 @@ Properties for current Git branch
 
 > **changedFiles**: `string`[]
 
-Defined in: [doc/IContext.ts:37](/packages/core/src/doc/IContext.ts#L37)
+Defined in: [doc/IContext.ts:44](/packages/core/src/doc/IContext.ts#L44)
 
 List of changed files to stage
 
@@ -48,7 +48,7 @@ List of changed files to stage
 
 > **ci**: `KnownCiEnv` & `object`
 
-Defined in: [doc/IContext.ts:43](/packages/core/src/doc/IContext.ts#L43)
+Defined in: [doc/IContext.ts:50](/packages/core/src/doc/IContext.ts#L50)
 
 Properties for current CI environment
 
@@ -78,7 +78,7 @@ Properties for current CI environment
 
 > **dryRun**: `boolean`
 
-Defined in: [doc/IContext.ts:53](/packages/core/src/doc/IContext.ts#L53)
+Defined in: [doc/IContext.ts:60](/packages/core/src/doc/IContext.ts#L60)
 
 If true, don't make any changes but report what would have been done
 
@@ -88,7 +88,7 @@ If true, don't make any changes but report what would have been done
 
 > **env**: `Record`\<`string`, `string`\>
 
-Defined in: [doc/IContext.ts:58](/packages/core/src/doc/IContext.ts#L58)
+Defined in: [doc/IContext.ts:65](/packages/core/src/doc/IContext.ts#L65)
 
 Environment variables
 
@@ -98,7 +98,7 @@ Environment variables
 
 > `optional` **failError?**: `Error`
 
-Defined in: [doc/IContext.ts:63](/packages/core/src/doc/IContext.ts#L63)
+Defined in: [doc/IContext.ts:70](/packages/core/src/doc/IContext.ts#L70)
 
 Error object defined for "fail" stage
 
@@ -108,9 +108,19 @@ Error object defined for "fail" stage
 
 > **logger**: [`Logger`](../classes/Logger.md)
 
-Defined in: [doc/IContext.ts:68](/packages/core/src/doc/IContext.ts#L68)
+Defined in: [doc/IContext.ts:75](/packages/core/src/doc/IContext.ts#L75)
 
 Logger for writing to console
+
+***
+
+### packageReleases?
+
+> `optional` **packageReleases?**: [`IPackageRelease`](IPackageRelease.md)[]
+
+Defined in: [doc/IContext.ts:29](/packages/core/src/doc/IContext.ts#L29)
+
+Independent release plan; undefined for shared versioning.
 
 ***
 
@@ -118,7 +128,7 @@ Logger for writing to console
 
 > **plugins**: `object`
 
-Defined in: [doc/IContext.ts:74](/packages/core/src/doc/IContext.ts#L74)
+Defined in: [doc/IContext.ts:81](/packages/core/src/doc/IContext.ts#L81)
 
 Key-value pairs of plugin names and configuration objects
 
@@ -134,11 +144,21 @@ Key-value pairs of plugin names and configuration objects
 
 ***
 
+### releaseCommit?
+
+> `optional` **releaseCommit?**: `string`
+
+Defined in: [doc/IContext.ts:32](/packages/core/src/doc/IContext.ts#L32)
+
+Commit shared by every Git tag in this release.
+
+***
+
 ### releasedPackages
 
 > **releasedPackages**: `object`
 
-Defined in: [doc/IContext.ts:80](/packages/core/src/doc/IContext.ts#L80)
+Defined in: [doc/IContext.ts:87](/packages/core/src/doc/IContext.ts#L87)
 
 Key-value pairs of release types and released package info
 
@@ -158,7 +178,7 @@ Key-value pairs of release types and released package info
 
 > `optional` **releaseNotes?**: `string`
 
-Defined in: [doc/IContext.ts:85](/packages/core/src/doc/IContext.ts#L85)
+Defined in: [doc/IContext.ts:92](/packages/core/src/doc/IContext.ts#L92)
 
 Multi-line string containing changelog
 
@@ -168,7 +188,7 @@ Multi-line string containing changelog
 
 > **rootDir**: `string`
 
-Defined in: [doc/IContext.ts:90](/packages/core/src/doc/IContext.ts#L90)
+Defined in: [doc/IContext.ts:97](/packages/core/src/doc/IContext.ts#L97)
 
 Absolute path of project root directory
 
@@ -178,7 +198,7 @@ Absolute path of project root directory
 
 > **tagPrefix**: `string`
 
-Defined in: [doc/IContext.ts:95](/packages/core/src/doc/IContext.ts#L95)
+Defined in: [doc/IContext.ts:102](/packages/core/src/doc/IContext.ts#L102)
 
 Git tag prefix that precedes version number (default is "v")
 
@@ -188,7 +208,7 @@ Git tag prefix that precedes version number (default is "v")
 
 > **version**: [`IVersionInfo`](IVersionInfo.md)
 
-Defined in: [doc/IContext.ts:101](/packages/core/src/doc/IContext.ts#L101)
+Defined in: [doc/IContext.ts:108](/packages/core/src/doc/IContext.ts#L108)
 
 Version info including old and new project version
 
@@ -204,7 +224,7 @@ Version info including old and new project version
 
 > `optional` **workspaces?**: `string`[]
 
-Defined in: [doc/IContext.ts:107](/packages/core/src/doc/IContext.ts#L107)
+Defined in: [doc/IContext.ts:114](/packages/core/src/doc/IContext.ts#L114)
 
 Subpackage paths or globs for monorepo
 
