@@ -29,6 +29,23 @@ Custom working directory to use instead of the project root.
 
 The output of the script for other steps to reference.
 
+## Permissions
+
+For events such as `push` and `workflow_run`, the action uses the GitHub API to find
+pull requests associated with the triggering commit. This existing lookup requires
+`pull-requests: read` for the `github-token`.
+
+For example, a workflow that checks out the repository and runs a script can use:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: read
+```
+
+Scripts and plugins may require additional permissions for their operations, such as
+`contents: write` to push repository changes.
+
 ## Example usage
 
 ```yaml
