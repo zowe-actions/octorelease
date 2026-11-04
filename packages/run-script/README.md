@@ -1,6 +1,6 @@
 # Run Script action
 
-GitHub action to run scripts in [Octorelease](https://github.com/octorelease/octorelease) context.
+GitHub action to run scripts in [Octorelease](https://github.com/zowe-actions/octorelease) context.
 
 ## Inputs
 

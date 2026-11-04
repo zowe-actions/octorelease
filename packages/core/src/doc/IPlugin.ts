@@ -17,7 +17,10 @@
 import type { IContext } from "./IContext";
 
 /**
- * Type for loaded plugin modules
+ * Named async handlers exported by a plugin module.
+ * Core awaits each handler and ignores its return value. Handlers communicate
+ * through the shared context and throw an Error to fail the stage. Each plugin
+ * is responsible for respecting `context.dryRun` before making changes.
  */
 export interface IPlugin {
     /**

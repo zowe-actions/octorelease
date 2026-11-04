@@ -1,8 +1,8 @@
 # VSCE plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to VS Code extensions.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin to package and publish VS Code extensions.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
+[![Build Status](https://github.com/zowe-actions/octorelease/workflows/Test/badge.svg)](https://github.com/zowe-actions/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
 [![npm latest version](https://img.shields.io/npm/v/@octorelease/vsce/latest.svg)](https://www.npmjs.com/package/@octorelease/vsce)
 <!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/vsce/next.svg)](https://www.npmjs.com/package/@octorelease/vsce) -->
 
@@ -19,7 +19,7 @@ $ npm install @octorelease/vsce -D
 
 ## Usage
 
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Add this plugin to your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
 
 ```json
 {
@@ -35,15 +35,15 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 | Variable | Description |
 | -------- | ----------- |
-| `OVSX_TOKEN` | Personal access token for the OVSX registry. |
-| `VSCE_TOKEN` | Personal access token for the VS Code marketplace. |
+| `OVSX_PAT` | Personal access token for the OVSX registry. |
+| `VSCE_PAT` | Personal access token for the VS Code marketplace. |
 
 ### Options
 
-| Options | Description | Default |
+| Option | Description | Default |
 | ------- | ----------- | ------- |
-| `ovsxPublish` | Specify true to publish to the OVSX registry. | `false` |
-| `vscePublish` | Specify false to skip publishing to the VS Code marketplace. | `true` |
+| `ovsxPublish` | Set `true` to publish to the OVSX registry. | `false` |
+| `vscePublish` | Set `false` to skip publishing to the VS Code marketplace. | `true` |
 | `vsixDir` | Path to directory where extension bundle (VSIX) should be generated, or `false` to skip creating a VSIX. If specified, the VSIX is packaged only once which guarantees that the same file is reused in later steps. | `false` |
 
 ### Examples
@@ -62,7 +62,7 @@ To publish extension VSIX to both VS Code marketplace and OVSX registry:
 ```
 
 ---
-To skip publishing to any registry and release the extension VSIX with another plugin like [@octorelease/github](https://github.com/octorelease/octorelease/tree/master/packages/github):
+To skip publishing to any registry and release the extension VSIX with another plugin like [@octorelease/github](https://github.com/zowe-actions/octorelease/tree/master/packages/github):
 
 ```json
 {

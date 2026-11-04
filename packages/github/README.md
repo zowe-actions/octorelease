@@ -1,8 +1,8 @@
 # GitHub plugin
 
-[Octorelease](https://github.com/octorelease/octorelease) plugin to perform actions related to GitHub.
+[Octorelease](https://github.com/zowe-actions/octorelease) plugin to manage releases, assets, and pull request notifications on GitHub.
 
-[![Build Status](https://github.com/octorelease/octorelease/workflows/Test/badge.svg)](https://github.com/octorelease/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
+[![Build Status](https://github.com/zowe-actions/octorelease/workflows/Test/badge.svg)](https://github.com/zowe-actions/octorelease/actions?query=workflow%3ATest+branch%3Amaster)
 [![npm latest version](https://img.shields.io/npm/v/@octorelease/github/latest.svg)](https://www.npmjs.com/package/@octorelease/github)
 <!-- [![npm next version](https://img.shields.io/npm/v/@octorelease/github/next.svg)](https://www.npmjs.com/package/@octorelease/github) -->
 
@@ -21,7 +21,7 @@ $ npm install @octorelease/github -D
 
 ## Usage
 
-The plugin can be configured in the [Octorelease configuration file](https://github.com/octorelease/octorelease/blob/master/docs/usage.md#configuration):
+Add this plugin to your [release configuration](https://github.com/zowe-actions/octorelease/blob/master/docs/usage.md#configuration):
 
 ```json
 {
@@ -41,19 +41,19 @@ The plugin can be configured in the [Octorelease configuration file](https://git
 
 ### Options
 
-| Options | Description | Default |
+| Option | Description | Default |
 | ------- | ----------- | ------- |
 | `assets` | File patterns to upload to draft GitHub release. Can specify one string or an array of strings. | `[]` |
-| `checkPrLabels` | Specify true to check pull request labels for a semver bump level. Can specify `true` to use default labels, or an array of custom label names (see example below). | `false` |
-| `failComment` | Create a GitHub issue with error details after a failed release. | `true` |
+| `checkPrLabels` | Set `true` to check pull request labels for a semver bump level. Can specify `true` to use default labels, or an array of custom label names (see example below). | `false` |
+| `failComment` | Post error details on the associated pull request after a failed release. | `true` |
 | `githubUrl` | Hostname of private GitHub instance. | https://github.com |
-| `publishRelease` | Specify true to publish the GitHub release associated with `assets` rather than leaving it in draft mode. | `false` |
+| `publishRelease` | Set `true` to publish the GitHub release associated with `assets` rather than leaving it in draft mode. | `false` |
 | `skipLabelPrompt` | PR labels that skip the prompt and wait for release labelling when `checkPrLabels` is enabled. | `[]` |
 | `successComment` | Post a comment on latest pull request after a successful release. | `true` |
 
 ### Examples
 
-To publish any TGZ archive created in the project root directory:
+Upload TGZ archives from the project root to a draft release:
 
 ```json
 {
@@ -66,7 +66,7 @@ To publish any TGZ archive created in the project root directory:
 ```
 
 ---
-To check pull request labels for a semver bump level:
+Choose version bumps from PR labels:
 
 ```json
 {

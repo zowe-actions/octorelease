@@ -6,7 +6,7 @@
 
 # Interface: IPluginsLoaded
 
-Defined in: [doc/IPluginsLoaded.ts:22](https://github.com/zowe-actions/octorelease/blob/fix/command-exists-check/packages/core/src/doc/IPluginsLoaded.ts#L22)
+Defined in: [doc/IPluginsLoaded.ts:22](/packages/core/src/doc/IPluginsLoaded.ts#L22)
 
 Contains key-value pairs of plugin names and loaded modules
 

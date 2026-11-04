@@ -35,8 +35,12 @@ import { Logger } from "./logger";
 
 /**
  * Build global context object that is passed to all plugin handlers.
+ * Requires a recognized CI environment and a release configuration with a
+ * `branches` array. Plugins are configured here but initialized separately.
  * @param opts Options for building the context object
- * @returns Global context object for Octorelease
+ * @returns Shared release context, or undefined when no branch matches and
+ * `opts.force` is not set
+ * @throws If CI detection, configuration loading, or Git inspection fails
  */
 export async function buildContext(opts?: IContextOpts): Promise<IContext | undefined> {
     const envCi = await loadCiEnv();
@@ -95,9 +99,12 @@ export async function commandExists(cmd: string): Promise<boolean> {
 
 /**
  * In dry run mode skip the task, otherwise run it.
+ * Only the supplied callback is guarded; callers must separately handle any
+ * preparation, file writes, or external commands performed outside it.
  * @param context Global context object for Octorelease
  * @param description Description to log when task is skipped
  * @param task Callback to execute when not in dry run mode
+ * @returns Task result, or undefined when skipped
  */
 export async function dryRunTask<T>(
     context: IContext,
