@@ -90,7 +90,7 @@ export async function buildContext(opts?: IContextOpts): Promise<IContext | unde
  * @param cmd Command to be run (e.g. lerna)
  */
 export async function commandExists(cmd: string): Promise<boolean> {
-    return (await io.which(cmd, false)) != null;
+    return (await io.which(cmd, false))?.length > 0;
 }
 
 /**
@@ -113,7 +113,7 @@ export async function dryRunTask<T>(
 
 /**
  * Load plugins listed in config by requiring their modules from disk.
- * If running as a GitHub Action, @octorelease-scoped plugins missing from
+ * If running as a GitHub Action, `@octorelease`-scoped plugins missing from
  * node_modules are loaded from the "dist" folder where they are bundled.
  * @param context Global context object for Octorelease
  * @returns Key-value pairs of plugin names and loaded modules
